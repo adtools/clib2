@@ -1,5 +1,5 @@
 /*
- * $Id: string_memchr.c,v 1.1.1.1 2004-07-26 16:32:15 obarthel Exp $
+ * $Id: string_memchr.c,v 1.2 2004-08-14 11:11:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,12 +40,6 @@
 #ifndef _STRING_HEADERS_H
 #include "string_headers.h"
 #endif /* _STRING_HEADERS_H */
-
-/****************************************************************************/
-
-#define IS_UNALIGNED(a) 	((((unsigned long)(a)) & 1) != 0)
-#define IS_SHORT_ALIGNED(a)	((((unsigned long)(a)) & 3) == 2)
-#define IS_LONG_ALIGNED(a)	((((unsigned long)(a)) & 1) == 0)
 
 /****************************************************************************/
 

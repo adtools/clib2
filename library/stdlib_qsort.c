@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_qsort.c,v 1.1.1.1 2004-07-26 16:32:02 obarthel Exp $
+ * $Id: stdlib_qsort.c,v 1.2 2004-08-14 11:11:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,7 +81,7 @@
 /* For an 68030 and beyond the alignment does not matter and you can skip the
    second half of the test (everything beyond the 'nbytes >= sizeof(long)'). */
 #if defined(M68020)
-#define IS_WORD_ALIGNED(a,b) 1
+#define IS_WORD_ALIGNED(a,b) (1)
 #else
 #define IS_WORD_ALIGNED(a,b) (((((unsigned long)(a)) | ((unsigned long)(b))) & 1) == 0)
 #endif /* M68020 */

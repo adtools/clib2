@@ -1,5 +1,5 @@
 /*
- * $Id: string_memcpy.c,v 1.2 2004-08-14 10:00:33 obarthel Exp $
+ * $Id: string_memcpy.c,v 1.3 2004-08-14 11:11:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -226,12 +226,6 @@ memcpy(void *dst, const void *src, size_t len)
 /****************************************************************************/
 
 #else
-
-/****************************************************************************/
-
-#define IS_UNALIGNED(a) 	((((unsigned long)(a)) & 1) != 0)
-#define IS_SHORT_ALIGNED(a)	((((unsigned long)(a)) & 3) == 2)
-#define IS_LONG_ALIGNED(a)	((((unsigned long)(a)) & 1) == 0)
 
 /****************************************************************************/
 

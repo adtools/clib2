@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.3 2004-08-08 10:55:57 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.4 2004-08-14 11:11:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -635,6 +635,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				char *			buffer_start	= buffer;
 
 				__long_double_t v;
+				int sign;
 
 				output_buffer = buffer_start;
 
@@ -645,14 +646,14 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				else
 					v = va_arg(arg, double);
 
-				if(isinf(v) != 0)
+				if((sign = isinf(v)) != 0)
 				{
 					SHOWMSG("infinity");
 
 					strcpy(output_buffer,"Inf");
 					output_len = 3;
 
-					if(v < 0.0)
+					if(sign < 0)
 						SET_FLAG(format_flags,FORMATF_IsNegative);
 
 					fill_character = ' ';

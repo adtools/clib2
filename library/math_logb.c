@@ -1,5 +1,5 @@
 /*
- * $Id: math_logb.c,v 1.1 2004-08-12 12:31:16 obarthel Exp $
+ * $Id: math_logb.c,v 1.2 2004-08-14 11:11:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,7 +59,7 @@ __logb(double x)
 {
 	double result;
 
-	result = log(x) / log(FLT_RADIX);
+	result = log(x) / log((double)FLT_RADIX);
 
 	return(result);
 }
