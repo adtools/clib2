@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.7 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.8 2005-02-20 09:03:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,6 +47,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 	DECLARE_UTILITYBASE();
 	struct file_hook_message message;
 	struct flock * l;
+	int vacant_slot;
 	int result = -1;
 	struct fd * fd;
 	va_list arg;
@@ -91,15 +92,14 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			}
 
 			va_start(arg,cmd);
-
 			l = va_arg(arg,struct flock *);
+			va_end(arg);
 
 			assert( l != NULL );
 
 			if(l->l_type < F_RDLCK || l->l_type > F_WRLCK)
 			{
 				SHOWMSG("invalid flock type");
-				va_end(arg);
 
 				__set_errno(EINVAL);
 				break;
@@ -108,17 +108,18 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			if(l->l_whence < SEEK_SET || l->l_whence > SEEK_END)
 			{
 				SHOWMSG("invalid flock offset");
-				va_end(arg);
 
 				__set_errno(EINVAL);
 				break;
 			}
 
-			result = __handle_record_locking(cmd,l,fd,&error);
-			if(result < 0)
+			if(__handle_record_locking(cmd,l,fd,&error) < 0)
+			{
 				__set_errno(error);
+				goto out;
+			}
 
-			va_end(arg);
+			result = 0;
 
 			break;
 
@@ -132,13 +133,13 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				goto out;
 			}
 
-			result = 0;
-
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING))
 				SET_FLAG(result,O_NONBLOCK);
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_ASYNC_IO))
 				SET_FLAG(result,O_ASYNC);
+
+			result = 0;
 
 			break;
 
@@ -152,11 +153,9 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				goto out;
 			}
 
-			result = 0;
-
 			va_start(arg,cmd);
-
 			flags = va_arg(arg,int);
+			va_end(arg);
 
 			if((FLAG_IS_SET(flags,O_NONBLOCK) && FLAG_IS_CLEAR(fd->fd_Flags,FDF_NON_BLOCKING)) ||
 			   (FLAG_IS_CLEAR(flags,O_NONBLOCK) && FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING)))
@@ -168,12 +167,10 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 
 				CallHookPkt(fd->fd_Hook,fd,&message);
 
-				result = message.result;
-				if(result < 0)
+				if(message.result < 0)
 				{
 					__set_errno(message.error);
 
-					va_end(arg);
 					goto out;
 				}
 
@@ -193,12 +190,10 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 
 				CallHookPkt(fd->fd_Hook,fd,&message);
 
-				result = message.result;
-				if(result < 0)
+				if(message.result < 0)
 				{
 					__set_errno(message.error);
 
-					va_end(arg);
 					goto out;
 				}
 
@@ -208,24 +203,24 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 					CLEAR_FLAG(fd->fd_Flags,FDF_ASYNC_IO);
 			}
 
-			va_end(arg);
+			result = 0;
 
 			break;
 
 		case F_DUPFD:
 
 			SHOWMSG("cmd=F_DUPFD");
-			
+
 			va_start(arg, cmd);
 			fdbase = va_arg(arg, int);
 			va_end(arg);
-			
+
 			if(fdbase < 0)
 			{
 				__set_errno(EINVAL);
 				goto out;
 			}
-			
+
 			/* Check if we have that many fd's already */
 			while(fdbase >= __num_fd)
 			{
@@ -237,8 +232,10 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 					goto out;
 			}
 
+			vacant_slot = -1;
+
 			/* Guaranteed to have enough here */
-			while(TRUE)
+			do
 			{
 				if(__check_abort_enabled)
 					__check_abort();
@@ -247,22 +244,24 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				{
 					if(FLAG_IS_CLEAR(__fd[i]->fd_Flags,FDF_IN_USE))
 					{
-						/* Got a file descriptor, duplicate it */
-						__duplicate_fd(__fd[i],fd);
-
-						result = i;
-						goto out;
+						vacant_slot = i;
+						break;
 					}
 				}
 
 				/* Didn't really find any, grow the table further */
-				if (__grow_fd_table() < 0)
+				if(vacant_slot < 0 && __grow_fd_table() < 0)
 					goto out;
 			}
+			while(vacant_slot < 0);
 
-			__set_errno(EMFILE);
-			break;		
-			
+			/* Got a file descriptor, duplicate it */
+			__duplicate_fd(__fd[vacant_slot],fd);
+
+			result = vacant_slot;
+
+			break;
+
 		default:
 
 			SHOWMSG("something else");
