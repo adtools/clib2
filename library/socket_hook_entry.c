@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.12 2005-03-09 12:06:10 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.13 2005-03-12 09:43:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -104,6 +104,8 @@ __socket_hook_entry(
 
 			SHOWMSG("file_action_close");
 
+			result = 0;
+
 			/* If this is an alias, just remove it. */
 			if(__fd_is_aliased(fd))
 			{
@@ -116,7 +118,7 @@ __socket_hook_entry(
 				{
 					PROFILE_OFF();
 
-					__CloseSocket((LONG)fd->fd_DefaultFile);
+					result = __CloseSocket((LONG)fd->fd_DefaultFile);
 
 					PROFILE_ON();
 				}
@@ -133,8 +135,6 @@ __socket_hook_entry(
 
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));
-
-			result = 0;
 
 			break;
 

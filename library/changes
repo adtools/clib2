@@ -74,6 +74,19 @@
   that the constructors/destructors are called in the proper
   order, too.
 
+- Aliases of file descriptors are now using the signal semaphore
+  of the original file descriptor.
+
+- close() did not return 0 if the file descriptor in question
+  was really just an alias. Fixed.
+
+- Added a feature which makes it possible to have several clients
+  use the standard I/O streams (stdin/stdout/stderr) and have these
+  referring to their process' Input()/Output()/ErrorOutput()
+  streams. This is intended to support the upcoming shared
+  library feature.
+
+
 
 c.lib 1.189 (5.3.2005)
 

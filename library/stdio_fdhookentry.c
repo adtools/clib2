@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.19 2005-03-09 12:06:10 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.20 2005-03-12 09:43:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,6 +75,35 @@ __fd_hook_entry(
 	__fd_lock(fd);
 
 	file = fd->fd_DefaultFile;
+
+	/* Check if this file should be dynamically bound to one of the
+	   three standard I/O streams. */
+	if(file == ZERO && FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+	{
+		if (fd == __fd[STDIN_FILENO])
+		{
+			file = Input();
+		}
+		else if (fd == __fd[STDOUT_FILENO])
+		{
+			file = Output();
+		}
+		else if (fd == __fd[STDERR_FILENO])
+		{
+			#if defined(__amigaos4__)
+			{
+				file = ErrorOutput();
+			}
+			#else
+			{
+				struct Process * this_process = (struct Process *)FindTask(NULL);
+
+				file = this_process->pr_CES;
+			}
+			#endif /* __amigaos4__ */
+		}
+	}
+
 	if(file == ZERO)
 	{
 		SHOWMSG("file is closed");
@@ -160,23 +189,23 @@ __fd_hook_entry(
 
 			SHOWMSG("file_action_close");
 
+			/* The following is almost guaranteed not to fail. */
+			result = 0;
+
 			/* If this is an alias, just remove it. */
 			if(__fd_is_aliased(fd))
 			{
 				__remove_fd_alias(fd);
 			}
-			else
+			else if (fd->fd_DefaultFile != ZERO)
 			{
-				/* The following is almost guaranteed not to fail. */
-				result = 0;
-
 				/* Are we disallowed to close this file? */
 				if(FLAG_IS_SET(fd->fd_Flags,FDF_NO_CLOSE))
 				{
 					/* OK, so we cannot close it. But we might be obliged to
 					   reset a console into buffered mode. */
 					if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-						SetMode(file,DOSFALSE);
+						SetMode(fd->fd_DefaultFile,DOSFALSE);
 				}
 				else
 				{
@@ -194,14 +223,14 @@ __fd_hook_entry(
 
 					PROFILE_OFF();
 
-					parent_dir = __safe_parent_of_file_handle(file);
+					parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile);
 					if(parent_dir != ZERO)
 					{
-						if(__safe_examine_file_handle(file,fib))
+						if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
 							name_and_path_valid = TRUE;
 					}
 
-					if(CANNOT Close(file))
+					if(CANNOT Close(fd->fd_DefaultFile))
 					{
 						fam->fam_Error = __translate_io_error_to_errno(IoErr());
 

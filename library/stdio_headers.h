@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.19 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.20 2005-03-12 09:43:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -316,6 +316,8 @@ struct iob
 											   mode (sockets only). */
 #define FDF_IS_INTERACTIVE		(1UL<<11)	/* File is attached to a console window or
 											   something like it. */
+#define FDF_STDIO				(1UL<<12)	/* File is to be attached to one of the
+											   standard input/output/error streams. */
 
 /****************************************************************************/
 
