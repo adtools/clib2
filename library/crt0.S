@@ -1,5 +1,5 @@
 //
-//	$Id: crt0.S,v 1.1.1.1 2004-07-26 16:30:22 obarthel Exp $
+//	$Id: crt0.S,v 1.2 2004-11-28 12:31:27 tfrieden Exp $
 //
 //	:ts=4
 //
@@ -18,5 +18,23 @@ _start:
 	addi r13, r13, _SDA_BASE_@l
 #endif
 
+#if defined(BASEREL_DATA)
+	/* We also need to set up the data segment pointer */
+	lis r2, _DATA_BASE_@ha
+	addi r2, r2, _DATA_BASE_@l
+#endif
+
 	b	_main
 
+#if defined(BASEREL_DATA)
+	.section .rodata
+
+	.globl __data_segment_descriptor
+__data_segment_descriptor:
+	.long __data_start
+	.long __data_end
+	.long _DATA_BASE_
+
+	.section .dend, "wa", @nobits
+	.space 	4
+#endif
