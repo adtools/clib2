@@ -1,3 +1,7 @@
+- Added strtoll() and strtoull(), with further changes to <limits.h>
+  and <stdlib.h>.
+
+
 c.lib 1.175 (10.9.2004)
 
 - <stdarg.h> now tries to use the compiler supplied, machine specific

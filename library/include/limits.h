@@ -1,5 +1,5 @@
 /*
- * $Id: limits.h,v 1.2 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: limits.h,v 1.3 2004-09-20 17:16:07 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,12 @@
 /****************************************************************************/
 
 /* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+#define	LLONG_MIN	(-0x7fffffffffffffffLL-1)
+#define	LLONG_MAX	0x7fffffffffffffffLL
+#define	ULLONG_MAX	0xffffffffffffffffULL
 
 /****************************************************************************/
 

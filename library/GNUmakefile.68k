@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.8 2004-08-25 15:27:27 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.9 2004-09-20 17:16:06 obarthel Exp $
 #
 # :ts=8
 #
@@ -307,6 +307,8 @@ C_LIB = \
 	stdlib_startup.o \
 	stdlib_strtol.o \
 	stdlib_strtoul.o \
+	stdlib_strtoll.o \
+	stdlib_strtoull.o \
 	stdlib_swapstack.o \
 	stdlib_sysbase.o \
 	stdlib_system.o \

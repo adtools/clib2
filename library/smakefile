@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.7 2004-08-25 15:27:27 obarthel Exp $
+# $Id: smakefile,v 1.8 2004-09-20 17:16:06 obarthel Exp $
 #
 # :ts=8
 #
@@ -415,6 +415,8 @@ STDLIB_OBJ = \
 	stdlib_strtod.o \
 	stdlib_strtol.o \
 	stdlib_strtoul.o \
+	stdlib_strtoll.o \
+	stdlib_strtoull.o \
 	stdlib_swapstack.o \
 	stdlib_system.o \
 	stdlib_unsetenv.o \

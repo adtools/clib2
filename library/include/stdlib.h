@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.2 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: stdlib.h,v 1.3 2004-09-20 17:16:07 obarthel Exp $
  *
  * :ts=4
  *
@@ -148,6 +148,11 @@ extern long atol(const char *str);
 /****************************************************************************/
 
 /* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+extern long long strtoll(const char *str, char **ptr, int base);
+extern unsigned long long strtoull(const char *str, char **ptr, int base);
 
 /****************************************************************************/
 
