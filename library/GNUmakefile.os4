@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.7 2004-09-20 17:16:06 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.8 2004-09-27 15:04:51 tfrieden Exp $
 #
 # :ts=8
 #
@@ -65,7 +65,7 @@ $(LIBUNIX_OBJS)/%.o : %.c
 
 $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
-	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) -DPPC_FLOATING_POINT_SUPPORT $<
+	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS)  $<
 
 $(LIBSTACK_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):stack]"
@@ -86,11 +86,15 @@ $(LIBAMIGA_OBJS)/%.o : %.c
 ##############################################################################
 
 ifeq (small_data,$(TYPE))
-CODE_TYPE := -msdata=sysv -DSMALL_DATA
+CODE_TYPE := -msdata=sysv -DSMALL_DATA -DPPC_FLOATING_POINT_SUPPORT
 endif
 
 ifeq (large_data,$(TYPE))
-CODE_TYPE := -msdata=data
+CODE_TYPE := -msdata=data -DPPC_FLOATING_POINT_SUPPORT
+endif
+
+ifeq (large_data_softfloat, $(TYPE))
+CODE_TYPE := -msdata=data -msoft-float
 endif
 
 ##############################################################################
@@ -684,7 +688,12 @@ all: \
 	lib/crtbegin.o \
 	lib/crtend.o \
 	lib/mainnb.o \
-	lib/libm.a
+	lib/libm.a \
+	lib/small-data/libm.a \
+	lib/bcrt0.o \
+	lib/bcrtbegin.o \
+	lib/bcrtend.o \
+	lib/soft-float/libc.a
 
 copy:
 	$(COPY) $(foreach file,$(LIBS),large_data/$(file)) lib
@@ -739,6 +748,12 @@ endif
 lib:
 	-$(MAKEDIR) $@
 
+lib/small-data:
+	-$(MAKEDIR) $@
+
+lib/soft-float:
+	-$(MAKEDIR) $@
+
 lib/libm.a: lib
 	$(MAKE) TYPE=large_data kitchen_sink
 	$(COPY) $(foreach file,$(LIBS),large_data/$(file)) lib
@@ -746,6 +761,10 @@ lib/libm.a: lib
 lib/small-data/libm.a: lib lib/small-data
 	$(MAKE) TYPE=small_data kitchen_sink
 	$(COPY) $(foreach file,$(LIBS),small_data/$(file)) lib/small-data
+
+lib/soft-float/libc.a: lib lib/soft-float
+	$(MAKE) TYPE=large_data_softfloat kitchen_sink
+	$(COPY) $(foreach file,$(LIBS),large_data_softfloat/$(file)) lib/soft-float
 
 lib/crt0.o : lib crt0.o
 	$(COPY) crt0.o lib
@@ -762,6 +781,15 @@ lib/mainnb.o : lib mainnb.o
 lib/mainb.o : lib mainb.o
 	$(COPY) mainb.o lib
 
+lib/bcrt0.o : lib bcrt0.o
+	$(COPY) bcrt0.o lib
+
+lib/bcrtbegin.o : lib bcrtbegin.o
+	$(COPY) bcrtbegin.o lib
+
+lib/bcrtend.o : lib bcrtend.o
+	$(COPY) bcrtend.o lib
+	
 ##############################################################################
 
 $(LIBAMIGA_OBJS)/amiga_hookentry.o : amiga_hookentry.c
@@ -881,6 +909,13 @@ mainnb.o : stdlib_main.c
 mainb.o : stdlib_main.c
 	@echo "Compiling $<"
 	@$(CC) -o mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA stdlib_main.c
+
+bcrtbegin.o : crtbegin.c
+	$(CC) -o bcrtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c 
+
+bcrtend.o : crtend.c
+	$(CC) -o bcrtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c 
+
 
 ##############################################################################
 
