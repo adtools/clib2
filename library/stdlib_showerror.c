@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.6 2005-01-08 10:21:25 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.7 2005-01-09 09:40:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,8 +78,6 @@ __show_error(const char * message)
 
 	struct Library * IntuitionBase;
 	struct Library * DOSBase;
-	struct FileHandle * fh;
-	BPTR output;
 
 	PROFILE_OFF();
 
@@ -98,23 +96,11 @@ __show_error(const char * message)
 		IIntuition = (struct IntuitionIFace *)GetInterface(IntuitionBase, "main", 1, 0);
 		if (IIntuition == NULL)
 			goto out;
-
-		/* Try to print the error message on the default error output stream. */
-		output = ErrorOutput();
-		if(output == ZERO)
-			output = Output();
-	}
-	#else
-	{
-		output = Output();
 	}
 	#endif /* __amigaos4__ */
 
-	/* This is for checking if the stream was redirected to "NIL:". */
-	fh = BADDR(output);
-
 	/* If we can't hope to print the error message, show a requester instead. */
-	if(__detach || __no_standard_io || __WBenchMsg != NULL || fh == NULL || fh->fh_Type == NULL)
+	if(__no_standard_io || __WBenchMsg != NULL)
 	{
 		if(IntuitionBase->lib_Version >= 37)
 		{
@@ -164,8 +150,31 @@ __show_error(const char * message)
 	}
 	else
 	{
-		Write(output,(STRPTR)message,(LONG)strlen(message));
-		Write(output,"\n",1);
+		BPTR output;
+
+		#if defined(__amigaos4__)
+		{
+			/* Try to print the error message on the default error output stream. */
+			output = ErrorOutput();
+			if(output == ZERO)
+				output = Output();
+		}
+		#else
+		{
+			struct Process * this_process = (struct Process *)FindTask(NULL);
+
+			if(this_process->pr_CES != ZERO)
+				output = this_process->pr_CES;
+			else
+				output = Output();
+		}
+		#endif /* __amigaos4__ */
+
+		if(output != ZERO)
+		{
+			Write(output,(STRPTR)message,(LONG)strlen(message));
+			Write(output,"\n",1);
+		}
 	}
 
  out:

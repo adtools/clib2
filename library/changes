@@ -9,6 +9,15 @@
 - The "ptrdiff_t" definition in <stddef.h> now defaults to type 'int' rather
   than 'long int'.
 
+- The "char" limits in <limits.h> are now set up according to the current
+  compiler settings, which can either default to an unsigned or
+  signed definition.
+
+- Changed the rules again for the use of stderr/stdout redirection when
+  printing error messages. It is always safe to redirect them now and
+  no requester will appear unless you specifically set the value of the
+  "__no_standard_io" variable to TRUE in your program.
+
 
 c.lib 1.185 (2.1.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_assertion_failure.c,v 1.5 2005-01-08 10:21:25 obarthel Exp $
+ * $Id: stdlib_assertion_failure.c,v 1.6 2005-01-09 09:40:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,50 +61,7 @@ __assertion_failure(
 	/* Don't drop into a recursion. */
 	if(been_here_before++ == 0)
 	{
-		BOOL use_stderr = FALSE;
-
-		/* Figure out if the assertion failure message can be printed
-		   on the stderr stream. */
-		if(__iob != NULL && NOT __no_standard_io)
-		{
-			struct iob * iob;
-
-			iob = (struct iob *)stderr;
-
-			if(iob != NULL &&
-			   FLAG_IS_SET(iob->iob_Flags,IOBF_IN_USE) &&
-			   FLAG_IS_SET(iob->iob_Flags,IOBF_WRITE))
-			{
-				struct fd * fd;
-
-				fd = __get_file_descriptor(iob->iob_Descriptor);
-
-				if(fd != NULL &&
-				   FLAG_IS_SET(fd->fd_Flags,FDF_IN_USE) &&
-				   FLAG_IS_SET(fd->fd_Flags,FDF_WRITE) &&
-				   FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET))
-				{
-					struct FileHandle * fh = BADDR(fd->fd_DefaultFile);
-
-					/* Check if this is really not redirected to "NIL:". */
-					if(fh->fh_Type != NULL)
-						use_stderr = TRUE;
-				}
-			}
-		}
-
-		if(use_stderr)
-		{
-			if(__program_name != NULL)
-				fprintf(stderr,"[%s] ",__program_name);
-
-			fprintf(stderr,
-				"%s:%d: failed assertion '%s'\n",
-					file_name,
-					line_number,
-					expression);
-		}
-		else
+		if(__no_standard_io || __WBenchMsg != NULL)
 		{
 			#if defined(__amigaos4__)
 			struct IntuitionIFace *	IIntuition = NULL;
@@ -149,6 +106,17 @@ __assertion_failure(
 
 				CloseLibrary(IntuitionBase);
 			}
+		}
+		else
+		{
+			if(__program_name != NULL)
+				fprintf(stderr,"[%s] ",__program_name);
+
+			fprintf(stderr,
+				"%s:%d: failed assertion '%s'\n",
+					file_name,
+					line_number,
+					expression);
 		}
 
 		abort();
