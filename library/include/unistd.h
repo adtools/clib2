@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.1.1.1 2004-07-26 16:32:56 obarthel Exp $
+ * $Id: unistd.h,v 1.2 2004-07-28 15:25:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -143,7 +143,7 @@ extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int lin
 #define	FD_SETSIZE 256
 #endif
 
-typedef	struct
+typedef	struct fd_set
 {
 	unsigned long bits[(FD_SETSIZE + 31) / 32];
 } fd_set;
