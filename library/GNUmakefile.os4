@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.15 2004-11-18 09:40:37 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.16 2004-11-28 12:30:53 tfrieden Exp $
 #
 # :ts=8
 #
@@ -95,6 +95,12 @@ ifeq (large_data_softfloat,$(TYPE))
 CODE_TYPE := -msdata=data -msoft-float
 FLOAT_TYPE :=
 endif
+
+ifeq (baserel,$(TYPE))
+CODE_TYPE := -mbaserel -DBASEREL_DATA 
+FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
+endif
+
 
 ##############################################################################
 
@@ -679,9 +685,11 @@ all: \
 	lib \
 	lib/soft-float \
 	lib/small-data \
+	lib/baserel \
 	small_data \
 	large_data \
 	large_data_softfloat \
+	baserel \
 	lib/bcrt0.o \
 	lib/bcrtbegin.o \
 	lib/bcrtend.o \
@@ -692,13 +700,19 @@ all: \
 	lib/mainnb.o \
 	lib/libm.a \
 	lib/small-data/libm.a \
-	lib/soft-float/libm.a
+	lib/soft-float/libm.a \
+	lib/baserel/crt0.o \
+	lib/baserel/crtbegin.o \
+	lib/baserel/crtend.o \
+	lib/baserel/mainb.o \
+	lib/baserel/mainnb.o \
+	lib/baserel/libm.a
 
 ##############################################################################
 
 # Delete all object files and libraries
 clean:
-	-$(DELETE) $(STARTUPS) lib small_data large_data large_data_softfloat
+	-$(DELETE) $(STARTUPS) lib small_data large_data large_data_softfloat baserel
 
 ##############################################################################
 
@@ -745,6 +759,9 @@ lib/small-data: lib
 
 lib/soft-float: lib
 	-$(MAKEDIR) $@
+	
+lib/baserel: lib
+	-$(MAKEDIR) $@
 
 small_data:
 	-$(MAKEDIR) $@
@@ -753,6 +770,9 @@ large_data:
 	-$(MAKEDIR) $@
 
 large_data_softfloat:
+	-$(MAKEDIR) $@
+	
+baserel:
 	-$(MAKEDIR) $@
 
 ##############################################################################
@@ -789,6 +809,16 @@ small_data/libm.a:
 
 ##############################################################################
 
+# Dependencies for libm.a (baserel variant)
+
+lib/baserel/libm.a: baserel baserel/libm.a
+
+baserel/libm.a:
+	$(MAKE) TYPE=baserel all_libraries
+	$(COPY) $(foreach file,$(LIBS),baserel/$(file)) lib/baserel
+
+##############################################################################
+
 # Rules to build and move the startup code
 lib/crt0.o : lib crt0.o
 	$(COPY) crt0.o lib
@@ -813,6 +843,22 @@ lib/bcrtbegin.o : lib bcrtbegin.o
 
 lib/bcrtend.o : lib bcrtend.o
 	$(COPY) bcrtend.o lib
+	
+lib/baserel/crt0.o : lib baserel/crt0.o
+	$(COPY) baserel/crt0.o lib/baserel
+
+lib/baserel/crtbegin.o : lib baserel/crtbegin.o
+	$(COPY) baserel/crtbegin.o lib/baserel
+
+lib/baserel/crtend.o : lib baserel/crtend.o
+	$(COPY) baserel/crtend.o lib/baserel
+
+lib/baserel/mainnb.o : lib baserel/mainnb.o
+	$(COPY) baserel/mainnb.o lib/baserel
+
+lib/baserel/mainb.o : lib baserel/mainb.o
+	$(COPY) baserel/mainb.o lib/baserel
+
 
 ##############################################################################
 
@@ -949,3 +995,21 @@ bcrtbegin.o : crtbegin.c
 
 bcrtend.o : crtend.c
 	$(CC) -o bcrtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c 
+
+baserel/crt0.o : crt0.S
+	@echo "Assembling $<"
+	@$(CC) -Wa,-mregnames -o baserel/crt0.o -mbaserel -DBASEREL_DATA -c crt0.S
+
+baserel/mainnb.o : stdlib_main.c
+	@echo "Compiling $<"
+	@$(CC) -o baserel/mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA stdlib_main.c
+
+baserel/mainb.o : stdlib_main.c
+	@echo "Compiling $<"
+	@$(CC) -o baserel/mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA stdlib_main.c
+
+baserel/crtbegin.o : crtbegin.c
+	$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c 
+
+baserel/crtend.o : crtend.c
+	$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c 
