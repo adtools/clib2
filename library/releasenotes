@@ -4,6 +4,8 @@ c.lib 1.167 (29.7.2004)
   methods for accessing the low level representation of the IEEE 754
   numbers they work on.
 
+- Fixed a compiler warning in h_strerror()
+
 
 c.lib 1.166 (28.7.2004)
 

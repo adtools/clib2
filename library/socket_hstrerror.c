@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hstrerror.c,v 1.1 2004-07-28 15:50:45 obarthel Exp $
+ * $Id: socket_hstrerror.c,v 1.2 2004-07-29 08:35:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -121,6 +121,7 @@ hstrerror(int error_number)
 				result = "Unknown server error_number";
 				break;
 
+			default:
 			case 4:	/* NO_ADDRESS */
 
 				result = "No address associated with name";
