@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_headers.h,v 1.1.1.1 2004-07-26 16:32:38 obarthel Exp $
+ * $Id: usergroup_headers.h,v 1.2 2004-09-16 08:45:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -519,14 +519,18 @@ extern int __root_egid;
 
 #define __umask(mask) ({ \
   ULONG _umask_mask = (mask); \
-  { \
+  ULONG _umask__re = \
+  ({ \
   register struct Library * const __umask__bn __asm("a6") = (struct Library *) (__UserGroupBase);\
+  register ULONG __umask__re __asm("d0"); \
   register ULONG __umask_mask __asm("d0") = (_umask_mask); \
   __asm volatile ("jsr a6@(-192:W)" \
-  : \
-  : "r"(__umask__bn), "r"(__umask_mask)  \
-  : "d0", "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
-  } \
+  : "=r"(__umask__re) \
+  : "r"(__umask__bn), "r"(__umask_mask) \
+  : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
+  __umask__re; \
+  }); \
+  _umask__re; \
 })
 
 #define __getumask() ({ \
@@ -718,7 +722,7 @@ VOID __endgrent(VOID);
 UBYTE *__crypt(UBYTE *key,UBYTE *set);
 UBYTE *__ug_GetSalt(struct passwd *user,UBYTE *buf,ULONG size);
 UBYTE *__getpass(UBYTE *prompt);
-VOID __umask(ULONG mask);
+UWORD __umask(ULONG mask);
 UWORD __getumask(VOID);
 LONG __setsid(VOID);
 LONG __getpgrp(VOID);
