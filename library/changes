@@ -18,6 +18,9 @@
   code. Also, the contents of the AnchorPath structure are no longer
   modified between calls. MatchEnd() has to be sufficient.
 
+- Moved redundant code out of the readdir()/opendir()/closedir()
+  functions which is not required unless the code is built for
+  Unix compatibility mode.
 
 
 c.lib 1.187 (29.1.2005)
