@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.4 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: unistd.h,v 1.5 2004-09-29 12:10:35 obarthel Exp $
  *
  * :ts=4
  *
@@ -87,6 +87,7 @@ extern int symlink(const char * actual_path, const char * symbolic_path);
 extern int readlink(const char * path_name, char * buffer, int buffer_size);
 extern int chdir(const char * path_name);
 extern unsigned int sleep(unsigned int seconds);
+extern void usleep(unsigned long microseconds);
 extern int getopt(int argc, char * argv[], char *opts);
 extern pid_t getpid(void);
 extern char *realpath(const char *file_name, char *resolved_name);

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_sleep.c,v 1.2 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: unistd_sleep.c,v 1.3 2004-09-29 12:10:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,132 +44,11 @@
 unsigned int
 sleep(unsigned int seconds)
 {
-	static BOOL sleeping;
-	unsigned int result = 0;
+	unsigned int result;
 
 	ENTER();
 
-	SHOWVALUE(seconds);
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	if(seconds > 0)
-	{
-		if(NOT sleeping)
-		{
-			BOOL timer_open;
-
-			sleeping = TRUE;
-
-			if(__timer_request == NULL)
-			{
-				timer_open = FALSE;
-
-				SHOWMSG("trying to open the timer");
-
-				PROFILE_OFF();
-
-				__timer_port = CreateMsgPort();
-				if(__timer_port != NULL)
-				{
-					__timer_request = (struct timerequest *)CreateIORequest(__timer_port,sizeof(*__timer_request));
-					if(__timer_request != NULL)
-					{
-						if(OpenDevice(TIMERNAME,UNIT_VBLANK,(struct IORequest *)__timer_request,0) == 0)
-							timer_open = TRUE;
-					}
-				}
-
-				if(NOT timer_open)
-				{
-					SHOWMSG("that didn't work");
-
-					DeleteIORequest((struct IORequest *)__timer_request);
-					__timer_request = NULL;
-
-					DeleteMsgPort(__timer_port);
-					__timer_port = NULL;
-				}
-
-				PROFILE_ON();
-			}
-			else
-			{
-				timer_open = TRUE;
-			}
-
-			if(timer_open)
-			{
-				ULONG signals_to_wait_for;
-				ULONG seconds_then;
-				ULONG timer_signal;
-				struct DateStamp ds;
-				ULONG signals;
-
-				__timer_request->tr_node.io_Command	= TR_ADDREQUEST;
-				__timer_request->tr_time.tv_secs	= seconds;
-				__timer_request->tr_time.tv_micro	= 0;
-
-				timer_signal = (1UL << __timer_port->mp_SigBit);
-
-				signals_to_wait_for = timer_signal;
-
-				SetSignal(0,signals_to_wait_for);
-
-				if(__check_abort_enabled)
-					SET_FLAG(signals_to_wait_for,SIGBREAKF_CTRL_C);
-
-				PROFILE_OFF();
-				DateStamp(&ds);
-				PROFILE_ON();
-
-				seconds_then = (ds.ds_Days * 24 * 60 + ds.ds_Minute) * 60 + ds.ds_Tick / TICKS_PER_SECOND;
-
-				SendIO((struct IORequest *)__timer_request);
-
-				while(TRUE)
-				{
-					PROFILE_OFF();
-					signals = Wait(signals_to_wait_for);
-					PROFILE_ON();
-
-					if(FLAG_IS_SET(signals,SIGBREAKF_CTRL_C))
-					{
-						ULONG seconds_now;
-
-						if(CheckIO((struct IORequest *)__timer_request))
-							AbortIO((struct IORequest *)__timer_request);
-
-						WaitIO((struct IORequest *)__timer_request);
-
-						SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
-						__check_abort();
-
-						PROFILE_OFF();
-						DateStamp(&ds);
-						PROFILE_ON();
-
-						seconds_now = (ds.ds_Days * 24 * 60 + ds.ds_Minute) * 60 + ds.ds_Tick / TICKS_PER_SECOND;
-
-						seconds_now -= seconds_then;
-						if(seconds_now < seconds)
-							result = (seconds - seconds_now);
-
-						break;
-					}
-
-					if(FLAG_IS_SET(signals,timer_signal))
-					{
-						WaitIO((struct IORequest *)__timer_request);
-						break;
-					}
-				}
-			}
-
-			sleeping = FALSE;
-		}
-	}
+	result = __time_delay(seconds,0);
 
 	RETURN(result);
 	return(result);

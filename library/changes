@@ -1,3 +1,6 @@
+- Added usleep(), and created wrapper code that both sleep() and
+  usleep() can use.
+
 - Added strtoll() and strtoull(), with further changes to <limits.h>
   and <stdlib.h>.
 

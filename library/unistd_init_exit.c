@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_init_exit.c,v 1.3 2004-08-07 10:24:04 obarthel Exp $
+ * $Id: unistd_init_exit.c,v 1.4 2004-09-29 12:10:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,21 +78,6 @@ __unistd_exit(void)
 
 			UnLock(uln->uln_Lock);
 		}
-	}
-
-	if(__timer_request != NULL)
-	{
-		if(__timer_request->tr_node.io_Device != NULL)
-			CloseDevice((struct IORequest *)__timer_request);
-
-		DeleteIORequest((struct IORequest *)__timer_request);
-		__timer_request = NULL;
-	}
-
-	if(__timer_port != NULL)
-	{
-		DeleteMsgPort(__timer_port);
-		__timer_port = NULL;
 	}
 
 	if(__current_directory_changed)

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_data.c,v 1.3 2004-09-29 12:10:29 obarthel Exp $
+ * $Id: unistd_usleep.c,v 1.1 2004-09-29 12:10:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,14 +41,14 @@
 
 /****************************************************************************/
 
-/* Names of files and directories to delete when shutting down. */
-struct MinList __unlink_list;
+void
+usleep(unsigned long microseconds)
+{
+	ENTER();
 
-/****************************************************************************/
+	SHOWVALUE(microseconds);
 
-/* If the program's current directory was changed, here is where
- * we find out about it.
- */
-BPTR __original_current_directory;
-BOOL __current_directory_changed;
-BOOL __unlock_current_directory;
+	__time_delay(0,microseconds);
+
+	LEAVE();
+}

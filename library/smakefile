@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.8 2004-09-20 17:16:06 obarthel Exp $
+# $Id: smakefile,v 1.9 2004-09-29 12:10:29 obarthel Exp $
 #
 # :ts=8
 #
@@ -497,12 +497,14 @@ UNISTD_OBJ = \
 	unistd_sleep.o \
 	unistd_strip_double_slash.o \
 	unistd_symlink.o \
+	unistd_time_delay.o \
 	unistd_translatea2u.o \
 	unistd_translaterel.o \
 	unistd_translateu2a.o \
 	unistd_truncate.o \
 	unistd_unix_path_semantics.o \
-	unistd_unlink.o
+	unistd_unlink.o \
+	unistd_usleep.o
 # \
 #	unistd_wildcard_expand.o
 
