@@ -1,5 +1,5 @@
 /*
- * $Id: time_localtime_r.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_localtime_r.c,v 1.3 2005-01-25 11:21:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,8 +67,8 @@ localtime_r(const time_t *t,struct tm * tm_ptr)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	/* The time parameter given represents local time and
-	 * must be converted to UTC before we proceed.
+	/* The time parameter given represents UTC and
+	 * must be converted to local time before we proceed.
 	 */
 	if(__default_locale != NULL)
 		gmt_offset = 60 * __default_locale->loc_GMTOffset;

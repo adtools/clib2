@@ -1,5 +1,5 @@
 /*
- * $Id: time_time.c,v 1.3 2005-01-24 10:25:46 obarthel Exp $
+ * $Id: time_time.c,v 1.4 2005-01-25 11:21:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,8 @@ time(time_t * tptr)
 	PROFILE_ON();
 
 	/* This converts the DateStamp contents into the number of
-	   seconds elapsed since January 1st 1970. */
+	   seconds elapsed since January 1st 1970. The time is
+	   given as relative to UTC, not local time. */
 	result = __convert_datestamp_to_time(&ds);
 
 	if(tptr != NULL)

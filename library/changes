@@ -7,7 +7,12 @@
   function.
 
 - The fall-back function for converting time into a string in strftime()
-  now calls itself for the "%x" and "%X" format specifiers.
+  now calls itself for the "%c", "%x" and "%X" format specifiers.
+
+- mktime() is supposed to convert the time specification, given as local
+  time, into the number of seconds since January 1st, 1970, relative to
+  UTC. This didn't really work up until now since the time value returned
+  was given as local time.
 
 
 c.lib 1.186 (14.1.2005)
