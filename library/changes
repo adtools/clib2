@@ -1,3 +1,5 @@
+c.lib 1.190 (25.3.2005)
+
 - DoTimer() now calls AllocSysObject() rather than making up
   a MsgPort locally.
 
