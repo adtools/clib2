@@ -1,5 +1,5 @@
 /*
- * $Id: uio_writev.c,v 1.1 2005-04-03 10:22:47 obarthel Exp $
+ * $Id: uio_writev.c,v 1.2 2005-04-03 10:53:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -83,13 +83,6 @@ writev(int file_descriptor,const struct iovec *iov,int vec_count)
 	   here than in the write loop. */
 	for(i = 0, total_num_bytes_written = 0 ; i < vec_count ; i++)
 	{
-		if(iov[i].iov_len < 0)
-		{
-			/* Paraoia... */
-			__set_errno(EINVAL);
-			goto out;
-		}
-
 		total_num_bytes_written += iov[i].iov_len;
 		if(total_num_bytes_written < 0) /* Rollover. */
 		{
