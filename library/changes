@@ -74,6 +74,12 @@
 
 - Extended the thread-safety locking to the file descriptors.
 
+  NOTE: these changes require that the entire library is rebuilt!
+
+- The translation of Unix to Amiga path names now silently accepts
+  absolute Amiga path names passed to it and will use them without
+  changing them.
+
 
 c.lib 1.188 (7.2.2005)
 

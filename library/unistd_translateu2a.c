@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.6 2005-02-21 10:22:02 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.7 2005-02-28 13:32:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,181 +75,370 @@
 int
 __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translation_info * nti)
 {
-	char volume_name[sizeof(nti->substitute)];
-	size_t volume_name_len;
 	int result = -1;
-	char * replace;
 	char * name;
-	size_t len,i,j;
 
 	/*PUSHDEBUGLEVEL(2);*/
 
 	assert( name_ptr != NULL && (*name_ptr) != NULL && nti != NULL );
 
-	name	= (char *)(*name_ptr);
-	replace	= nti->substitute;
+	name = (char *)(*name_ptr);
 
 	nti->is_root = FALSE;
 
-	/* Check if the name would become too long to handle. */
-	len = strlen(name);
-	if(len >= sizeof(nti->substitute))
+	/* If this is not an absolute Amiga path name, which we will accept "as is",
+	   perform the translation and substitution. */
+	if(strchr(name,':') == NULL)
 	{
-		D(("path name '%s' is too long (%ld characters total; maximum is %ld)!",name,len,sizeof(nti->substitute)-1));
+		char volume_name[sizeof(nti->substitute)];
+		size_t volume_name_len;
+		char * replace = nti->substitute;
+		size_t len,i,j;
 
-		__set_errno(ENAMETOOLONG);
-		goto out;
-	}
-
-	D(("initial name = '%s'",name));
-
-	/* Prepend an absolute path to the name, if such a path was previously set
-	   as the current directory. */
-	if(__translate_relative_path_name((const char **)&name,nti->substitute,sizeof(nti->substitute)) < 0)
-	{
-		SHOWMSG("relative path name could not be worked into the pattern");
-		goto out;
-	}
-
-	/* If the name was replaced, update the string length cached. */
-	if(name != (*name_ptr))
-	{
-		D(("name after relative path replacement = '%s'",name));
-
+		/* Check if the name would become too long to handle. */
 		len = strlen(name);
-	}
-
-	/* If there are neighboring slashes, strip all but one
-	   ('foo//bar' -> 'foo/bar'). The "//" pattern in a Unix
-	   file name is apparently harmless, but on AmigaDOS it
-	   has a very definite meaning. */
-	if(len > 2)
-	{
-		BOOL have_double_slash = FALSE;
-
-		for(i = 0 ; i < len - 1 ; i++)
+		if(len >= sizeof(nti->substitute))
 		{
-			if(name[i] == '/' && name[i + 1] == '/')
+			D(("path name '%s' is too long (%ld characters total; maximum is %ld)!",name,len,sizeof(nti->substitute)-1));
+
+			__set_errno(ENAMETOOLONG);
+			goto out;
+		}
+
+		D(("initial name = '%s'",name));
+
+		/* Prepend an absolute path to the name, if such a path was previously set
+		   as the current directory. */
+		if(__translate_relative_path_name((const char **)&name,nti->substitute,sizeof(nti->substitute)) < 0)
+		{
+			SHOWMSG("relative path name could not be worked into the pattern");
+			goto out;
+		}
+
+		/* If the name was replaced, update the string length cached. */
+		if(name != (*name_ptr))
+		{
+			D(("name after relative path replacement = '%s'",name));
+
+			len = strlen(name);
+		}
+
+		/* If there are neighboring slashes, strip all but one
+		   ('foo//bar' -> 'foo/bar'). The "//" pattern in a Unix
+		   file name is apparently harmless, but on AmigaDOS it
+		   has a very definite meaning. */
+		if(len > 2)
+		{
+			BOOL have_double_slash = FALSE;
+
+			for(i = 0 ; i < len - 1 ; i++)
 			{
-				have_double_slash = TRUE;
-				break;
+				if(name[i] == '/' && name[i + 1] == '/')
+				{
+					have_double_slash = TRUE;
+					break;
+				}
+			}
+
+			if(have_double_slash)
+			{
+				BOOL have_slash;
+				char c;
+
+				have_slash = FALSE;
+
+				for(i = j = 0 ; i < len ; i++)
+				{
+					c = name[i];
+
+					if(c == '/')
+					{
+						if(NOT have_slash)
+							replace[j++] = c;
+
+						have_slash = TRUE;
+					}
+					else
+					{
+						replace[j++] = c;
+
+						have_slash = FALSE;
+					}
+				}
+
+				name = replace;
+
+				len = j;
+
+				name[len] = '\0';
+				D(("name = '%s' (line %ld)",name,__LINE__));
 			}
 		}
 
-		if(have_double_slash)
+		/* If there are any, strip the trailing slashes ('foo/' -> 'foo'). A
+		   leading '/' must be preserved, though ('///' -> '/'). */
+		if(len > 1)
 		{
-			BOOL have_slash;
-			char c;
+			size_t num_trailing_slashes = 0;
 
-			have_slash = FALSE;
+			while((num_trailing_slashes < len - 1) && (name[len - (num_trailing_slashes + 1)] == '/'))
+				num_trailing_slashes++;
 
-			for(i = j = 0 ; i < len ; i++)
+			if(num_trailing_slashes > 0)
 			{
-				c = name[i];
+				len -= num_trailing_slashes;
 
-				if(c == '/')
+				if(name != replace)
 				{
-					if(NOT have_slash)
-						replace[j++] = c;
+					memmove(replace,name,len);
+					name = replace;
+				}
 
-					have_slash = TRUE;
+				name[len] = '\0';
+				D(("name = '%s' (line %ld)",name,__LINE__));
+			}
+		}
+
+		/* Ditch all leading './' ('./foo' -> 'foo'). */
+		while(len > 2 && name[0] == '.' && name[1] == '/')
+		{
+			name	+= 2;
+			len		-= 2;
+
+			D(("name = '%s' (line %ld)",name,__LINE__));
+		}
+
+		/* Ditch all embedded '/./' ('foo/./bar' -> 'foo/bar'). */
+		if(len > 2)
+		{
+			BOOL have_slash_dot_slash = FALSE;
+
+			for(i = j = 0 ; i < len - 2 ; i++)
+			{
+				if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '/')
+				{
+					have_slash_dot_slash = TRUE;
+					break;
+				}
+			}
+
+			if(have_slash_dot_slash)
+			{
+				for(i = j = 0 ; i < len ; i++)
+				{
+					replace[j++] = name[i];
+		
+					if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '/')
+						i += 2;
+				}
+		
+				len = j;
+		
+				name = replace;
+		
+				name[len] = '\0';	
+				D(("name = '%s' (line %ld)",name,__LINE__));
+			}
+		}
+
+		/* Special case: the path name may end with "/." signifying that the
+		   directory itself is requested ('foo/.' -> 'foo'). */
+		if(len >= 2 && strncmp(&name[len - 2],"/.",2) == SAME)
+		{
+			/* If it's just '/.' then it's really '/'. */
+			if(len == 2)
+			{
+				strcpy(replace,"/");
+				name = replace;
+
+				len = 1;
+			}
+			else 
+			{
+				if(name != replace)
+				{
+					memmove(replace,name,len - 2);
+					name = replace;
+				}
+
+				len -= 2;
+			}
+
+			name[len] = '\0';
+			D(("name = '%s' (line %ld)",name,__LINE__));
+		}
+
+		/* Check for absolute path. */
+		if(name[0] == '/')
+		{
+			if(len == 1)
+			{
+				SHOWMSG("this is the root directory");
+
+				nti->is_root = TRUE;
+			}
+
+			/* Ok, so this is an absolute path. We begin by checking
+			   for a few special cases, the first being a reference
+			   to "/tmp". */
+			if((strncmp(name,"/tmp",4) == SAME) && (name[4] == '/' || len == 4))
+			{
+				if(name[4] == '/')
+				{
+					/* Convert "/tmp/foo" to "T:foo". */
+					memmove(&replace[2],&name[5],len - 5);
+					memmove(replace,"T:",2);
+
+					len -= 3;
 				}
 				else
 				{
-					replace[j++] = c;
+					/* Convert "/tmp" to "T:". */
+					strcpy(replace,"T:");
 
-					have_slash = FALSE;
+					len = 2;
 				}
-			}
 
-			name = replace;
-
-			len = j;
-
-			name[len] = '\0';
-			D(("name = '%s' (line %ld)",name,__LINE__));
-		}
-	}
-
-	/* If there are any, strip the trailing slashes ('foo/' -> 'foo'). A
-	   leading '/' must be preserved, though ('///' -> '/'). */
-	if(len > 1)
-	{
-		size_t num_trailing_slashes = 0;
-
-		while((num_trailing_slashes < len - 1) && (name[len - (num_trailing_slashes + 1)] == '/'))
-			num_trailing_slashes++;
-
-		if(num_trailing_slashes > 0)
-		{
-			len -= num_trailing_slashes;
-
-			if(name != replace)
-			{
-				memmove(replace,name,len);
 				name = replace;
+
+				name[len] = '\0';
+				D(("name = '%s' (line %ld)",name,__LINE__));
 			}
-
-			name[len] = '\0';
-			D(("name = '%s' (line %ld)",name,__LINE__));
-		}
-	}
-
-	/* Ditch all leading './' ('./foo' -> 'foo'). */
-	while(len > 2 && name[0] == '.' && name[1] == '/')
-	{
-		name	+= 2;
-		len		-= 2;
-
-		D(("name = '%s' (line %ld)",name,__LINE__));
-	}
-
-	/* Ditch all embedded '/./' ('foo/./bar' -> 'foo/bar'). */
-	if(len > 2)
-	{
-		BOOL have_slash_dot_slash = FALSE;
-
-		for(i = j = 0 ; i < len - 2 ; i++)
-		{
-			if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '/')
+			else if ((strncmp(name,"/dev/null",9)) == SAME && (len == 9 || name[9] == '/'))
 			{
-				have_slash_dot_slash = TRUE;
+				strcpy(replace,"NIL:");
+				name = replace;
+
+				len = 4;
+
+				name[len] = '\0';
+				D(("name = '%s' (line %ld)",name,__LINE__));
+			}
+			else
+			{
+				size_t path_name_start = 0;
+
+				volume_name_len = 0;
+
+				/* Find out how long the first component
+				   of the absolute path is. */
+				for(i = 1 ; i <= len ; i++)
+				{
+					if(i == len || name[i] == '/')
+					{
+						volume_name_len = i - 1;
+
+						/* Is there anything following the path name? */
+						if(i < len)
+							path_name_start = i + 1;
+
+						break;
+					}
+				}
+
+				/* Copy the first component and attach a colon. "/foo" becomes "foo:". */
+				memmove(replace,&name[1],volume_name_len);
+				replace[volume_name_len++] = ':';
+
+				/* Now add the finishing touches. "/foo/bar" finally
+				   becomes "foo:bar" and "/foo" becomes "foo:". */
+				if(path_name_start > 0)
+				{
+					memmove(&replace[volume_name_len],&name[path_name_start],len - path_name_start);
+
+					len--;
+				}
+
+				name = replace;
+
+				name[len] = '\0';
+				D(("name = '%s' (line %ld)",name,__LINE__));
+			}
+		}
+
+		/* Extract and remove the volume name from the path. We
+		   are going to need it later. */
+		volume_name_len = 0;
+
+		for(i = 0 ; i < len ; i++)
+		{
+			if(name[i] == ':')
+			{
+				/* Look for extra colon characters embedded in the name
+			       (as in "foo/bar:baz") which really don't belong here. */
+				for(j = 0 ; j < i ; j++)
+				{
+					if(name[j] == '/')
+					{
+						D(("name '%s' still contains colon characters",name));
+
+						__set_errno(EINVAL); /* invalid name */
+						goto out;
+					}
+				}
+
+				volume_name_len = i + 1;
+
+				memmove(volume_name,name,volume_name_len);
+
+				name	+= volume_name_len;
+				len		-= volume_name_len;
+
+				D(("name = '%s' (line %ld)",name,__LINE__));
+
 				break;
 			}
 		}
 
-		if(have_slash_dot_slash)
+		/* Look for extra colon characters embedded in the name
+	       (as in "foo:bar:baz") which really don't belong here. */
+		for(i = 0 ; i < len ; i++)
 		{
-			for(i = j = 0 ; i < len ; i++)
+			if(name[i] == ':')
 			{
-				replace[j++] = name[i];
-	
-				if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '/')
-					i += 2;
+				D(("name '%s' still contains colon characters",name));
+
+				__set_errno(EINVAL); /* invalid name */
+				goto out;
 			}
-	
-			len = j;
-	
-			name = replace;
-	
-			name[len] = '\0';	
-			D(("name = '%s' (line %ld)",name,__LINE__));
 		}
-	}
 
-	/* Special case: the path name may end with "/." signifying that the
-	   directory itself is requested ('foo/.' -> 'foo'). */
-	if(len >= 2 && strncmp(&name[len - 2],"/.",2) == SAME)
-	{
-		/* If it's just '/.' then it's really '/'. */
-		if(len == 2)
+		/* Now parse the path name and replace all embedded '..' with
+		   the AmigaDOS counterparts ('foo/../bar' -> 'foo//bar'). */
+		if(len > 3)
 		{
-			strcpy(replace,"/");
-			name = replace;
+			BOOL have_slash_dot_dot_slash = FALSE;
 
-			len = 1;
+			for(i = j = 0 ; i < len - 3 ; i++)
+			{
+				if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '.' && name[i + 3] == '/')
+				{
+					have_slash_dot_dot_slash = TRUE;
+					break;
+				}
+			}
+
+			if(have_slash_dot_dot_slash)
+			{
+				for(i = j = 0 ; i < len ; i++)
+				{
+					replace[j++] = name[i];
+
+					if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '.' && name[i + 3] == '/')
+						i += 2;
+				}
+
+				len = j;
+
+				name = replace;
+
+				name[len] = '\0';
+				D(("name = '%s' (line %ld)",name,__LINE__));
+			}
 		}
-		else 
+
+		/* Translate a trailing '/..' to '//' */
+		if(len >= 3 && strncmp(&name[len - 3],"/..",3) == SAME)
 		{
 			if(name != replace)
 			{
@@ -258,281 +447,97 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 			}
 
 			len -= 2;
+
+			name[len++] = '/';
+
+			name[len] = '\0';
+			D(("name = '%s' (line %ld)",name,__LINE__));
 		}
 
-		name[len] = '\0';
-		D(("name = '%s' (line %ld)",name,__LINE__));
-	}
-
-	/* Check for absolute path. */
-	if(name[0] == '/')
-	{
-		if(len == 1)
+		/* Translate a leading '../' ('../foo' -> '/foo') */
+		if(len >= 3 && strncmp(name,"../",3) == SAME)
 		{
-			SHOWMSG("this is the root directory");
+			memmove(replace,&name[2],len - 2);
+			name = replace;
 
-			nti->is_root = TRUE;
+			len -= 2;
+
+			name[len] = '\0';
+			D(("name = '%s' (line %ld)",name,__LINE__));
 		}
 
-		/* Ok, so this is an absolute path. We begin by checking
-		   for a few special cases, the first being a reference
-		   to "/tmp". */
-		if((strncmp(name,"/tmp",4) == SAME) && (name[4] == '/' || len == 4))
+		/* Translate the '..' ('..' -> '/') */
+		if(len == 2 && strncmp(name,"..",2) == SAME)
 		{
-			if(name[4] == '/')
-			{
-				/* Convert "/tmp/foo" to "T:foo". */
-				memmove(&replace[2],&name[5],len - 5);
-				memmove(replace,"T:",2);
+			strcpy(replace,"/");
+			name = replace;
 
-				len -= 3;
-			}
-			else
-			{
-				/* Convert "/tmp" to "T:". */
-				strcpy(replace,"T:");
+			len = 1;
 
-				len = 2;
-			}
+			D(("name = '%s' (line %ld)",name,__LINE__));
+		}
+
+		/* Translate the '.' ('.' -> '') */
+		if(len == 1 && name[0] == '.')
+		{
+			strcpy(replace,"");
+			name = replace;
+
+			len = 0;
+
+			D(("name = '%s' (line %ld)",name,__LINE__));
+		}
+
+		/* Now put it all together again. */
+		if(volume_name_len > 0)
+		{
+			memmove(&replace[volume_name_len],name,len);
+			memmove(replace,volume_name,volume_name_len);
+
+			len += volume_name_len;
 
 			name = replace;
 
 			name[len] = '\0';
 			D(("name = '%s' (line %ld)",name,__LINE__));
 		}
-		else if ((strncmp(name,"/dev/null",9)) == SAME && (len == 9 || name[9] == '/'))
+
+		/* Reduce any "//" embedded in the name, if necessary. */
+		if(len > 1)
 		{
-			strcpy(replace,"NIL:");
-			name = replace;
+			BOOL have_double_slash = FALSE;
 
-			len = 4;
-
-			name[len] = '\0';
-			D(("name = '%s' (line %ld)",name,__LINE__));
-		}
-		else
-		{
-			size_t path_name_start = 0;
-
-			volume_name_len = 0;
-
-			/* Find out how long the first component
-			   of the absolute path is. */
-			for(i = 1 ; i <= len ; i++)
+			for(i = 0 ; i < len - 1 ; i++)
 			{
-				if(i == len || name[i] == '/')
+				if(name[i] == '/' && name[i + 1] == '/')
 				{
-					volume_name_len = i - 1;
-
-					/* Is there anything following the path name? */
-					if(i < len)
-						path_name_start = i + 1;
-
+					have_double_slash = TRUE;
 					break;
 				}
 			}
-
-			/* Copy the first component and attach a colon. "/foo" becomes "foo:". */
-			memmove(replace,&name[1],volume_name_len);
-			replace[volume_name_len++] = ':';
-
-			/* Now add the finishing touches. "/foo/bar" finally
-			   becomes "foo:bar" and "/foo" becomes "foo:". */
-			if(path_name_start > 0)
+		
+			if(have_double_slash)
 			{
-				memmove(&replace[volume_name_len],&name[path_name_start],len - path_name_start);
-
-				len--;
-			}
-
-			name = replace;
-
-			name[len] = '\0';
-			D(("name = '%s' (line %ld)",name,__LINE__));
-		}
-	}
-
-	/* Extract and remove the volume name from the path. We
-	   are going to need it later. */
-	volume_name_len = 0;
-
-	for(i = 0 ; i < len ; i++)
-	{
-		if(name[i] == ':')
-		{
-			/* Look for extra colon characters embedded in the name
-		       (as in "foo/bar:baz") which really don't belong here. */
-			for(j = 0 ; j < i ; j++)
-			{
-				if(name[j] == '/')
+				if(name != replace)
 				{
-					D(("name '%s' still contains colon characters",name));
-
-					__set_errno(EINVAL); /* invalid name */
-					goto out;
+					memmove(replace,name,len);
+					name = replace;
 				}
-			}
-
-			volume_name_len = i + 1;
-
-			memmove(volume_name,name,volume_name_len);
-
-			name	+= volume_name_len;
-			len		-= volume_name_len;
-
-			D(("name = '%s' (line %ld)",name,__LINE__));
-
-			break;
-		}
-	}
-
-	/* Look for extra colon characters embedded in the name
-       (as in "foo:bar:baz") which really don't belong here. */
-	for(i = 0 ; i < len ; i++)
-	{
-		if(name[i] == ':')
-		{
-			D(("name '%s' still contains colon characters",name));
-
-			__set_errno(EINVAL); /* invalid name */
-			goto out;
-		}
-	}
-
-	/* Now parse the path name and replace all embedded '..' with
-	   the AmigaDOS counterparts ('foo/../bar' -> 'foo//bar'). */
-	if(len > 3)
-	{
-		BOOL have_slash_dot_dot_slash = FALSE;
-
-		for(i = j = 0 ; i < len - 3 ; i++)
-		{
-			if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '.' && name[i + 3] == '/')
-			{
-				have_slash_dot_dot_slash = TRUE;
-				break;
+		
+				__strip_double_slash(name,len);
+				len = strlen(name);
+		
+				D(("name = '%s' (line %ld)",name,__LINE__));
 			}
 		}
 
-		if(have_slash_dot_dot_slash)
-		{
-			for(i = j = 0 ; i < len ; i++)
-			{
-				replace[j++] = name[i];
-
-				if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '.' && name[i + 3] == '/')
-					i += 2;
-			}
-
-			len = j;
-
-			name = replace;
-
-			name[len] = '\0';
-			D(("name = '%s' (line %ld)",name,__LINE__));
-		}
+		/* The following is somewhat controversial. It assumes that what comes out
+		   as a path name that ends with ":/" should translate into the root
+		   directory. This would not be the case for the names of assignments,
+		   though, for which the "/" suffix would actually do something useful. */
+		if(len >= 2 && strncmp(&name[len - 2],":/",2) == SAME)
+			nti->is_root = TRUE;
 	}
-
-	/* Translate a trailing '/..' to '//' */
-	if(len >= 3 && strncmp(&name[len - 3],"/..",3) == SAME)
-	{
-		if(name != replace)
-		{
-			memmove(replace,name,len - 2);
-			name = replace;
-		}
-
-		len -= 2;
-
-		name[len++] = '/';
-
-		name[len] = '\0';
-		D(("name = '%s' (line %ld)",name,__LINE__));
-	}
-
-	/* Translate a leading '../' ('../foo' -> '/foo') */
-	if(len >= 3 && strncmp(name,"../",3) == SAME)
-	{
-		memmove(replace,&name[2],len - 2);
-		name = replace;
-
-		len -= 2;
-
-		name[len] = '\0';
-		D(("name = '%s' (line %ld)",name,__LINE__));
-	}
-
-	/* Translate the '..' ('..' -> '/') */
-	if(len == 2 && strncmp(name,"..",2) == SAME)
-	{
-		strcpy(replace,"/");
-		name = replace;
-
-		len = 1;
-
-		D(("name = '%s' (line %ld)",name,__LINE__));
-	}
-
-	/* Translate the '.' ('.' -> '') */
-	if(len == 1 && name[0] == '.')
-	{
-		strcpy(replace,"");
-		name = replace;
-
-		len = 0;
-
-		D(("name = '%s' (line %ld)",name,__LINE__));
-	}
-
-	/* Now put it all together again. */
-	if(volume_name_len > 0)
-	{
-		memmove(&replace[volume_name_len],name,len);
-		memmove(replace,volume_name,volume_name_len);
-
-		len += volume_name_len;
-
-		name = replace;
-
-		name[len] = '\0';
-		D(("name = '%s' (line %ld)",name,__LINE__));
-	}
-
-	/* Reduce any "//" embedded in the name, if necessary. */
-	if(len > 1)
-	{
-		BOOL have_double_slash = FALSE;
-
-		for(i = 0 ; i < len - 1 ; i++)
-		{
-			if(name[i] == '/' && name[i + 1] == '/')
-			{
-				have_double_slash = TRUE;
-				break;
-			}
-		}
-	
-		if(have_double_slash)
-		{
-			if(name != replace)
-			{
-				memmove(replace,name,len);
-				name = replace;
-			}
-	
-			__strip_double_slash(name,len);
-			len = strlen(name);
-	
-			D(("name = '%s' (line %ld)",name,__LINE__));
-		}
-	}
-
-	/* The following is somewhat controversial. It assumes that what comes out
-	   as a path name that ends with ":/" should translate into the root
-	   directory. This would not be the case for the names of assignments,
-	   though, for which the "/" suffix would actually do something useful. */
-	if(len >= 2 && strncmp(&name[len - 2],":/",2) == SAME)
-		nti->is_root = TRUE;
 
 	nti->original_name = (char *)(*name_ptr);
 	(*name_ptr) = name;
