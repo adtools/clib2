@@ -1,5 +1,5 @@
 /*
- * $Id: string_strtok.c,v 1.1.1.1 2004-07-26 16:32:20 obarthel Exp $
+ * $Id: string_strtok.c,v 1.2 2004-10-25 19:53:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,9 +89,12 @@ strtok(char *str, const char *separator_set)
 		goto out;
 
 	/* This is where the search can resume later. */
-	last = &str[size+1];
-	if((*last) == '\0')
-		last = NULL;
+	last = &str[size];
+
+	/* If we didn't hit the end of the string already,
+	   skip the separator. */
+	if((*last) != '\0')
+		last++;
 
 	/* This is the token we found; make sure that
 	   it looks like a valid string. */

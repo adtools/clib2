@@ -1,3 +1,6 @@
+- strtok() did not terminate properly if the last token in the string
+  did not end with a separator character but with a '\0' byte. Fixed.
+
 - The directory scanning functions opendir/closedir did not get the global
   directory data tracking data structure initialized which later led to
   Enforcer hits and maybe trashed memory. Fixed.
