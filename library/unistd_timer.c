@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_timer.c,v 1.4 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: unistd_timer.c,v 1.5 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,7 +59,7 @@ struct TimerIFace * __ITimer;
 
 /****************************************************************************/
 
-CLIB_CONSTRUCTOR(__timer_init)
+CLIB_CONSTRUCTOR(timer_init)
 {
 	BOOL success = FALSE;
 
@@ -112,7 +112,7 @@ CLIB_CONSTRUCTOR(__timer_init)
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__timer_exit)
+CLIB_DESTRUCTOR(timer_exit)
 {
 	ENTER();
 

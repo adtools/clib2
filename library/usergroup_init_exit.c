@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_init_exit.c,v 1.7 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: usergroup_init_exit.c,v 1.8 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,7 @@ struct UserGroupIFace * __IUserGroup;
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__usergroup_exit)
+CLIB_DESTRUCTOR(usergroup_exit)
 {
 	ENTER();
 
@@ -85,7 +85,7 @@ CLIB_DESTRUCTOR(__usergroup_exit)
 
 /****************************************************************************/
 
-CLIB_CONSTRUCTOR(__usergroup_init)
+CLIB_CONSTRUCTOR(usergroup_init)
 {
 	struct TagItem tags[2];
 	BOOL success = FALSE;

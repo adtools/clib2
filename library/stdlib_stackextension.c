@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackextension.c,v 1.8 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdlib_stackextension.c,v 1.9 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -282,7 +282,7 @@ ULONG __stk_size;
 
 /****************************************************************************/
 
-STK_CONSTRUCTOR(__stk_init)
+STK_CONSTRUCTOR(stk_init)
 {
 	struct Task *task = FindTask(NULL);
 
@@ -300,7 +300,7 @@ STK_CONSTRUCTOR(__stk_init)
 /****************************************************************************/
 
 /* Free all spare stackframes */
-STK_DESTRUCTOR(__stk_exit)
+STK_DESTRUCTOR(stk_exit)
 {
 	if(__memory_pool == NULL)
 	{

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.42 2005-03-11 13:23:18 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.43 2005-03-11 18:27:26 obarthel Exp $
 #
 # :ts=8
 #
@@ -27,7 +27,7 @@ MAKEDIR = mkdir
 # DELETE = delete all quiet
 # MAKEDIR = makedir
 
-MAKE = make -f GNUmakefile.os4
+MAKE = $(MAKE_COMMAND) -f GNUmakefile.os4
 
 ##############################################################################
 

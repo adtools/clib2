@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.41 2005-03-11 13:23:17 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.42 2005-03-11 18:27:26 obarthel Exp $
 #
 # :ts=8
 #
@@ -12,7 +12,7 @@ RANLIB = ranlib
 COPY = copy clone buf=0
 DELETE = delete all quiet
 MAKEDIR = makedir
-MAKE = make -f GNUmakefile.68k
+MAKE = $(MAKE_COMMAND) -f GNUmakefile.68k
 
 ##############################################################################
 

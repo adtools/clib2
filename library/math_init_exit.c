@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.11 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.12 2005-03-11 18:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ double __huge_val;
 
 /****************************************************************************/
 
-MATH_DESTRUCTOR(__math_exit)
+MATH_DESTRUCTOR(math_exit)
 {
 	#if defined(IEEE_FLOATING_POINT_SUPPORT)
 	{
@@ -98,7 +98,7 @@ MATH_DESTRUCTOR(__math_exit)
 
 /****************************************************************************/
 
-MATH_CONSTRUCTOR(__math_init)
+MATH_CONSTRUCTOR(math_init)
 {
 	BOOL success = FALSE;
 

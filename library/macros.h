@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.16 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: macros.h,v 1.17 2005-03-11 18:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,8 +101,8 @@
 	int __stdargs _STI_##pri##_##name(void)
 
 #define DESTRUCTOR(name,pri) \
-	int __stdargs _STD_##pri##_##name(void); \
-	int __stdargs _STD_##pri##_##name(void)
+	void __stdargs _STD_##pri##_##name(void); \
+	void __stdargs _STD_##pri##_##name(void)
 
 #define CONSTRUCTOR_SUCCEED() \
 	return(0)

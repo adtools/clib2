@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.3 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.4 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -110,7 +110,7 @@ is_final_quote_character(const unsigned char * str)
 
 /****************************************************************************/
 
-ARG_CONSTRUCTOR(__arg_init)
+ARG_CONSTRUCTOR(arg_init)
 {
 	BOOL success = FALSE;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_init_exit.c,v 1.8 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: unistd_init_exit.c,v 1.9 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@ struct MinList __unlink_list;
 
 /****************************************************************************/
 
-CLIB_CONSTRUCTOR(__unistd_init)
+CLIB_CONSTRUCTOR(unistd_init)
 {
 	ENTER();
 
@@ -59,7 +59,7 @@ CLIB_CONSTRUCTOR(__unistd_init)
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__unistd_exit)
+CLIB_DESTRUCTOR(unistd_exit)
 {
 	ENTER();
 

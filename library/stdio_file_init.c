@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.3 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.4 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -196,7 +196,7 @@ wb_file_init(void)
 
 /****************************************************************************/
 
-FILE_CONSTRUCTOR(__stdio_file_init)
+FILE_CONSTRUCTOR(stdio_file_init)
 {
 	struct SignalSemaphore * stdio_lock;
 	struct SignalSemaphore * fd_lock;

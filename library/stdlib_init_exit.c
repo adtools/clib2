@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_init_exit.c,v 1.8 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdlib_init_exit.c,v 1.9 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@ char * __program_name;
 
 /****************************************************************************/
 
-STDLIB_DESTRUCTOR(__stdlib_exit)
+STDLIB_DESTRUCTOR(stdlib_exit)
 {
 	__memory_exit();
 
@@ -64,7 +64,7 @@ STDLIB_DESTRUCTOR(__stdlib_exit)
 
 /****************************************************************************/
 
-STDLIB_CONSTRUCTOR(__stdlib_init)
+STDLIB_CONSTRUCTOR(stdlib_init)
 {
 	BOOL success = FALSE;
 

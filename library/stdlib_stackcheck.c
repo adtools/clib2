@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackcheck.c,v 1.5 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdlib_stackcheck.c,v 1.6 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -115,7 +115,7 @@ UBYTE * __base;
 
 /****************************************************************************/
 
-STK_CONSTRUCTOR(__stk_init)
+STK_CONSTRUCTOR(stk_init)
 {
 	struct Task * this_task = FindTask(NULL);
 	ULONG lower = (ULONG)this_task->tc_SPLower;

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stack_usage.c,v 1.3 2005-03-11 09:37:29 obarthel Exp $
+ * $Id: stdlib_stack_usage.c,v 1.4 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,6 +44,15 @@
 /****************************************************************************/
 
 static struct StackSwapStruct stack_swap_struct;
+
+/****************************************************************************/
+
+#if defined(__SASC)
+
+ULONG __stk_extensions;	/* number of stack extensions performed */
+ULONG __stk_maxsize;	/* maximum amount of memory allocated for stack extension */	
+
+#endif /* __SASC */
 
 /****************************************************************************/
 

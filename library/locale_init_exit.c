@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.9 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.10 2005-03-11 18:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -214,7 +214,7 @@ __locale_unlock(void)
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__locale_exit_destructor)
+CLIB_DESTRUCTOR(locale_exit)
 {
 	ENTER();
 
@@ -232,7 +232,7 @@ CLIB_DESTRUCTOR(__locale_exit_destructor)
 
 /****************************************************************************/
 
-CLIB_CONSTRUCTOR(__locale_init_constructor)
+CLIB_CONSTRUCTOR(locale_init)
 {
 	BOOL success = FALSE;
 	int i;

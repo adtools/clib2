@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.9 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.10 2005-03-11 18:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -82,7 +82,7 @@ __dirent_unlock(void)
 
 /****************************************************************************/
 
-CLIB_CONSTRUCTOR(__dirent_init)
+CLIB_CONSTRUCTOR(dirent_init)
 {
 	BOOL success = FALSE;
 
@@ -112,7 +112,7 @@ CLIB_CONSTRUCTOR(__dirent_init)
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__dirent_exit)
+CLIB_DESTRUCTOR(dirent_exit)
 {
 	ENTER();
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.27 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.28 2005-03-11 18:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -99,7 +99,7 @@ __close_all_files(void)
 
 /****************************************************************************/
 
-STDIO_DESTRUCTOR(__stdio_exit)
+STDIO_DESTRUCTOR(stdio_exit)
 {
 	__close_all_files();
 
@@ -108,7 +108,7 @@ STDIO_DESTRUCTOR(__stdio_exit)
 
 /****************************************************************************/
 
-STDIO_CONSTRUCTOR(__stdio_init)
+STDIO_CONSTRUCTOR(stdio_init)
 {
 	const int num_standard_files = (STDERR_FILENO - STDIN_FILENO + 1);
 

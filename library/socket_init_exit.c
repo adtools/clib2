@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.16 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.17 2005-03-11 18:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -92,7 +92,7 @@ int h_errno;
 
 /****************************************************************************/
 
-SOCKET_DESTRUCTOR(__socket_exit)
+SOCKET_DESTRUCTOR(socket_exit)
 {
 	/* Disable ^C checking. */
 	if(__SocketBase != NULL)
@@ -134,7 +134,7 @@ SOCKET_DESTRUCTOR(__socket_exit)
 
 /****************************************************************************/
 
-SOCKET_CONSTRUCTOR(__socket_init)
+SOCKET_CONSTRUCTOR(socket_init)
 {
 	struct TagItem tags[5];
 	BOOL success = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.3 2005-01-09 10:10:40 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.4 2005-03-11 18:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,7 @@ static struct RexxSysIFace * IRexxSys;
 
 /****************************************************************************/
 
-CLIB_CONSTRUCTOR(__rexxvars_init)
+CLIB_CONSTRUCTOR(rexxvars_init)
 {
 	ENTER();
 
@@ -85,7 +85,7 @@ CLIB_CONSTRUCTOR(__rexxvars_init)
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__rexxvars_exit)
+CLIB_DESTRUCTOR(rexxvars_exit)
 {
 	ENTER();
 
