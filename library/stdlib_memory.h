@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_memory.h,v 1.1 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_memory.h,v 1.2 2005-03-20 11:18:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,7 +40,7 @@
  * Uncomment this to build a library which has the memory debugging features
  * enabled.
  */
-/*#define __MEM_DEBUG */
+/*#define __MEM_DEBUG*/
 
 /****************************************************************************/
 

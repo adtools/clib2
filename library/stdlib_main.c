@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.19 2005-03-19 11:06:57 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.20 2005-03-20 11:18:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -30,10 +30,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-/*#define DEBUG*/
-
-/****************************************************************************/
 
 #ifndef EXEC_EXECBASE_H
 #include <exec/execbase.h>

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.15 2005-03-19 11:06:57 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.16 2005-03-20 11:18:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,12 @@
 #ifndef _MATH_FP_SUPPORT_H
 #include "math_fp_support.h"
 #endif /* _MATH_FP_SUPPORT_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

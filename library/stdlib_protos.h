@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.13 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.14 2005-03-20 11:18:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,11 +49,7 @@
 /****************************************************************************/
 
 #ifndef _STDLIB_MEMORY_H
-
-/* Forward declarations */
-struct MemoryNode;
-struct MemoryTree;
-
+#include "stdlib_memory.h"
 #endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/

@@ -113,6 +113,11 @@
   data structures possibly not being in a well-defined and
   initialized state.
 
+- Turns out that the constructor/destructor calling sequence
+  was still wrongish for the OS4 library. So I had to change
+  it *again*. Which probably means that the 68k library will
+  need further changes...
+
 
 c.lib 1.189 (5.3.2005)
 

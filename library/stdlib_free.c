@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_free.c,v 1.9 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_free.c,v 1.10 2005-03-20 11:18:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@
 
 /****************************************************************************/
 
-STATIC CHAR
+STATIC char
 get_hex_char(int n)
 {
 	char result;

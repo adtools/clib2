@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor.h,v 1.1 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdlib_constructor.h,v 1.2 2005-03-20 11:18:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -112,32 +112,32 @@
    constructors and the user-supplied destructors before the library
    destructors. */
 
-#define STDLIB_CONSTRUCTOR(name)	CONSTRUCTOR(name,	1)
-#define STDLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	1)
+#define STDLIB_CONSTRUCTOR(name)	CONSTRUCTOR(name,	9)
+#define STDLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	9)
 
-#define STK_CONSTRUCTOR(name)		CONSTRUCTOR(name,	2)
-#define STK_DESTRUCTOR(name)		DESTRUCTOR(name,	2)
+#define STK_CONSTRUCTOR(name)		CONSTRUCTOR(name,	8)
+#define STK_DESTRUCTOR(name)		DESTRUCTOR(name,	8)
 
-#define STDIO_CONSTRUCTOR(name)		CONSTRUCTOR(name,	3)
-#define STDIO_DESTRUCTOR(name)		DESTRUCTOR(name,	3)
+#define STDIO_CONSTRUCTOR(name)		CONSTRUCTOR(name,	7)
+#define STDIO_DESTRUCTOR(name)		DESTRUCTOR(name,	7)
 
-#define FILE_CONSTRUCTOR(name)		CONSTRUCTOR(name,	4)
-#define FILE_DESTRUCTOR(name)		DESTRUCTOR(name,	4)
+#define FILE_CONSTRUCTOR(name)		CONSTRUCTOR(name,	6)
+#define FILE_DESTRUCTOR(name)		DESTRUCTOR(name,	6)
 
 #define MATH_CONSTRUCTOR(name)		CONSTRUCTOR(name,	5)
 #define MATH_DESTRUCTOR(name)		DESTRUCTOR(name,	5)
 
-#define SOCKET_CONSTRUCTOR(name)	CONSTRUCTOR(name,	6)
-#define SOCKET_DESTRUCTOR(name)		DESTRUCTOR(name,	6)
+#define SOCKET_CONSTRUCTOR(name)	CONSTRUCTOR(name,	4)
+#define SOCKET_DESTRUCTOR(name)		DESTRUCTOR(name,	4)
 
-#define ARG_CONSTRUCTOR(name)		CONSTRUCTOR(name,	7)
-#define ARG_DESTRUCTOR(name)		DESTRUCTOR(name,	7)
+#define ARG_CONSTRUCTOR(name)		CONSTRUCTOR(name,	3)
+#define ARG_DESTRUCTOR(name)		DESTRUCTOR(name,	3)
 
-#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	8)
-#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	8)
+#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	2)
+#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	2)
 
-#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	9)
-#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	9)
+#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	1)
+#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	1)
 
 /****************************************************************************/
 

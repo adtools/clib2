@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_red_black.c,v 1.4 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_red_black.c,v 1.5 2005-03-20 11:18:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -130,7 +130,7 @@ rotate_right (struct MemoryTree * tree, struct MemoryNode * y)
 
 /****************************************************************************/
 
-STATIC STRUCT MemoryNode *
+STATIC struct MemoryNode *
 get_successor (struct MemoryTree * tree, struct MemoryNode * x)
 {
 	struct MemoryNode *nil = &tree->mt_NullNode;
