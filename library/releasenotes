@@ -1,6 +1,5 @@
-c.lib 1.178 (7.10.2004)
+c.lib 1.179 (22.10.2004)
 
-- The OS4 version had floating point math support code enabled in all
-  libraries and not just "libm.a". Trying to link with, for example,
-  "libc.a" would bring up a number of unsatisfied symbol references
-  which could be fixed only by linking against "libm.a", too.
+- The scanf() family no longer ignores a conversion request of
+  type '%x' (hexadecimal) and treats the number to be processed
+  as in octal notation if that number begins with the digit 0.
