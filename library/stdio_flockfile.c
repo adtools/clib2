@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_flockfile.c,v 1.2 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: stdio_flockfile.c,v 1.3 2005-02-28 13:42:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,6 +40,10 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+#if defined(__THREAD_SAFE)
 
 /****************************************************************************/
 
@@ -87,3 +91,7 @@ flockfile(FILE *stream)
 
 	LEAVE();
 }
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */

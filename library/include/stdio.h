@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.7 2005-02-28 10:07:35 obarthel Exp $
+ * $Id: stdio.h,v 1.8 2005-02-28 13:42:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -200,21 +200,6 @@ extern int putchar(int c);
 
 /****************************************************************************/
 
-/* The following four functions are not part of ISO 'C' (1994). */
-
-/****************************************************************************/
-
-extern int getc_unlocked(FILE *stream);
-extern int getchar_unlocked(void);
-extern int putc_unlocked(int c,FILE *stream);
-extern int putchar_unlocked(int c);
-
-/****************************************************************************/
-
-/* ISO 'C' (1994) functions continue below. */
-
-/****************************************************************************/
-
 extern char *fgets(char *s,int n,FILE *stream);
 extern char *gets(char *s);
 
@@ -265,23 +250,6 @@ extern char *tmpnam(char *buf);
 /****************************************************************************/
 
 /*
- * A special buffer flush routine which returns the last character written
- * in case of success and EOF in case of failure. This is used by the
- * putc_unlocked() macro defined below.
- */
-extern int __flush(FILE *stream);
-
-/****************************************************************************/
-
-/*
- * A special function which returns the input character. This is used by
- * the getc() macro defined below.
- */
-extern int __unlockfile(FILE *stream,int c);
-
-/****************************************************************************/
-
-/*
  * fgetc() implemented as a "simple" macro; note that fgetc() does much more than
  * can be conveniently expressed as a macro!
  */
@@ -291,8 +259,6 @@ extern int __unlockfile(FILE *stream,int c);
 	 ((FILE *)(f))->position < ((FILE *)(f))->num_read_bytes) ? \
 	    ((FILE *)(f))->buffer[((FILE *)(f))->position++] : \
 	    fgetc(f))
-
-#define getc_unlocked(f) __getc_unlocked(f)
 
 /****************************************************************************/
 
@@ -310,13 +276,6 @@ extern int __unlockfile(FILE *stream,int c);
 	   __flush(f) : \
 	   (((FILE *)(f))->buffer[((FILE *)(f))->num_write_bytes-1]))) : \
 	   fputc((c),(f)))
-
-#define putc_unlocked(c,f) __putc_unlocked((c),(f))
-
-/****************************************************************************/
-
-#define getchar_unlocked()	__getc_unlocked(stdin)
-#define putchar_unlocked(c)	__putc_unlocked((c),stdout)
 
 /****************************************************************************/
 
@@ -365,6 +324,38 @@ extern int __unlockfile(FILE *stream,int c);
 
 /****************************************************************************/
 
+/*
+ * A special buffer flush routine which returns the last character written
+ * in case of success and EOF in case of failure. This is used by the
+ * putc_unlocked() macro defined above.
+ */
+extern int __flush(FILE *stream);
+
+/****************************************************************************/
+
+/*
+ * A special function which returns the input character. This is used by
+ * the getc() macro defined above.
+ */
+extern int __unlockfile(FILE *stream,int c);
+
+/****************************************************************************/
+
+extern int getc_unlocked(FILE *stream);
+extern int getchar_unlocked(void);
+extern int putc_unlocked(int c,FILE *stream);
+extern int putchar_unlocked(int c);
+
+/****************************************************************************/
+
+#define getc_unlocked(f)	__getc_unlocked(f)
+#define putc_unlocked(c,f)	__putc_unlocked((c),(f))
+
+#define getchar_unlocked()	__getc_unlocked(stdin)
+#define putchar_unlocked(c)	__putc_unlocked((c),stdout)
+
+/****************************************************************************/
+
 extern FILE * fdopen(int file_descriptor, const char * type);
 extern int fileno(FILE * file);
 extern int asprintf(char **ret, const char *format, ...);
@@ -375,9 +366,27 @@ extern FILE * popen(const char *command, const char *type);
 
 /****************************************************************************/
 
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
 extern void flockfile(FILE * file);
 extern void funlockfile(FILE * file);
 extern int ftrylockfile(FILE * file);
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
+#define flockfile(file)		((void)0)
+#define funlockfile(file)	((void)0)
+#define ftrylockfile(file)	(0)
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */
 
 /****************************************************************************/
 
