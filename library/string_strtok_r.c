@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime.c,v 1.3 2004-11-18 09:40:37 obarthel Exp $
+ * $Id: string_strtok_r.c,v 1.1 2004-11-18 09:40:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,23 +37,76 @@
 
 /****************************************************************************/
 
-#ifndef _TIME_HEADERS_H
-#include "time_headers.h"
-#endif /* _TIME_HEADERS_H */
+#ifndef _STRING_HEADERS_H
+#include "string_headers.h"
+#endif /* _STRING_HEADERS_H */
 
 /****************************************************************************/
 
 char *
-asctime(const struct tm *tm)
+strtok_r(char *str, const char *separator_set,char ** state_ptr)
 {
-	static char buffer[40];
+	char * result = NULL;
+	char * last;
+	size_t size;
 
-	char * result;
+	assert( separator_set != NULL && state_ptr != NULL );
 
-	ENTER();
+	#if defined(CHECK_FOR_NULL_POINTERS)
+	{
+		if(separator_set == NULL || state_ptr == NULL)
+		{
+			errno = EFAULT;
+			goto out;
+		}
+	}
+	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	result = __asctime_r(tm,buffer,sizeof(buffer));
+	last = (*state_ptr);
 
-	RETURN(result);
+	/* Did we get called before? Restart at the last valid position. */
+	if(str == NULL)
+	{
+		str = last;
+
+		/* However, we may have hit the end of the
+		   string already. */
+		if(str == NULL)
+			goto out;
+	}
+
+	last = NULL;
+
+	/* Skip the characters which count as
+	   separators. */
+	str += strspn(str, separator_set);
+	if((*str) == '\0')
+		goto out;
+
+	/* Count the number of characters which aren't
+	   separators. */
+	size = strcspn(str, separator_set);
+	if(size == 0)
+		goto out;
+
+	/* This is where the search can resume later. */
+	last = &str[size];
+
+	/* If we didn't hit the end of the string already,
+	   skip the separator. */
+	if((*last) != '\0')
+		last++;
+
+	/* This is the token we found; make sure that
+	   it looks like a valid string. */
+	str[size] = '\0';
+
+	result = str;
+
+ out:
+
+	if(state_ptr != NULL)
+		(*state_ptr) = last;
+
 	return(result);
 }

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.11 2004-11-14 11:06:27 obarthel Exp $
+# $Id: smakefile,v 1.12 2004-11-18 09:40:37 obarthel Exp $
 #
 # :ts=8
 #
@@ -457,6 +457,7 @@ STRING_OBJ = \
 	string_strspn.o \
 	string_strstr.o \
 	string_strtok.o \
+	string_strtok_r.o \
 	string_strxfrm.o
 
 STRINGS_OBJ = \
@@ -465,14 +466,18 @@ STRINGS_OBJ = \
 
 TIME_OBJ = \
 	time_asctime.o \
+	time_asctime_r.o \
 	time_clock.o \
 	time_converttime.o \
 	time_ctime.o \
+	time_ctime_r.o \
 	time_data.o \
 	time_difftime.o \
 	time_gettimeofday.o \
 	time_gmtime.o \
+	time_gmtime_r.o \
 	time_localtime.o \
+	time_localtime_r.o \
 	time_mktime.o \
 	time_numbertostring.o \
 	time_strftime.o \

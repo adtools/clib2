@@ -1,5 +1,5 @@
 /*
- * $Id: time_gmtime.c,v 1.2 2004-11-17 19:07:22 obarthel Exp $
+ * $Id: time_gmtime.c,v 1.3 2004-11-18 09:40:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,35 +40,6 @@
 #ifndef _TIME_HEADERS_H
 #include "time_headers.h"
 #endif /* _TIME_HEADERS_H */
-
-/****************************************************************************/
-
-struct tm *
-gmtime_r(const time_t *t,struct tm * tm_ptr)
-{
-	struct tm * result = NULL;
-
-	ENTER();
-
-	assert( t != NULL && tm_ptr != NULL );
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
-	{
-		if(t == NULL || tm_ptr == NULL)
-		{
-			errno = EFAULT;
-			goto out;
-		}
-	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	result = __convert_time((*t), 0, tm_ptr);
-
- out:
-
-	RETURN(result);
-	return(result);
-}
 
 /****************************************************************************/
 

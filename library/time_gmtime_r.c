@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime.c,v 1.3 2004-11-18 09:40:37 obarthel Exp $
+ * $Id: time_gmtime_r.c,v 1.1 2004-11-18 09:40:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,16 +43,28 @@
 
 /****************************************************************************/
 
-char *
-asctime(const struct tm *tm)
+struct tm *
+gmtime_r(const time_t *t,struct tm * tm_ptr)
 {
-	static char buffer[40];
-
-	char * result;
+	struct tm * result = NULL;
 
 	ENTER();
 
-	result = __asctime_r(tm,buffer,sizeof(buffer));
+	assert( t != NULL && tm_ptr != NULL );
+
+	#if defined(CHECK_FOR_NULL_POINTERS)
+	{
+		if(t == NULL || tm_ptr == NULL)
+		{
+			errno = EFAULT;
+			goto out;
+		}
+	}
+	#endif /* CHECK_FOR_NULL_POINTERS */
+
+	result = __convert_time((*t), 0, tm_ptr);
+
+ out:
 
 	RETURN(result);
 	return(result);
