@@ -1,5 +1,5 @@
 /*
- * $Id: test.c,v 1.2 2005-01-25 11:21:58 obarthel Exp $
+ * $Id: test.c,v 1.3 2005-01-29 17:48:07 obarthel Exp $
  *
  * :ts=4
  */
@@ -102,9 +102,14 @@ main(int argc,char ** argv)
 	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
 	printf("2005-01-25 12:03:53 -> local time = %s\n",time_buffer);
 
+	time(&now);
 	tm = (*gmtime(&now));
 	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
 	printf("2005-01-25 12:03:53 -> gmt = %s\n",time_buffer);
+
+	tm = (*gmtime(&now));
+	strftime(time_buffer,sizeof(time_buffer),"%c %U %W %j",&tm);
+	printf("%s\n",time_buffer);
 
 	#if defined(IEEE_FLOATING_POINT_SUPPORT) || defined(M68881_FLOATING_POINT_SUPPORT)
 	{
