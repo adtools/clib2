@@ -118,6 +118,13 @@
   it *again*. Which probably means that the 68k library will
   need further changes...
 
+- Moved stdlib_main.o into the regular lib.c, at least for
+  the 68k build. The PowerPC build may follow later, provided
+  I manage to get the specs file fixed.
+
+- Moved the check for the presence of an FPU into the
+  math_init.c code.
+
 
 c.lib 1.189 (5.3.2005)
 

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.46 2005-03-20 11:18:06 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.47 2005-03-20 17:14:58 obarthel Exp $
 #
 # :ts=8
 #
@@ -301,6 +301,7 @@ C_LIB = \
 	stdlib_labs.o \
 	stdlib_ldiv.o \
 	stdlib_machine_test.o \
+	stdlib_main.o \
 	stdlib_malloc.o \
 	stdlib_math.o \
 	stdlib_mkdtemp.o \
@@ -546,7 +547,6 @@ MATH_LIB = \
 	stdio_vsnprintf.o \
 	stdio_vsprintf.o \
 	stdlib_atof.o \
-	stdlib_machine_test.o \
 	stdlib_strtod.o \
 	time_difftime.o
 

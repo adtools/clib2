@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.45 2005-03-19 11:06:56 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.46 2005-03-20 17:14:58 obarthel Exp $
 #
 # :ts=8
 #
@@ -302,6 +302,7 @@ C_LIB = \
 	stdlib_labs.o \
 	stdlib_ldiv.o \
 	stdlib_machine_test.o \
+	stdlib_main.o \
 	stdlib_malloc.o \
 	stdlib_math.o \
 	stdlib_mkdtemp.o \
@@ -544,7 +545,6 @@ MATH_LIB = \
 
 MATH_LIB_881 = \
 	m881.lib_rev.o \
-	stdlib_machine_test.o \
 	$(MATH_LIB)
 
 MATH_LIB_IEEE = \
@@ -759,7 +759,7 @@ endif
 
 ##############################################################################
 
-STARTUPS := nrcrt0.o nbcrt0.o nr32crt0.o nb32crt0.o ncrt0.o mainnb.o mainb.o mainb32.o
+STARTUPS := nrcrt0.o nbcrt0.o nr32crt0.o nb32crt0.o ncrt0.o
 
 ##############################################################################
 
@@ -769,9 +769,6 @@ all: \
 	lib/ncrt0.o \
 	lib/n32bcrt0.o \
 	lib/n32rcrt0.o \
-	lib/mainnb.o \
-	lib/mainb.o \
-	lib/mainb32.o \
 	lib/libm020/libm.a \
 	lib/libm.a \
 	lib/libb/libm.a \
@@ -881,15 +878,6 @@ lib/n32bcrt0.o : lib nb32crt0.o
 lib/n32rcrt0.o : lib nr32crt0.o
 	@$(COPY) nr32crt0.o lib
 
-lib/mainnb.o : lib mainnb.o
-	@$(COPY) mainnb.o lib
-
-lib/mainb.o : lib mainb.o
-	@$(COPY) mainb.o lib
-
-lib/mainb32.o : lib mainb32.o
-	@$(COPY) mainb32.o lib
-
 ##############################################################################
 
 $(LIBAMIGA_OBJS)/amiga_hookentry.o : amiga_hookentry.c
@@ -949,17 +937,21 @@ else
 LOCAL_CODE_FLAGS := $(CODE_FLAGS)
 endif
 
+$(LIBM881_OBJS)/math_init_exit.o : math_init_exit.c
+	@echo "Compiling $< [$(TYPE):m881]"
+	@$(CC) -o $(LIBM881_OBJS)/math_init_exit.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) -DM68881_FLOATING_POINT_SUPPORT $(INCLUDES) $<
+
 $(LIBC_OBJS)/stdlib_machine_test.o : stdlib_machine_test.c
 	@echo "Compiling $< [$(TYPE):c]"
 	@$(CC) -o $(LIBC_OBJS)/stdlib_machine_test.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) $(INCLUDES) $<
 
-$(LIBM881_OBJS)/stdlib_machine_test.o : stdlib_machine_test.c
-	@echo "Compiling $< [$(TYPE):c]"
-	@$(CC) -o $(LIBM881_OBJS)/stdlib_machine_test.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) $(INCLUDES) -DM68881_FLOATING_POINT_SUPPORT $<
-
 $(LIBC_OBJS)/stdlib_showerror.o : stdlib_showerror.c
 	@echo "Compiling $< [$(TYPE):c]"
 	@$(CC) -o $(LIBC_OBJS)/stdlib_showerror.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) $(INCLUDES) $<
+
+$(LIBC_OBJS)/stdlib_main.o : stdlib_main.c
+	@echo "Compiling $< [$(TYPE):c]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_main.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) $(INCLUDES) stdlib_main.c
 
 ##############################################################################
 
@@ -1108,18 +1100,6 @@ nb32crt0.o : ncrt0.S
 ncrt0.o : ncrt0.S
 	@echo "Assembling $< [large_data]"
 	@$(CC) -traditional -o $@ -c ncrt0.S
-
-mainb32.o : stdlib_main.c
-	@echo "Compiling $< [small_data32]"
-	@$(CC) -o mainb32.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -fbaserel32 -DSMALL_DATA32 -m68020-60 -DM68020 stdlib_main.c
-
-mainb.o : stdlib_main.c
-	@echo "Compiling $< [small_data]"
-	@$(CC) -o mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -fbaserel -DSMALL_DATA -m68000 stdlib_main.c
-
-mainnb.o : stdlib_main.c
-	@echo "Compiling $< [large_data]"
-	@$(CC) -o mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -m68000 stdlib_main.c
 
 ##############################################################################
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.14 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.15 2005-03-20 17:14:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -117,6 +117,17 @@ MATH_CONSTRUCTOR(math_init)
 	BOOL success = FALSE;
 
 	ENTER();
+
+	#if defined(M68881_FLOATING_POINT_SUPPORT)
+	{
+		if(FLAG_IS_CLEAR(((struct ExecBase *)SysBase)->AttnFlags,AFF_68881))
+		{
+			__show_error("This program requires a floating point processor.");
+
+			goto out;
+		}
+	}
+	#endif /* M68881_FLOATING_POINT_SUPPORT */
 
 	#if defined(IEEE_FLOATING_POINT_SUPPORT)
 	{
