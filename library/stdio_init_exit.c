@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.9 2005-01-09 10:10:41 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.10 2005-01-09 10:43:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -113,7 +113,7 @@ __stdio_init(void)
 
 	ENTER();
 
-	ASSERT( num_standard_files == (STDERR_FILENO-STDIN_FILENO+1) );
+	assert( num_standard_files == (STDERR_FILENO-STDIN_FILENO+1) );
 
 	__iob = malloc(sizeof(*__iob) * num_standard_files);
 	if(__iob == NULL)
