@@ -1,17 +1,17 @@
-- Folded duplicate code stdio_init_exit.c into a common function.
+- Folded duplicate code in "stdio_init_exit.c" into a common function.
 
-- Simplified the code in time_asctime_r.c which builds the time
+- Simplified the code in "time_asctime_r.c" which builds the time
   string. It gracefully handles buffer sizes which are too short
   by returning an empty string.
 
-- Moved the tm->tm_wday initialization out of the hook function
-  in time_strftime.c since it was to be called only once anyway.
+- Moved the "tm->tm_wday" initialization out of the hook function
+  in "time_strftime.c" since it was to be called only once anyway.
 
-- Lost a few compiler warnings in unistd_time_delay.c and
-  time_gettimeofday.c.
+- Lost a few compiler warnings in "unistd_time_delay.c" and
+  "time_gettimeofday.c".
 
-- Folded duplicate code in time_mktime.c; also, errno is no longer
-  modified unless the library is built with the CHECK_FOR_NULL_POINTERS
+- Folded duplicate code in "time_mktime.c"; also, errno is no longer
+  modified unless the library is built with the "CHECK_FOR_NULL_POINTERS"
   option.
 
 
