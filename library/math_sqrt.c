@@ -1,5 +1,5 @@
 /*
- * $Id: math_sqrt.c,v 1.2 2004-08-21 18:57:40 obarthel Exp $
+ * $Id: math_sqrt.c,v 1.3 2004-09-27 15:06:19 tfrieden Exp $
  *
  * :ts=4
  *
@@ -135,7 +135,7 @@ __sqrt(double x)
 
 /****************************************************************************/
 
-#if defined(PPC_FLOATING_POINT_SUPPORT)
+#ifdef __PPC__
 
 static	const double	one	= 1.0, tiny=1.0e-300;
 
@@ -236,7 +236,7 @@ __sqrt(double x)
 	return z;
 }
 
-#endif /* PPC_FLOATING_POINT_SUPPORT */
+#endif
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_modf.c,v 1.1.1.1 2004-07-26 16:30:50 obarthel Exp $
+ * $Id: math_modf.c,v 1.2 2004-09-27 15:06:19 tfrieden Exp $
  *
  * :ts=4
  *
@@ -109,7 +109,7 @@ __modf(double x,double *nptr)
 
 /****************************************************************************/
 
-#if defined(PPC_FLOATING_POINT_SUPPORT)
+#if defined(__PPC__)
 
 INLINE static const double
 __modf(double x,double *nptr)

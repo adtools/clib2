@@ -1,5 +1,5 @@
 /*
- * $Id: math_fabs.c,v 1.1.1.1 2004-07-26 16:30:42 obarthel Exp $
+ * $Id: math_fabs.c,v 1.2 2004-09-27 15:06:16 tfrieden Exp $
  *
  * :ts=4
  *
@@ -139,6 +139,17 @@ __fabs(double x)
 
 	return res;
 
+}
+
+#else
+
+INLINE static const double
+__fabs(double x)
+{
+	if (x > 0)
+		return x;
+	else
+		return -x;
 }
 
 #endif /* PPC_FLOATING_POINT_SUPPORT */

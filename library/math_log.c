@@ -1,5 +1,5 @@
 /*
- * $Id: math_log.c,v 1.1.1.1 2004-07-26 16:30:49 obarthel Exp $
+ * $Id: math_log.c,v 1.2 2004-09-27 15:06:19 tfrieden Exp $
  *
  * :ts=4
  *
@@ -135,7 +135,7 @@ __log(double x)
 
 /****************************************************************************/
 
-#if defined(PPC_FLOATING_POINT_SUPPORT)
+#if defined(__PPC__)
 
 static const double
 ln2_hi  =  6.93147180369123816490e-01,	/* 3fe62e42 fee00000 */
