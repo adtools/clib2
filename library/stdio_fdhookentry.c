@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.20 2005-03-12 09:43:48 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.21 2005-03-12 09:49:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,11 +84,11 @@ __fd_hook_entry(
 		{
 			file = Input();
 		}
-		else if (fd == __fd[STDOUT_FILENO])
+		else if (__num_fd > STDOUT_FILENO && fd == __fd[STDOUT_FILENO])
 		{
 			file = Output();
 		}
-		else if (fd == __fd[STDERR_FILENO])
+		else if (__num_fd > STDERR_FILENO && fd == __fd[STDERR_FILENO])
 		{
 			#if defined(__amigaos4__)
 			{
