@@ -1,5 +1,5 @@
 /*
- * $Id: ctype_table.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: ctype_table.c,v 1.3 2005-01-09 15:20:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,22 +36,8 @@
 
 /****************************************************************************/
 
-/* The construction of this table is rather peculiar. The assumption is that
-   the table index from which a flag value could be fetched is in the range
-   -128..255 since the character to be tested could be a signed or unsigned
-   8 bit value. The table access pointer (declared below) therefore points
-   to the 128th byte of '__ctype_data[]'. */
-static const unsigned char __ctype_data[3 * 128] =
+const unsigned char __ctype_table[2 * 128] =
 {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
 	/*   0      */ __CTYPE_CONTROL,
 	/*   1      */ __CTYPE_CONTROL,
 	/*   2      */ __CTYPE_CONTROL,
@@ -190,7 +176,3 @@ static const unsigned char __ctype_data[3 * 128] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-
-/****************************************************************************/
-
-const unsigned char * const __ctype_table = &__ctype_data[128];

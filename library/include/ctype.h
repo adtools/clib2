@@ -1,5 +1,5 @@
 /*
- * $Id: ctype.h,v 1.4 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: ctype.h,v 1.5 2005-01-09 15:20:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,15 +66,14 @@ extern int toupper(int c);
 /*
  * If requested, reimplement the character classification functions as macros;
  * note that the macro variants ignore the current locale and default to the
- * 'C' locale rules. Note that the characters to be tested must be either
- * signed or unsigned 8 bit values.
+ * 'C' locale rules.
  */
 
 #ifdef __C_MACROS__
 
 /****************************************************************************/
 
-extern const unsigned char * const __ctype_table;
+extern const unsigned char __ctype_table[];
 
 /****************************************************************************/
 
@@ -89,17 +88,17 @@ extern const unsigned char * const __ctype_table;
 
 /****************************************************************************/
 
-#define isalnum(c)	((__ctype_table[c] & (__CTYPE_DIGIT|__CTYPE_LOWER_CASE|__CTYPE_UPPER_CASE)) != 0)
-#define isalpha(c)	((__ctype_table[c] & (__CTYPE_LOWER_CASE|__CTYPE_UPPER_CASE)) != 0)
-#define iscntrl(c)	((__ctype_table[c] & __CTYPE_CONTROL) != 0)
-#define isdigit(c)	((__ctype_table[c] & __CTYPE_DIGIT) != 0)
-#define isxdigit(c)	((__ctype_table[c] & __CTYPE_HEX_DIGIT) != 0)
-#define isgraph(c)	((__ctype_table[c] & (__CTYPE_DIGIT|__CTYPE_PUNCTUATION|__CTYPE_LOWER_CASE|__CTYPE_UPPER_CASE)) != 0)
-#define ispunct(c)	((__ctype_table[c] & __CTYPE_PUNCTUATION) != 0)
-#define isprint(c)	((__ctype_table[c] & __CTYPE_PRINTABLE) != 0)
-#define islower(c)	((__ctype_table[c] & __CTYPE_LOWER_CASE) != 0)
-#define isupper(c)	((__ctype_table[c] & __CTYPE_UPPER_CASE) != 0)
-#define isspace(c)	((__ctype_table[c] & __CTYPE_WHITE_SPACE) != 0)
+#define isalnum(c)	((__ctype_table[(c) & 255] & (__CTYPE_DIGIT|__CTYPE_LOWER_CASE|__CTYPE_UPPER_CASE)) != 0)
+#define isalpha(c)	((__ctype_table[(c) & 255] & (__CTYPE_LOWER_CASE|__CTYPE_UPPER_CASE)) != 0)
+#define iscntrl(c)	((__ctype_table[(c) & 255] & __CTYPE_CONTROL) != 0)
+#define isdigit(c)	((__ctype_table[(c) & 255] & __CTYPE_DIGIT) != 0)
+#define isxdigit(c)	((__ctype_table[(c) & 255] & __CTYPE_HEX_DIGIT) != 0)
+#define isgraph(c)	((__ctype_table[(c) & 255] & (__CTYPE_DIGIT|__CTYPE_PUNCTUATION|__CTYPE_LOWER_CASE|__CTYPE_UPPER_CASE)) != 0)
+#define ispunct(c)	((__ctype_table[(c) & 255] & __CTYPE_PUNCTUATION) != 0)
+#define isprint(c)	((__ctype_table[(c) & 255] & __CTYPE_PRINTABLE) != 0)
+#define islower(c)	((__ctype_table[(c) & 255] & __CTYPE_LOWER_CASE) != 0)
+#define isupper(c)	((__ctype_table[(c) & 255] & __CTYPE_UPPER_CASE) != 0)
+#define isspace(c)	((__ctype_table[(c) & 255] & __CTYPE_WHITE_SPACE) != 0)
 
 /****************************************************************************/
 

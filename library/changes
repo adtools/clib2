@@ -29,6 +29,8 @@
   tracks whether or not console output is possible. We now use the
   global "__no_standard_io" instead.
 
+- Made the <ctype.h> macros more robust.
+
 
 c.lib 1.185 (2.1.2005)
 
