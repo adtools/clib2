@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setjmp.c,v 1.1.1.1 2004-07-26 16:32:05 obarthel Exp $
+ * $Id: stdlib_setjmp.c,v 1.2 2004-09-27 15:07:20 tfrieden Exp $
  *
  * :ts=4
  *
@@ -283,6 +283,8 @@ l1:	moveml	a0@(4:W),d1-d7				| restore all data registers       \n\
 
 /****************************************************************************/
 
+#ifdef PPC_FLOATING_POINT_SUPPORT
+
 __asm("							\n\
 								\n\
 	.text						\n\
@@ -358,6 +360,48 @@ longjmp:						\n\
 	blr							\n\
 								\n\
 ");
+#else
+__asm("							\n\
+								\n\
+	.text						\n\
+	.align 2					\n\
+								\n\
+	.globl setjmp				\n\
+								\n\
+setjmp:							\n\
+								\n\
+	mflr	r10					\n\
+	mfcr	r11					\n\
+	mr		r12, r1				\n\
+	stmw	r10, 0(r3)			\n\
+	li		r3, 0				\n\
+	blr							\n\
+								\n\
+");
+
+__asm("							\n\
+	.text						\n\
+	.align 2					\n\
+								\n\
+	.globl longjmp				\n\
+								\n\
+longjmp:						\n\
+								\n\
+	lmw		r10,0(r3)			\n\
+	mtlr	r10					\n\
+	mtcr	r11					\n\
+	mr		r1,r12				\n\
+	cmpwi	r4, 0				\n\
+	bne		1f					\n\
+	li		r3,1				\n\
+	blr							\n\
+1:								\n\
+	mr		r3, r4				\n\
+	blr							\n\
+								\n\
+");
+
+#endif /* defined PPC_FLOATING_POINT_SUPPORT */
 
 #endif /* defined STACK_EXTENSION */
 
