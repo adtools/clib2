@@ -48,6 +48,9 @@
   is now determined at initialization time. The I/O mode is restored before
   the program exits. Previously, any changes to the I/O mode would persist.
 
+- Lost some more code that is not required for AmigaOS 4.x and can be
+  handled conveniently through conditional compilation.
+
 
 c.lib 1.185 (2.1.2005)
 

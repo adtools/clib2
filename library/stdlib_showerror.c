@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.8 2005-01-09 10:10:41 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.9 2005-01-13 15:39:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -102,37 +102,14 @@ __show_error(const char * message)
 	/* If we can't hope to print the error message, show a requester instead. */
 	if(__no_standard_io || __WBenchMsg != NULL)
 	{
-		if(IntuitionBase->lib_Version >= 37)
+		UBYTE program_name[256];
+		struct EasyStruct es;
+		STRPTR title_string;
+
+		/* The following does not make great sense on OS4. */
+		#if NOT defined(__amigaos4__)
 		{
-			UBYTE program_name[256];
-			struct EasyStruct es;
-			STRPTR title_string;
-
-			if(__WBenchMsg != NULL)
-			{
-				title_string = (STRPTR)FilePart(__WBenchMsg->sm_ArgList[0].wa_Name);
-			}
-			else
-			{
-				if(GetProgramName(program_name,sizeof(program_name)))
-					title_string = FilePart((STRPTR)program_name);
-				else
-					title_string = (STRPTR)"Error";
-			}
-
-			memset(&es,0,sizeof(es));
-
-			es.es_StructSize	= sizeof(es);
-			es.es_Title			= title_string;
-			es.es_TextFormat	= (STRPTR)message;
-			es.es_GadgetFormat	= (STRPTR)"Sorry";
-
-			EasyRequestArgs(NULL,&es,NULL,NULL);
-		}
-		else
-		{
-			/* The following does not make great sense on OS4. */
-			#if NOT defined(__amigaos4__)
+			if(IntuitionBase->lib_Version < 37)
 			{
 				static struct TextAttr default_font	= { (STRPTR)"topaz.font",8,FS_NORMAL,FPF_ROMFONT|FPF_DESIGNED };
 				static struct IntuiText sorry_text	= {0,1,JAM1,6,3,(struct TextAttr *)NULL,(STRPTR)"Sorry",(struct IntuiText *)NULL};
@@ -144,9 +121,32 @@ __show_error(const char * message)
 				body_text.IText = (STRPTR)message;
 
 				AutoRequest(NULL,&body_text,NULL,&sorry_text,0,0,37 + 8 * strlen(message),46);
+
+				goto out;
 			}
-			#endif /* __amigaos4__ */
 		}
+		#endif /* __amigaos4__ */
+
+		if(__WBenchMsg != NULL)
+		{
+			title_string = (STRPTR)FilePart(__WBenchMsg->sm_ArgList[0].wa_Name);
+		}
+		else
+		{
+			if(GetProgramName(program_name,sizeof(program_name)))
+				title_string = FilePart((STRPTR)program_name);
+			else
+				title_string = (STRPTR)"Error";
+		}
+
+		memset(&es,0,sizeof(es));
+
+		es.es_StructSize	= sizeof(es);
+		es.es_Title			= title_string;
+		es.es_TextFormat	= (STRPTR)message;
+		es.es_GadgetFormat	= (STRPTR)"Sorry";
+
+		EasyRequestArgs(NULL,&es,NULL,NULL);
 	}
 	else
 	{

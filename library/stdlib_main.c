@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.9 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.10 2005-01-13 15:39:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -250,33 +250,31 @@ detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list
 	{
 		if(__IUtility != NULL)
 			DropInterface((struct Interface *)__IUtility);
+
+		if(IDOS != NULL)
+			DropInterface((struct Interface *)IDOS);
+	}
+	#else
+	{
+		/* The following trick is necessary only under dos.library V40 and below. */
+		if(((struct Library *)DOSBase)->lib_Version < 50)
+		{
+			/* Now for the slightly shady part. We need to unload the segment
+			   list this program was originally loaded with. We have to close
+			   dos.library, though, which means that either we can close the
+			   library or unload the code, but not both. But there's a loophole
+			   in that we can enter Forbid(), unload the code, close the library
+			   and exit and nobody will be able to allocate this program's
+			   memory until after the process has been terminated. */
+			Forbid();
+
+			UnLoadSeg(segment_list);
+		}
 	}
 	#endif /* __amigaos4__ */
 
 	if(__UtilityBase != NULL)
 		CloseLibrary(__UtilityBase);
-
-	/* The following trick is necessary only under dos.library V40 and below. */
-	if(((struct Library *)DOSBase)->lib_Version < 50)
-	{
-		/* Now for the slightly shady part. We need to unload the segment
-		   list this program was originally loaded with. We have to close
-		   dos.library, though, which means that either we can close the
-		   library or unload the code, but not both. But there's a loophole
-		   in that we can enter Forbid(), unload the code, close the library
-		   and exit and nobody will be able to allocate this program's
-		   memory until after the process has been terminated. */
-		Forbid();
-
-		UnLoadSeg(segment_list);
-	}
-
-	#if defined(__amigaos4__)
-	{
-		if(IDOS != NULL)
-			DropInterface((struct Interface *)IDOS);
-	}
-	#endif /* __amigaos4__ */
 
 	if(DOSBase != NULL)
 		CloseLibrary(DOSBase);
