@@ -1,5 +1,5 @@
 /*
- * $Id: signal_headers.h,v 1.2 2004-11-14 11:06:27 obarthel Exp $
+ * $Id: signal_headers.h,v 1.3 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -85,9 +85,9 @@ extern const char NOCOMMON __abnormal_program_termination[];
 
 /****************************************************************************/
 
-#ifndef _STDLIB_PROTOS_H
-#include "stdlib_protos.h"
-#endif /* _STDLIB_PROTOS_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: string_strdup.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: string_strdup.c,v 1.3 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,7 +43,9 @@
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
@@ -55,7 +57,7 @@
 
 /****************************************************************************/
 
-char *
+__static char *
 __strdup(const char *s,const char * file,int line)
 {
 	char * result = NULL;
@@ -88,6 +90,10 @@ __strdup(const char *s,const char * file,int line)
 
 /****************************************************************************/
 
+#if NOT defined(__MEM_DEBUG)
+
+/****************************************************************************/
+
 char *
 strdup(const char *s)
 {
@@ -97,3 +103,7 @@ strdup(const char *s)
 
 	return(result);
 }
+
+/****************************************************************************/
+
+#endif /* __MEM_DEBUG */

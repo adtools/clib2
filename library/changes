@@ -11,6 +11,11 @@
 
 - Finally optimized the alloca() memory cleanup code.
 
+- Tried to make it possible to have debug versions of the memory
+  management code in the default link library along with the
+  normal versions. Let's see how well this works out in the GCC
+  version. SAS/C does not seem to like it...
+
 
 c.lib 1.184 (28.11.2004)
 

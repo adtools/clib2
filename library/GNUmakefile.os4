@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.17 2004-12-13 11:11:57 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.18 2004-12-24 18:31:37 obarthel Exp $
 #
 # :ts=8
 #
@@ -32,19 +32,19 @@ MAKE = make -f GNUmakefile.os4
 ##############################################################################
 
 ifeq (,$(TYPE))
-LIBC_OBJS	= libc_objs
-LIBUNIX_OBJS	= libunix_objs
-LIBM_OBJS	= libm_objs
-LIBNET_OBJS	= libnet_objs
-LIBDEBUG_OBJS	= libdebug_objs
-LIBAMIGA_OBJS	= libamiga_objs
+LIBC_OBJS		= libc_objs
+LIBUNIX_OBJS		= libunix_objs
+LIBM_OBJS		= libm_objs
+LIBNET_OBJS		= libnet_objs
+LIBDEBUG_OBJS		= libdebug_objs
+LIBAMIGA_OBJS		= libamiga_objs
 else
-LIBC_OBJS	= $(TYPE)/libc_objs
-LIBUNIX_OBJS	= $(TYPE)/libunix_objs
-LIBM_OBJS	= $(TYPE)/libm_objs
-LIBNET_OBJS	= $(TYPE)/libnet_objs
-LIBDEBUG_OBJS	= $(TYPE)/libdebug_objs
-LIBAMIGA_OBJS	= $(TYPE)/libamiga_objs
+LIBC_OBJS		= $(TYPE)/libc_objs
+LIBUNIX_OBJS		= $(TYPE)/libunix_objs
+LIBM_OBJS		= $(TYPE)/libm_objs
+LIBNET_OBJS		= $(TYPE)/libnet_objs
+LIBDEBUG_OBJS		= $(TYPE)/libdebug_objs
+LIBAMIGA_OBJS		= $(TYPE)/libamiga_objs
 endif
 
 ##############################################################################
@@ -241,7 +241,9 @@ C_LIB = \
 	stdio_translateioerror.o \
 	stdio_ungetc.o \
 	stdio_vasprintf.o \
+	stdio_vasprintf_debug.o \
 	stdio_vasprintf_hook_entry.o \
+	stdio_vasprintf_hook_entry_debug.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
 	stdio_vprintf.o \
@@ -252,12 +254,14 @@ C_LIB = \
 	stdlib_abort.o \
 	stdlib_abs.o \
 	stdlib_alloca.o \
+	stdlib_alloca_debug.o \
 	stdlib_assertion_failure.o \
 	stdlib_atexit.o \
 	stdlib_atoi.o \
 	stdlib_atol.o \
 	stdlib_bsearch.o \
 	stdlib_calloc.o \
+	stdlib_calloc_debug.o \
 	stdlib_checkdetach.o \
 	stdlib_constructor.o \
 	stdlib_constructor_begin.o \
@@ -274,6 +278,7 @@ C_LIB = \
 	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
+	stdlib_free_debug.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
 	stdlib_getsp.o \
@@ -283,6 +288,7 @@ C_LIB = \
 	stdlib_ldiv.o \
 	stdlib_machine_test.o \
 	stdlib_malloc.o \
+	stdlib_malloc_debug.o \
 	stdlib_math.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
@@ -346,6 +352,7 @@ C_LIB = \
 	string_strcpy.o \
 	string_strcspn.o \
 	string_strdup.o \
+	string_strdup_debug.o \
 	string_strerror.o \
 	string_strlcat.o \
 	string_strlcpy.o \
@@ -388,6 +395,7 @@ C_LIB = \
 	unistd_fileno.o \
 	unistd_ftruncate.o \
 	unistd_getcwd.o \
+	unistd_getcwd_debug.o \
 	unistd_getopt.o \
 	unistd_getpid.o \
 	unistd_init_exit.o \
@@ -428,7 +436,6 @@ UNIX_LIB = \
 	stdio_fdhookentry.o \
 	stdio_fflush.o \
 	stdio_fopen.o \
-	stdio_fopen.o \
 	stdio_init_exit.o \
 	stdio_locksemaphorename.o \
 	stdio_openiob.o \
@@ -437,7 +444,6 @@ UNIX_LIB = \
 	stdio_rename.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
-	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
 	stdlib_system.o \
 	unistd_access.o \
@@ -445,6 +451,7 @@ UNIX_LIB = \
 	unistd_chdir_exit.o \
 	unistd_chown.o \
 	unistd_getcwd.o \
+	unistd_getcwd_debug.o \
 	unistd_lchown.o \
 	unistd_link.o \
 	unistd_readlink.o \
@@ -509,6 +516,7 @@ MATH_LIB = \
 	stdio_sprintf.o \
 	stdio_sscanf.o \
 	stdio_vasprintf.o \
+	stdio_vasprintf_debug.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
 	stdio_vprintf.o \
@@ -904,6 +912,54 @@ $(LIBC_OBJS)/stdlib_malloc.o : stdlib_malloc.c stdlib_mem_debug.h
 $(LIBC_OBJS)/stdlib_realloc.o : stdlib_realloc.c stdlib_mem_debug.h
 
 $(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_mem_debug.h
+
+##############################################################################
+
+# Peculiar build rules for the debug versions of memory allocation functions,
+# or at least those which use memory allocation functionality.
+$(LIBC_OBJS)/stdlib_alloca_debug.o : stdlib_alloca.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_alloca_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_alloca.c
+
+$(LIBC_OBJS)/stdlib_calloc_debug.o : stdlib_calloc.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_calloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_calloc.c
+
+$(LIBC_OBJS)/stdlib_free_debug.o : stdlib_free.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_free_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_free.c
+
+$(LIBC_OBJS)/stdlib_malloc_debug.o : stdlib_malloc.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_malloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_malloc.c
+
+$(LIBC_OBJS)/stdlib_realloc_debug.o : stdlib_realloc.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_realloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_realloc.c
+
+$(LIBC_OBJS)/stdio_vasprintf_hook_entry_debug.o : stdio_vasprintf_hook_entry.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/stdio_vasprintf_hook_entry_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdio_vasprintf_hook_entry.c
+
+$(LIBC_OBJS)/stdio_vasprintf_debug.o : stdio_vasprintf.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/stdio_vasprintf_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdio_vasprintf.c
+
+$(LIBM_OBJS)/stdio_vasprintf_debug.o : stdio_vasprintf.c
+	@echo "Compiling $< [$(TYPE):m debug]"
+	@$(CC) -o $(LIBM_OBJS)/stdio_vasprintf_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG $(FLOAT_TYPE) stdio_vasprintf.c
+
+$(LIBC_OBJS)/string_strdup_debug.o : string_strdup.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/string_strdup_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG string_strdup.c
+
+$(LIBC_OBJS)/unistd_getcwd_debug.o : unistd_getcwd.c
+	@echo "Compiling $< [$(TYPE):c debug]"
+	@$(CC) -o $(LIBC_OBJS)/unistd_getcwd_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG unistd_getcwd.c
+
+$(LIBUNIX_OBJS)/unistd_getcwd_debug.o : unistd_getcwd.c
+	@echo "Compiling $< [$(TYPE):unix debug]"
+	@$(CC) -o $(LIBUNIX_OBJS)/unistd_getcwd_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG -DUNIX_PATH_SEMANTICS unistd_getcwd.c
 
 ##############################################################################
 

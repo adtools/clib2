@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_getcwd.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: unistd_getcwd.c,v 1.3 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,7 +49,9 @@
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
@@ -61,7 +63,7 @@
 
 /****************************************************************************/
 
-char *
+__static char *
 __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 {
 	#if defined(UNIX_PATH_SEMANTICS)
@@ -213,6 +215,10 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 
 /****************************************************************************/
 
+#if NOT defined(__MEM_DEBUG)
+
+/****************************************************************************/
+
 char *
 getcwd(char * buffer, size_t buffer_size)
 {
@@ -222,3 +228,7 @@ getcwd(char * buffer, size_t buffer_size)
 
 	return(result);
 }
+
+/****************************************************************************/
+
+#endif /* __MEM_DEBUG */

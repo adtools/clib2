@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: stdio_vasprintf.c,v 1.3 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,13 +37,15 @@
 
 /****************************************************************************/
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
@@ -55,7 +57,7 @@
 
 /****************************************************************************/
 
-int
+__static int
 __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg)
 {
 	struct iob string_iob;
@@ -121,6 +123,10 @@ __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg)
 
 /****************************************************************************/
 
+#if NOT defined(__MEM_DEBUG)
+
+/****************************************************************************/
+
 int
 vasprintf(char **ret,const char *format,va_list arg)
 {
@@ -130,3 +136,7 @@ vasprintf(char **ret,const char *format,va_list arg)
 
 	return(result);
 }
+
+/****************************************************************************/
+
+#endif /* __MEM_DEBUG */

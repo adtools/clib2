@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.3 2004-12-24 11:46:12 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.4 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -141,7 +141,6 @@ extern int	__startup_init(void);
 extern void __memory_init(void);
 extern size_t __get_allocation_size(size_t size);
 extern void * __allocate_memory(size_t size,BOOL never_free,const char * file,int line);
-extern void * __malloc(size_t size,const char * file,int line);
 
 /* stdlib_free.c */
 extern void __memory_exit(void);
@@ -149,14 +148,9 @@ extern struct MemoryNode * __find_memory_node(void * address);
 extern void __force_free(void * ptr,const char * file,int line);
 extern void __check_memory_allocations(const char * file,int line);
 extern void __free_memory_node(struct MemoryNode * mn,const char * file,int line);
-extern void __free(void * ptr,const char * file,int line);
 
 /* stdlib_alloca.c */
 extern void __alloca_cleanup(const char * file,int line);
-extern void * __alloca(size_t size,const char * file,int line);
-
-/* stdlib_realloc.c */
-extern void * __realloc(void *ptr,size_t size,const char * file,int line);
 
 /****************************************************************************/
 

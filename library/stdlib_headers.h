@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.4 2004-12-24 11:46:12 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.5 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -100,6 +100,47 @@
 
 #include "macros.h"
 #include "debug.h"
+
+/****************************************************************************/
+
+/* We shuffle things around a bit for the debug code. This works by joining
+   related code which shares the same name. The debug code symbols also have
+   to be completely separate from the "regular" code. */
+#if defined(__MEM_DEBUG)
+
+#define __static
+
+#define __alloca_cleanup __alloca_cleanup_debug
+#define __alloca_exit __alloca_exit_debug
+
+#define __find_memory_node __find_memory_node_debug
+#define __free_memory_node __free_memory_node_debug
+#define __force_free __force_free_debug
+
+#define __get_allocation_size __get_allocation_size_debug
+#define __allocate_memory __allocate_memory_debug
+
+#define __memory_pool __memory_pool_debug
+#define __memory_list __memory_list_debug
+
+#define __vasprintf_hook_entry __vasprintf_hook_entry_debug
+
+extern void * __alloca(size_t size,const char * file,int line);
+extern void * __calloc(size_t num_elements,size_t element_size,const char * file,int line);
+extern void __free(void * ptr,const char * file,int line);
+extern void * __malloc(size_t size,const char * file,int line);
+extern void * __realloc(void *ptr,size_t size,const char * file,int line);
+extern char * __strdup(const char *s,const char * file,int line);
+extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int line);
+
+#else
+
+#define __static static
+
+#define __free(mem,file,line) free(mem)
+#define __malloc(size,file,line) malloc(size)
+
+#endif /* __MEM_DEBUG */
 
 /****************************************************************************/
 

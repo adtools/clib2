@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.2 2004-12-24 11:46:12 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.3 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,7 +111,7 @@ __alloca_cleanup(const char * file,int line)
 
 /****************************************************************************/
 
-void *
+__static void *
 __alloca(size_t size,const char * file,int line)
 {
 	void * stack_pointer = __get_sp();
@@ -170,6 +170,10 @@ __alloca(size_t size,const char * file,int line)
 
 /****************************************************************************/
 
+#if NOT defined(__MEM_DEBUG)
+
+/****************************************************************************/
+
 void *
 alloca(size_t size)
 {
@@ -179,3 +183,7 @@ alloca(size_t size)
 
 	return(result);
 }
+
+/****************************************************************************/
+
+#endif /* __MEM_DEBUG */

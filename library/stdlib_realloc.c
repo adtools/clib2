@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_realloc.c,v 1.1.1.1 2004-07-26 16:32:03 obarthel Exp $
+ * $Id: stdlib_realloc.c,v 1.2 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,7 +47,7 @@
 
 /****************************************************************************/
 
-void *
+__static void *
 __realloc(void *ptr,size_t size,const char * file,int line)
 {
 	void * result = NULL;
@@ -199,6 +199,10 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 
 /****************************************************************************/
 
+#if NOT defined(__MEM_DEBUG)
+
+/****************************************************************************/
+
 void *
 realloc(void *ptr,size_t size)
 {
@@ -208,3 +212,7 @@ realloc(void *ptr,size_t size)
 
 	return(result);
 }
+
+/****************************************************************************/
+
+#endif /* __MEM_DEBUG */

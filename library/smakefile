@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.13 2004-12-24 11:46:12 obarthel Exp $
+# $Id: smakefile,v 1.14 2004-12-24 18:31:38 obarthel Exp $
 #
 # :ts=8
 #
@@ -345,7 +345,9 @@ STDIO_OBJ = \
 	stdio_translateioerror.o \
 	stdio_ungetc.o \
 	stdio_vasprintf.o \
+	stdio_vasprintf_debug.o \
 	stdio_vasprintf_hook_entry.o \
+	stdio_vasprintf_hook_debug.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
 	stdio_vprintf.o \
@@ -358,6 +360,10 @@ STDLIB_OBJ = \
 	stdlib_abort.o \
 	stdlib_abs.o \
 	stdlib_alloca.o \
+	stdlib_alloca_debug.o \
+	stdlib_calloc_debug.o \
+	stdlib_free_debug.o \
+	stdlib_malloc_debug.o \
 	stdlib_assertion_failure.o \
 	stdlib_atexit.o \
 	stdlib_atof.o \
@@ -446,6 +452,7 @@ STRING_OBJ = \
 	string_strcpy.o \
 	string_strcspn.o \
 	string_strdup.o \
+	string_strdup_debug.o \
 	string_strerror.o \
 	string_strlcat.o \
 	string_strlcpy.o \
@@ -497,6 +504,7 @@ UNISTD_OBJ = \
 	unistd_fileno.o \
 	unistd_ftruncate.o \
 	unistd_getcwd.o \
+	unistd_getcwd_debug.o \
 	unistd_getopt.o \
 	unistd_getpid.o \
 	unistd_init_exit.o \
@@ -676,6 +684,38 @@ stdlib_main.o : stdlib_main.c
 sas_profile.o : sas_profile.c
 	@echo "Compiling $<"
 	@sc $(CFLAGS) noprofile sas_profile.c
+
+stdio_vasprintf_hook_debug.o : stdio_vasprintf_hook_entry.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=stdio_vasprintf_hook_debug.o stdio_vasprintf_hook_entry.c
+
+stdio_vasprintf_debug.o : stdio_vasprintf.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=stdio_vasprintf_debug.o stdio_vasprintf.c
+
+stdlib_alloca_debug.o : stdlib_alloca.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=stdlib_alloca_debug.o stdlib_alloca.c
+
+stdlib_calloc_debug.o : stdlib_calloc.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=stdlib_calloc_debug.o stdlib_calloc.c
+
+stdlib_free_debug.o : stdlib_free.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=stdlib_free_debug.o stdlib_free.c
+
+stdlib_malloc_debug.o : stdlib_malloc.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=stdlib_malloc_debug.o stdlib_malloc.c
+
+string_strdup_debug.o : string_strdup.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=string_strdup_debug.o string_strdup.c
+
+unistd_getcwd_debug.o : unistd_getcwd.c
+	@echo "Compiling $<"
+	@sc $(CFLAGS) define=__USE_MEM_TREES define=__MEM_DEBUG objname=unistd_getcwd_debug.o unistd_getcwd.c
 
 ##############################################################################
 

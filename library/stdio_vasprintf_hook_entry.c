@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf_hook_entry.c,v 1.1.1.1 2004-07-26 16:31:43 obarthel Exp $
+ * $Id: stdio_vasprintf_hook_entry.c,v 1.2 2004-12-24 18:31:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,7 +43,9 @@
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
