@@ -1,5 +1,5 @@
 /*
- * $Id: complex.h,v 1.1 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: complex.h,v 1.2 2005-04-04 11:56:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,7 +65,7 @@ extern "C" {
 
 /****************************************************************************/
 
-/* Basic types. */
+/* Basic types; imaginary is assumed not to be implemented yet. */
 #define complex _Complex
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.22 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.23 2005-04-04 11:56:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -354,7 +354,7 @@ _main(void)
 			__stack_size = size;
 	}
 
-	/* How much stack size was provided? */
+	/* How much stack space was provided? */
 	current_stack_size = get_stack_size();
 
 	/* If this is a resident program, don't allow for the detach
