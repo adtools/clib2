@@ -106,7 +106,7 @@
 
 - Removed some more redundant data from stdlib_main.c.
 
-- Added the first real C99 function: _Exit().
+- Added the first "real" C99 function: _Exit() ;-)
 
 - assertion failures early on during program initialization
   should no longer spell big trouble on account of the stdio
@@ -118,12 +118,23 @@
   it *again*. Which probably means that the 68k library will
   need further changes...
 
-- Moved stdlib_main.o into the regular lib.c, at least for
+- Moved stdlib_main.o into the regular libc.a, at least for
   the 68k build. The PowerPC build may follow later, provided
-  I manage to get the specs file fixed.
+  I manage to get the specs file fixed. Actually, stdlib_main.o
+  is in the libc.a library already. Now about that specs file...
 
 - Moved the check for the presence of an FPU into the
-  math_init.c code.
+  math_init.c code. I am far from certain whether this will
+  have the desired effect, though. Due to how the GNU ld linker
+  works, libraries are scanned once only. And the FPU check will
+  be pulled in only if something references the HUGE_VAL
+  constant.
+
+- The thread-safe system() call now blocks all standard I/O operations
+  until the function has returned. Which is harsh, but there is no
+  elegant solution to the issue of keeping the same dos.library
+  file handles from concurrent use which SystemTagList() might just
+  end up using.
 
 
 c.lib 1.189 (5.3.2005)

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fprintf.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_fprintf.c,v 1.5 2005-03-24 15:31:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,8 +59,6 @@ fprintf(FILE *stream,const char *format,...)
 	if(__check_abort_enabled)
 		__check_abort();
 
-	flockfile(stream);
-
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL || format == NULL)
@@ -76,8 +74,6 @@ fprintf(FILE *stream,const char *format,...)
 	va_end(arg);
 
  out:
-
-	funlockfile(stream);
 
 	RETURN(result);
 	return(result);

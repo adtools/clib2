@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_system.c,v 1.5 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: stdlib_system.c,v 1.6 2005-03-24 15:31:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,10 @@
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+#ifndef _STIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
@@ -172,7 +176,18 @@ system(const char * command)
 		SHOWSTRING(command);
 
 		PROFILE_OFF();
+
+		/* In thread-safe mode, system() operation can interfere with
+		   regular file I/O if the same dos.library file handles are
+		   involved. Because we really cannot predict which file handles
+		   will be associated with the current Output() and Input()
+		   streams, we play it safe and just block everything. */
+		__stdio_lock();
+
 		result = SystemTagList((STRPTR)command, (struct TagItem *)system_tags);
+
+		__stdio_unlock();
+
 		PROFILE_ON();
 	}
 
