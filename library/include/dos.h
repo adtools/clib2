@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.6 2005-02-03 16:56:20 obarthel Exp $
+ * $Id: dos.h,v 1.7 2005-02-03 17:33:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,6 +66,26 @@ extern "C" {
  * ISO 'C' standard context. It is redefined to WBenchMsg to make it
  * compatible with the original Amiga program startup code which would
  * refer to the variable under that name.
+ *
+ * It is recommended to access the Workbench startup message as part of your
+ * program's main() function, like this:
+ *
+ *    int
+ *    main(int argc,char ** argv)
+ *    {
+ *       struct WBStartup * wb_startup_message;
+ *
+ *       if(argc == 0)
+ *          wb_startup_message = (struct WBStartup *)argv;
+ *       else
+ *          wb_startup_message = NULL;
+ *
+ *       ...
+ *    }
+ *
+ * This approach has the advantage that your program does not rely upon a
+ * global variable initialized by the startup code, whose name you might
+ * not even know exactly.
  */
 extern struct WBStartup * __WBenchMsg;
 #define WBenchMsg __WBenchMsg
