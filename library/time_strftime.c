@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_strftime.c,v 1.3 2005-01-24 10:25:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -207,55 +207,7 @@ format_date(const char *format,const struct tm *tm,time_t time_value,struct Hook
 			/* Locale specific date and time ("%a %b %d %H:%M:%S %Y"). */
 			case 'c':
 
-				assert( 0 <= tm->tm_wday && tm->tm_wday <= 6 );
-
-				if(0 <= tm->tm_wday && tm->tm_wday <= 6)
-					str = __abbreviated_week_day_names[tm->tm_wday];
-				else
-					str = "-";
-
-				store_string_via_hook(str,-1,hook);
-				store_string_via_hook(" ",1,hook);
-
-				assert( 0 <= tm->tm_mon && tm->tm_mon <= 11 );
-
-				if(0 <= tm->tm_mon && tm->tm_mon <= 11)
-					str = __abbreviated_month_names[tm->tm_mon];
-				else
-					str = "-";
-
-				store_string_via_hook(str,-1,hook);
-				store_string_via_hook(" ",1,hook);
-
-				assert( 1 <= tm->tm_mday && tm->tm_mday <= 31 );
-
-				__number_to_string((unsigned int)tm->tm_mday,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
-				store_string_via_hook(" ",1,hook);
-
-				assert( 0 <= tm->tm_hour && tm->tm_hour <= 23 );
-
-				__number_to_string((unsigned int)tm->tm_hour,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
-				store_string_via_hook(":",1,hook);
-
-				assert( 0 <= tm->tm_min && tm->tm_min <= 59 );
-
-				__number_to_string((unsigned int)tm->tm_min,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
-				store_string_via_hook(":",1,hook);
-
-				assert( 0 <= tm->tm_sec && tm->tm_sec <= 59 );
-
-				__number_to_string((unsigned int)tm->tm_sec,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
-				store_string_via_hook(" ",1,hook);
-
-				assert( 0 <= tm->tm_year );
-
-				__number_to_string((unsigned int)1900 + tm->tm_year,buffer,sizeof(buffer),0);
-				store_string_via_hook(buffer,-1,hook);
-
+				format_date("%a %b %d %H:%M:%S %Y",tm,time_value,hook);
 				break;
 
 			/* Day of the month ("01"-"31"). */
@@ -414,58 +366,13 @@ format_date(const char *format,const struct tm *tm,time_t time_value,struct Hook
 			/* Locale-specific date ("%a %b %d, %Y"). */
 			case 'x':
 
-				assert( 0 <= tm->tm_wday && tm->tm_wday <= 6 );
-
-				if(0 <= tm->tm_wday && tm->tm_wday <= 6)
-					str = __abbreviated_week_day_names[tm->tm_wday];
-				else
-					str = "-";
-
-				store_string_via_hook(str,-1,hook);
-				store_string_via_hook(" ",1,hook);
-
-				assert( 0 <= tm->tm_mon && tm->tm_mon <= 11 );
-
-				if(0 <= tm->tm_mon && tm->tm_mon <= 11)
-					str = __abbreviated_month_names[tm->tm_mon];
-				else
-					str = "-";
-
-				store_string_via_hook(str,-1,hook);
-				store_string_via_hook(" ",1,hook);
-
-				assert( 1 <= tm->tm_mday && tm->tm_mday <= 31 );
-
-				__number_to_string((unsigned int)tm->tm_mday,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
-				store_string_via_hook(", ",2,hook);
-
-				assert( 0 <= tm->tm_year );
-
-				__number_to_string((unsigned int)1900 + tm->tm_year,buffer,sizeof(buffer),0);
-				store_string_via_hook(buffer,-1,hook);
-
+				format_date("%a %b %d, %Y",tm,time_value,hook);
 				break;
 
 			/* Locale-specific time ("%H:%M:%S"). */
 			case 'X':
 
-				assert( 0 <= tm->tm_hour && tm->tm_hour <= 23 );
-
-				__number_to_string((unsigned int)tm->tm_hour,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
-				store_string_via_hook(":",1,hook);
-
-				assert( 0 <= tm->tm_min && tm->tm_min <= 59 );
-
-				__number_to_string((unsigned int)tm->tm_min,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
-				store_string_via_hook(":",1,hook);
-
-				assert( 0 <= tm->tm_sec && tm->tm_sec <= 59 );
-
-				__number_to_string((unsigned int)tm->tm_sec,buffer,sizeof(buffer),2);
-				store_string_via_hook(buffer,2,hook);
+				format_date("%H:%M:%S",tm,time_value,hook);
 				break;
 
 			/* Year without century ("00"-"99"). */

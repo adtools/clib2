@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.5 2005-01-12 09:15:50 obarthel Exp $
+ * $Id: macros.h,v 1.6 2005-01-24 10:25:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,6 +60,9 @@
 
 /****************************************************************************/
 
+/* This is the difference (in seconds) between the Unix epoch (which began
+   on January 1st, 1970) and the AmigaOS epoch (which began eight years
+   later on January 1st 1978). */
 #define UNIX_TIME_OFFSET 252460800
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: stat_convertfileinfo.c,v 1.4 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stat_convertfileinfo.c,v 1.5 2005-01-24 10:25:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,6 +38,10 @@
 #ifndef _LOCALE_HEADERS_H
 #include "locale_headers.h"
 #endif /* _LOCALE_HEADERS_H */
+
+#ifndef _TIME_HEADERS_H
+#include "time_headers.h"
+#endif /* _TIME_HEADERS_H */
 
 /****************************************************************************/
 
@@ -109,9 +113,7 @@ __convert_file_info_to_stat(
 	if(FLAG_IS_SET(flags,FIBF_OTR_EXECUTE))
 		SET_FLAG(mode,S_IXOTH);
 
-	mtime = UNIX_TIME_OFFSET + fib->fib_Date.ds_Days * 24*60*60 + fib->fib_Date.ds_Minute * 60 + (fib->fib_Date.ds_Tick / TICKS_PER_SECOND);
-	if(__default_locale != NULL)
-		mtime += 60 * __default_locale->loc_GMTOffset;
+	mtime = __convert_datestamp_to_time(&fib->fib_Date);
 
 	if(fib->fib_DirEntryType < 0)
 	{

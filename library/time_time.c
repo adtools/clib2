@@ -1,5 +1,5 @@
 /*
- * $Id: time_time.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_time.c,v 1.3 2005-01-24 10:25:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,22 +45,15 @@ time_t
 time(time_t * tptr)
 {
 	struct DateStamp ds;
-	ULONG seconds;
 	time_t result;
 
 	PROFILE_OFF();
 	DateStamp(&ds);
 	PROFILE_ON();
 
-	seconds = 60 * ((ULONG)ds.ds_Minute + 24 * 60 * (ULONG)ds.ds_Days) + (ds.ds_Tick / TICKS_PER_SECOND);
-
-	/* time() should try to return the current time in UTC form. Thus,
-	 * we have to take the local time zone into account.
-	 */
-	if(__default_locale != NULL)
-		result = UNIX_TIME_OFFSET + seconds + 60 * __default_locale->loc_GMTOffset;
-	else
-		result = UNIX_TIME_OFFSET + seconds;
+	/* This converts the DateStamp contents into the number of
+	   seconds elapsed since January 1st 1970. */
+	result = __convert_datestamp_to_time(&ds);
 
 	if(tptr != NULL)
 		(*tptr) = result;

@@ -1,5 +1,5 @@
 /*
- * $Id: time_mktime.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_mktime.c,v 1.3 2005-01-24 10:25:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -100,14 +100,12 @@ mktime(struct tm *tm)
 		int year;
 
 		/* We need to have the full year number for the
-		 * leap year calculation below.
-		 */
+		   leap year calculation below. */
 		year = tm->tm_year + 1900;
 
 		/* Now for the famous leap year calculation rules... We
-		 * need to find out if the number of days in the month
-		 * of February are appropriate for the data given.
-		 */
+		   need to find out if the number of days in the month
+		   of February are appropriate for the data given. */
 		if((year % 4) != 0)
 			max_month_days = 28;
 		else if ((year % 400) == 0)
@@ -177,8 +175,7 @@ mktime(struct tm *tm)
 	seconds = Date2Amiga(&clock_data);
 
 	/* The AmigaOS "epoch" starts with January 1st, 1978, which was
-	 * a Sunday.
-	 */
+	   a Sunday. */
 	tm->tm_wday	= (seconds / (24 * 60 * 60)) % 7;
 
 	clock_data.mday		= 1;
@@ -188,6 +185,8 @@ mktime(struct tm *tm)
 
 	tm->tm_yday	= (seconds - delta) / (24 * 60 * 60);
 
+	/* Finally, adjust for the difference between the Unix and the
+	   AmigaOS epochs, which differ by 8 years. */
 	result = seconds + UNIX_TIME_OFFSET;
 
 	error = 0;

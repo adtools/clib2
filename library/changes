@@ -3,6 +3,12 @@
   happen and is a side-effect of the new stdio initialization code which
   checks if the stdio streams are in non-blocking mode. Fixed.
 
+- Moved the common DateStamp to time_t conversion code into a shared
+  function.
+
+- The fall-back function for converting time into a string in strftime()
+  now calls itself for the "%x" and "%X" format specifiers.
+
 
 c.lib 1.186 (14.1.2005)
 

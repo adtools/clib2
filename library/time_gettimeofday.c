@@ -1,5 +1,5 @@
 /*
- * $Id: time_gettimeofday.c,v 1.4 2005-01-08 10:21:25 obarthel Exp $
+ * $Id: time_gettimeofday.c,v 1.5 2005-01-24 10:25:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,11 +70,17 @@ gettimeofday(struct timeval *tp, struct timezone *tzp)
 
 	ENTER();
 
+	/* Obtain the current system time. */
 	GetSysTime(&tv);
 
+	/* Convert the number of seconds so that they match the Unix epoch, which
+	   starts (January 1st, 1970) eight years before the AmigaOS epoch. */
 	seconds			= tv.tv_sec + UNIX_TIME_OFFSET;
 	microseconds	= tv.tv_usec;
 
+	/* If possible, adjust for the local time zone. We do this because the
+	   AmigaOS system time is returned in local time and we want to return
+	   it in UTC. */
 	if(__default_locale != NULL)
 		seconds += 60 * __default_locale->loc_GMTOffset;
 
@@ -94,6 +100,8 @@ gettimeofday(struct timeval *tp, struct timezone *tzp)
 		else
 			tzp->tz_minuteswest = 0;
 
+		/* The -1 means "we do not know if the time given is in
+		   daylight savings time". */
 		tzp->tz_dsttime = -1;
 
 		SHOWVALUE(tzp->tz_minuteswest);

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.20 2005-01-10 00:56:15 theantony Exp $
+# $Id: GNUmakefile.os4,v 1.21 2005-01-24 10:25:46 obarthel Exp $
 #
 # :ts=8
 #
@@ -365,6 +365,7 @@ C_LIB = \
 	time_asctime_r.o \
 	time_clock.o \
 	time_converttime.o \
+	time_convert_datestamp.o \
 	time_ctime.o \
 	time_ctime_r.o \
 	time_data.o \

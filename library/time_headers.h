@@ -1,5 +1,5 @@
 /*
- * $Id: time_headers.h,v 1.5 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_headers.h,v 1.6 2005-01-24 10:25:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,6 +94,7 @@ extern const char * const NOCOMMON __month_names[12];
 extern char * __asctime_r(const struct tm *tm,char * buffer,size_t buffer_size);
 extern char * __number_to_string(unsigned int number,char * string,size_t max_len,size_t min_len);
 extern struct tm * __convert_time(ULONG seconds, LONG gmt_offset, struct tm * tm);
+extern time_t __convert_datestamp_to_time(const struct DateStamp * ds);
 
 /****************************************************************************/
 
