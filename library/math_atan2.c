@@ -1,5 +1,5 @@
 /*
- * $Id: math_atan2.c,v 1.2 2004-08-21 18:57:40 obarthel Exp $
+ * $Id: math_atan2.c,v 1.3 2004-08-27 11:40:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,7 +63,7 @@ extern double __atan(double x);
 /****************************************************************************/
 
 INLINE static const double
-__atan2(double x,double y)
+__atan2(double y,double x)
 {
 	const double pi = 3.14159265358979323846;
 	const double pi_over_2 = pi / 2.0;
@@ -135,7 +135,7 @@ __atan(double x)
 }
 
 INLINE static const double
-__atan2(double x,double y)
+__atan2(double y,double x)
 {
 	double pi,pi_over_2;
 	double result;
@@ -210,7 +210,7 @@ pi      = 3.1415926535897931160E+00, /* 0x400921FB, 0x54442D18 */
 pi_lo   = 1.2246467991473531772E-16; /* 0x3CA1A626, 0x33145C07 */
 
 INLINE static const double
-__atan2(double x,double y)
+__atan2(double y,double x)
 {
 	double z;
 	int k,m,hx,hy,ix,iy;
@@ -319,11 +319,11 @@ __atan2(double x,double y)
 /****************************************************************************/
 
 double
-atan2(double x,double y)
+atan2(double y,double x)
 {
 	double result;
 
-	result = __atan2(x,y);
+	result = __atan2(y,x);
 
 	return(result);
 }

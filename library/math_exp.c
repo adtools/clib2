@@ -1,5 +1,5 @@
 /*
- * $Id: math_exp.c,v 1.1.1.1 2004-07-26 16:30:41 obarthel Exp $
+ * $Id: math_exp.c,v 1.2 2004-08-27 11:40:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -194,7 +194,7 @@ __exp(double x)
 	    } 
 		else 
 		{
-			k  = invln2*x+halF[xsb];
+			k  = (int)(invln2*x+halF[xsb]);
 			t  = k;
 			hi = x - t*ln2HI[0];	/* t*ln2HI is exact here */
 			lo = t*ln2LO[0];

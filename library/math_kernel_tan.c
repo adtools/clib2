@@ -1,5 +1,5 @@
 /*
- * $Id: math_kernel_tan.c,v 1.1.1.1 2004-07-26 16:30:48 obarthel Exp $
+ * $Id: math_kernel_tan.c,v 1.2 2004-08-27 11:40:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -82,7 +82,21 @@ double __kernel_tan(double x, double y, int iy)
 			unsigned int low;
 			GET_LOW_WORD(low,x);
 			if(((ix|low)|(iy+1))==0) return one/fabs(x);
-			else return (iy==1)? x: -one/x;
+			else {
+				if (iy == 1)
+					return x;
+				else {	/* compute -1 / (x+y) carefully */
+					double a, t;
+
+					z = w = x + y;
+					SET_LOW_WORD(z,0);
+					v = y - (z - x);
+					t = a = -one / w;
+					SET_LOW_WORD(t,0);
+					s = one + t * z;
+					return t + a * (s + t * v);
+				}
+			}
 		}
 	}
 	if(ix>=0x3FE59428) { 			/* |x|>=0.6744 */
