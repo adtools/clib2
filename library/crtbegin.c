@@ -1,5 +1,5 @@
 /* 
- * $Id: crtbegin.c,v 1.6 2005-03-10 09:55:03 obarthel Exp $
+ * $Id: crtbegin.c,v 1.7 2005-03-10 13:28:05 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,7 @@ _fini(void)
 	   the next following destructor. */
 	(void)setjmp(__exit_jmp_buf);
 
-	for(i = j, num_dtors = 0 ; __DTOR_LIST__[j] != NULL ; j++)
+	for(j = 0, num_dtors = 0 ; __DTOR_LIST__[j] != NULL ; j++)
 		num_dtors++;
 
 	while(i++ < num_dtors)
