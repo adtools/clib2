@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.2 2004-10-25 19:50:33 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.3 2005-03-03 14:46:10 obarthel Exp $
 #
 # :ts=8
 #
@@ -21,11 +21,11 @@ WARNINGS = \
 	-Wall -W -Wshadow -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
 	-Wundef -Wbad-function-cast -Wmissing-declarations -Wconversion
 
-INCLUDE = -I../library/include
+INCLUDE = -I../library/include -I$(V)/include
 LIB = -L../library/lib
 #OPTIONS = -DNDEBUG -fno-builtin -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT
 #OPTIONS = -D__MEM_DEBUG -fno-builtin
- OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
+#OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g2
