@@ -1,5 +1,5 @@
 /*
- * $Id: strings.h,v 1.4 2005-03-02 12:57:56 obarthel Exp $
+ * $Id: ftw.h,v 1.1 2005-03-02 12:57:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,12 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STRINGS_H
-#define _STRINGS_H
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard. */
+#ifndef	_FTW_H
+#define	_FTW_H
 
 /****************************************************************************/
 
@@ -46,26 +42,54 @@ extern "C" {
 
 /****************************************************************************/
 
-#ifndef _STDDEF_H
-#include <stddef.h>
-#endif /* _STDDEF_H */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
-/* These come from 4.4BSD. */
-extern int strcasecmp(const char *s1, const char *s2);
-extern int strncasecmp(const char *s1, const char *s2, size_t len);
-extern int ffs(int i);
+#include <sys/stat.h>
 
 /****************************************************************************/
 
-/*
- * These two provide functions which are available with the Lattice and
- * SAS/C compiler runtime libraries. Which probably makes them more exotic
- * than XENIX.
- */
-#define stricmp(s1, s2)			strcasecmp((s1), (s2))
-#define strnicmp(s1, s2, len)	strncasecmp((s1), (s2), (len))
+/* Values passed to the user function (argument #3). */
+enum
+{
+	FTW_F,		/* Regular file. */
+	FTW_D,		/* Directory. */
+	FTW_DP,		/* Directory, already visited. (nftw() only) */
+	FTW_SL,		/* Symlink. (nftw() only) */
+	FTW_SLN,	/* Broken Symlink. (does not point to an existing file, nftw() only) */
+	FTW_DNR,	/* Directory which can not be read (e.g. not enough permissions) */
+	FTW_NS		/* Stat failed. */
+};
+
+/****************************************************************************/
+
+/* Flags for FTW.quit */
+#define	FTW_SKD		(1L<<0)	/* Skip directory. */
+#define	FTW_PRUNE	(1L<<1)	/* Prune traversal. (skip up) */
+
+/****************************************************************************/
+
+/* Flags for nftw() */
+#define	FTW_PHYS		(1L<<0)
+#define	FTW_MOUNT		(1L<<1)		/* Currently unsupported. */
+#define	FTW_DEPTH		(1L<<2)
+#define	FTW_CHDIR		(1L<<3)
+#define	FTW_ALL_FLAGS	(0x0000000f)
+
+/****************************************************************************/
+
+struct FTW
+{
+	int quit;	/* Flags passed out from the user function to ftw()/nftw() */
+	int base;	/* Index of current item from start of string. e.g. 4 for "foo/bar" */
+	int level;	/* Current depth. (counted from 0) */
+};
+
+/****************************************************************************/
+
+extern int ftw(const char *path,int (*func)(const char *,const struct stat *,int),int depth);
+extern int nftw(const char *path,int (*func)(const char *,const struct stat *,int,struct FTW *),int depth,int flags);
 
 /****************************************************************************/
 
@@ -75,4 +99,4 @@ extern int ffs(int i);
 
 /****************************************************************************/
 
-#endif /* _STRINGS_H */
+#endif /* _FTW_H */

@@ -1,5 +1,5 @@
 /*
- * $Id: strings.h,v 1.4 2005-03-02 12:57:56 obarthel Exp $
+ * $Id: strings_ffs.c,v 1.1 2005-03-02 12:57:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,8 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STRINGS_H
-#define _STRINGS_H
+#ifndef _STDLIB_NULL_POINTER_CHECK_H
+#include "stdlib_null_pointer_check.h"
+#endif /* _STDLIB_NULL_POINTER_CHECK_H */
+
+/****************************************************************************/
+
+#ifndef _STRINGS_HEADERS_H
+#include "strings_headers.h"
+#endif /* _STRINGS_HEADERS_H */
 
 /****************************************************************************/
 
@@ -40,39 +47,25 @@
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+/* Return the index of the lowest set bit. (Counted from one) */
+int
+ffs(int i)
+{
+	int result = 0;
 
-/****************************************************************************/
+	if(i != 0)
+	{
+		int x;
 
-#ifndef _STDDEF_H
-#include <stddef.h>
-#endif /* _STDDEF_H */
+		x = (i & (-i)) - 1;
+		x -= ((x >> 1) & 0x55555555);
+		x = ((x >> 2) & 0x33333333) + (x & 0x33333333);
+		x = ((x >> 4) + x) & 0x0f0f0f0f;
+		x += (x >> 8);
+		x += (x >> 16);
 
-/****************************************************************************/
+		result = 1 + (x & 0x3f); /* The first bit has index 1. */
+	}
 
-/* These come from 4.4BSD. */
-extern int strcasecmp(const char *s1, const char *s2);
-extern int strncasecmp(const char *s1, const char *s2, size_t len);
-extern int ffs(int i);
-
-/****************************************************************************/
-
-/*
- * These two provide functions which are available with the Lattice and
- * SAS/C compiler runtime libraries. Which probably makes them more exotic
- * than XENIX.
- */
-#define stricmp(s1, s2)			strcasecmp((s1), (s2))
-#define strnicmp(s1, s2, len)	strncasecmp((s1), (s2), (len))
-
-/****************************************************************************/
-
-#ifdef __cplusplus
+	return(result);
 }
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#endif /* _STRINGS_H */

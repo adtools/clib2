@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.32 2005-02-28 13:22:53 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.33 2005-03-02 12:57:53 obarthel Exp $
 #
 # :ts=8
 #
@@ -152,6 +152,8 @@ C_LIB = \
 	fcntl_open.o \
 	fcntl_read.o \
 	fcntl_write.o \
+	ftw_ftw.o \
+	ftw_nftw.o \
 	libgen_basename.o \
 	libgen_dirname.o \
 	locale_init_exit.o \
@@ -273,6 +275,7 @@ C_LIB = \
 	stdlib_atexit.o \
 	stdlib_atoi.o \
 	stdlib_atol.o \
+	stdlib_atoll.o \
 	stdlib_bsearch.o \
 	stdlib_calloc.o \
 	stdlib_checkdetach.o \
@@ -348,6 +351,7 @@ C_LIB = \
 	stdlib_umodsi3.o \
 	stdlib_unsetenv.o \
 	stdlib_wildcard_expand.o \
+	strings_ffs.o \
 	strings_strcasecmp.o \
 	strings_strncasecmp.o \
 	string_bcmp.o \
@@ -431,7 +435,8 @@ C_LIB = \
 	unistd_truncate.o \
 	unistd_unlink.o \
 	unistd_usleep.o \
-	utime_utime.o
+	utime_utime.o \
+	utsname_uname.o
 
 # All objects files which make up libunix.a
 UNIX_LIB = \
@@ -620,7 +625,8 @@ NET_LIB = \
 	usergroup_setregid.o \
 	usergroup_setreuid.o \
 	usergroup_setsid.o \
-	usergroup_setuid.o
+	usergroup_setuid.o \
+	utsname_uname.o
 
 # All objects files which make up libdebug.a
 DEBUG_LIB = \

@@ -1,5 +1,5 @@
 /*
- * $Id: strings.h,v 1.4 2005-03-02 12:57:56 obarthel Exp $
+ * $Id: stdlib_atoll.c,v 1.1 2005-03-02 12:57:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,48 +31,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STRINGS_H
-#define _STRINGS_H
+#ifndef _STDLIB_NULL_POINTER_CHECK_H
+#include "stdlib_null_pointer_check.h"
+#endif /* _STDLIB_NULL_POINTER_CHECK_H */
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#if defined(USE_64_BIT_INTS)
 
 /****************************************************************************/
 
-#ifndef _STDDEF_H
-#include <stddef.h>
-#endif /* _STDDEF_H */
+long long
+atoll(const char *str)
+{
+	long long result = 0;
 
-/****************************************************************************/
+	assert( str != NULL );
 
-/* These come from 4.4BSD. */
-extern int strcasecmp(const char *s1, const char *s2);
-extern int strncasecmp(const char *s1, const char *s2, size_t len);
-extern int ffs(int i);
+	#if defined(CHECK_FOR_NULL_POINTERS)
+	{
+		if(str == NULL)
+		{
+			errno = EFAULT;
+			goto out;
+		}
+	}
+	#endif /* CHECK_FOR_NULL_POINTERS */
 
-/****************************************************************************/
+	result = strtoll(str, (char **)NULL, 10);
 
-/*
- * These two provide functions which are available with the Lattice and
- * SAS/C compiler runtime libraries. Which probably makes them more exotic
- * than XENIX.
- */
-#define stricmp(s1, s2)			strcasecmp((s1), (s2))
-#define strnicmp(s1, s2, len)	strncasecmp((s1), (s2), (len))
+ out:
 
-/****************************************************************************/
-
-#ifdef __cplusplus
+	return(result);
 }
-#endif /* __cplusplus */
 
 /****************************************************************************/
 
-#endif /* _STRINGS_H */
+#endif /* USE_64_BIT_INTS */

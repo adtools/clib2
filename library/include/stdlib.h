@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.7 2005-02-27 18:09:12 obarthel Exp $
+ * $Id: stdlib.h,v 1.8 2005-03-02 12:57:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -153,11 +153,12 @@ extern int rand_r(unsigned int * seed);
 
 /****************************************************************************/
 
-/* These two functions are unavailable under SAS/C for lack of a
+/* These functions are unavailable under SAS/C for lack of a
    "long long" data type. */
 #if ! defined(__SASC)
 extern long long strtoll(const char *str, char **ptr, int base);
 extern unsigned long long strtoull(const char *str, char **ptr, int base);
+extern long long atoll(const char *str);
 #endif /* __SASC */
 
 /****************************************************************************/

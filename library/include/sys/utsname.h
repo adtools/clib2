@@ -1,5 +1,5 @@
 /*
- * $Id: strings.h,v 1.4 2005-03-02 12:57:56 obarthel Exp $
+ * $Id: utsname.h,v 1.1 2005-03-02 12:57:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,12 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STRINGS_H
-#define _STRINGS_H
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard. */
+#ifndef	_SYS_UTSNAME_H
+#define	_SYS_UTSNAME_H
 
 /****************************************************************************/
 
@@ -46,26 +42,26 @@ extern "C" {
 
 /****************************************************************************/
 
-#ifndef _STDDEF_H
-#include <stddef.h>
-#endif /* _STDDEF_H */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
-/* These come from 4.4BSD. */
-extern int strcasecmp(const char *s1, const char *s2);
-extern int strncasecmp(const char *s1, const char *s2, size_t len);
-extern int ffs(int i);
+#define	SYS_NMLN 32
 
 /****************************************************************************/
 
-/*
- * These two provide functions which are available with the Lattice and
- * SAS/C compiler runtime libraries. Which probably makes them more exotic
- * than XENIX.
- */
-#define stricmp(s1, s2)			strcasecmp((s1), (s2))
-#define strnicmp(s1, s2, len)	strncasecmp((s1), (s2), (len))
+struct utsname
+{
+	char sysname[SYS_NMLN];		/* OS Name ("AmigaOS") */
+	char nodename[SYS_NMLN];	/* Usually Hostname, but there appears to be no standard.  */
+	char release[SYS_NMLN];		/* Release e.g. "51.1" (The Version of version.library) */
+	char version[SYS_NMLN];		/* Version e.h. "4.0" (OS Version) */
+	char machine[SYS_NMLN];		/* Machine e.g. "m68k" or "ppc" */
+};
+
+/****************************************************************************/
+
+extern int uname(struct utsname *);
 
 /****************************************************************************/
 
@@ -75,4 +71,4 @@ extern int ffs(int i);
 
 /****************************************************************************/
 
-#endif /* _STRINGS_H */
+#endif /* _SYS_UTSNAME_H */

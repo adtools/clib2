@@ -80,6 +80,9 @@
   absolute Amiga path names passed to it and will use them without
   changing them.
 
+- Added atoll(), ffs(), ftw(), nftw(), lstat() and uname() code
+  contributed by Peter Bengtsson. Thank you very much!
+
 
 c.lib 1.188 (7.2.2005)
 
