@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stack_usage.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_stack_usage.c,v 1.3 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,6 +31,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef NDEBUG
+
+/****************************************************************************/
+
 #include "stdlib_headers.h"
 
 /****************************************************************************/
@@ -39,11 +43,7 @@
 
 /****************************************************************************/
 
-#ifndef NDEBUG
-
 static struct StackSwapStruct stack_swap_struct;
-
-#endif /* NDEBUG */
 
 /****************************************************************************/
 
@@ -52,20 +52,16 @@ static struct StackSwapStruct stack_swap_struct;
 /****************************************************************************/
 
 void
-__stack_usage_init(struct StackSwapStruct * UNUSED stk)
+__stack_usage_init(struct StackSwapStruct * stk)
 {
-	#ifndef NDEBUG
+	if(stk != NULL)
 	{
-		if(stk != NULL)
-		{
-			size_t stack_size = ((ULONG)stk->stk_Upper - (ULONG)stk->stk_Lower);
+		size_t stack_size = ((ULONG)stk->stk_Upper - (ULONG)stk->stk_Lower);
 
-			memset(stk->stk_Lower,STACK_FILL_COOKIE,stack_size);
+		memset(stk->stk_Lower,STACK_FILL_COOKIE,stack_size);
 
-			stack_swap_struct = (*stk);
-		}
+		stack_swap_struct = (*stk);
 	}
-	#endif /* NDEBUG */
 }
 
 /****************************************************************************/
@@ -73,45 +69,45 @@ __stack_usage_init(struct StackSwapStruct * UNUSED stk)
 void
 __stack_usage_exit(void)
 {
-	#ifndef NDEBUG
+	if(stack_swap_struct.stk_Lower != NULL && stack_swap_struct.stk_Upper != 0)
 	{
-		if(stack_swap_struct.stk_Lower != NULL && stack_swap_struct.stk_Upper != 0)
+		const UBYTE * m = (const UBYTE *)stack_swap_struct.stk_Lower;
+		size_t stack_size = ((ULONG)stack_swap_struct.stk_Upper - (ULONG)stack_swap_struct.stk_Lower);
+		size_t total,i;
+
+		total = 0;
+
+		/* Figure out how much of the stack was used by checking
+		   if the fill pattern was overwritten. */
+		for(i = 0 ; i < stack_size ; i++)
 		{
-			const UBYTE * m = (const UBYTE *)stack_swap_struct.stk_Lower;
-			size_t stack_size = ((ULONG)stack_swap_struct.stk_Upper - (ULONG)stack_swap_struct.stk_Lower);
-			size_t total,i;
+			/* Strangely, the first long word is always trashed,
+			   even if the stack doesn't grow down this far... */
+			if(i > sizeof(LONG) && m[i] != STACK_FILL_COOKIE)
+				break;
 
-			total = 0;
-
-			/* Figure out how much of the stack was used by checking
-			   if the fill pattern was overwritten. */
-			for(i = 0 ; i < stack_size ; i++)
-			{
-				/* Strangely, the first long word is always trashed,
-				   even if the stack doesn't grow down this far... */
-				if(i > sizeof(LONG) && m[i] != STACK_FILL_COOKIE)
-					break;
-
-				total++;				
-			}
-
-			kprintf("[%s] total amount of stack space used = %ld bytes\n",
-				__program_name,stack_size - total);
-
-			stack_swap_struct.stk_Lower = NULL;
-			stack_swap_struct.stk_Upper = 0;
+			total++;				
 		}
 
-		if(__stk_maxsize == 0)
-		{
-			kprintf("[%s] no stack extension was performed\n",
-				__program_name);
-		}
-		else
-		{
-			kprintf("[%s] maximum size of extended stack = %ld bytes, stack was extended %ld times\n",
-				__program_name,__stk_maxsize,__stk_extensions);
-		}
+		kprintf("[%s] total amount of stack space used = %ld bytes\n",
+			__program_name,stack_size - total);
+
+		stack_swap_struct.stk_Lower = NULL;
+		stack_swap_struct.stk_Upper = 0;
 	}
-	#endif /* NDEBUG */
+
+	if(__stk_maxsize == 0)
+	{
+		kprintf("[%s] no stack extension was performed\n",
+			__program_name);
+	}
+	else
+	{
+		kprintf("[%s] maximum size of extended stack = %ld bytes, stack was extended %ld times\n",
+			__program_name,__stk_maxsize,__stk_extensions);
+	}
 }
+
+/****************************************************************************/
+
+#endif /* NDEBUG */

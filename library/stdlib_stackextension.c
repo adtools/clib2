@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackextension.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdlib_stackextension.c,v 1.7 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,6 +62,11 @@ static void *				__stk_initial_sp_lower;	/* original stackborders */
 static void *				__stk_initial_sp_upper;
 static struct stackframe *	__stk_used;				/* used stackframes */
 static struct stackframe *	__stk_spare;			/* spare stackframes */
+
+/****************************************************************************/
+
+ULONG __stk_extensions;	/* number of stack extensions performed */
+ULONG __stk_maxsize;	/* maximum amount of memory allocated for stack extension */	
 
 /****************************************************************************/
 

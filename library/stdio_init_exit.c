@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.25 2005-03-09 16:56:05 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.26 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,6 +44,18 @@
 #ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
+
+/****************************************************************************/
+
+/* The file handle table. */
+struct iob **	__iob;
+int				__num_iob;
+
+/****************************************************************************/
+
+/* The file descriptor table. */
+struct fd **	__fd;
+int				__num_fd;
 
 /****************************************************************************/
 

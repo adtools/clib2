@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.1 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.2 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,6 +63,10 @@ static BPTR old_input;
 
 static BPTR output;
 static BPTR input;
+
+/****************************************************************************/
+
+struct WBStartup * __WBenchMsg;
 
 /****************************************************************************/
 

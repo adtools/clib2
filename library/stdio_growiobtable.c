@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_growiobtable.c,v 1.5 2005-03-09 10:48:59 obarthel Exp $
+ * $Id: stdio_growiobtable.c,v 1.6 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,12 +40,6 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
-
-/****************************************************************************/
-
-/* The file handle table. */
-struct iob **	__iob;
-int				__num_iob;
 
 /****************************************************************************/
 

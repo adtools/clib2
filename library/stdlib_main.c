@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.13 2005-03-07 14:04:09 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.14 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,11 @@ extern int main(int arg_c,char ** arg_v);
 
 /****************************************************************************/
 
+/* This will be set to TRUE in case a stack overflow was detected. */
+BOOL __stack_overflow;
+
+/****************************************************************************/
+
 /* The SAS/C profiling hooks can be used to track call chains. Neat
    trick, but not always necessary. Don't enable this unless you know
    what you're doing... */
@@ -119,7 +124,6 @@ call_main(void)
 		__stk_init,
 		__stdio_init,
 		__stdio_file_init,
-		__machine_test,
 		__math_init,
 		__socket_init,
 		__arg_init,
@@ -214,7 +218,11 @@ call_main(void)
 	}
 
 	/* If necessary, print stack size usage information. */
-	__stack_usage_exit();
+	#ifndef NDEBUG
+	{
+		__stack_usage_exit();
+	}
+	#endif /* NDEBUG */
 
 	SHOWMSG("invoking the destructors");
 
@@ -297,6 +305,17 @@ get_stack_size(void)
 
 	return(result);
 }
+
+/****************************************************************************/
+
+/* The global utility.library base, as required by clib2. */
+struct Library * __UtilityBase;
+
+/****************************************************************************/
+
+#if defined(__amigaos4__)
+struct UtilityIFace * __IUtility;
+#endif /* __amigaos4__ */
 
 /****************************************************************************/
 
@@ -460,7 +479,11 @@ _main(void)
 			stk->stk_Pointer	= (APTR)(stk->stk_Upper - 32);
 
 			/* If necessary, set up for stack size usage measurement. */
-			__stack_usage_init(stk);
+			#ifndef NDEBUG
+			{
+				__stack_usage_init(stk);
+			}
+			#endif /* NDEBUG */
 
 			return_code = __swap_stack_and_call(stk,(APTR)call_main);
 

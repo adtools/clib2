@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackoverflow.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_stackoverflow.c,v 1.3 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,10 @@
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+extern BOOL NOCOMMON __stack_overflow;
 
 /****************************************************************************/
 

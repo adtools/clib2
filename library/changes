@@ -54,6 +54,11 @@
 
 - Added S_IREAD, S_IWRITE and S_IEXEC aliases to <sys/stat.h>.
 
+- Moved data out of stdlib_data.c and into the code that references
+  or initializes it.
+
+- The stdlib constructor now performs the CPU/FPU compatibility test.
+
 
 c.lib 1.189 (5.3.2005)
 

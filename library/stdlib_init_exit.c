@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_init_exit.c,v 1.6 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: stdlib_init_exit.c,v 1.7 2005-03-11 09:37:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,6 +75,9 @@ __stdlib_init(void)
 	int result = ERROR;
 
 	ENTER();
+
+	if(__machine_test() < 0)
+		goto out;
 
 	if(__WBenchMsg == NULL)
 	{
