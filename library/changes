@@ -1,3 +1,5 @@
+c.lib 1.189 (5.3.2005)
+
 - Rewrote the __translate_unix_to_amiga_path_name() function to
   translate patterns such as "foo/bar/../../baz" properly, and to
   use strlen() a lot less.
