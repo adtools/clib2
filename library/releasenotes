@@ -1,4 +1,6 @@
-- Added "math_logb.c"; I still have to verify that it works as expected.
+c.lib 1.170 (14.8.2004)
+
+- Added "math_logb.c", and it appears to work, too.
 
 
 c.lib 1.169 (8.8.2004)

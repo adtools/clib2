@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.4 2004-08-12 12:31:14 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.5 2004-08-14 08:54:25 obarthel Exp $
 #
 # :ts=8
 #
@@ -699,11 +699,6 @@ STARTUPS := nrcrt0.o nbcrt0.o nr32crt0.o nb32crt0.o ncrt0.o mainnb.o mainb.o mai
 ##############################################################################
 
 all: \
-	lib/libm020/libm.a \
-	lib/libm.a \
-	lib/libb/libm020/libm.a \
-	lib/libb/libm.a \
-	lib/libb32/libm020/libm.a \
 	lib/nrcrt0.o \
 	lib/nbcrt0.o \
 	lib/ncrt0.o \
@@ -711,7 +706,12 @@ all: \
 	lib/n32rcrt0.o \
 	lib/mainnb.o \
 	lib/mainb.o \
-	lib/mainb32.o
+	lib/mainb32.o \
+	lib/libm.a \
+	lib/libm020/libm.a \
+	lib/libb/libm.a \
+	lib/libb/libm020/libm.a \
+	lib/libb32/libm020/libm.a
 
 ##############################################################################
 
