@@ -94,6 +94,8 @@
 - ftruncate() ended up changing the current file position, contrary
   to what it is supposed to do. Fixed.
 
+- fcntl() did not work for sockets. Fixed.
+
 
 c.lib 1.189 (5.3.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.12 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.13 2005-03-16 09:28:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -126,12 +126,6 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 
 			SHOWMSG("cmd=F_GETFL");
 
-			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
-			{
-				__set_errno(EINVAL);
-				goto out;
-			}
-
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING))
 				SET_FLAG(result,O_NONBLOCK);
 
@@ -145,12 +139,6 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 		case F_SETFL:
 
 			SHOWMSG("cmd=F_SETFL");
-
-			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
-			{
-				__set_errno(EINVAL);
-				goto out;
-			}
 
 			va_start(arg,cmd);
 			flags = va_arg(arg,int);

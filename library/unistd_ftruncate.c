@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.8 2005-03-14 10:03:06 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.9 2005-03-16 09:28:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,6 @@ ftruncate(int file_descriptor, off_t length)
 	BOOL restore_initial_position = FALSE;
 	off_t current_file_size;
 	off_t initial_position = -1;
-	BOOL success;
 
 	ENTER();
 
