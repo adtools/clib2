@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.1.1.1 2004-07-26 16:31:48 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.2 2004-08-08 10:55:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -456,8 +456,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 		{
 			#if defined(FLOATING_POINT_SUPPORT)
 			{
-				long double sum = 0.0;
-				long double new_sum;
+				__long_double_t sum = 0.0;
+				__long_double_t new_sum;
 				BOOL is_negative = FALSE;
 				BOOL decimal_point_matches = FALSE;
 				BOOL have_exponent = FALSE;
@@ -495,7 +495,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						SHOWMSG("extended format (long double)");
 
-						next_parameter = va_arg(arg,long double *);
+						next_parameter = va_arg(arg,__long_double_t *);
 					}
 
 					assert( next_parameter != NULL );
@@ -520,7 +520,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					}
 					else
 					{
-						*((long double *)next_parameter) = 0;
+						*((__long_double_t *)next_parameter) = 0;
 					}
 				}
 
@@ -869,7 +869,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 						}
 						else
 						{
-							*((long double *)next_parameter) = sum;
+							*((__long_double_t *)next_parameter) = sum;
 						}
 
 						num_assignments++;
@@ -912,7 +912,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						SHOWMSG("extended format (long double)");
 
-						next_parameter = va_arg(arg,long double *);
+						next_parameter = va_arg(arg,__long_double_t *);
 					}
 
 					assert( next_parameter != NULL );

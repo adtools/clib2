@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.1.1.1 2004-07-26 16:30:46 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.2 2004-08-08 10:55:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -121,41 +121,45 @@ __math_init(void)
 	#endif /* IEEE_FLOATING_POINT_SUPPORT */
 
 	/* Now fill in the HUGE_VAL constant, which is set to
-	 * +Infinity.
-	 */
+	   the largest representable floating point value. */
 	if(sizeof(__huge_val) == 4) /* single precision */
 	{
-		static const unsigned long infinity[] =
+		static const unsigned long largest_fp_value[1] =
 		{
-			0x7F800000
+			/* Exponent = +126, Mantissa = 8,388,607 */
+			0x7f7fffff
 		};
 
-		assert( sizeof(infinity) == sizeof(__huge_val) );
+		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
 
-		memmove((void *)&__huge_val,infinity,sizeof(infinity));
+		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
 	}
 	else if (sizeof(__huge_val) == 8) /* double precision */
 	{
-		static const unsigned long infinity[] =
+		static const unsigned long largest_fp_value[2] =
 		{
-			0x7FF00000,0x00000000
+			/* Exponent = +1022, Mantissa = 4,503,599,627,370,495 */
+			0x7fefffff,0xffffffff
 		};
 
-		assert( sizeof(infinity) == sizeof(__huge_val) );
+		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
 
-		memmove((void *)&__huge_val,infinity,sizeof(infinity));
+		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
 	}
+#if defined(USE_LONG_DOUBLE)
 	else if (sizeof(__huge_val) == 12) /* extended precision */
 	{
-		static const unsigned long infinity[] =
+		static const unsigned long largest_fp_value[3] =
 		{
-			0x7FFF0000,0x00000000,0x00000000
+			/* Exponent = +32766, Mantissa = 18,446,744,073,709,551,615 */
+			0x7ffe0000,0xffffffff,0xffffffff
 		};
 
-		assert( sizeof(infinity) == sizeof(__huge_val) );
+		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
 
-		memmove((void *)&__huge_val,infinity,sizeof(infinity));
+		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
 	}
+#endif /* USE_LONG_DOUBLE */
 
 	result = OK;
 

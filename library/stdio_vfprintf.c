@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.3 2004-08-08 10:55:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,7 +72,7 @@
 /****************************************************************************/
 
 static int
-get_num_leading_digits(long double v)
+get_num_leading_digits(__long_double_t v)
 {
 	int num_digits;
 
@@ -634,14 +634,14 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				const char *	buffer_stop		= &buffer[sizeof(buffer)-1];
 				char *			buffer_start	= buffer;
 
-				long double v;
+				__long_double_t v;
 
 				output_buffer = buffer_start;
 
 				D(("sizeof(long double) == %ld",sizeof(v)));
 
 				if(parameter_size == parameter_size_long_double)
-					v = va_arg(arg, long double);
+					v = va_arg(arg, __long_double_t);
 				else
 					v = va_arg(arg, double);
 
@@ -676,7 +676,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				else
 				{
 					BOOL strip_trailing_zeroes = FALSE;
-					long double roundoff_fudge = 0.0;
+					__long_double_t roundoff_fudge = 0.0;
 					int max_digits = -1;
 					int exponent = 0;
 					int digit;
@@ -713,7 +713,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					/* Figure out whether 'e' or 'f' format should be used. */
 					if(conversion_type == 'g' || conversion_type == 'e')
 					{
-						long double local_v = v;
+						__long_double_t local_v = v;
 						int local_exponent = 0;
 
 						/* Put one single digit in front of the decimal point. */
@@ -978,7 +978,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				/* Remove the parameter from the argument vector and
 				   don't produce any output. */
 				if(parameter_size == parameter_size_long_double)
-					(void)va_arg(arg, long double);
+					(void)va_arg(arg, __long_double_t);
 				else
 					(void)va_arg(arg, double);
 

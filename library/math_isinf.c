@@ -1,5 +1,5 @@
 /*
- * $Id: math_isinf.c,v 1.1 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: math_isinf.c,v 1.2 2004-08-08 10:55:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,26 +45,6 @@
 
 /****************************************************************************/
 
-union ieee_long_double
-{
-	long double		value;
-	unsigned long	raw[3];
-};
-
-union ieee_double
-{
-	double			value;
-	unsigned long	raw[2];
-};
-
-union ieee_single
-{
-	float			value;
-	unsigned long	raw[1];
-};
-
-/****************************************************************************/
-
 int
 isinf(double number)
 {
@@ -93,6 +73,7 @@ isinf(double number)
 		/* Exponent = 2047 and fraction = 0.0 */
 		is_infinity = (((x.raw[0] & 0x7FFFFFFF) == 0x7FF00000) && (x.raw[1] == 0));
 	}
+#if defined(USE_LONG_DOUBLE)
 	else if (sizeof(number) == 12) /* extended precision */
 	{
 		union ieee_long_double x;
@@ -102,6 +83,7 @@ isinf(double number)
 		/* Exponent = 32767 and fraction = 0.0 */
 		is_infinity = (((x.raw[0] & 0x7FFF0000) == 0x7FFF0000) && (x.raw[1] & 0x7FFFFFFF) == 0 && (x.raw[2] == 0));
 	}
+#endif /* USE_LONG_DOUBLE */
 	else
 	{
 		/* Can't happen */

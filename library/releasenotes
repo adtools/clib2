@@ -1,3 +1,19 @@
+c.lib 1.169 (8.8.2004)
+
+- Since the 'long double' data type is not really supported by the GCC
+  versions we use (and not supported by SAS/C either) building the
+  library with support code for it is now a configurable option. Unless
+  enabled, 'long double' is now treated like 'double'.
+
+- Reworked the HUGE_VAL definition which previously would default to
+  Infinity. The new code properly defines this to the largest
+  representable floating point number. The 'great' thing about the
+  HUGE_VAL definition in this library is that it's a reference to
+  a binary constant initialized by the library startup code. So any
+  application checking for HUGE_VAL merely needs to be relinked
+  rather than recompiled.
+
+
 c.lib 1.168 (7.8.2004)
 
 - Ditched __is_infinity() and __is_not_a_number(), brought them back

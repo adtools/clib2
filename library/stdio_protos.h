@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.1.1.1 2004-07-26 16:31:39 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.2 2004-08-08 10:55:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -197,24 +197,6 @@ extern ssize_t __read(int file_descriptor, void * buffer, size_t num_bytes, int 
 
 /* stdio_duplicate_fd.c */
 extern void __duplicate_fd(struct fd * duplicate_fd,struct fd * original_fd);
-
-/****************************************************************************/
-
-#if defined(FLOATING_POINT_SUPPORT)
-
-/****************************************************************************/
-
-/* stdio_isnotanumber.c */
-extern int __is_not_a_number(long double number);
-
-/****************************************************************************/
-
-/* stdio_isinfinity.c */
-extern int __is_infinity(long double number);
-
-/****************************************************************************/
-
-#endif /* FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
 
