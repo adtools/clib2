@@ -1,5 +1,5 @@
 /*
- * $Id: stdarg.h,v 1.4 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: uio_headers.h,v 1.1 2005-04-03 10:22:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,68 +31,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDARG_H
-#define _STDARG_H
+#ifndef _UIO_HEADERS_H
+#define _UIO_HEADERS_H
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-#ifndef __amigaos4__
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-typedef char * va_list;
+#ifndef	_SYS_UIO_H
+#include <sys/uio.h>
+#endif /* _SYS_UIO_H */
 
 /****************************************************************************/
 
-#define va_start(ap, last)	((void)(ap = (va_list)&(last) + sizeof(last)))
-#define va_arg(ap, type)	((type *)(ap += sizeof(type)))[-1]
-#define va_end(ap)			((void)0)
-
-/****************************************************************************/
-
-/* The following macro is not part of the ISO 'C' (1994) standard, but it should
-   be part of ISO/IEC 9899:1999, also known as "C99". */
-
-/****************************************************************************/
-
-#define va_copy(dst,src) ((void)((dst) = (src)))
-
-/****************************************************************************/
-
-#else
-
-/****************************************************************************/
-
-#if defined(__GNUC__)
-
-/* Use the compiler supplied, machine specific <stdarg.h> file. */
-#undef _STDARG_H
-#include_next "stdarg.h"
-
-#include <sys/amigaos-va.h>
-
-#else
-
-#error "Unknown compiler"
-
-#endif /* __GNUC__ */
-
-/****************************************************************************/
-
-#endif /* __amigaos4__ */
-
-/****************************************************************************/
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#endif /* _STDARG_H */
+#endif /* _UIO_HEADERS_H */

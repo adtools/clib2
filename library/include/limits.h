@@ -1,5 +1,5 @@
 /*
- * $Id: limits.h,v 1.5 2005-01-09 09:40:33 obarthel Exp $
+ * $Id: limits.h,v 1.6 2005-04-03 10:22:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,6 +90,10 @@
 #define	LLONG_MIN	(-0x7fffffffffffffffLL-1)
 #define	LLONG_MAX	0x7fffffffffffffffLL
 #define	ULLONG_MAX	0xffffffffffffffffULL
+
+/****************************************************************************/
+
+#define SSIZE_MAX 2147483647L
 
 /****************************************************************************/
 

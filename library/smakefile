@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.36 2005-03-30 19:37:26 obarthel Exp $
+# $Id: smakefile,v 1.37 2005-04-03 10:22:47 obarthel Exp $
 #
 # :ts=8
 #
@@ -507,6 +507,8 @@ TIME_OBJ = \
 UNISTD_OBJ = \
 	ftw_ftw.o \
 	ftw_nftw.o \
+	uio_readv.o \
+	uio_writev.o \
 	unistd_access.o \
 	unistd_chdir.o \
 	unistd_chdir_exit.o \

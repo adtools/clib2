@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.47 2005-03-30 19:37:13 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.48 2005-04-03 10:22:47 obarthel Exp $
 #
 # :ts=8
 #
@@ -406,6 +406,8 @@ C_LIB = \
 	time_strftime.o \
 	time_time.o \
 	time_weekday.o \
+	uio_readv.o \
+	uio_writev.o \
 	unistd_access.o \
 	unistd_chdir.o \
 	unistd_chdir_exit.o \
@@ -472,6 +474,8 @@ UNIX_LIB = \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
 	stdlib_system.o \
+	uio_readv.o \
+	uio_writev.o \
 	unistd_access.o \
 	unistd_chdir.o \
 	unistd_chdir_exit.o \
@@ -494,6 +498,18 @@ UNIX_LIB = \
 	utime_utime.o
 
 MATH_LIB = \
+	complex_carg.o \
+	complex_cargf.o \
+	complex_cargl.o \
+	complex_cimag.o \
+	complex_cimagf.o \
+	complex_cimagl.o \
+	complex_conj.o \
+	complex_conjf.o \
+	complex_conjl.o \
+	complex_creal.o \
+	complex_crealf.o \
+	complex_creall.o \
 	math_acos.o \
 	math_asin.o \
 	math_atan.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: stdarg.h,v 1.4 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: complex_headers.h,v 1.1 2005-04-03 10:22:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,68 +31,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDARG_H
-#define _STDARG_H
+#ifndef _COMPLEX_HEADERS_H
+#define _COMPLEX_HEADERS_H
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#ifndef _MATH_FP_SUPPORT_H
+#include "math_fp_support.h"
+#endif /* _MATH_FP_SUPPORT_H */
 
 /****************************************************************************/
 
-#ifndef __amigaos4__
+#if defined(FLOATING_POINT_SUPPORT) && defined(__GNUC__)
 
 /****************************************************************************/
 
-typedef char * va_list;
+#include <complex.h>
+#include <math.h>
 
 /****************************************************************************/
 
-#define va_start(ap, last)	((void)(ap = (va_list)&(last) + sizeof(last)))
-#define va_arg(ap, type)	((type *)(ap += sizeof(type)))[-1]
-#define va_end(ap)			((void)0)
+#define COMPLEX_SUPPORT
 
 /****************************************************************************/
 
-/* The following macro is not part of the ISO 'C' (1994) standard, but it should
-   be part of ISO/IEC 9899:1999, also known as "C99". */
+#define	REAL(z)	(__real__ (z))
+#define	IMAG(z)	(__imag__ (z))
+#define	CONJ(z)	(~(z))
 
 /****************************************************************************/
 
-#define va_copy(dst,src) ((void)((dst) = (src)))
+#endif /* FLOATING_POINT_SUPPORT && __GNUC__ */
 
 /****************************************************************************/
 
-#else
-
-/****************************************************************************/
-
-#if defined(__GNUC__)
-
-/* Use the compiler supplied, machine specific <stdarg.h> file. */
-#undef _STDARG_H
-#include_next "stdarg.h"
-
-#include <sys/amigaos-va.h>
-
-#else
-
-#error "Unknown compiler"
-
-#endif /* __GNUC__ */
-
-/****************************************************************************/
-
-#endif /* __amigaos4__ */
-
-/****************************************************************************/
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#endif /* _STDARG_H */
+#endif /* _COMPLEX_HEADERS_H */

@@ -32,6 +32,31 @@
 - Invoking fstat() on what maps to a con-handler stream now produces
   information identifying it as a character special file.
 
+- Added more code and changes contributed by Peter Bengtsson, thank you
+  very much! This includes the following:
+
+  - Added SSIZE_MAX to <limits.h>.
+
+  - Added <sys/uio.h>, readv() and writev().
+
+  - Cut back the soft link resolution code in lstat().
+
+  - In <fcntl.h> O_NDELAY is now an alias for O_NONBLOCK.
+
+  - Added <complex.h>, carg(), cargf(), cargl(), cimag(), cimagf(),
+    cimagl(), conj(), conjf(), conjl(), creal(), crealf() and creall().
+
+  Note that the C99 support for the complex floating point data
+  types is limited to GCC 3.x for now.
+
+- Added va_copy() to <stdarg.h>.
+
+- Added _Exit() to <stdlib.h>.
+
+- Added <stdbool.h>.
+
+- Added vfscanf() to <stdio.h>.
+
 
 c.lib 1.190 (25.3.2005)
 

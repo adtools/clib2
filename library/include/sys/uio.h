@@ -1,5 +1,5 @@
 /*
- * $Id: stdarg.h,v 1.4 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: uio.h,v 1.1 2005-04-03 10:22:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,8 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDARG_H
-#define _STDARG_H
+#ifndef _SYS_UIO_H
+#define _SYS_UIO_H
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
@@ -42,50 +46,32 @@ extern "C" {
 
 /****************************************************************************/
 
-#ifndef __amigaos4__
+#ifndef _SYS_TYPES_H
+#include <sys/types.h>
+#endif /* _SYS_TYPES_H */
+
+#ifndef _STDDEF_H
+#include <stddef.h>
+#endif /* _STDDEF_H */
 
 /****************************************************************************/
 
-typedef char * va_list;
+/*
+ * The size of MAX_IOVEC is rather arbitrary since there is no kernel support
+ * for vectored I/O and even a single struct iovec can overflow a ssize_t.
+ */
+#define	MAX_IOVEC	1024
+
+typedef struct iovec
+{
+	void *	iov_base;
+	size_t	iov_len;
+} iovec_t;
 
 /****************************************************************************/
 
-#define va_start(ap, last)	((void)(ap = (va_list)&(last) + sizeof(last)))
-#define va_arg(ap, type)	((type *)(ap += sizeof(type)))[-1]
-#define va_end(ap)			((void)0)
-
-/****************************************************************************/
-
-/* The following macro is not part of the ISO 'C' (1994) standard, but it should
-   be part of ISO/IEC 9899:1999, also known as "C99". */
-
-/****************************************************************************/
-
-#define va_copy(dst,src) ((void)((dst) = (src)))
-
-/****************************************************************************/
-
-#else
-
-/****************************************************************************/
-
-#if defined(__GNUC__)
-
-/* Use the compiler supplied, machine specific <stdarg.h> file. */
-#undef _STDARG_H
-#include_next "stdarg.h"
-
-#include <sys/amigaos-va.h>
-
-#else
-
-#error "Unknown compiler"
-
-#endif /* __GNUC__ */
-
-/****************************************************************************/
-
-#endif /* __amigaos4__ */
+extern ssize_t readv(int file_descriptor,const struct iovec *iov,int vec_count);
+extern ssize_t writev(int file_descriptor,const struct iovec *iov,int vec_count);
 
 /****************************************************************************/
 
@@ -95,4 +81,4 @@ typedef char * va_list;
 
 /****************************************************************************/
 
-#endif /* _STDARG_H */
+#endif /* _SYS_UIO_H */

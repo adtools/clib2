@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fscanf.c,v 1.5 2005-03-24 15:31:16 obarthel Exp $
+ * $Id: stdio_fscanf.c,v 1.6 2005-04-03 10:22:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,7 +72,7 @@ fscanf(FILE *stream, const char *format, ...)
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
 	va_start(arg,format);
-	result = __vfscanf(stream,format,arg);
+	result = vfscanf(stream,format,arg);
 	va_end(arg);
 
  out:

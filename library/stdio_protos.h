@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.17 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.18 2005-04-03 10:22:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -147,11 +147,6 @@ extern int __drop_iob_read_buffer(struct iob * file);
 
 /* stdio_flushiobwritebuffer.c */
 extern int __flush_iob_write_buffer(struct iob * file);
-
-/****************************************************************************/
-
-/* stdio_vfscanf.c */
-extern int __vfscanf(FILE *stream, const char *format, va_list arg);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stat_lstat.c,v 1.8 2005-03-02 18:49:01 obarthel Exp $
+ * $Id: stat_lstat.c,v 1.9 2005-04-03 10:22:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,16 +63,17 @@
  */
 
 static BPTR
-lstat_lock(const char *name,const int mode,int *link_length)
+lstat_lock(const char *name,const int mode,int * link_length)
 {
 	D_S(struct bcpl_name,bname);
 	const size_t name_size = sizeof(bname->name);
 	char * new_name = NULL;
 	struct DevProc * dvp = NULL;
-	LONG link_count = 16;
 	BPTR lock = ZERO;
 	size_t name_len;
 	LONG error;
+
+	assert( name != NULL && link_length != NULL );
 
 	name_len = strlen(name);
 	if(name_len >= name_size)
@@ -112,34 +113,14 @@ lstat_lock(const char *name,const int mode,int *link_length)
 		{
 			LONG result;
 
-			/* Should we give the soft link resolution another try? */
-			link_count--;
-			if(link_count == 0)
-			{
-				/* Nope, we already spent too much time trying to
-				   resolve nested links. */
-				SetIoErr(ERROR_TOO_MANY_LEVELS);
-				goto out;
-			}
-
 			/* For soft link resolution we need a temporary buffer to
 			   let the file system store the resolved path name in. */
+			new_name = malloc(name_size);
 			if(new_name == NULL)
 			{
-				new_name = malloc(name_size);
-				if(new_name == NULL)
-				{
-					SetIoErr(ERROR_NO_FREE_STORE);
-					goto out;
-				}
-
-				strcpy(new_name,name);
-				name = new_name;
+				SetIoErr(ERROR_NO_FREE_STORE);
+				goto out;
 			}
-
-			/* Remember that we found a link. */
-			if((*link_length) < (int)name_size)
-				(*link_length) = name_size;
 
 			/* Now ask the file system to resolve the entire path. */
 			result = ReadLink(dvp->dvp_Port,dvp->dvp_Lock,(STRPTR)name,(STRPTR)name,name_size);
@@ -151,15 +132,13 @@ lstat_lock(const char *name,const int mode,int *link_length)
 				goto out;
 			}
 
+			assert( result > 0 );
+
 			/* Remember the length of the link name. */
-			if((*link_length) < result)
-				(*link_length) = result;
+			(*link_length) = result;
 
-			/* We now have a new name to resolve. */
-			name_len = strlen(name);
-
-			bname->name[0] = name_len;
-			memmove(&bname->name[1],name,name_len);
+			/* Finished for now. */
+			break;
 		}
 		else
 		{

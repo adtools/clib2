@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.11 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.12 2005-04-03 10:22:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@
 /****************************************************************************/
 
 int
-__vfscanf(FILE *stream, const char *format, va_list arg)
+vfscanf(FILE *stream, const char *format, va_list arg)
 {
 	enum format_size_t
 	{

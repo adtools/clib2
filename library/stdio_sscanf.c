@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf.c,v 1.6 2005-02-28 10:07:31 obarthel Exp $
+ * $Id: stdio_sscanf.c,v 1.7 2005-04-03 10:22:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -85,7 +85,7 @@ sscanf(const char *s,const char *format, ...)
 	string_iob.iob_StringLength	= strlen(s);
 
 	va_start(arg,format);
-	result = __vfscanf((FILE *)&string_iob,format,arg);
+	result = vfscanf((FILE *)&string_iob,format,arg);
 	va_end(arg);
 
  out:

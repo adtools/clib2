@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.9 2005-03-06 09:04:44 obarthel Exp $
+ * $Id: stdio.h,v 1.10 2005-04-03 10:22:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -397,6 +397,15 @@ extern int __vasprintf(const char *file,int line,char **ret,const char *format,v
 
 #define vasprintf(ret,format,arg) __vasprintf(__FILE__,__LINE__,(ret),(format),(arg))
 #endif /* __MEM_DEBUG */
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard, but it should
+   be part of ISO/IEC 9899:1999, also known as "C99". */
+
+/****************************************************************************/
+
+extern int vfscanf(FILE *stream, const char *format, va_list arg);
 
 /****************************************************************************/
 

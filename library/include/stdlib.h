@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.8 2005-03-02 12:57:56 obarthel Exp $
+ * $Id: stdlib.h,v 1.9 2005-04-03 10:22:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -184,6 +184,15 @@ extern void unsetenv(const char *name);
 extern char * mktemp(char * name_template);
 extern int mkstemp(char *name_template);
 extern char * mkdtemp(char *name_template);
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard, but it should
+   be part of ISO/IEC 9899:1999, also known as "C99". */
+
+/****************************************************************************/
+
+extern void _Exit(int status);
 
 /****************************************************************************/
 

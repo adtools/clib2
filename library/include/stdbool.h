@@ -1,5 +1,5 @@
 /*
- * $Id: stdarg.h,v 1.4 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: stdbool.h,v 1.1 2005-04-03 10:22:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,8 +31,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDARG_H
-#define _STDARG_H
+#ifndef _STDBOOL_H
+#define _STDBOOL_H
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard, but it should
+   be part of ISO/IEC 9899:1999, also known as "C99". */
+
+/****************************************************************************/
+
+#if defined(__cplusplus) && defined(__GNUC__)
+#warning C99 header used in C++.
+#endif /* __GNUC__ */
+
+/****************************************************************************/
+
+#if (__STDC_VERSION__ + 0) < 199901L
+#warning C99 header file used by non-C99 compliant compiler.
+#endif /* __STDC_VERSION__ */
 
 /****************************************************************************/
 
@@ -42,50 +59,16 @@ extern "C" {
 
 /****************************************************************************/
 
-#ifndef __amigaos4__
+#define bool _Bool
 
 /****************************************************************************/
 
-typedef char * va_list;
+#define false	0
+#define true	1
 
 /****************************************************************************/
 
-#define va_start(ap, last)	((void)(ap = (va_list)&(last) + sizeof(last)))
-#define va_arg(ap, type)	((type *)(ap += sizeof(type)))[-1]
-#define va_end(ap)			((void)0)
-
-/****************************************************************************/
-
-/* The following macro is not part of the ISO 'C' (1994) standard, but it should
-   be part of ISO/IEC 9899:1999, also known as "C99". */
-
-/****************************************************************************/
-
-#define va_copy(dst,src) ((void)((dst) = (src)))
-
-/****************************************************************************/
-
-#else
-
-/****************************************************************************/
-
-#if defined(__GNUC__)
-
-/* Use the compiler supplied, machine specific <stdarg.h> file. */
-#undef _STDARG_H
-#include_next "stdarg.h"
-
-#include <sys/amigaos-va.h>
-
-#else
-
-#error "Unknown compiler"
-
-#endif /* __GNUC__ */
-
-/****************************************************************************/
-
-#endif /* __amigaos4__ */
+#define __bool_true_and_false_are_defined 1
 
 /****************************************************************************/
 
@@ -95,4 +78,4 @@ typedef char * va_list;
 
 /****************************************************************************/
 
-#endif /* _STDARG_H */
+#endif /* _STDBOOL_H */
