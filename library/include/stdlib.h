@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.5 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: stdlib.h,v 1.6 2005-01-30 09:48:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -149,8 +149,12 @@ extern long atol(const char *str);
 
 /****************************************************************************/
 
+/* These two functions are unavailable under SAS/C for lack of a
+   "long long" data type. */
+#if ! defined(__SASC)
 extern long long strtoll(const char *str, char **ptr, int base);
 extern unsigned long long strtoull(const char *str, char **ptr, int base);
+#endif /* __SASC */
 
 /****************************************************************************/
 
