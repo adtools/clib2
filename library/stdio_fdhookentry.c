@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.9 2005-02-04 15:03:11 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.10 2005-02-07 11:19:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,6 +49,12 @@
 
 #include <strings.h>
 #include <limits.h>
+
+/****************************************************************************/
+
+#if defined(__amigaos4__) && !defined(Flush)
+#define Flush(fh) FFlush(fh)
+#endif /* __amigaos4__ && !Flush */
 
 /****************************************************************************/
 
