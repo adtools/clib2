@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.26 2005-02-07 10:52:16 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.27 2005-02-18 18:53:16 obarthel Exp $
 #
 # :ts=8
 #
@@ -185,6 +185,7 @@ C_LIB = \
 	stdio_data.o \
 	stdio_dropiobreadbuffer.o \
 	stdio_duplicate_fd.o \
+	stdio_examine_fh.o \
 	stdio_fclose.o \
 	stdio_fdhookentry.o \
 	stdio_feof.o \
@@ -215,6 +216,7 @@ C_LIB = \
 	stdio_gets.o \
 	stdio_growfdtable.o \
 	stdio_growiobtable.o \
+	stdio_grow_file.o \
 	stdio_initializefd.o \
 	stdio_initializeiob.o \
 	stdio_init_exit.o \
@@ -222,6 +224,7 @@ C_LIB = \
 	stdio_locksemaphorename.o \
 	stdio_nostdio.o \
 	stdio_openiob.o \
+	stdio_parent_of_fh.o \
 	stdio_perror.o \
 	stdio_popen.o \
 	stdio_printf.o \
@@ -409,6 +412,7 @@ C_LIB = \
 	unistd_realpath.o \
 	unistd_sleep.o \
 	unistd_symlink.o \
+	unistd_sync_fd.o \
 	unistd_timer.o \
 	unistd_time_delay.o \
 	unistd_truncate.o \
@@ -443,6 +447,7 @@ UNIX_LIB = \
 	stdio_locksemaphorename.o \
 	stdio_openiob.o \
 	stdio_popen.o \
+	stdio_record_locking.o \
 	stdio_remove.o \
 	stdio_rename.o \
 	stdlib_mkdtemp.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fsync.c,v 1.1 2005-02-04 15:03:11 obarthel Exp $
+ * $Id: unistd_fsync.c,v 1.2 2005-02-18 18:53:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,17 +49,12 @@
 int
 fsync(int file_descriptor)
 {
-	DECLARE_UTILITYBASE();
-
-	struct file_hook_message message;
 	struct fd * fd;
 	int result = -1;
 
 	ENTER();
 
 	SHOWVALUE(file_descriptor);
-
-	assert( UtilityBase != NULL );
 
 	if(__check_abort_enabled)
 		__check_abort();
@@ -75,19 +70,15 @@ fsync(int file_descriptor)
 		goto out;
 	}
 
-	message.action	= file_hook_action_flush;
-	message.arg		= 1; /* flush everything */
-
-	assert( fd->fd_Hook != NULL );
-
-	CallHookPkt(fd->fd_Hook,fd,&message);
-
-	result = message.result;
-	if(result != 0)
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
-		__set_errno(message.error);
+		__set_errno(EINVAL);
 		goto out;
 	}
+
+	__sync_fd(fd,1); /* flush everything */
+
+	result = OK;
 
  out:
 

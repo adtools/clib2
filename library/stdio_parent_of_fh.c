@@ -1,5 +1,5 @@
 /*
- * $Id: socket_getpeername.c,v 1.4 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: stdio_parent_of_fh.c,v 1.1 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,71 +31,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_NULL_POINTER_CHECK_H
-#include "stdlib_null_pointer_check.h"
-#endif /* _STDLIB_NULL_POINTER_CHECK_H */
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-#if defined(SOCKET_SUPPORT)
-
-/****************************************************************************/
-
-#ifndef _SOCKET_HEADERS_H
-#include "socket_headers.h"
-#endif /* _SOCKET_HEADERS_H */
-
-/****************************************************************************/
-
-int
-getpeername(int sockfd,struct sockaddr *name,int *namelen)
+/* This is used in place of ParentOfFH() in order to work around a bug in
+ * dos.library V40 and below: a "NIL:" file handle will crash the
+ * ParentOfFH() function.
+ */
+BPTR
+__safe_parent_of_file_handle(BPTR file_handle)
 {
-	struct fd * fd;
-	int result = -1;
+	BPTR result = ZERO;
 
-	ENTER();
-
-	SHOWVALUE(sockfd);
-	SHOWPOINTER(name);
-	SHOWPOINTER(namelen);
-
-	assert( name != NULL && namelen != NULL );
-	assert(__SocketBase != NULL);
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
+	#ifndef __amigaos4__
 	{
-		if(name == NULL || namelen == NULL)
-		{
-			SHOWMSG("invalid parameters");
+		struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
 
-			__set_errno(EFAULT);
+		if(fh == NULL || fh->fh_Type == NULL)
+		{
+			SetIoErr(ERROR_OBJECT_WRONG_TYPE);
 			goto out;
 		}
 	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	assert( sockfd >= 0 && sockfd < __num_fd );
-	assert( __fd[sockfd] != NULL );
-	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IN_USE) );
-	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IS_SOCKET) );
-
-	fd = __get_file_descriptor_socket(sockfd);
-	if(fd == NULL)
-		goto out;
+	#endif /* __amigaos4__ */
 
 	PROFILE_OFF();
-	result = __getpeername((LONG)fd->fd_DefaultFile,name,(LONG *)namelen);
+	result = ParentOfFH(file_handle);
 	PROFILE_ON();
 
  out:
 
-	if(__check_abort_enabled)
-		__check_abort();
-
-	RETURN(result);
 	return(result);
 }
-
-/****************************************************************************/
-
-#endif /* SOCKET_SUPPORT */

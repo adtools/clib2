@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fchmod.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stat_fchmod.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,18 +44,19 @@
 int
 fchmod(int file_descriptor, mode_t mode)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
+	D_S(struct FileInfoBlock,fib);
 	ULONG protection;
+	BPTR parent_dir = ZERO;
+	BPTR old_current_dir = ZERO;
+	BOOL current_dir_changed = FALSE;
 	int result = -1;
 	struct fd * fd;
+	LONG success;
 
 	ENTER();
 
 	SHOWVALUE(file_descriptor);
 	SHOWVALUE(mode);
-
-	assert( UtilityBase != NULL );
 
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
@@ -68,6 +69,12 @@ fchmod(int file_descriptor, mode_t mode)
 	if(fd == NULL)
 	{
 		__set_errno(EBADF);
+		goto out;
+	}
+
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	{
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -109,20 +116,53 @@ fchmod(int file_descriptor, mode_t mode)
 	if(FLAG_IS_SET(mode,S_IXOTH))
 		SET_FLAG(protection,FIBF_OTR_EXECUTE);
 
-	SHOWMSG("calling the hook");
+	PROFILE_OFF();
+	parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile);
+	PROFILE_ON();
 
-	message.action		= file_hook_action_change_attributes;
-	message.attributes	= protection ^ (FIBF_READ|FIBF_WRITE|FIBF_EXECUTE|FIBF_DELETE);
+	if(parent_dir == ZERO)
+	{
+		SHOWMSG("couldn't find parent directory");
 
-	assert( fd->fd_Hook != NULL );
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
 
-	CallHookPkt(fd->fd_Hook,fd,&message);
+	PROFILE_OFF();
+	success = __safe_examine_file_handle(fd->fd_DefaultFile,fib);
+	PROFILE_ON();
 
-	result = message.result;
+	if(NO success)
+	{
+		SHOWMSG("could not obtain file name");
 
-	__set_errno(message.error);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	old_current_dir = CurrentDir(parent_dir);
+	current_dir_changed = TRUE;
+
+	PROFILE_OFF();
+	success = SetProtection(fib->fib_FileName,protection ^ (FIBF_READ|FIBF_WRITE|FIBF_EXECUTE|FIBF_DELETE));
+	PROFILE_ON();
+
+	if(NO success)
+	{
+		SHOWMSG("could not change protection bits");
+
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	result = OK;
 
  out:
+
+	if(current_dir_changed)
+		CurrentDir(old_current_dir);
+
+	UnLock(parent_dir);
 
 	RETURN(result);
 	return(result);

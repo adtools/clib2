@@ -1,5 +1,5 @@
 /*
- * $Id: socket_getpeername.c,v 1.4 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: unistd_sync_fd.c,v 1.1 2005-02-18 18:53:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,71 +31,40 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_NULL_POINTER_CHECK_H
-#include "stdlib_null_pointer_check.h"
-#endif /* _STDLIB_NULL_POINTER_CHECK_H */
+#ifndef _UNISTD_HEADERS_H
+#include "unistd_headers.h"
+#endif /* _UNISTD_HEADERS_H */
 
 /****************************************************************************/
 
-#if defined(SOCKET_SUPPORT)
+#if defined(__amigaos4__) && !defined(Flush)
+#define Flush(fh) FFlush(fh)
+#endif /* __amigaos4__ && !Flush */
 
 /****************************************************************************/
 
-#ifndef _SOCKET_HEADERS_H
-#include "socket_headers.h"
-#endif /* _SOCKET_HEADERS_H */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
-int
-getpeername(int sockfd,struct sockaddr *name,int *namelen)
+void
+__sync_fd(struct fd * fd,int mode)
 {
-	struct fd * fd;
-	int result = -1;
+	assert( fd != NULL );
 
-	ENTER();
-
-	SHOWVALUE(sockfd);
-	SHOWPOINTER(name);
-	SHOWPOINTER(namelen);
-
-	assert( name != NULL && namelen != NULL );
-	assert(__SocketBase != NULL);
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
+	if(fd->fd_DefaultFile != ZERO)
 	{
-		if(name == NULL || namelen == NULL)
-		{
-			SHOWMSG("invalid parameters");
+		/* The mode tells us what to flush. 0 means "flush just the data", and
+		   everything else means "flush everything. */
+		Flush(fd->fd_DefaultFile);
 
-			__set_errno(EFAULT);
-			goto out;
+		if(mode != 0)
+		{
+			struct FileHandle * fh = BADDR(fd->fd_DefaultFile);
+
+			/* Verify that this file is not bound to "NIL:". */
+			if(fh->fh_Type != NULL)
+				DoPkt(fh->fh_Type,ACTION_FLUSH,	0,0,0,0,0);
 		}
 	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	assert( sockfd >= 0 && sockfd < __num_fd );
-	assert( __fd[sockfd] != NULL );
-	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IN_USE) );
-	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IS_SOCKET) );
-
-	fd = __get_file_descriptor_socket(sockfd);
-	if(fd == NULL)
-		goto out;
-
-	PROFILE_OFF();
-	result = __getpeername((LONG)fd->fd_DefaultFile,name,(LONG *)namelen);
-	PROFILE_ON();
-
- out:
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	RETURN(result);
-	return(result);
 }
-
-/****************************************************************************/
-
-#endif /* SOCKET_SUPPORT */

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_recvfrom.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: socket_recvfrom.c,v 1.4 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -82,7 +82,7 @@ recvfrom(int sockfd,void *buff,int len,int flags,struct sockaddr *from,int *from
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IN_USE) );
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IS_SOCKET) );
 
-	fd = __get_socket_descriptor(sockfd);
+	fd = __get_file_descriptor_socket(sockfd);
 	if(fd == NULL)
 		goto out;
 

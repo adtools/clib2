@@ -1,5 +1,5 @@
 /*
- * $Id: socket_shutdown.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_shutdown.c,v 1.3 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,7 +59,7 @@ shutdown(int sockfd, int how)
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IN_USE) );
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IS_SOCKET) );
 
-	fd = __get_socket_descriptor(sockfd);
+	fd = __get_file_descriptor_socket(sockfd);
 	if(fd == NULL)
 		goto out;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_dup2.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_dup2.c,v 1.5 2005-02-18 18:53:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -104,7 +104,6 @@ dup2(int file_descriptor1, int file_descriptor2)
 
 	if(file_descriptor1 != file_descriptor2)
 	{
-		struct file_hook_message message;
 		struct fd * fd2;
 
 		/* Have a look at the requested file descriptor. */
@@ -123,21 +122,7 @@ dup2(int file_descriptor1, int file_descriptor2)
 				goto out;
 		}
 
-		SHOWMSG("calling the hook");
-
-		message.action			= file_hook_action_duplicate_fd;
-		message.duplicate_fd	= fd2;
-
-		assert( fd1->fd_Hook != NULL );
-
-		CallHookPkt(fd1->fd_Hook,fd1,&message);
-
-		result = message.result;
-		if(result != 0)
-		{
-			__set_errno(message.error);
-			goto out;
-		}
+		__duplicate_fd(fd2,fd1);
 	}
 
 	result = file_descriptor2;

@@ -2,6 +2,15 @@
   translate patterns such as "foo/bar/../../baz" properly, and to
   use strlen() less.
 
+- Major, major changes! Moved most of the monolithic code out of
+  the file descriptor hook and into the respective functions,
+  such as dup2(), fchmod(), fchown(), fcntl(), fdatasync(), fstatfs(),
+  fsync(), ftruncate() and lseek(). Code which is not strictly
+  required will no longer find its way into your programs if you
+  link with the updated library.
+
+  NOTE: these changes require that the entire library is rebuilt!
+
 
 c.lib 1.188 (7.2.2005)
 

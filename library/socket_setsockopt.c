@@ -1,5 +1,5 @@
 /*
- * $Id: socket_setsockopt.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: socket_setsockopt.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,7 +81,7 @@ setsockopt(int sockfd,int level,int optname,const void *optval,int optlen)
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IN_USE) );
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IS_SOCKET) );
 
-	fd = __get_socket_descriptor(sockfd);
+	fd = __get_file_descriptor_socket(sockfd);
 	if(fd == NULL)
 		goto out;
 

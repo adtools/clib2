@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.12 2005-02-04 15:03:11 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.13 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -271,6 +271,15 @@ struct iob
 
 /****************************************************************************/
 
+/* Forward declaration... */
+struct fd;
+
+/****************************************************************************/
+
+typedef void (*fd_cleanup_t)(struct fd * fd);
+
+/****************************************************************************/
+
 struct fd
 {
 	struct Hook *	fd_Hook;			/* Hook to invoke to perform actions */
@@ -283,6 +292,8 @@ struct fd
 	struct Hook		fd_DefaultHook;		/* Static hook */
 	BPTR			fd_DefaultFile;		/* A dos.library file handle */
 	LONG			fd_Position;		/* Cached file position (seek offset). */
+
+	fd_cleanup_t	fd_Cleanup;			/* Cleanup function, if any. */
 };
 
 /****************************************************************************/
@@ -313,18 +324,9 @@ enum file_hook_action_t
 	file_hook_action_write,
 	file_hook_action_seek,
 	file_hook_action_close,
-	file_hook_action_lock_record,
 	file_hook_action_set_blocking,
-	file_hook_action_change_owner,
-	file_hook_action_truncate,
-	file_hook_action_examine,
-	file_hook_action_change_attributes,
-	file_hook_action_info,
-	file_hook_action_duplicate_fd,
-	file_hook_action_seek_and_extend,
-	file_hook_action_is_interactive,
 	file_hook_action_set_async,
-	file_hook_action_flush
+	file_hook_action_examine
 };
 
 /****************************************************************************/
@@ -339,23 +341,12 @@ struct file_hook_message
 	long					position;	/* The seek position */
 	long					mode;		/* The seek mode */
 
-	struct flock *			lock;		/* Record locking request */
-	int						command;	/* What kind of locking command was sent */
-
 	int						arg;		/* Whether or not this file should
-										   be set non-blocking */
-
-	uid_t					owner;
-	gid_t					group;
+										   be set non-blocking or use
+										   asynchronous I/O */
 
 	struct FileInfoBlock *	file_info;
 	struct MsgPort *		file_system;
-
-	struct InfoData *		info_data;
-
-	struct fd *				duplicate_fd;
-
-	ULONG					attributes;
 
 	int						error;		/* Error code, if any... */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.6 2005-02-04 15:03:10 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.7 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -114,26 +114,6 @@ __socket_hook_entry(
 
 			break;
 
-		case file_hook_action_duplicate_fd:
-
-			SHOWMSG("file_hook_action_duplicate_fd");
-
-			__duplicate_fd(message->duplicate_fd,fd);
-
-			result = 0;
-
-			break;
-
-		case file_hook_action_seek:
-		case file_hook_action_seek_and_extend:
-
-			SHOWMSG("file_hook_action_seek");
-
-			result	= -1;
-			error	= ESPIPE;
-
-			break;
-
 		case file_hook_action_set_blocking:
 
 			SHOWMSG("file_hook_action_set_blocking");
@@ -171,15 +151,6 @@ __socket_hook_entry(
 			PROFILE_ON();
 
 			result = 0;
-
-			break;
-
-		case file_hook_action_flush:
-
-			SHOWMSG("file_hook_action_flush attempted on socket");
-
-			result = -1;
-			error = EINVAL;
 
 			break;
 

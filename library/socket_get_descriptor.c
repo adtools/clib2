@@ -1,5 +1,5 @@
 /*
- * $Id: socket_get_descriptor.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: socket_get_descriptor.c,v 1.4 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,7 +42,7 @@
 /****************************************************************************/
 
 struct fd *
-__get_socket_descriptor(int socket_descriptor)
+__get_file_descriptor_socket(int socket_descriptor)
 {
 	struct fd * result = NULL;
 	struct fd * fd;

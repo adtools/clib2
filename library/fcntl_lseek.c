@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_lseek.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: fcntl_lseek.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,18 +44,19 @@
 off_t
 __lseek(int file_descriptor, off_t offset, int mode, int * error_ptr)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
+	D_S(struct FileInfoBlock,fib);
 	off_t result = -1;
 	struct fd * fd;
+	BOOL fib_is_valid = FALSE;
+	LONG current_position;
+	LONG new_position;
+	LONG new_mode;
 
 	ENTER();
 
 	SHOWVALUE(file_descriptor);
 	SHOWVALUE(offset);
 	SHOWVALUE(mode);
-
-	assert( UtilityBase != NULL );
 
 	assert( error_ptr != NULL );
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
@@ -72,6 +73,14 @@ __lseek(int file_descriptor, off_t offset, int mode, int * error_ptr)
 		goto out;
 	}
 
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	{
+		SHOWMSG("can't seek on a socket");
+
+		(*error_ptr) = ESPIPE;
+		goto out;
+	}
+
 	if(mode < SEEK_SET || mode > SEEK_END)
 	{
 		SHOWMSG("seek mode is invalid");
@@ -80,28 +89,105 @@ __lseek(int file_descriptor, off_t offset, int mode, int * error_ptr)
 		goto out;
 	}
 
-	SHOWMSG("calling the hook");
+	if(mode == SEEK_CUR)
+		new_mode = OFFSET_CURRENT;
+	else if (mode == SEEK_SET)
+		new_mode = OFFSET_BEGINNING;
+	else
+		new_mode = OFFSET_END;
 
-	#if defined(UNIX_PATH_SEMANTICS)
+	D(("seek&extended to offset %ld, mode %ld; current position = %ld",offset,new_mode,Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT)));
+
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 	{
-		message.action = file_hook_action_seek_and_extend;
+		current_position = fd->fd_Position;
 	}
-	#else
+	else
 	{
-		message.action = file_hook_action_seek;
+		PROFILE_OFF();
+		current_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
+		PROFILE_ON();
+
+		if(current_position < 0)
+		{
+			(*error_ptr) = EBADF;
+			goto out;
+		}
 	}
-	#endif /* UNIX_PATH_SEMANTICS */
 
-	message.position	= offset;
-	message.mode		= mode;
+	new_position = current_position;
 
-	assert( fd->fd_Hook != NULL );
+	switch(new_mode)
+	{
+		case OFFSET_CURRENT:
 
-	CallHookPkt(fd->fd_Hook,fd,&message);
+			new_position += offset;
+			break;
 
-	(*error_ptr) = message.error;
+		case OFFSET_BEGINNING:
 
-	result = message.result;
+			new_position = offset;
+			break;
+
+		case OFFSET_END:
+
+			if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+			{
+				new_position = fib->fib_Size + offset;
+
+				fib_is_valid = TRUE;
+			}
+
+			break;
+	}
+
+	if(new_position != current_position)
+	{
+		LONG position;
+
+		PROFILE_OFF();
+		position = Seek(fd->fd_DefaultFile,offset,new_mode);
+		PROFILE_ON();
+
+		if(position < 0)
+		{
+			D(("seek failed, mode=%ld (%ld), offset=%ld, ioerr=%ld",new_mode,message->mode,offset,IoErr()));
+
+			(*error_ptr) = __translate_io_error_to_errno(IoErr());
+
+			#if defined(UNIX_PATH_SEMANTICS)
+			{
+				if(NOT fib_is_valid && CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
+				{
+					(*error_ptr) = __translate_io_error_to_errno(IoErr());
+					goto out;
+				}
+
+				if(new_position <= fib->fib_Size)
+				{
+					(*error_ptr) = __translate_io_error_to_errno(IoErr());
+					goto out;
+				}
+
+				if(__grow_file_size(fd,new_position - fib->fib_Size) != OK)
+				{
+					(*error_ptr) = __translate_io_error_to_errno(IoErr());
+					goto out;
+				}
+			}
+			#else
+			{
+				(*error_ptr) = __translate_io_error_to_errno(IoErr());
+				goto out;
+			}
+			#endif /* UNIX_PATH_SEMANTICS */
+		}
+	}
+
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
+		fd->fd_Position = new_position;
+
+	result = new_position;
 
  out:
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.5 2005-02-18 18:53:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,18 +44,16 @@
 int
 ftruncate(int file_descriptor, off_t length)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
+	D_S(struct FileInfoBlock,fib);
 	int result = -1;
 	struct fd * fd;
 	long int position;
+	BOOL success;
 
 	ENTER();
 
 	SHOWVALUE(file_descriptor);
 	SHOWVALUE(length);
-
-	assert( UtilityBase != NULL );
 
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
@@ -68,6 +66,12 @@ ftruncate(int file_descriptor, off_t length)
 	if(fd == NULL)
 	{
 		__set_errno(EBADF);
+		goto out;
+	}
+
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	{
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -85,7 +89,7 @@ ftruncate(int file_descriptor, off_t length)
 	{
 		SHOWMSG("file descriptor is not write-enabled");
 
-		__set_errno(EBADF);
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -94,18 +98,42 @@ ftruncate(int file_descriptor, off_t length)
 	if(position < 0)
 		goto out;
 
-	SHOWMSG("calling the hook");
-
-	message.action	= file_hook_action_truncate;
-	message.size	= length;
-
-	assert( fd->fd_Hook != NULL );
-
-	CallHookPkt(fd->fd_Hook,fd,&message);
-
-	if(message.result < 0)
+	if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
 	{
-		__set_errno(message.error);
+		SHOWMSG("couldn't examine file");
+
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	PROFILE_OFF();
+
+	if(length < fib->fib_Size)
+	{
+		/* Careful: seek to a position where the file can be safely truncated. */
+		success = (Seek(fd->fd_DefaultFile,length,OFFSET_BEGINNING) != -1 && SetFileSize(fd->fd_DefaultFile,length,OFFSET_BEGINNING) != -1);
+	}
+	else if (length > fib->fib_Size)
+	{
+		success = (Seek(fd->fd_DefaultFile,fib->fib_Size,OFFSET_BEGINNING) != -1 && __grow_file_size(fd,length - fib->fib_Size) == OK);
+	}
+	else
+	{
+		success = TRUE;
+	}
+
+	PROFILE_ON();
+
+	if(NO success)
+	{
+		int error;
+
+		error = __translate_io_error_to_errno(IoErr());
+
+		/* Return to the original file position. */
+		lseek(file_descriptor,position,SEEK_SET);
+
+		__set_errno(error);
 		goto out;
 	}
 

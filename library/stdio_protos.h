@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.5 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.6 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -202,6 +202,31 @@ extern ssize_t __read(int file_descriptor, void * buffer, size_t num_bytes, int 
 
 /* stdio_duplicate_fd.c */
 extern void __duplicate_fd(struct fd * duplicate_fd,struct fd * original_fd);
+
+/****************************************************************************/
+
+/* stdio_examine_fh.c */
+extern LONG __safe_examine_file_handle(BPTR file_handle,struct FileInfoBlock *fib);
+
+/****************************************************************************/
+
+/* stdio_parent_of_fh.c */
+extern BPTR __safe_parent_of_file_handle(BPTR file_handle);
+
+/****************************************************************************/
+
+/* stdio_grow_file.c */
+extern int __grow_file_size(struct fd * fd,int num_bytes);
+
+/****************************************************************************/
+
+/* unistd_sync_fd.c */
+extern void __sync_fd(struct fd * fd,int mode);
+
+/****************************************************************************/
+
+/* stdio_record_locking.c */
+extern int __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.6 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.7 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,6 +50,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 	int result = -1;
 	struct fd * fd;
 	va_list arg;
+	int error;
 	int flags;
 	int fdbase;
 	int i;
@@ -83,6 +84,12 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 
 			SHOWMSG("cmd=F_GETLK/F_SETLK/F_SETLKW");
 
+			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+			{
+				__set_errno(EINVAL);
+				goto out;
+			}
+
 			va_start(arg,cmd);
 
 			l = va_arg(arg,struct flock *);
@@ -107,16 +114,9 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				break;
 			}
 
-			message.action	= file_hook_action_lock_record;
-			message.lock	= l;
-			message.command	= cmd;
-
-			assert( fd->fd_Hook != NULL );
-
-			CallHookPkt(fd->fd_Hook,fd,&message);
-
-			result = message.result;
-			__set_errno(message.error);
+			result = __handle_record_locking(cmd,l,fd,&error);
+			if(result < 0)
+				__set_errno(error);
 
 			va_end(arg);
 
@@ -125,6 +125,12 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 		case F_GETFL:
 
 			SHOWMSG("cmd=F_GETFL");
+
+			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+			{
+				__set_errno(EINVAL);
+				goto out;
+			}
 
 			result = 0;
 
@@ -139,6 +145,12 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 		case F_SETFL:
 
 			SHOWMSG("cmd=F_SETFL");
+
+			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+			{
+				__set_errno(EINVAL);
+				goto out;
+			}
 
 			result = 0;
 
@@ -236,19 +248,10 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 					if(FLAG_IS_CLEAR(__fd[i]->fd_Flags,FDF_IN_USE))
 					{
 						/* Got a file descriptor, duplicate it */
-						message.action = file_hook_action_duplicate_fd;
-						message.duplicate_fd = __fd[i];
+						__duplicate_fd(__fd[i],fd);
 
-						assert( fd->fd_Hook != NULL );
-
-						CallHookPkt(fd->fd_Hook,fd,&message);
-
-						/* If it worked, leave */
-						if (message.result == 0)
-						{
-							result = i;
-							goto out;
-						}
+						result = i;
+						goto out;
 					}
 				}
 

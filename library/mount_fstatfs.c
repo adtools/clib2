@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: mount_fstatfs.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,11 +50,11 @@
 int
 fstatfs(int file_descriptor, struct statfs *buf)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
 	D_S(struct InfoData,id);
+	BPTR parent_dir = ZERO;
 	int result = -1;
 	struct fd * fd;
+	LONG success;
 
 	ENTER();
 
@@ -62,7 +62,6 @@ fstatfs(int file_descriptor, struct statfs *buf)
 	SHOWPOINTER(buf);
 
 	assert( buf != NULL );
-	assert( UtilityBase != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -90,25 +89,43 @@ fstatfs(int file_descriptor, struct statfs *buf)
 		goto out;
 	}
 
-	SHOWMSG("calling the hook");
-
-	message.action		= file_hook_action_info;
-	message.info_data	= id;
-
-	assert( fd->fd_Hook != NULL );
-
-	CallHookPkt(fd->fd_Hook,fd,&message);
-
-	result = message.result;
-	if(result != 0)
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
-		__set_errno(message.error);
+		__set_errno(EINVAL);
+		goto out;
+	}
+
+	PROFILE_OFF();
+	parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile);
+	PROFILE_ON();
+
+	if(parent_dir == ZERO)
+	{
+		SHOWMSG("couldn't find parent directory");
+
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	PROFILE_OFF();
+	success = Info(parent_dir,id);
+	PROFILE_ON();
+
+	if(NO success)
+	{
+		SHOWMSG("couldn't get info on drive");
+
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
 	__convert_info_to_statfs(id,buf);
 
+	result = OK;
+
  out:
+
+	UnLock(parent_dir);
 
 	RETURN(result);
 	return(result);

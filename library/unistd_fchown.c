@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fchown.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_fchown.c,v 1.5 2005-02-18 18:53:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,18 +44,19 @@
 int
 fchown(int file_descriptor, uid_t owner, gid_t group)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
+	D_S(struct FileInfoBlock,fib);
+	BPTR parent_dir = ZERO;
+	BPTR old_current_dir = ZERO;
+	BOOL current_dir_changed = FALSE;
 	int result = -1;
 	struct fd * fd;
+	LONG success;
 
 	ENTER();
 
 	SHOWVALUE(file_descriptor);
 	SHOWVALUE(owner);
 	SHOWVALUE(group);
-
-	assert( UtilityBase != NULL );
 
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
@@ -71,21 +72,105 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 		goto out;
 	}
 
-	SHOWMSG("calling the hook");
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	{
+		__set_errno(EINVAL);
+		goto out;
+	}
 
-	message.action	= file_hook_action_change_owner;
-	message.owner	= owner;
-	message.group	= group;
+	if(owner > 65535 || group > 65535)
+	{
+		SHOWMSG("owner or group not OK");
 
-	assert( fd->fd_Hook != NULL );
+		SHOWVALUE(owner);
+		SHOWVALUE(group);
 
-	CallHookPkt(fd->fd_Hook,fd,&message);
+		__set_errno(EINVAL);
+		goto out;
+	}
 
-	result = message.result;
+	PROFILE_OFF();
+	success = (__safe_examine_file_handle(fd->fd_DefaultFile,fib) && (parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile)) != ZERO);
+	PROFILE_ON();
 
-	__set_errno(message.error);
+	if(NO success)
+	{
+		SHOWMSG("couldn't find parent directory");
+
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	old_current_dir = CurrentDir(parent_dir);
+	current_dir_changed = TRUE;
+
+	PROFILE_OFF();
+
+	#if defined(__amigaos4__)
+	{
+		success = SetOwner(fib->fib_FileName,(LONG)((((ULONG)owner) << 16) | group));
+	}
+	#else
+	{
+		if(((struct Library *)DOSBase)->lib_Version >= 39)
+		{
+			success = SetOwner(fib->fib_FileName,(LONG)((((ULONG)owner) << 16) | group));
+		}
+		else
+		{
+			D_S(struct bcpl_name,new_name);
+			struct DevProc * dvp;
+			unsigned int len;
+
+			SHOWMSG("have to do this manually...");
+
+			success = DOSFALSE;
+
+			len = strlen(fib->fib_FileName);
+
+			assert( len < sizeof(new_name->name) );
+
+			dvp = GetDeviceProc(fib->fib_FileName,NULL);
+			if(dvp != NULL)
+			{
+				LONG error;
+
+				new_name->name[0] = len;
+				memmove(&new_name->name[1],fib->fib_FileName,len);
+
+				success	= DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0,0);
+				error	= IoErr();
+
+				FreeDeviceProc(dvp);
+
+				SetIoErr(error);
+			}
+		}
+	}
+	#endif /* __amigaos4__ */
+
+	PROFILE_ON();
+
+	if(NO success)
+	{
+		SHOWMSG("couldn't change owner/group");
+
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	result = OK;
 
  out:
+
+	PROFILE_OFF();
+
+	UnLock(parent_dir);
+
+	if(current_dir_changed)
+		CurrentDir(old_current_dir);
+
+	PROFILE_ON();
 
 	RETURN(result);
 	return(result);
