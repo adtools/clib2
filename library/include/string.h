@@ -1,5 +1,5 @@
 /*
- * $Id: string.h,v 1.1.1.1 2004-07-26 16:32:55 obarthel Exp $
+ * $Id: string.h,v 1.2 2004-07-30 09:25:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,11 +71,21 @@ extern size_t strxfrm(char *dest, const char *src, size_t len);
 
 /****************************************************************************/
 
+extern void *memmove(void *dest, const void * src, size_t len);
 extern void *memchr(const void * ptr, int val, size_t len);
+
+/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
+   memcmp/memcpy/memset functions instead of 'size_t'. This can produce warnings
+   where none are necessary. */
+#if defined(__GNUC__) && (__GNUC__ < 3)
+extern int memcmp(const void *ptr1, const void *ptr2, unsigned long len);
+extern void *memcpy(void *dest, const void *src, unsigned long len);
+extern void *memset(void *ptr, int val, unsigned long len);
+#else
 extern int memcmp(const void *ptr1, const void *ptr2, size_t len);
 extern void *memcpy(void *dest, const void *src, size_t len);
-extern void *memmove(void *dest, const void * src, size_t len);
 extern void *memset(void *ptr, int val, size_t len);
+#endif /* __GNUC__ && __GNUC__ < 3 */
 
 /****************************************************************************/
 
