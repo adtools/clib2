@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.12 2005-03-04 20:08:19 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.13 2005-03-05 17:55:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -206,7 +206,7 @@ __socket_init(void)
 	 */
 	#if defined(__THREAD_SAFE) && defined(SBTC_CAN_SHARE_LIBRARY_BASES)
 	{
-		if(SocketBase->lib_Version >= 4)
+		if(__SocketBase->lib_Version >= 4)
 		{
 			tags[0].ti_Tag	= SBTM_SETVAL(SBTC_CAN_SHARE_LIBRARY_BASES);
 			tags[0].ti_Data	= TRUE;

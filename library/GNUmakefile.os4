@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.34 2005-03-03 14:20:55 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.35 2005-03-05 17:55:26 obarthel Exp $
 #
 # :ts=8
 #
@@ -111,7 +111,7 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -I$(SDK_INCLUDE)
-OPTIONS = -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames
+OPTIONS = -D__THREAD_SAFE -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames
 OPTIMIZE = -O -fomit-frame-pointer -funroll-loops
 #DEBUG = -g
 
