@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.5 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.6 2005-03-06 09:00:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -138,6 +138,35 @@ obtain_file_lock_semaphore(BOOL shared)
 
 	if(FileLockSemaphore == NULL && __file_lock_semaphore_name != NULL && __file_lock_semaphore_name[0] != '\0')
 	{
+		struct FileLockSemaphore * fls;
+
+		/* We allocate the new semaphore first, so that we don't spend
+		   any time in Forbid() allocating memory. */
+		#if defined(__amigaos4__)
+		{
+			fls = AllocSysObjectTags(ASOT_SEMAPHORE,
+				ASOSEM_Size,	sizeof(*fls),
+				ASOSEM_Name,	__file_lock_semaphore_name,
+				ASOSEM_Pri,		1,
+			TAG_END);
+		}
+		#else
+		{
+			fls = AllocVec(sizeof(*fls) + strlen(__file_lock_semaphore_name) + 1,MEMF_ANY|MEMF_PUBLIC);
+			if(fls != NULL)
+			{
+				memset(fls,0,sizeof(*fls));
+
+				InitSemaphore(&fls->fls_Semaphore);
+
+				fls->fls_Semaphore.ss_Link.ln_Name = (char *)(fls + 1);
+				strcpy(fls->fls_Semaphore.ss_Link.ln_Name,__file_lock_semaphore_name);
+
+				fls->fls_Semaphore.ss_Link.ln_Pri = 1;
+			}
+		}
+		#endif /* __amigaos4__ */
+
 		SHOWMSG("try to find the locking semaphore");
 
 		Forbid();
@@ -145,48 +174,29 @@ obtain_file_lock_semaphore(BOOL shared)
 		FileLockSemaphore = (struct FileLockSemaphore *)FindSemaphore((STRPTR)__file_lock_semaphore_name);
 		if(FileLockSemaphore == NULL)
 		{
-			SHOWMSG("didn't find it; we're going to make our own");
+			SHOWMSG("didn't find it; we're going to add our own");
 
-			#if defined(__amigaos4__)
-			{
-				FileLockSemaphore = AllocSysObjectTags(ASOT_SEMAPHORE,
-					ASOSEM_Size,	sizeof(*FileLockSemaphore),
-					ASOSEM_Name,	__file_lock_semaphore_name,
-					ASOSEM_Pri,		1,
-				TAG_END);
-			}
-			#else
-			{
-				FileLockSemaphore = AllocMem(sizeof(*FileLockSemaphore) + strlen(__file_lock_semaphore_name)+1,MEMF_ANY|MEMF_PUBLIC);
-				if(FileLockSemaphore != NULL)
-				{
-					memset(FileLockSemaphore,0,sizeof(*FileLockSemaphore));
-
-					InitSemaphore(&FileLockSemaphore->fls_Semaphore);
-
-					FileLockSemaphore->fls_Semaphore.ss_Link.ln_Name = (char *)(FileLockSemaphore + 1);
-					strcpy(FileLockSemaphore->fls_Semaphore.ss_Link.ln_Name,__file_lock_semaphore_name);
-
-					FileLockSemaphore->fls_Semaphore.ss_Link.ln_Pri = 1;
-				}
-			}
-			#endif /* __amigaos4__ */
-
-			if(FileLockSemaphore != NULL)
+			if(fls != NULL)
 			{
 				SHOWMSG("adding our own semaphore");
 
-				FileLockSemaphore->fls_Size = sizeof(*FileLockSemaphore);
-				NewList((struct List *)&FileLockSemaphore->fls_LockList);
+				fls->fls_Size = sizeof(*fls);
+				NewList((struct List *)&fls->fls_LockList);
 
-				AddSemaphore(&FileLockSemaphore->fls_Semaphore);
+				AddSemaphore(&fls->fls_Semaphore);
+
+				FileLockSemaphore = fls;
+				fls = NULL;
 			}
 			else
 			{
 				SHOWMSG("not enough memory");
 			}
 		}
-		else if (FileLockSemaphore->fls_Size < sizeof(*FileLockSemaphore))
+
+		Permit();
+
+		if(FileLockSemaphore != NULL && FileLockSemaphore->fls_Size < sizeof(*FileLockSemaphore))
 		{
 			SHOWMSG("semaphore found, but it's too short");
 
@@ -196,7 +206,20 @@ obtain_file_lock_semaphore(BOOL shared)
 			FileLockSemaphore = NULL;
 		}
 
-		Permit();
+		/* Release the memory allocated for the semaphore, in case
+		   we didn't need it after all. */
+		if(fls != NULL)
+		{
+			#if defined(__amigaos4__)
+			{
+				FreeSysObject(ASOT_SEMAPHORE,fls);
+			}
+			#else
+			{
+				FreeVec(fls);
+			}
+			#endif /* __amigaos4__ */
+		}
 	}
 
 	if(FileLockSemaphore != NULL)
