@@ -1,5 +1,5 @@
 /*
- * $Id: math_sin.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_sin.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___sin:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __sin(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __sin(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __sin(double x)
 {
 	double result;
@@ -137,7 +137,7 @@ __sin(double x)
 
 #if defined(PPC_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __sin(double x)
 {
 	double y[2],z=0.0;

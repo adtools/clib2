@@ -25,6 +25,29 @@
   buffered files which now bypasses close/read/write/lseek and
   directly invokes the hook code for unbuffered files.
 
+- Added various floating point constants to <math.h>, courtesy
+  of Henning Nielsen Lund. Thank you very much!
+
+- When using the wildcard expansion code for command line
+  parameters (which is by default linked in with libunix.a),
+  regular expressions can no longer prompt dos.library requesters
+  to appear. However, to be on the safe side, if you are expecting
+  to pass regular expressions on the command line, do not use
+  the wildcard expansion code such as by overriding the library
+  symbols with dummy functions such as are used in the file
+  "stdlib_wildcard_expand.c".
+
+- Added a new variable '__open_locale' which can be used to
+  restrict all library functions to use the "C" language locale
+  rather than the current system locale settings. In addition
+  to that, two new functions __locale_exit() and __locale_init()
+  can be used to close and (re-)open the system locale at a
+  later time.
+
+- Local ("static") functions are now identified by the STATIC
+  qualifier. This was done in preparation for changes that will
+  deal with global and local data and the issue of thread safety.
+
 
 c.lib 1.188 (7.2.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_setsuperattrs.c,v 1.3 2005-01-09 10:10:41 obarthel Exp $
+ * $Id: amiga_setsuperattrs.c,v 1.4 2005-02-25 10:14:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@
 
 /****************************************************************************/
 
-static ULONG
+STATIC ULONG
 SetSuperAttrsA(Class * cl,Object * obj,struct TagItem * tags)
 {
 	ULONG result = 0;

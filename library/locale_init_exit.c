@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.4 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -88,9 +88,11 @@ __close_all_locales(void)
 	}
 }
 
+
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__locale_exit)
+void
+__locale_exit(void)
 {
 	ENTER();
 
@@ -125,7 +127,64 @@ CLIB_DESTRUCTOR(__locale_exit)
 
 /****************************************************************************/
 
-CLIB_CONSTRUCTOR(__locale_init)
+int
+__locale_init(void)
+{
+	int result = -1;
+
+	ENTER();
+
+	PROFILE_OFF();
+
+	if(__LocaleBase == NULL)
+	{
+		__LocaleBase = OpenLibrary("locale.library",38);
+
+		#if defined(__amigaos4__)
+		{
+			if (__LocaleBase != NULL)
+			{
+				__ILocale = (struct LocaleIFace *)GetInterface(__LocaleBase, "main", 1, 0);
+				if(__ILocale == NULL)
+				{
+					CloseLibrary(__LocaleBase);
+					__LocaleBase = NULL;
+				}
+			}
+		}
+		#endif /* __amigaos4__ */
+	}
+
+	if(__LocaleBase != NULL && __default_locale == NULL)
+	{
+		DECLARE_LOCALEBASE();
+
+		__default_locale = OpenLocale(NULL);
+	}
+
+	if(__default_locale != NULL)
+		result = 0;
+
+	PROFILE_ON();
+
+	RETURN(result);
+	return(result);
+}
+
+/****************************************************************************/
+
+CLIB_DESTRUCTOR(__locale_exit_destructor)
+{
+	ENTER();
+
+	__locale_exit();
+
+	LEAVE();
+}
+
+/****************************************************************************/
+
+CLIB_CONSTRUCTOR(__locale_init_constructor)
 {
 	int i;
 
@@ -134,32 +193,8 @@ CLIB_CONSTRUCTOR(__locale_init)
 	for(i = 0 ; i < NUM_LOCALES ; i++)
 		strcpy(__locale_name_table[i],"C");
 
-	PROFILE_OFF();
-
-	__LocaleBase = OpenLibrary("locale.library",38);
-
-	#if defined(__amigaos4__)
-	{
-		if (__LocaleBase != NULL)
-		{
-			__ILocale = (struct LocaleIFace *)GetInterface(__LocaleBase, "main", 1, 0);
-			if(__ILocale == NULL)
-			{
-				CloseLibrary(__LocaleBase);
-				__LocaleBase = NULL;
-			}
-		}
-	}
-	#endif /* __amigaos4__ */
-
-	if(__LocaleBase != NULL)
-	{
-		DECLARE_LOCALEBASE();
-
-		__default_locale = OpenLocale(NULL);
-	}
-
-	PROFILE_ON();
+	if(__open_locale)
+		__locale_init();
 
 	RETURN(OK);
 

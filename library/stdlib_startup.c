@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_startup.c,v 1.6 2005-01-09 15:58:02 obarthel Exp $
+ * $Id: stdlib_startup.c,v 1.7 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,7 +90,7 @@ UBYTE * __quote_vector;
 
 /****************************************************************************/
 
-static BOOL
+STATIC BOOL
 is_escape_character(UBYTE c)
 {
 	BOOL result;
@@ -102,7 +102,7 @@ is_escape_character(UBYTE c)
 
 /****************************************************************************/
 
-static BOOL
+STATIC BOOL
 is_final_quote_character(const char * str)
 {
 	BOOL result;

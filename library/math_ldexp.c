@@ -1,5 +1,5 @@
 /*
- * $Id: math_ldexp.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_ldexp.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ union dtol
 	long	ival[2];
 };
 
-INLINE static const double
+INLINE STATIC const double
 __ldexp(double x,int n)
 {
 	union dtol number;
@@ -96,7 +96,7 @@ __ldexp(double x,int n)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __ldexp(double x,int n)
 {
 	double result;
@@ -129,7 +129,7 @@ union dtol
 	long	ival[2];
 };
 
-INLINE static const double
+INLINE STATIC const double
 __ldexp(double x,int n)
 {
 	union dtol number;

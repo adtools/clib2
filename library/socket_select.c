@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: socket_select.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,7 +47,7 @@
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 copy_fd_set(fd_set * to,fd_set * from,int num_fds)
 {
 	ENTER();
@@ -72,7 +72,7 @@ copy_fd_set(fd_set * to,fd_set * from,int num_fds)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 zero_fd_set(fd_set * set,int num_fds)
 {
 	ENTER();
@@ -96,7 +96,7 @@ zero_fd_set(fd_set * set,int num_fds)
 
 /****************************************************************************/
 
-static fd_set *
+STATIC fd_set *
 allocate_fd_set(int num_fds,fd_set * duplicate_this_set)
 {
 	fd_set * result = NULL;
@@ -130,7 +130,7 @@ allocate_fd_set(int num_fds,fd_set * duplicate_this_set)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 free_fd_set(fd_set * set)
 {
 	if(set != NULL)
@@ -139,7 +139,7 @@ free_fd_set(fd_set * set)
 
 /****************************************************************************/
 
-static struct fd *
+STATIC struct fd *
 get_file_descriptor(int file_descriptor)
 {
 	struct fd * result = NULL;
@@ -166,7 +166,7 @@ get_file_descriptor(int file_descriptor)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 fix_datestamp(struct DateStamp * ds)
 {
 	const LONG ticks_per_minute	= 60 * TICKS_PER_SECOND;
@@ -195,7 +195,7 @@ fix_datestamp(struct DateStamp * ds)
 
 /****************************************************************************/
 
-static struct DateStamp *
+STATIC struct DateStamp *
 timeval_to_datestamp(struct DateStamp * ds,const struct timeval * tv)
 {
 	assert( ds != NULL && tv != NULL );
@@ -211,7 +211,7 @@ timeval_to_datestamp(struct DateStamp * ds,const struct timeval * tv)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 add_dates(struct DateStamp * to,const struct DateStamp * from)
 {
 	assert( to != NULL && from != NULL );
@@ -225,7 +225,7 @@ add_dates(struct DateStamp * to,const struct DateStamp * from)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 map_descriptor_sets(
 	const fd_set *	input_fds,
 	int				num_input_fds,
@@ -341,7 +341,7 @@ map_descriptor_sets(
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 remap_descriptor_sets(
 	const fd_set *	socket_fds,
 	int				num_socket_fds,
@@ -432,7 +432,7 @@ remap_descriptor_sets(
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 get_num_descriptors_used(int num_fds,int * num_socket_used_ptr,int * num_file_used_ptr)
 {
 	int num_socket_used = 0;

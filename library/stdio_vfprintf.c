@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.10 2005-02-21 10:22:01 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.11 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@
 
 /****************************************************************************/
 
-static int
+STATIC int
 get_num_leading_digits(__long_double_t v)
 {
 	int num_digits;

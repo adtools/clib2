@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_qsort.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdlib_qsort.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,7 +89,7 @@
 /******************************************************************/
 
 /* swap nbytes between a and b */
-INLINE static void
+INLINE STATIC void
 swap(char * a, char * b, size_t nbytes)
 {
 	char temp;

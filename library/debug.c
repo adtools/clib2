@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: debug.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=8
  *
@@ -133,7 +133,7 @@ _POPDEBUGLEVEL(void)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 _INDENT(void)
 {
 	if(program_name_len > 0)

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.7 2005-02-03 12:14:55 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.8 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,7 +139,7 @@ extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int lin
 
 #else
 
-#define __static static
+#define __static STATIC
 
 #define __free(mem,file,line) free(mem)
 #define __malloc(size,file,line) malloc(size)

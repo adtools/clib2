@@ -1,5 +1,5 @@
 /*
- * $Id: locale_localeconv.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: locale_localeconv.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,7 @@ struct lconv *
 localeconv(void)
 {
 	static struct lconv loc;
+
 	struct Locale * numeric_locale = __locale_table[LC_NUMERIC];
 	struct Locale * monetary_locale = __locale_table[LC_MONETARY];
 	struct lconv * result;

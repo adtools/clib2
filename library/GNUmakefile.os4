@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.28 2005-02-20 13:19:40 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.29 2005-02-25 10:14:20 obarthel Exp $
 #
 # :ts=8
 #
@@ -155,6 +155,7 @@ C_LIB = \
 	libgen_dirname.o \
 	locale_init_exit.o \
 	locale_localeconv.o \
+	locale_open_locale.o \
 	locale_setlocale.o \
 	mount_convertinfo.o \
 	mount_fstatfs.o \

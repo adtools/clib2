@@ -1,5 +1,5 @@
 /*
- * $Id: math_pow.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_pow.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,7 +98,7 @@ ___pow:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __pow(double x,double y)
 {
 	double result;
@@ -121,7 +121,7 @@ __pow(double x,double y)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __exp(double x)
 {
 	double result;
@@ -133,7 +133,7 @@ __exp(double x)
 	return(result);
 }
 
-INLINE static const double
+INLINE STATIC const double
 __log(double x)
 {
 	double result;
@@ -145,7 +145,7 @@ __log(double x)
 	return(result);
 }
 
-INLINE static const double
+INLINE STATIC const double
 __pow(double x,double y)
 {
 	double result;
@@ -208,7 +208,7 @@ ivln2    =  1.44269504088896338700e+00, /* 0x3FF71547, 0x652B82FE =1/ln2 */
 ivln2_h  =  1.44269502162933349609e+00, /* 0x3FF71547, 0x60000000 =24b 1/ln2*/
 ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
 
-INLINE static const double
+INLINE STATIC const double
 __pow(double x,double y)
 {
 	double z,ax,z_h,z_l,p_h,p_l;

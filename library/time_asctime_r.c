@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime_r.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: time_asctime_r.c,v 1.7 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,7 +43,7 @@
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 add_to_string(char * to,size_t to_size,const char * string,size_t * offset_ptr)
 {
 	size_t offset,len;

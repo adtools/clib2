@@ -1,5 +1,5 @@
 /*
- * $Id: math_log.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_log.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___log:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __log(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __log(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __log(double x)
 {
 	double result;
@@ -150,7 +150,7 @@ Lg6 = 1.531383769920937332e-01,  /* 3FC39A09 D078C69F */
 Lg7 = 1.479819860511658591e-01,  /* 3FC2F112 DF3E5244 */
 zero = 0.0;
 
-INLINE static const double
+INLINE STATIC const double
 __log(double x)
 {
 	double hfsq,f,s,z,R,w,t1,t2,dk;

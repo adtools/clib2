@@ -1,5 +1,5 @@
 /*
- * $Id: math_tanh.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_tanh.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___tanh:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __tanh(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __tanh(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __tanh(double x)
 {
 	double result;
@@ -139,7 +139,7 @@ __tanh(double x)
 
 static const double one=1.0, two=2.0, tiny = 1.0e-300;
 
-INLINE static const double
+INLINE STATIC const double
 __tanh(double x)
 {
 	double t,z;

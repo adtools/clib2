@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.10 2005-01-13 15:39:39 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.11 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -107,7 +107,7 @@ _EPILOG(REG(a0,char * id))
 
 /****************************************************************************/
 
-static int
+STATIC int
 call_main(void)
 {
 	/* Initialization functions; must be called exactly in this
@@ -243,7 +243,7 @@ call_main(void)
 
 /****************************************************************************/
 
-static void ASM
+STATIC VOID ASM
 detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list))
 {
 	#if defined(__amigaos4__)
@@ -282,7 +282,7 @@ detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list
 
 /****************************************************************************/
 
-static ULONG
+STATIC ULONG
 get_stack_size(void)
 {
 	struct Task * tc = FindTask(NULL);

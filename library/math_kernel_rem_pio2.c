@@ -1,5 +1,5 @@
 /*
- * $Id: math_kernel_rem_pio2.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_kernel_rem_pio2.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ one     =  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
 two24   =  1.67772160000000000000e+07, /* 0x41700000, 0x00000000 */
 twon24  =  5.96046447753906250000e-08; /* 0x3E700000, 0x00000000 */
 
-INLINE static int __kernel_rem_pio2(double *x, double *y, int e0, int nx, int prec, const int *ipio2) 
+INLINE STATIC int kernel_rem_pio2(double *x, double *y, int e0, int nx, int prec, const int *ipio2) 
 {
 	int jz,jx,jv,jp,jk,carry,n,iq[20],i,j,k,m,q0,ih;
 	double z,fw,f[20],fq[20],q[20];
@@ -341,7 +341,7 @@ int __rem_pio2(double x, double *y)
 	tx[2] = z;
 	nx = 3;
 	while(tx[nx-1]==zero) nx--;	/* skip zero term */
-	n  =  __kernel_rem_pio2(tx,y,e0,nx,2,two_over_pi);
+	n  =  kernel_rem_pio2(tx,y,e0,nx,2,two_over_pi);
 	if(hx<0) {y[0] = -y[0]; y[1] = -y[1]; return -n;}
 	return n;
 }

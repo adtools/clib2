@@ -1,5 +1,5 @@
 /*
- * $Id: string_memchr.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: string_memchr.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 
 /****************************************************************************/
 
-INLINE static void *
+INLINE STATIC void *
 __memchr(const unsigned char * m,unsigned char val,size_t len)
 {
 	void * result = NULL;

@@ -1,5 +1,5 @@
 /*
- * $Id: math_kernel_scalbn.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_kernel_scalbn.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@
 
 /****************************************************************************/
 
-INLINE static double copysign(double x, double y)
+INLINE STATIC double copysign(double x, double y)
 {
 	unsigned int hx,hy;
 

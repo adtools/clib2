@@ -1,5 +1,5 @@
 /*
- * $Id: math_atan2.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_atan2.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ extern double __atan(double x);
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __atan2(double y,double x)
 {
 	const double pi = 3.14159265358979323846;
@@ -122,7 +122,7 @@ __atan2(double y,double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __atan(double x)
 {
 	double result;
@@ -134,7 +134,7 @@ __atan(double x)
 	return(result);
 }
 
-INLINE static const double
+INLINE STATIC const double
 __atan2(double y,double x)
 {
 	double pi,pi_over_2;
@@ -209,7 +209,7 @@ pi_o_2  = 1.5707963267948965580E+00, /* 0x3FF921FB, 0x54442D18 */
 pi      = 3.1415926535897931160E+00, /* 0x400921FB, 0x54442D18 */
 pi_lo   = 1.2246467991473531772E-16; /* 0x3CA1A626, 0x33145C07 */
 
-INLINE static const double
+INLINE STATIC const double
 __atan2(double y,double x)
 {
 	double z;

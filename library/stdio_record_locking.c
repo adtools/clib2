@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.2 2005-02-21 10:22:00 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -100,21 +100,21 @@ static struct FileLockSemaphore * FileLockSemaphore;
 
 /****************************************************************************/
 
-static void release_file_lock_semaphore(struct FileLockSemaphore *fls);
-static struct FileLockSemaphore *obtain_file_lock_semaphore(BOOL shared);
-static void remove_locked_region_node(struct FileLockSemaphore *fls, struct fd *fd, LONG start, LONG stop, LONG original_length);
-static void delete_locked_region_node(struct LockedRegionNode *lrn);
-static long create_locked_region_node(struct LockedRegionNode **result_ptr);
-static void delete_file_lock_node(struct FileLockNode *fln);
-static long create_file_lock_node(struct fd *fd, struct FileLockNode **result_ptr);
-static long find_file_lock_node_by_file_handle(struct FileLockSemaphore *fls, BPTR file_handle, struct FileLockNode **result_ptr);
-static long find_file_lock_node_by_drawer_and_name(struct FileLockSemaphore *fls, BPTR dir_lock, STRPTR file_name, struct FileLockNode **result_ptr);
-static struct LockedRegionNode *find_colliding_region(struct FileLockNode *fln, LONG start, LONG stop, BOOL shared);
-static void cleanup_locked_records(struct fd * fd);
+STATIC VOID release_file_lock_semaphore(struct FileLockSemaphore *fls);
+STATIC struct FileLockSemaphore *obtain_file_lock_semaphore(BOOL shared);
+STATIC VOID remove_locked_region_node(struct FileLockSemaphore *fls, struct fd *fd, LONG start, LONG stop, LONG original_length);
+STATIC VOID delete_locked_region_node(struct LockedRegionNode *lrn);
+STATIC LONG create_locked_region_node(struct LockedRegionNode **result_ptr);
+STATIC VOID delete_file_lock_node(struct FileLockNode *fln);
+STATIC LONG create_file_lock_node(struct fd *fd, struct FileLockNode **result_ptr);
+STATIC LONG find_file_lock_node_by_file_handle(struct FileLockSemaphore *fls, BPTR file_handle, struct FileLockNode **result_ptr);
+STATIC LONG find_file_lock_node_by_drawer_and_name(struct FileLockSemaphore *fls, BPTR dir_lock, STRPTR file_name, struct FileLockNode **result_ptr);
+STATIC struct LockedRegionNode *find_colliding_region(struct FileLockNode *fln, LONG start, LONG stop, BOOL shared);
+STATIC VOID cleanup_locked_records(struct fd * fd);
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 release_file_lock_semaphore(struct FileLockSemaphore * fls)
 {
 	ENTER();
@@ -129,7 +129,7 @@ release_file_lock_semaphore(struct FileLockSemaphore * fls)
 
 /****************************************************************************/
 
-static struct FileLockSemaphore *
+STATIC struct FileLockSemaphore *
 obtain_file_lock_semaphore(BOOL shared)
 {
 	struct FileLockSemaphore * result = NULL;
@@ -234,7 +234,7 @@ obtain_file_lock_semaphore(BOOL shared)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 remove_locked_region_node(struct FileLockSemaphore * fls,struct fd * fd,LONG start,LONG UNUSED stop,LONG original_length)
 {
 	ENTER();
@@ -304,7 +304,7 @@ remove_locked_region_node(struct FileLockSemaphore * fls,struct fd * fd,LONG sta
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 delete_locked_region_node(struct LockedRegionNode * lrn)
 {
 	ENTER();
@@ -318,7 +318,7 @@ delete_locked_region_node(struct LockedRegionNode * lrn)
 
 /****************************************************************************/
 
-static long
+STATIC LONG
 create_locked_region_node(struct LockedRegionNode ** result_ptr)
 {
 	struct LockedRegionNode * lrn;
@@ -349,7 +349,7 @@ create_locked_region_node(struct LockedRegionNode ** result_ptr)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 delete_file_lock_node(struct FileLockNode * fln)
 {
 	ENTER();
@@ -370,7 +370,7 @@ delete_file_lock_node(struct FileLockNode * fln)
 
 /****************************************************************************/
 
-static long
+STATIC LONG
 create_file_lock_node(struct fd * fd,struct FileLockNode ** result_ptr)
 {
 	struct FileLockNode * result = NULL;
@@ -433,7 +433,7 @@ create_file_lock_node(struct fd * fd,struct FileLockNode ** result_ptr)
 
 /****************************************************************************/
 
-static long
+STATIC LONG
 find_file_lock_node_by_drawer_and_name(
 	struct FileLockSemaphore *	fls,
 	BPTR						dir_lock,
@@ -499,7 +499,7 @@ find_file_lock_node_by_drawer_and_name(
 
 /****************************************************************************/
 
-static LONG
+STATIC LONG
 find_file_lock_node_by_file_handle(
 	struct FileLockSemaphore *	fls,
 	BPTR						file_handle,
@@ -555,7 +555,7 @@ find_file_lock_node_by_file_handle(
 
 /****************************************************************************/
 
-static struct LockedRegionNode *
+STATIC struct LockedRegionNode *
 find_colliding_region(struct FileLockNode * fln,LONG start,LONG stop,BOOL shared)
 {
 	struct LockedRegionNode * result = NULL;
@@ -612,7 +612,7 @@ find_colliding_region(struct FileLockNode * fln,LONG start,LONG stop,BOOL shared
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 cleanup_locked_records(struct fd * fd)
 {
 	ENTER();

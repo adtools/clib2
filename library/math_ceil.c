@@ -1,5 +1,5 @@
 /*
- * $Id: math_ceil.c,v 1.3 2005-01-26 09:24:38 obarthel Exp $
+ * $Id: math_ceil.c,v 1.4 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___ceil:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __ceil(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __ceil(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __ceil(double x)
 {
 	int rounding_mode, round_up;
@@ -152,7 +152,7 @@ __ceil(double x)
 
 static const double huge = 1.0e300;
 
-INLINE static const double
+INLINE STATIC const double
 __ceil(double x)
 {
 	int i0,i1,j0;

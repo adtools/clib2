@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.7 2005-02-03 17:33:54 obarthel Exp $
+ * $Id: dos.h,v 1.8 2005-02-25 10:14:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -269,6 +269,32 @@ extern unsigned int __stack_size;
  * have already been opened for you.
  */
 extern unsigned int (* __get_default_stack_size)(void);
+
+/****************************************************************************/
+
+/*
+ * This library falls back onto locale.library to perform string collation
+ * in strcoll(), character conversion in toupper() and various other
+ * functions. This may not your intention. To restrict the library to use
+ * only the "C" language locale, declare the following variable in your
+ * code and set it to FALSE, so that it overrides the default settings.
+ * The variable value is checked during program startup and, if set to
+ * TRUE, has the effect of opening locale.library and obtaining the
+ * default locale.
+ */
+extern BOOL __open_locale;
+
+/*
+ * Two functions control how this library uses the locale.library API to
+ * perform string collation, character and time conversion, etc.
+ *
+ * __locale_init() opens locale.library and attempts to open the default
+ * locale. If it succeeds, it will return 0 and -1 otherwise.
+ *
+ * __locale_exit() releases the default locale and closes locale.library.
+ */
+extern void __locale_exit(void);
+extern int __locale_init(void);
 
 /****************************************************************************/
 

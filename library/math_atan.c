@@ -1,5 +1,5 @@
 /*
- * $Id: math_atan.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_atan.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___atan:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __atan(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __atan(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __atan(double x)
 {
 	double result;
@@ -169,7 +169,7 @@ static const double
 one   = 1.0,
 huge   = 1.0e300;
 
-INLINE static const double
+INLINE STATIC const double
 __atan(double x)
 {
 	double w,s1,s2,z;

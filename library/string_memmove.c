@@ -1,5 +1,5 @@
 /*
- * $Id: string_memmove.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: string_memmove.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -351,7 +351,7 @@ memmove(void *dest, const void * src, size_t len)
 
 /****************************************************************************/
 
-INLINE static void
+INLINE STATIC VOID
 __memmove(unsigned char * to,unsigned char * from,size_t len)
 {
 	if(from < to && to < from + len)

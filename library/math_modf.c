@@ -1,5 +1,5 @@
 /*
- * $Id: math_modf.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_modf.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,7 +58,7 @@
 
 #if defined(IEEE_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __modf(double x,double *nptr)
 {
 	double int_n;
@@ -88,7 +88,7 @@ __modf(double x,double *nptr)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __modf(double x,double *nptr)
 {
 	double result;
@@ -111,7 +111,7 @@ __modf(double x,double *nptr)
 
 #if defined(__PPC__)
 
-INLINE static const double
+INLINE STATIC const double
 __modf(double x,double *nptr)
 {
 	double int_n;

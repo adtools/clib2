@@ -1,5 +1,5 @@
 /*
- * $Id: string_memcpy.c,v 1.5 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: string_memcpy.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -229,7 +229,7 @@ memcpy(void *dst, const void *src, size_t len)
 
 /****************************************************************************/
 
-INLINE static void 
+INLINE STATIC VOID 
 __memcpy(unsigned char * to,unsigned char * from,size_t len)
 {
 	/* The setup below is intended to speed up copying larger

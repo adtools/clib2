@@ -1,5 +1,5 @@
 /*
- * $Id: math_cos.c,v 1.3 2005-01-26 09:24:38 obarthel Exp $
+ * $Id: math_cos.c,v 1.4 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___cos:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __cos(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __cos(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __cos(double x)
 {
 	double result;
@@ -137,7 +137,7 @@ __cos(double x)
 
 #if defined(PPC_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __cos(double x)
 {
 	double y[2],z=0.0;

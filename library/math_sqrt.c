@@ -1,5 +1,5 @@
 /*
- * $Id: math_sqrt.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_sqrt.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___sqrt:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __sqrt(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __sqrt(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __sqrt(double x)
 {
 	double result;
@@ -139,7 +139,7 @@ __sqrt(double x)
 
 static	const double	one	= 1.0, tiny=1.0e-300;
 
-INLINE static const double
+INLINE STATIC const double
 __sqrt(double x)
 {
 	double z;

@@ -1,5 +1,5 @@
 /*
- * $Id: math_fabs.c,v 1.5 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_fabs.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -88,7 +88,7 @@ ___fabs:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __fabs(double x)
 {
 	double result;
@@ -110,7 +110,7 @@ __fabs(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __fabs(double x)
 {
 	double result;
@@ -134,7 +134,7 @@ __fabs(double x)
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __fabs(double x)
 {
 	double res;
@@ -153,7 +153,7 @@ __fabs(double x)
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __fabs(double x)
 {
 	double res;

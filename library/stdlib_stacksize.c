@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stacksize.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_stacksize.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@
 
 /******************************************************************************/
 
-static unsigned int
+STATIC unsigned int
 get_default_stack_size(void)
 {
 	unsigned int result = 0;

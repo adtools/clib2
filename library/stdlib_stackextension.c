@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackextension.c,v 1.4 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_stackextension.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -326,7 +326,7 @@ CLIB_DESTRUCTOR(__stk_exit)
 
 /* Move a stackframe with a minimum of requiredstack bytes to the used list
    and fill the StackSwapStruct structure. */
-static void
+STATIC VOID
 pushframe(ULONG requiredstack, struct StackSwapStruct *sss)
 {
 	struct stackframe *sf;
@@ -504,7 +504,7 @@ stkext_f(struct StackSwapStruct sss, long d0, long d1, long a0, long a1, long a6
 
 /* Move all used stackframes upto (and including) sf to the spares list
    and fill the StackSwapStruct structure. */
-static void
+STATIC VOID
 popframes(struct stackframe *sf, struct StackSwapStruct *sss)
 {
 	struct stackframe *sf2;

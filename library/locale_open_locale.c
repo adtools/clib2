@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_addtof.c,v 1.3 2005-02-25 10:14:20 obarthel Exp $
+ * $Id: locale_open_locale.c,v 1.1 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,53 +31,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <exec/interrupts.h>
-#include <hardware/intbits.h>
-#include <graphics/graphint.h>
-
-#include <string.h>
+#ifndef _LOCALE_HEADERS_H
+#include "locale_headers.h"
+#endif /* _LOCALE_HEADERS_H */
 
 /****************************************************************************/
 
-#include <proto/exec.h>
-#include <proto/graphics.h>
-#include <clib/alib_protos.h>
-
-/****************************************************************************/
-
-#include "macros.h"
-
-/****************************************************************************/
-
-#include "debug.h"
-
-/****************************************************************************/
-
-typedef LONG (* CFUNC)(APTR arg);
-
-/****************************************************************************/
-
-STATIC LONG INTERRUPT ASM
-call_routine(REG(a1,struct Isrvstr *i))
-{
-	CFUNC p = (CFUNC)i->ccode;
-
-	(*p)(i->Carg);
-
-	return(0);
-}
-
-/****************************************************************************/
-
-VOID
-AddTOF(struct Isrvstr *i,CFUNC p,APTR arg)
-{
-	assert( i != NULL && p != NULL );
-
-	i->code		= (long (*)())call_routine;
-	i->Iptr		= i;
-	i->ccode	= p;
-	i->Carg		= arg;
-
-	AddIntServer(INTB_VERTB,(struct Interrupt *)i);
-}
+BOOL __open_locale = TRUE;

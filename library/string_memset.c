@@ -1,5 +1,5 @@
 /*
- * $Id: string_memset.c,v 1.5 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: string_memset.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,7 +43,7 @@
 
 /****************************************************************************/
 
-INLINE static void
+INLINE STATIC VOID
 __memset(unsigned char * to,unsigned char value,size_t len)
 {
 	/* The setup below is intended to speed up changing larger

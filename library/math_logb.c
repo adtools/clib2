@@ -1,5 +1,5 @@
 /*
- * $Id: math_logb.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_logb.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __logb(double x)
 {
 	double result;
@@ -70,7 +70,7 @@ __logb(double x)
 
 #if defined(PPC_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __logb(double x)
 {
 	unsigned int lx,ix;

@@ -1,5 +1,5 @@
 /*
- * $Id: math_floor.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_floor.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ ___floor:
 
 /****************************************************************************/
 
-INLINE static const double
+INLINE STATIC const double
 __floor(double x)
 {
 	double result;
@@ -119,7 +119,7 @@ __floor(double x)
 
 #if defined(M68881_FLOATING_POINT_SUPPORT)
 
-INLINE static const double
+INLINE STATIC const double
 __floor(double x)
 {
 	int rounding_mode, round_down;
@@ -153,7 +153,7 @@ __floor(double x)
 #if defined(PPC_FLOATING_POINT_SUPPORT)
 
 static const double huge = 1.0e300;
-INLINE static const double
+INLINE STATIC const double
 __floor(double x)
 {
 	int i0,i1,j0;

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.7 2005-02-07 11:19:32 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.8 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,7 +111,7 @@ struct name_node
 
 /****************************************************************************/
 
-static int
+STATIC int
 compare(const char **a,const char **b)
 {
 	DECLARE_UTILITYBASE();
@@ -126,6 +126,7 @@ compare(const char **a,const char **b)
 int
 __wildcard_expand_init(void)
 {
+	APTR old_window_pointer;
 	struct AnchorPath * ap = NULL;
 	struct MinList argument_list;
 	size_t argument_list_size;
@@ -138,6 +139,11 @@ __wildcard_expand_init(void)
 	int i;
 
 	PROFILE_OFF();
+
+	/* Disable dos.library requesters during pattern matching below. We
+	   do this so early in order to make it easier to reset the window
+	   pointer in the cleanup code. */
+	old_window_pointer = __set_process_window((APTR)-1);
 
 	/* No work to be done? */
 	if(__quote_vector == NULL || __argc == 0 || __argv == NULL)
@@ -404,6 +410,8 @@ __wildcard_expand_init(void)
 
 	free(__quote_vector);
 	__quote_vector = NULL;
+
+	__set_process_window(old_window_pointer);
 
 	PROFILE_ON();
 

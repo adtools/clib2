@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_red_black.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_red_black.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@
 
 /****************************************************************************/
 
-static void 
+STATIC VOID 
 help_insertion (struct MemoryTree * tree, struct MemoryNode * z)
 {
 	struct MemoryNode *nil = &tree->mt_NullNode;
@@ -82,7 +82,7 @@ help_insertion (struct MemoryTree * tree, struct MemoryNode * z)
 		y->mn_Right = z;
 }
 
-static void 
+STATIC VOID 
 rotate_left (struct MemoryTree * tree, struct MemoryNode * x)
 {
 	struct MemoryNode *nil = &tree->mt_NullNode;
@@ -105,7 +105,7 @@ rotate_left (struct MemoryTree * tree, struct MemoryNode * x)
 	x->mn_Parent = y;
 }
 
-static void 
+STATIC VOID 
 rotate_right (struct MemoryTree * tree, struct MemoryNode * y)
 {
 	struct MemoryNode *nil = &tree->mt_NullNode;
@@ -130,7 +130,7 @@ rotate_right (struct MemoryTree * tree, struct MemoryNode * y)
 
 /****************************************************************************/
 
-static struct MemoryNode *
+STATIC STRUCT MemoryNode *
 get_successor (struct MemoryTree * tree, struct MemoryNode * x)
 {
 	struct MemoryNode *nil = &tree->mt_NullNode;
@@ -164,7 +164,7 @@ get_successor (struct MemoryTree * tree, struct MemoryNode * x)
 	return (result);
 }
 
-static void 
+STATIC VOID 
 remove_fixup (struct MemoryTree * tree, struct MemoryNode * x)
 {
 	struct MemoryNode *root = tree->mt_Root->mn_Left;

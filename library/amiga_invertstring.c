@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_invertstring.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: amiga_invertstring.c,v 1.3 2005-02-25 10:14:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,7 +49,7 @@
 
 /****************************************************************************/
 
-static int
+STATIC int
 do_escape(int cc)
 {
 	int result;
@@ -91,7 +91,7 @@ do_escape(int cc)
 
 /****************************************************************************/
 
-static ULONG
+STATIC ULONG
 do_angle(STRPTR * strp, struct InputEvent *ie)
 {
 	ULONG result;

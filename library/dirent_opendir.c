@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_opendir.c,v 1.6 2005-02-21 16:09:39 obarthel Exp $
+ * $Id: dirent_opendir.c,v 1.7 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,7 +57,7 @@
 
 /****************************************************************************/
 
-static struct Node *
+STATIC struct Node *
 find_by_name(struct List * list,const char * name)
 {
 	struct Node * result = NULL;

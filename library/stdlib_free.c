@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_free.c,v 1.5 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_free.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@
 
 /****************************************************************************/
 
-static char
+STATIC CHAR
 get_hex_char(int n)
 {
 	char result;
@@ -65,7 +65,7 @@ get_hex_char(int n)
 	return(result);
 }
 
-static void
+STATIC VOID
 int_to_hex(unsigned long v,char * buffer,int min_digits)
 {
 	int i,j,c;
@@ -94,7 +94,7 @@ int_to_hex(unsigned long v,char * buffer,int min_digits)
 	buffer[i] = '\0';
 }
 
-static void
+STATIC VOID
 dump_memory(unsigned char * m,int size,int ignore)
 {
 	const int mod = 20;
@@ -162,7 +162,7 @@ dump_memory(unsigned char * m,int size,int ignore)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 check_memory_node(struct MemoryNode * mn,const char * file,int line)
 {
 	size_t size = mn->mn_Size;
@@ -328,7 +328,7 @@ __find_memory_node(void * address)
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 remove_and_free_memory_node(struct MemoryNode * mn)
 {
 	size_t allocation_size;
@@ -434,7 +434,7 @@ __free_memory_node(struct MemoryNode * mn,const char * UNUSED file,int UNUSED li
 
 /****************************************************************************/
 
-static void
+STATIC VOID
 free_memory(void * ptr,BOOL force,const char * file,int line)
 {
 	struct MemoryNode * mn;
