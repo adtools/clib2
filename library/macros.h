@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.14 2005-03-10 13:58:13 obarthel Exp $
+ * $Id: macros.h,v 1.15 2005-03-11 11:35:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -158,11 +158,33 @@
    constructors and the user-supplied destructors before the library
    destructors. */
 
-#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	500)
-#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	500)
-#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	150)
-#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	150)
-	
+#define STDLIB_CONSTRUCTOR(name)	CONSTRUCTOR(name,	100)
+#define STDLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	100)
+
+#define STK_CONSTRUCTOR(name)		CONSTRUCTOR(name,	110)
+#define STK_DESTRUCTOR(name)		DESTRUCTOR(name,	110)
+
+#define STDIO_CONSTRUCTOR(name)		CONSTRUCTOR(name,	120)
+#define STDIO_DESTRUCTOR(name)		DESTRUCTOR(name,	120)
+
+#define FILE_CONSTRUCTOR(name)		CONSTRUCTOR(name,	130)
+#define FILE_DESTRUCTOR(name)		DESTRUCTOR(name,	130)
+
+#define MATH_CONSTRUCTOR(name)		CONSTRUCTOR(name,	140)
+#define MATH_DESTRUCTOR(name)		DESTRUCTOR(name,	140)
+
+#define SOCKET_CONSTRUCTOR(name)	CONSTRUCTOR(name,	150)
+#define SOCKET_DESTRUCTOR(name)		DESTRUCTOR(name,	150)
+
+#define ARG_CONSTRUCTOR(name)		CONSTRUCTOR(name,	160)
+#define ARG_DESTRUCTOR(name)		DESTRUCTOR(name,	160)
+
+#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	170)
+#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	170)
+
+#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	180)
+#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	180)
+
 /****************************************************************************/
 
 /* Magic macros for code profiling, SAS/C style. Normally, you would find
