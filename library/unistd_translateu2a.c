@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.4 2005-02-15 17:27:22 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.5 2005-02-16 14:48:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,35 +111,12 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 		goto out;
 	}
 
+	/* If the name was replaced, update the string length cached. */
 	if(name != (*name_ptr))
 	{
 		D(("name after relative path replacement = '%s'",name));
 
 		len = strlen(name);
-	}
-
-	/* If there are any, strip the trailing slashes ('foo/' -> 'foo'). A
-	   leading '/' must be preserved, though ('///' -> '/'). */
-	if(len > 1)
-	{
-		size_t num_trailing_slashes = 0;
-
-		while((num_trailing_slashes < len - 1) && (name[len - (num_trailing_slashes + 1)] == '/'))
-			num_trailing_slashes++;
-
-		if(num_trailing_slashes > 0)
-		{
-			len -= num_trailing_slashes;
-
-			if(name != replace)
-			{
-				memmove(replace,name,len);
-				name = replace;
-			}
-
-			name[len] = '\0';
-			D(("name = '%s' (line %ld)",name,__LINE__));
-		}
 	}
 
 	/* If there are neighboring slashes, strip all but one
@@ -194,15 +171,35 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 		}
 	}
 
-	/* Ditch all leading './' ('./foo' -> 'foo'). */
-	if(len >= 2 && strncmp(name,"./",2) == SAME)
+	/* If there are any, strip the trailing slashes ('foo/' -> 'foo'). A
+	   leading '/' must be preserved, though ('///' -> '/'). */
+	if(len > 1)
 	{
-		do
+		size_t num_trailing_slashes = 0;
+
+		while((num_trailing_slashes < len - 1) && (name[len - (num_trailing_slashes + 1)] == '/'))
+			num_trailing_slashes++;
+
+		if(num_trailing_slashes > 0)
 		{
-			name	+= 2;
-			len		-= 2;
+			len -= num_trailing_slashes;
+
+			if(name != replace)
+			{
+				memmove(replace,name,len);
+				name = replace;
+			}
+
+			name[len] = '\0';
+			D(("name = '%s' (line %ld)",name,__LINE__));
 		}
-		while(len >= 2 && name[0] == '.' && name[1] == '/');
+	}
+
+	/* Ditch all leading './' ('./foo' -> 'foo'). */
+	while(len > 2 && name[0] == '.' && name[1] == '/')
+	{
+		name	+= 2;
+		len		-= 2;
 
 		D(("name = '%s' (line %ld)",name,__LINE__));
 	}
@@ -277,9 +274,9 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 			nti->is_root = TRUE;
 		}
 
-		/* Ok, so this is an absolute path. We first
-		   check for a few special cases, the first
-		   being a reference to "/tmp". */
+		/* Ok, so this is an absolute path. We begin by checking
+		   for a few special cases, the first being a reference
+		   to "/tmp". */
 		if((strncmp(name,"/tmp",4) == SAME) && (name[4] == '/' || len == 4))
 		{
 			if(name[4] == '/')
