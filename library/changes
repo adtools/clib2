@@ -36,6 +36,10 @@
 - The library no longer sends ACTION_DISK_INFO packets to the console
   handler. The side-effects were too varied and irritating after all.
 
+- Added the fsync() and fdatasync() functions and the <stdint.h> and
+  <inttypes.h> header files contributed by Peter Bengtsson. Thank
+  you very much!
+
 
 c.lib 1.187 (29.1.2005)
 

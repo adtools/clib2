@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.8 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.9 2005-02-04 15:03:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -1395,6 +1395,30 @@ grow_file_size(struct fd * fd,int num_bytes,int * error_ptr)
 
 /****************************************************************************/
 
+static void
+sync_fd(struct fd * fd,int mode)
+{
+	assert( fd != NULL );
+
+	if(fd->fd_DefaultFile != ZERO)
+	{
+		/* The mode tells us what to flush. 0 means "flush just the data", and
+		   everything else means "flush everything. */
+		Flush(fd->fd_DefaultFile);
+
+		if(mode != 0)
+		{
+			struct FileHandle * fh = BADDR(fd->fd_DefaultFile);
+
+			/* Verify that this file is not bound to "NIL:". */
+			if(fh->fh_Type != NULL)
+				DoPkt(fh->fh_Type,ACTION_FLUSH,	0,0,0,0,0);
+		}
+	}
+}
+
+/****************************************************************************/
+
 void
 __fd_hook_entry(
 	struct Hook *				UNUSED	unused_hook,
@@ -2201,6 +2225,15 @@ __fd_hook_entry(
 			SHOWMSG("file_hook_action_duplicate_fd");
 
 			__duplicate_fd(message->duplicate_fd,fd);
+
+			result = 0;
+			break;
+
+		case file_hook_action_flush:
+
+			SHOWMSG("file_hook_action_flush");
+
+			sync_fd(fd,message->arg);
 
 			result = 0;
 			break;

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.8 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: unistd.h,v 1.9 2005-02-04 15:03:14 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,6 +98,8 @@ extern void usleep(unsigned long microseconds);
 extern int getopt(int argc, char * argv[], char *opts);
 extern pid_t getpid(void);
 extern char *realpath(const char *file_name, char *resolved_name);
+extern int fsync(int file_descriptor);
+extern int fdatasync(int file_descriptor);
 
 /****************************************************************************/
 

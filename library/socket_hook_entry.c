@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.6 2005-02-04 15:03:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -171,6 +171,15 @@ __socket_hook_entry(
 			PROFILE_ON();
 
 			result = 0;
+
+			break;
+
+		case file_hook_action_flush:
+
+			SHOWMSG("file_hook_action_flush attempted on socket");
+
+			result = -1;
+			error = EINVAL;
 
 			break;
 

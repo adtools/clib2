@@ -1,5 +1,5 @@
-#
-# $Id: smakefile,v 1.19 2005-02-03 16:56:15 obarthel Exp $
+_#
+# $Id: smakefile,v 1.20 2005-02-04 15:03:10 obarthel Exp $
 #
 # :ts=8
 #
@@ -501,8 +501,10 @@ UNISTD_OBJ = \
 	unistd_dup.o \
 	unistd_dup2.o \
 	unistd_fchown.o \
+	unistd_fdatasync.o \
 	unistd_fdopen.o \
 	unistd_fileno.o \
+	unistd_fsync.o \
 	unistd_ftruncate.o \
 	unistd_getcwd.o \
 	unistd_getopt.o \

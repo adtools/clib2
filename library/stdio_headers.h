@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.11 2005-02-04 08:49:10 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.12 2005-02-04 15:03:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -323,7 +323,8 @@ enum file_hook_action_t
 	file_hook_action_duplicate_fd,
 	file_hook_action_seek_and_extend,
 	file_hook_action_is_interactive,
-	file_hook_action_set_async
+	file_hook_action_set_async,
+	file_hook_action_flush
 };
 
 /****************************************************************************/
