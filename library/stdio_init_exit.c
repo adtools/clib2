@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.11 2005-01-09 15:58:02 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.12 2005-01-12 09:15:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -188,7 +188,28 @@ __stdio_init(void)
 			PROFILE_OFF();
 
 			if(IsInteractive(default_file))
+			{
+				struct FileHandle * fh;
+
 				SET_FLAG(fd_flags,FDF_IS_INTERACTIVE);
+
+				/* Try to figure out if the console is in single
+				   character mode. */
+				fh = BADDR(default_file);
+				if(fh->fh_Type != NULL)
+				{
+					D_S(struct InfoData,id);
+
+					if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
+					{
+						if(id->id_DiskType == ID_RAWCON)
+						{
+							SET_FLAG(fd_flags,FDF_NON_BLOCKING);
+							SET_FLAG(fd_flags,FDF_DEFAULT_NON_BLOCKING);
+						}
+					}
+				}
+			}
 
 			PROFILE_ON();
 		}
@@ -254,7 +275,26 @@ __stdio_init(void)
 	if(__fd[STDERR_FILENO]->fd_DefaultFile != ZERO)
 	{
 		if(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
+		{
+			struct FileHandle * fh;
+
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
+
+			fh = BADDR(__fd[STDERR_FILENO]->fd_DefaultFile);
+			if(fh->fh_Type != NULL)
+			{
+				D_S(struct InfoData,id);
+
+				if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
+				{
+					if(id->id_DiskType == ID_RAWCON)
+					{
+						SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NON_BLOCKING);
+						SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_DEFAULT_NON_BLOCKING);
+					}
+				}
+			}
+		}
 	}
 
 	PROFILE_ON();

@@ -44,6 +44,10 @@
   out whether read/write accesses are permitted. This decision is now
   for the file system to make.
 
+- Whether or not stdio console streams are blocking or non-blocking
+  is now determined at initialization time. The I/O mode is restored before
+  the program exits. Previously, any changes to the I/O mode would persist.
+
 
 c.lib 1.185 (2.1.2005)
 

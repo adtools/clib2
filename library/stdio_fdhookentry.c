@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.6 2005-01-09 15:58:02 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.7 2005-01-12 09:15:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -1848,9 +1848,9 @@ __fd_hook_entry(
 				SHOWMSG("changing the mode");
 
 				if(message->arg != 0)
-					mode = 0; /* buffered mode */
+					mode = DOSFALSE;	/* buffered mode */
 				else
-					mode = 1; /* single character mode */
+					mode = DOSTRUE;		/* single character mode */
 
 				if(CANNOT SetMode(fd->fd_DefaultFile,mode))
 				{

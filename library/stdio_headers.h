@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.8 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.9 2005-01-12 09:15:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -249,25 +249,27 @@ struct iob
 
 /****************************************************************************/
 
-#define FDF_READ			(1UL<<0)	/* Data can be read from this file */
-#define FDF_WRITE			(1UL<<1)	/* Data can be written to this file */
-#define FDF_APPEND			(1UL<<2)	/* Before any data is written to it,
-										   the file position must be set to the
-										   end of the file */
-#define FDF_NO_CLOSE		(1UL<<3)	/* Never close this file */
-#define FDF_NON_BLOCKING	(1UL<<4)	/* File was switched into non-blocking
-										   mode (console streams only) */
-#define FDF_IS_SOCKET		(1UL<<5)	/* This is not a disk file but a socket */
-#define FDF_IS_LOCKED		(1UL<<6)	/* This file has an advisory record lock set */
-#define FDF_IN_USE			(1UL<<7)	/* This file is in use */
-#define FDF_CREATED			(1UL<<8)	/* This file was newly created and may need
-										   to have its protection bits updated after
-										   it has been closed */
-#define FDF_CACHE_POSITION	(1UL<<9)	/* Cache the file position. */
-#define FDF_ASYNC_IO		(1UL<<10)	/* File was switched into asynchronous I/O
-										   mode (sockets only). */
-#define FDF_IS_INTERACTIVE	(1UL<<11)	/* File is attached to a console window or
-										   something like it. */
+#define FDF_READ				(1UL<<0)	/* Data can be read from this file */
+#define FDF_WRITE				(1UL<<1)	/* Data can be written to this file */
+#define FDF_APPEND				(1UL<<2)	/* Before any data is written to it,
+											   the file position must be set to the
+											   end of the file */
+#define FDF_NO_CLOSE			(1UL<<3)	/* Never close this file */
+#define FDF_NON_BLOCKING		(1UL<<4)	/* File was switched into non-blocking
+											   mode (console streams only) */
+#define FDF_IS_SOCKET			(1UL<<5)	/* This is not a disk file but a socket */
+#define FDF_IS_LOCKED			(1UL<<6)	/* This file has an advisory record lock set */
+#define FDF_IN_USE				(1UL<<7)	/* This file is in use */
+#define FDF_CREATED				(1UL<<8)	/* This file was newly created and may need
+											   to have its protection bits updated after
+											   it has been closed */
+#define FDF_CACHE_POSITION		(1UL<<9)	/* Cache the file position. */
+#define FDF_ASYNC_IO			(1UL<<10)	/* File was switched into asynchronous I/O
+											   mode (sockets only). */
+#define FDF_IS_INTERACTIVE		(1UL<<11)	/* File is attached to a console window or
+											   something like it. */
+#define FDF_DEFAULT_NON_BLOCKING (1UL<<12)	/* This file defaults to non-blocking I/O
+											   mode. */
 
 /****************************************************************************/
 
