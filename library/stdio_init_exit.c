@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.3 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -194,9 +194,8 @@ __stdio_init(void)
 	}
 
 	/* If the program was launched from Workbench, we continue by
-	 * duplicating the default output stream for use as the
-	 * standard error stream.
-	 */
+	   duplicating the default output stream for use as the
+	   standard error stream. */
 	if(__WBenchMsg != NULL)
 	{
 		PROFILE_OFF();
@@ -207,14 +206,26 @@ __stdio_init(void)
 	}
 	else
 	{
-		struct Process * this_process = (struct Process *)FindTask(NULL);
+		BPTR ces;
+
+		/* Figure out what the default error output stream is. */
+		#if defined(__amigaos4__)
+		{
+			ces = ErrorOutput();
+		}
+		#else
+		{
+			struct Process * this_process = (struct Process *)FindTask(NULL);
+
+			ces = this_process->pr_CES;
+		}
+		#endif /* __amigaos4__ */
 
 		/* Is the standard error stream configured? If so, use it.
-		 * Otherwise, try to duplicate the standard output stream.
-		 */
-		if(this_process->pr_CES != ZERO)
+		   Otherwise, try to duplicate the standard output stream. */
+		if(ces != ZERO)
 		{
-			__fd[STDERR_FILENO]->fd_DefaultFile = this_process->pr_CES;
+			__fd[STDERR_FILENO]->fd_DefaultFile = ces;
 
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
 		}
@@ -231,8 +242,7 @@ __stdio_init(void)
 	PROFILE_OFF();
 
 	/* Check if the standard error output refers to a console or must
-	 * be considered unusable for console output.
-	 */
+	   be considered unusable for console output. */
 	if(__fd[STDERR_FILENO]->fd_DefaultFile == ZERO ||
 	   ((struct FileHandle *)BADDR(__fd[STDERR_FILENO]->fd_DefaultFile))->fh_Type == NULL ||
 	   NOT IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))

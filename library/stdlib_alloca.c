@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.3 2004-12-24 18:31:38 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.4 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,7 +90,7 @@ __alloca_cleanup(const char * file,int line)
 
 		/* The assumption is that the stack grows downwards. If this function is
 		   called, we must get rid off all the allocations associated with stack
-		   pointers whose addresses are less than the current stack pointer.
+		   pointers whose addresses are smaller than the current stack pointer.
 		   Which so happen to be stored near the end of the list. The further
 		   we move up from the end to the top of the list, the closer we get
 		   to the allocations made in the context of a stack frame near to
@@ -104,7 +104,7 @@ __alloca_cleanup(const char * file,int line)
 			Remove((struct Node *)mcn);
 
 			__force_free(mcn->mcn_Memory,file,line);
-			__force_free(mcn,file,line);
+			__free(mcn,file,line);
 		}
 	}
 }
@@ -151,7 +151,7 @@ __alloca(size_t size,const char * file,int line)
 	{
 		SHOWMSG("not enough memory");
 
-		__force_free(mcn,file,line);
+		__free(mcn,file,line);
 		goto out;
 	}
 
@@ -170,10 +170,6 @@ __alloca(size_t size,const char * file,int line)
 
 /****************************************************************************/
 
-#if NOT defined(__MEM_DEBUG)
-
-/****************************************************************************/
-
 void *
 alloca(size_t size)
 {
@@ -183,7 +179,3 @@ alloca(size_t size)
 
 	return(result);
 }
-
-/****************************************************************************/
-
-#endif /* __MEM_DEBUG */

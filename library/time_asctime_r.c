@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime_r.c,v 1.1 2004-11-18 09:40:37 obarthel Exp $
+ * $Id: time_asctime_r.c,v 1.2 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,10 +44,9 @@
 /****************************************************************************/
 
 static void
-add_to_string(char * to,int to_size,const char * string,int * offset_ptr)
+add_to_string(char * to,size_t to_size,const char * string,size_t * offset_ptr)
 {
-	int offset;
-	int len;
+	size_t offset, len;
 
 	assert( to != NULL && to_size > 0 && string != NULL && offset_ptr != NULL );
 
@@ -81,7 +80,7 @@ __asctime_r(const struct tm *tm,char * buffer,size_t buffer_size)
 	char number[16];
 	char * result = NULL;
 	const char * b;
-	int offset = 0;
+	size_t offset = 0;
 
 	ENTER();
 

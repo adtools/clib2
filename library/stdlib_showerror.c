@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.3 2004-12-24 10:52:02 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.4 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,11 +89,11 @@ __show_error(const char * message)
 
 	#if defined(__amigaos4__)
 	{
-		IDOS = (struct DOSIFace *)GetInterface((struct Library *)DOSBase, "main", 1, 0);
+		IDOS = (struct DOSIFace *)GetInterface(DOSBase, "main", 1, 0);
 		if (IDOS == NULL)
 			goto out;
 
-		IIntuition = (struct IntuitionIFace *)GetInterface((struct Library *)IntuitionBase, "main", 1, 0);
+		IIntuition = (struct IntuitionIFace *)GetInterface(IntuitionBase, "main", 1, 0);
 		if (IIntuition == NULL)
 			goto out;
 	}

@@ -16,6 +16,17 @@
   normal versions. Let's see how well this works out in the GCC
   version. SAS/C does not seem to like it...
 
+- Changed the definition of alloca() for GCC, which now defaults 
+  to the built-in function.
+
+- Updated the stdio.h, stdlib.h, string.h and unistd.h header files
+  to declare function prototypes for the __MEM_DEBUG versions of the
+  library functions only if that preprocessor symbol is defined.
+
+- If a SIGINT signal is caught and processed by the default signal
+  handler, the localized "*** BREAK" string will be printed rather
+  than the built-in one.
+
 
 c.lib 1.184 (28.11.2004)
 

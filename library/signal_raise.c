@@ -1,5 +1,5 @@
 /*
- * $Id: signal_raise.c,v 1.1.1.1 2004-07-26 16:31:05 obarthel Exp $
+ * $Id: signal_raise.c,v 1.2 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,12 +68,16 @@ raise(int sig)
 
 		if(handler == SIG_DFL)
 		{
+			char break_string[80];
+
 			SHOWMSG("this is the default handler");
 
 			/* Don't trigger a recursion. */
 			__check_abort_enabled = FALSE;
 
-			__print_termination_message((sig == SIGINT) ? "*** BREAK\n" : __abnormal_program_termination);
+			Fault(ERROR_BREAK,NULL,break_string,(LONG)sizeof(break_string));
+
+			__print_termination_message((sig == SIGINT) ? break_string : NULL);
 
 			SHOWMSG("bye, bye...");
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_free.c,v 1.3 2004-12-24 18:31:38 obarthel Exp $
+ * $Id: stdlib_free.c,v 1.4 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -505,19 +505,11 @@ __free(void * ptr,const char * file,int line)
 
 /****************************************************************************/
 
-#if NOT defined(__MEM_DEBUG)
-
-/****************************************************************************/
-
 void
 free(void * ptr)
 {
 	__free(ptr,NULL,0);
 }
-
-/****************************************************************************/
-
-#endif /* __MEM_DEBUG */
 
 /****************************************************************************/
 
@@ -535,11 +527,7 @@ __memory_exit(void)
 			__program_name,__current_num_memory_chunks_allocated,__maximum_num_memory_chunks_allocated);
 
 		__check_memory_allocations(__FILE__,__LINE__);
-	}
-	#endif /* __MEM_DEBUG */
 
-	#if defined(__MEM_DEBUG)
-	{
 		__never_free = FALSE;
 
 		if(__memory_list.mlh_Head != NULL)
@@ -551,14 +539,14 @@ __memory_exit(void)
 				__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
 			}
 		}
+
+		#if defined(__USE_MEM_TREES)
+		{
+			__initialize_red_black_tree(&__memory_tree);
+		}
+		#endif /* __USE_MEM_TREES */
 	}
 	#endif /* __MEM_DEBUG */
-
-	#if defined(__USE_MEM_TREES) && defined(__MEM_DEBUG)
-	{
-		__initialize_red_black_tree(&__memory_tree);
-	}
-	#endif /* __USE_MEM_TREES && __MEM_DEBUG */
 
 	if(__memory_pool != NULL)
 	{

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.5 2004-11-14 11:06:27 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.6 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -127,7 +127,6 @@ CLIB_DESTRUCTOR(__socket_exit)
 int
 __socket_init(void)
 {
-	struct Process * this_process;
 	struct TagItem tags[5];
 	int result = ERROR;
 	LONG status;
@@ -201,15 +200,25 @@ __socket_init(void)
 	/* Check if this program was launched as a server by the Internet
 	 * superserver.
 	 */
-	this_process = (struct Process *)FindTask(NULL);
-	if(this_process->pr_CLI != ZERO && NOT __detach)
+	if(Cli() != NULL && NOT __detach)
 	{
 		struct DaemonMessage * dm;
 
 		/* The socket the superserver may have launched this program
 		 * with is attached to the exit data entry of the process.
 		 */
-		dm = (struct DaemonMessage *)this_process->pr_ExitData;
+		#if defined(__amigaos4__)
+		{
+			dm = (struct DaemonMessage *)GetExitData();
+		}
+		#else
+		{
+			struct Process * this_process = (struct Process *)FindTask(NULL);
+
+			dm = (struct DaemonMessage *)this_process->pr_ExitData;
+		}
+		#endif /* __amigaos4__ */
+
 		if(TypeOfMem(dm) != 0 && TypeOfMem(((char *)dm) + sizeof(*dm)-1) != 0)
 		{
 			int daemon_socket;

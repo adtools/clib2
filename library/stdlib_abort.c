@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_abort.c,v 1.1.1.1 2004-07-26 16:31:50 obarthel Exp $
+ * $Id: stdlib_abort.c,v 1.2 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@ abort(void)
 
 	__check_abort_enabled = FALSE;
 
-	__print_termination_message(__abnormal_program_termination);
+	__print_termination_message(NULL);
 
 	/* Note that we drop into the exit() function which
 	 * does not trigger the exit trap.

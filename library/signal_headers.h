@@ -1,5 +1,5 @@
 /*
- * $Id: signal_headers.h,v 1.3 2004-12-24 18:31:38 obarthel Exp $
+ * $Id: signal_headers.h,v 1.4 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,12 +76,7 @@ extern int NOCOMMON __signals_blocked;
 
 /****************************************************************************/
 
-extern BOOL NOCOMMON __termination_message_printed;
 extern BOOL NOCOMMON __termination_message_disabled;
-
-/****************************************************************************/
-
-extern const char NOCOMMON __abnormal_program_termination[];
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.14 2004-12-24 18:31:38 obarthel Exp $
+# $Id: smakefile,v 1.15 2004-12-26 10:28:56 obarthel Exp $
 #
 # :ts=8
 #
@@ -345,9 +345,7 @@ STDIO_OBJ = \
 	stdio_translateioerror.o \
 	stdio_ungetc.o \
 	stdio_vasprintf.o \
-	stdio_vasprintf_debug.o \
 	stdio_vasprintf_hook_entry.o \
-	stdio_vasprintf_hook_debug.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
 	stdio_vprintf.o \
@@ -360,10 +358,6 @@ STDLIB_OBJ = \
 	stdlib_abort.o \
 	stdlib_abs.o \
 	stdlib_alloca.o \
-	stdlib_alloca_debug.o \
-	stdlib_calloc_debug.o \
-	stdlib_free_debug.o \
-	stdlib_malloc_debug.o \
 	stdlib_assertion_failure.o \
 	stdlib_atexit.o \
 	stdlib_atof.o \
@@ -413,6 +407,7 @@ STDLIB_OBJ = \
 	stdlib_red_black.o \
 	stdlib_setenv.o \
 	stdlib_setjmp.o \
+	stdlib_set_process_window.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
 	stdlib_srand.o \
@@ -452,7 +447,6 @@ STRING_OBJ = \
 	string_strcpy.o \
 	string_strcspn.o \
 	string_strdup.o \
-	string_strdup_debug.o \
 	string_strerror.o \
 	string_strlcat.o \
 	string_strlcpy.o \
@@ -504,7 +498,6 @@ UNISTD_OBJ = \
 	unistd_fileno.o \
 	unistd_ftruncate.o \
 	unistd_getcwd.o \
-	unistd_getcwd_debug.o \
 	unistd_getopt.o \
 	unistd_getpid.o \
 	unistd_init_exit.o \
@@ -563,6 +556,16 @@ USERGROUP_OBJ = \
 
 UTIME_OBJ = \
 	utime_utime.o
+
+MEMDEBUG_OBJ = \
+	stdio_vasprintf_debug.o \
+	stdio_vasprintf_hook_debug.o \
+	stdlib_alloca_debug.o \
+	stdlib_calloc_debug.o \
+	stdlib_free_debug.o \
+	stdlib_malloc_debug.o \
+	string_strdup_debug.o \
+	unistd_getcwd_debug.o
 
 ##############################################################################
 

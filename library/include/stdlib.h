@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.3 2004-09-20 17:16:07 obarthel Exp $
+ * $Id: stdlib.h,v 1.4 2004-12-26 10:28:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -83,14 +83,12 @@ extern void *calloc(size_t num_elements,size_t element_size);
 extern void free(void *ptr);
 extern void *realloc(void *ptr,size_t size);
 
-/* This are the versions for use with memory debugging; do not call
-   them directly! */
+#ifdef __MEM_DEBUG
 extern void *__malloc(size_t size,const char *file,int line);
 extern void *__calloc(size_t num_elements,size_t element_size,const char *file,int line);
 extern void __free(void *ptr,const char *file,int line);
 extern void *__realloc(void *ptr,size_t size,const char *file,int line);
 
-#ifdef __MEM_DEBUG
 #define malloc(size) __malloc((size),__FILE__,__LINE__)
 #define calloc(num_elements,element_size) __calloc((num_elements),(element_size),__FILE__,__LINE__)
 #define free(ptr) __free((ptr),__FILE__,__LINE__)
@@ -157,15 +155,14 @@ extern unsigned long long strtoull(const char *str, char **ptr, int base);
 /****************************************************************************/
 
 #if defined(__GNUC__)
- #if defined(alloca)
-  #undef alloca
-  #define alloca(size) __builtin_alloca(size)
- #endif /* alloca */
+ #undef alloca
+ #define alloca(size) __builtin_alloca(size)
 #else
  extern void * alloca(size_t size);
- extern void * __alloca(size_t size,const char *file,int line);
 
  #ifdef __MEM_DEBUG
+  extern void * __alloca(size_t size,const char *file,int line);
+
   #define alloca(size) __alloca((size),__FILE__,__LINE__)
  #endif /* __MEM_DEBUG */
 #endif /* __GNUC__ */

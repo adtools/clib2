@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.18 2004-12-24 18:31:37 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.19 2004-12-26 10:28:56 obarthel Exp $
 #
 # :ts=8
 #
@@ -237,9 +237,7 @@ C_LIB = \
 	stdio_translateioerror.o \
 	stdio_ungetc.o \
 	stdio_vasprintf.o \
-	stdio_vasprintf_debug.o \
 	stdio_vasprintf_hook_entry.o \
-	stdio_vasprintf_hook_entry_debug.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
 	stdio_vprintf.o \
@@ -250,14 +248,12 @@ C_LIB = \
 	stdlib_abort.o \
 	stdlib_abs.o \
 	stdlib_alloca.o \
-	stdlib_alloca_debug.o \
 	stdlib_assertion_failure.o \
 	stdlib_atexit.o \
 	stdlib_atoi.o \
 	stdlib_atol.o \
 	stdlib_bsearch.o \
 	stdlib_calloc.o \
-	stdlib_calloc_debug.o \
 	stdlib_checkdetach.o \
 	stdlib_constructor.o \
 	stdlib_constructor_begin.o \
@@ -274,7 +270,6 @@ C_LIB = \
 	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
-	stdlib_free_debug.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
 	stdlib_getsp.o \
@@ -284,7 +279,6 @@ C_LIB = \
 	stdlib_ldiv.o \
 	stdlib_machine_test.o \
 	stdlib_malloc.o \
-	stdlib_malloc_debug.o \
 	stdlib_math.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
@@ -303,6 +297,7 @@ C_LIB = \
 	stdlib_red_black.o \
 	stdlib_setenv.o \
 	stdlib_setjmp.o \
+	stdlib_set_process_window.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
 	stdlib_socket.o \
@@ -348,7 +343,6 @@ C_LIB = \
 	string_strcpy.o \
 	string_strcspn.o \
 	string_strdup.o \
-	string_strdup_debug.o \
 	string_strerror.o \
 	string_strlcat.o \
 	string_strlcpy.o \
@@ -391,7 +385,6 @@ C_LIB = \
 	unistd_fileno.o \
 	unistd_ftruncate.o \
 	unistd_getcwd.o \
-	unistd_getcwd_debug.o \
 	unistd_getopt.o \
 	unistd_getpid.o \
 	unistd_init_exit.o \
@@ -446,7 +439,6 @@ UNIX_LIB = \
 	unistd_chdir_exit.o \
 	unistd_chown.o \
 	unistd_getcwd.o \
-	unistd_getcwd_debug.o \
 	unistd_lchown.o \
 	unistd_link.o \
 	unistd_readlink.o \
@@ -504,7 +496,6 @@ MATH_LIB = \
 	stdio_sprintf.o \
 	stdio_sscanf.o \
 	stdio_vasprintf.o \
-	stdio_vasprintf_debug.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
 	stdio_vprintf.o \
@@ -701,6 +692,17 @@ AMIGA_LIB = \
 	amiga_setsuperattrs.o \
 	amiga_timedelay.o \
 	amiga_waitbeam.o
+
+MEMDEBUG_LIB = \
+	stdio_vasprintf_debug.o \
+	stdio_vasprintf_debug.o \
+	stdio_vasprintf_hook_entry_debug.o \
+	stdlib_alloca_debug.o \
+	stdlib_calloc_debug.o \
+	stdlib_free_debug.o \
+	stdlib_malloc_debug.o \
+	string_strdup_debug.o \
+	unistd_getcwd_debug.o
 
 ##############################################################################
 

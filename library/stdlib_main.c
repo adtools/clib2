@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.7 2004-11-14 11:43:30 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.8 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -285,8 +285,9 @@ detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list
 /****************************************************************************/
 
 static ULONG
-get_stack_size(struct Task * tc)
+get_stack_size(void)
 {
+	struct Task * tc = FindTask(NULL);
 	ULONG upper,lower;
 	ULONG result;
 
@@ -307,9 +308,9 @@ _main(void)
 	struct Process * child_process = NULL;
 	struct WBStartup * startup_message;
 	struct Process * this_process;
+	APTR old_window_pointer = NULL;
 	int return_code = RETURN_FAIL;
 	ULONG current_stack_size;
-	APTR old_window_pointer;
 	int os_version;
 
 	SysBase = *(struct Library **)4;
@@ -336,11 +337,6 @@ _main(void)
 	{
 		startup_message = NULL;
 	}
-
-	old_window_pointer = this_process->pr_WindowPtr;
-
-	if(__disable_dos_requesters)
-		this_process->pr_WindowPtr = (APTR)-1;
 
 	__WBenchMsg = startup_message;
 
@@ -381,6 +377,19 @@ _main(void)
 	}
 	#endif /* __amigaos4__ */
 
+	if(__disable_dos_requesters)
+	{
+		/* Don't display any requesters. */
+		old_window_pointer = __set_process_window((APTR)-1);
+	}
+	else
+	{
+		/* Just remember the original pointer. */
+		old_window_pointer = __set_process_window(NULL);
+
+		__set_process_window(old_window_pointer);
+	}
+
 	/* If a callback was provided which can fill us in on which
 	   minimum stack size should be used, invoke it now and
 	   store its result in the global __stack_size variable. */
@@ -394,7 +403,7 @@ _main(void)
 	}
 
 	/* How much stack size was provided? */
-	current_stack_size = get_stack_size(&this_process->pr_Task);
+	current_stack_size = get_stack_size();
 
 	/* If this is a resident program, don't allow for the detach
 	   code to run. Same goes for launching the program from
@@ -550,7 +559,8 @@ _main(void)
 
  out:
 
-	this_process->pr_WindowPtr = old_window_pointer;
+	if(DOSBase != NULL)
+		__set_process_window(old_window_pointer);
 
 	if(child_process == NULL)
 	{

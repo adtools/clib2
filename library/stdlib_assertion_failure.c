@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_assertion_failure.c,v 1.1.1.1 2004-07-26 16:31:50 obarthel Exp $
+ * $Id: stdlib_assertion_failure.c,v 1.2 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,8 +64,7 @@ __assertion_failure(
 		BOOL use_stderr = FALSE;
 
 		/* Figure out if the assertion failure message can be printed
-		 * on the stderr stream.
-		 */
+		   on the stderr stream. */
 		if(__iob != NULL && NOT __no_standard_io)
 		{
 			struct iob * iob;
@@ -121,7 +120,7 @@ __assertion_failure(
 			{
 				if(IntuitionBase != NULL)
 				{
-					IIntuition = (struct IntuitionIFace *)GetInterface((struct Library *)IntuitionBase, "main", 1, 0);
+					IIntuition = (struct IntuitionIFace *)GetInterface(IntuitionBase, "main", 1, 0);
 					if(IIntuition == NULL)
 					{
 						CloseLibrary(IntuitionBase);
@@ -134,7 +133,6 @@ __assertion_failure(
 			if(IntuitionBase != NULL)
 			{
 				struct EasyStruct es;
-				ULONG args[3];
 
 				memset(&es,0,sizeof(es));
 
@@ -143,11 +141,7 @@ __assertion_failure(
 				es.es_TextFormat	= (STRPTR)"Assertion of expression\n'%s'\nfailed in file '%s', line %ld";
 				es.es_GadgetFormat	= (STRPTR)"Sorry";
 
-				args[0] = (ULONG)expression;
-				args[1] = (ULONG)file_name;
-				args[2] = (ULONG)line_number;
-
-				EasyRequestArgs(NULL,&es,NULL,args);
+				EasyRequest(NULL,&es,NULL,expression,file_name,line_number);
 
 				#if defined(__amigaos4__)
 				{

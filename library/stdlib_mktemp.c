@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_mktemp.c,v 1.3 2004-11-10 17:45:40 obarthel Exp $
+ * $Id: stdlib_mktemp.c,v 1.4 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -162,8 +162,6 @@ mktemp(char * name_template)
 
 	SHOWSTRING(name_template);
 
-	old_window_pointer = this_process->pr_WindowPtr;
-
 	/* Now check if the name we picked is unique. If not, make another name. */
 	while(TRUE)
 	{
@@ -193,7 +191,7 @@ mktemp(char * name_template)
 		#endif /* UNIX_PATH_SEMANTICS */
 
 		/* Turn off DOS error requesters. */
-		this_process->pr_WindowPtr = (APTR)-1;
+		old_window_pointer = __set_process_window((APTR)-1);
 
 		/* Does this object exist already? */
 		PROFILE_OFF();
@@ -201,7 +199,7 @@ mktemp(char * name_template)
 		PROFILE_ON();
 
 		/* Restore DOS requesters. */
-		this_process->pr_WindowPtr = old_window_pointer;
+		__set_process_window(old_window_pointer);
 
 		if(lock == ZERO)
 		{

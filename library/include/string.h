@@ -1,5 +1,5 @@
 /*
- * $Id: string.h,v 1.5 2004-11-17 19:07:26 obarthel Exp $
+ * $Id: string.h,v 1.6 2004-12-26 10:28:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,11 +106,9 @@ extern char * rindex(const char *s, int c);
 
 extern char * strdup(const char *s);
 
-/* This is the version for use with memory debugging; do not call
-   it directly! */
+#ifdef __MEM_DEBUG
 extern char * __strdup(const char *s,const char *file,int line);
 
-#ifdef __MEM_DEBUG
 #define strdup(s) __strdup((s),__FILE__,__LINE__)
 #endif /* __MEM_DEBUG */
 

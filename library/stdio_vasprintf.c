@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf.c,v 1.3 2004-12-24 18:31:38 obarthel Exp $
+ * $Id: stdio_vasprintf.c,v 1.4 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,10 +123,6 @@ __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg)
 
 /****************************************************************************/
 
-#if NOT defined(__MEM_DEBUG)
-
-/****************************************************************************/
-
 int
 vasprintf(char **ret,const char *format,va_list arg)
 {
@@ -136,7 +132,3 @@ vasprintf(char **ret,const char *format,va_list arg)
 
 	return(result);
 }
-
-/****************************************************************************/
-
-#endif /* __MEM_DEBUG */

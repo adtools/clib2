@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.3 2004-08-25 15:27:28 obarthel Exp $
+ * $Id: stdio.h,v 1.4 2004-12-26 10:28:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -328,11 +328,9 @@ extern FILE * popen(const char *command, const char *type);
 
 extern int vasprintf(char **ret,const char *format,va_list arg);
 
-/* This is the version for use with memory debugging; do not call
-   it directly! */
+#ifdef __MEM_DEBUG
 extern int __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg);
 
-#ifdef __MEM_DEBUG
 #define vasprintf(ret,format,arg) __vasprintf(__FILE__,__LINE__,(ret),(format),(arg))
 #endif /* __MEM_DEBUG */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_calloc.c,v 1.3 2004-12-26 10:28:56 obarthel Exp $
+ * $Id: stdlib_set_process_window.c,v 1.1 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,63 +31,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#undef calloc
-
-/****************************************************************************/
-
-__static void *
-__calloc(size_t num_elements,size_t element_size,const char * file,int line)
+APTR
+__set_process_window(APTR new_window_pointer)
 {
-	void * result = NULL;
+	APTR result;
 
-	#ifdef __MEM_DEBUG
+	#if defined(__amigaos4__)
 	{
-		/*__check_memory_allocations(file,line);*/
+		result = SetProcWindow(new_window_pointer);
 	}
-	#endif /* __MEM_DEBUG */
-
-	assert( (int)num_elements >= 0 && (int)element_size >= 0 );
-
-	if(num_elements > 0 && element_size > 0)
+	#else
 	{
-		size_t total_size;
+		struct Process * this_process = (struct Process *)FindTask(NULL);
 
-		total_size = num_elements * element_size;
+		result = this_process->pr_WindowPtr;
 
-		result = __malloc(total_size,file,line);
-		if(result != NULL)
-			memset(result,0,total_size);
-		else
-			SHOWMSG("memory allocation failure");
+		this_process->pr_WindowPtr = new_window_pointer;
 	}
-	else
-	{
-		SHOWMSG("zero length allocation");
-	}
-
-	return(result);
-}
-
-/****************************************************************************/
-
-void *
-calloc(size_t num_elements,size_t element_size)
-{
-	void * result;
-
-	result = __calloc(num_elements,element_size,NULL,0);
+	#endif /* __amigaos4__ */
 
 	return(result);
 }

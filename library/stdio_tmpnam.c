@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_tmpnam.c,v 1.1.1.1 2004-07-26 16:31:42 obarthel Exp $
+ * $Id: stdio_tmpnam.c,v 1.2 2004-12-26 10:28:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -35,6 +35,10 @@
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
 
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
+
 /****************************************************************************/
 
 char *
@@ -42,7 +46,6 @@ tmpnam(char *buf)
 {
 	static char local_buffer[L_tmpnam];
 	static unsigned short counter;
-	struct Process * this_process;
 	APTR old_window_pointer;
 	unsigned short c;
 	char * result = NULL; /* ZZZ compiler claims that this assignment is unnecessary. */
@@ -57,10 +60,6 @@ tmpnam(char *buf)
 	/* If no user-supplied buffer is available, use the local one. */
 	if(buf == NULL)
 		buf = local_buffer;
-
-	this_process = (struct Process *)FindTask(NULL);
-
-	old_window_pointer = this_process->pr_WindowPtr;
 
 	while(TRUE)
 	{
@@ -85,7 +84,7 @@ tmpnam(char *buf)
 		D(("checking if '%s' exists",buf));
 
 		/* Turn off DOS error requesters. */
-		this_process->pr_WindowPtr = (APTR)-1;
+		old_window_pointer = __set_process_window((APTR)-1);
 
 		/* Does this object exist already? */
 		PROFILE_OFF();
@@ -93,7 +92,7 @@ tmpnam(char *buf)
 		PROFILE_ON();
 
 		/* Restore DOS requesters. */
-		this_process->pr_WindowPtr = old_window_pointer;
+		__set_process_window(old_window_pointer);
 
 		if(lock == ZERO)
 		{
