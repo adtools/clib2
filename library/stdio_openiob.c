@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_openiob.c,v 1.2 2004-11-03 15:35:56 obarthel Exp $
+ * $Id: stdio_openiob.c,v 1.3 2004-11-03 15:39:04 obarthel Exp $
  *
  * :ts=4
  *
@@ -127,15 +127,6 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 		SET_FLAG(open_mode,O_RDWR);
 	}
 
-	/* Figure out the buffered file access mode by looking at the open mode. */
-	file_flags = 0;
-
-	if(FLAG_IS_SET(open_mode,O_RDONLY) || FLAG_IS_SET(open_mode,O_RDWR))
-		SET_FLAG(file_flags,IOBF_READ);
-
-	if(FLAG_IS_SET(open_mode,O_WRONLY) || FLAG_IS_SET(open_mode,O_RDWR))
-		SET_FLAG(file_flags,IOBF_WRITE);
-
 	SHOWMSG("allocating file buffer");
 
 	/* Allocate a little more memory than necessary. */
@@ -171,12 +162,21 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 			CLEAR_FLAG(fd->fd_Flags,FDF_APPEND);
 	}
 
+	/* Figure out the buffered file access mode by looking at the open mode. */
+	file_flags = IOBF_IN_USE | IOBF_NO_NUL;
+
+	if(FLAG_IS_SET(open_mode,O_RDONLY) || FLAG_IS_SET(open_mode,O_RDWR))
+		SET_FLAG(file_flags,IOBF_READ);
+
+	if(FLAG_IS_SET(open_mode,O_WRONLY) || FLAG_IS_SET(open_mode,O_RDWR))
+		SET_FLAG(file_flags,IOBF_WRITE);
+
 	__initialize_iob(file,(HOOKFUNC)__iob_hook_entry,
 		buffer,
 		aligned_buffer,BUFSIZ,
 		file_descriptor,
 		slot_number,
-		IOBF_IN_USE | file_flags | IOBF_NO_NUL);
+		file_flags);
 
 	buffer = NULL;
 
