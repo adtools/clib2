@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_machine_test.c,v 1.3 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: stdlib_machine_test.c,v 1.4 2005-03-07 16:56:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,6 +56,17 @@ __machine_test(void)
 		}
 	}
 	#endif /* M68020 */
+
+	#if defined(M68881_FLOATING_POINT_SUPPORT)
+	{
+		if(FLAG_IS_CLEAR(((struct ExecBase *)SysBase)->AttnFlags,AFF_68881))
+		{
+			__show_error("This program requires a floating point processor.");
+
+			goto out;
+		}
+	}
+	#endif /* M68881_FLOATING_POINT_SUPPORT */
 
 	result = OK;
 

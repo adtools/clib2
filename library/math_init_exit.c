@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.8 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.9 2005-03-07 16:56:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -93,17 +93,6 @@ __math_init(void)
 {
 	int result = ERROR;
 
-	#if defined(M68881_FLOATING_POINT_SUPPORT)
-	{
-		if(FLAG_IS_CLEAR(((struct ExecBase *)SysBase)->AttnFlags,AFF_68881))
-		{
-			__show_error("This program requires a floating point processor.");
-
-			goto out;
-		}
-	}
-	#endif /* M68881_FLOATING_POINT_SUPPORT */
-
 	#if defined(IEEE_FLOATING_POINT_SUPPORT)
 	{
 		char * failed_library = NULL;
@@ -128,8 +117,8 @@ __math_init(void)
 		{
 			char message[60];
 
-			strcpy(message,failed_library);
-			strcat(message," could not be opened.");
+			strlcpy(message,failed_library,sizeof(message));
+			strlcat(message," could not be opened.",sizeof(message));
 
 			__show_error(message);
 

@@ -30,6 +30,9 @@
   on plain 68000 machines. This won't work for the 32 bit small
   data model, which implies 68020 code, but so there...
 
+- Moved the CPU/FPU type tests into the respective linker
+  libraries.
+
 
 c.lib 1.189 (5.3.2005)
 

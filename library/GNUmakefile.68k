@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.36 2005-03-07 14:04:08 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.37 2005-03-07 16:56:35 obarthel Exp $
 #
 # :ts=8
 #
@@ -77,18 +77,18 @@ $(LIBAMIGA_OBJS)/%.o : %.c
 ##############################################################################
 
 ifeq (small_data_020,$(TYPE))
-CODE_TYPE	:= -m68020-60 -fbaserel
-CODE_FLAGS	:= -DSMALL_DATA -DM68020
+CODE_TYPE	:= -m68020-60
+CODE_FLAGS	:= -fbaserel -DSMALL_DATA -DM68020
 endif
 
 ifeq (small_data,$(TYPE))
-CODE_TYPE	:= -m68000 -fbaserel
-CODE_FLAGS	:= -DSMALL_DATA
+CODE_TYPE	:= -m68000
+CODE_FLAGS	:= -fbaserel -DSMALL_DATA
 endif
 
 ifeq (small_data32,$(TYPE))
-CODE_TYPE	:= -m68020-60 -fbaserel32
-CODE_FLAGS	:= -DSMALL_DATA32 -DM68020
+CODE_TYPE	:= -m68020-60
+CODE_FLAGS	:= -fbaserel32 -DSMALL_DATA32 -DM68020
 endif
 
 ifeq (large_data_020,$(TYPE))
@@ -549,6 +549,7 @@ MATH_LIB = \
 
 MATH_LIB_881 = \
 	m881.lib_rev.o \
+	stdlib_machine_test.o \
 	$(MATH_LIB)
 
 MATH_LIB_IEEE = \
@@ -853,47 +854,47 @@ lib/libm020 : lib
 
 lib/libb/libm020/libm.a: lib lib/libb/libm020
 	$(MAKE) TYPE=small_data_020 kitchen_sink
-	$(COPY) $(foreach file,$(LIBS_020),small_data_020/$(file)) lib/libb/libm020
+	@$(COPY) $(foreach file,$(LIBS_020),small_data_020/$(file)) lib/libb/libm020
 
 lib/libb/libm.a: lib lib/libb
 	$(MAKE) TYPE=small_data kitchen_sink
-	$(COPY) $(foreach file,$(LIBS_68K),small_data/$(file)) lib/libb
+	@$(COPY) $(foreach file,$(LIBS_68K),small_data/$(file)) lib/libb
 
 lib/libb32/libm020/libm.a: lib lib/libb32 lib/libb32/libm020
 	$(MAKE) TYPE=small_data32 kitchen_sink
-	$(COPY) $(foreach file,$(LIBS_020),small_data32/$(file)) lib/libb32/libm020
+	@$(COPY) $(foreach file,$(LIBS_020),small_data32/$(file)) lib/libb32/libm020
 
 lib/libm020/libm.a: lib lib/libm020
 	$(MAKE) TYPE=large_data_020 kitchen_sink
-	$(COPY) $(foreach file,$(LIBS_020),large_data_020/$(file)) lib/libm020
+	@$(COPY) $(foreach file,$(LIBS_020),large_data_020/$(file)) lib/libm020
 
 lib/libm.a: lib
 	$(MAKE) TYPE=large_data kitchen_sink
-	$(COPY) $(foreach file,$(LIBS_68K),large_data/$(file)) lib
+	@$(COPY) $(foreach file,$(LIBS_68K),large_data/$(file)) lib
 
 lib/nrcrt0.o : lib nrcrt0.o
-	$(COPY) nrcrt0.o lib
+	@$(COPY) nrcrt0.o lib
 
 lib/nbcrt0.o : lib nbcrt0.o
-	$(COPY) nbcrt0.o lib
+	@$(COPY) nbcrt0.o lib
 
 lib/ncrt0.o : lib ncrt0.o
-	$(COPY) ncrt0.o lib
+	@$(COPY) ncrt0.o lib
 
 lib/n32bcrt0.o : lib nb32crt0.o
-	$(COPY) nb32crt0.o lib
+	@$(COPY) nb32crt0.o lib
 
 lib/n32rcrt0.o : lib nr32crt0.o
-	$(COPY) nr32crt0.o lib
+	@$(COPY) nr32crt0.o lib
 
 lib/mainnb.o : lib mainnb.o
-	$(COPY) mainnb.o lib
+	@$(COPY) mainnb.o lib
 
 lib/mainb.o : lib mainb.o
-	$(COPY) mainb.o lib
+	@$(COPY) mainb.o lib
 
 lib/mainb32.o : lib mainb32.o
-	$(COPY) mainb32.o lib
+	@$(COPY) mainb32.o lib
 
 ##############################################################################
 
@@ -947,17 +948,24 @@ $(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_mem_debug.h
 
 ##############################################################################
 
+# The -fbaserel32 option requires the CPU type to be 68010/68020, too.
+ifneq (,$(findstring fbaserel32,$(CODE_FLAGS)))
+LOCAL_CODE_FLAGS := $(CODE_FLAGS) $(CODE_TYPE)
+else
+LOCAL_CODE_FLAGS := $(CODE_FLAGS)
+endif
+
 $(LIBC_OBJS)/stdlib_machine_test.o : stdlib_machine_test.c
 	@echo "Compiling $< [$(TYPE):c]"
-	@$(CC) -o $(LIBC_OBJS)/stdlib_machine_test.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(INCLUDES) $<
+	@$(CC) -o $(LIBC_OBJS)/stdlib_machine_test.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) $(INCLUDES) $<
+
+$(LIBM881_OBJS)/stdlib_machine_test.o : stdlib_machine_test.c
+	@echo "Compiling $< [$(TYPE):c]"
+	@$(CC) -o $(LIBM881_OBJS)/stdlib_machine_test.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) $(INCLUDES) -DM68881_FLOATING_POINT_SUPPORT $<
 
 $(LIBC_OBJS)/stdlib_showerror.o : stdlib_showerror.c
 	@echo "Compiling $< [$(TYPE):c]"
-	@$(CC) -o $(LIBC_OBJS)/stdlib_showerror.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(INCLUDES) $<
-
-$(LIBM881_OBJS)/math_init_exit.o : math_init_exit.c
-	@echo "Compiling $< [$(TYPE):m881]"
-	@$(CC) -o $(LIBM881_OBJS)/math_init_exit.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(INCLUDES) -DM68881_FLOATING_POINT_SUPPORT $<
+	@$(CC) -o $(LIBC_OBJS)/stdlib_showerror.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(LOCAL_CODE_FLAGS) $(INCLUDES) $<
 
 ##############################################################################
 
