@@ -1,3 +1,8 @@
+- Rewrote the __translate_unix_to_amiga_path_name() function to
+  translate patterns such as "foo/bar/../../baz" properly, and to
+  use strlen() less.
+
+
 c.lib 1.188 (7.2.2005)
 
 - Folded duplicate code in "stdio_init_exit.c" into a common function.
