@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.4 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.5 2005-02-03 12:14:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,6 +81,13 @@ CLIB_DESTRUCTOR(__wildcard_expand_exit)
 	if(anchor != NULL)
 	{
 		MatchEnd(anchor);
+
+		#if defined(__amigaos4__)
+		{
+			FreeDosObject(DOS_ANCHORPATH,anchor);
+		}
+		#endif /* __amigaos4__ */
+
 		anchor = NULL;
 	}
 
@@ -136,22 +143,44 @@ __wildcard_expand_init(void)
 	argc = __argc;
 	argv = __argv;
 
-	/* We need some extra room in this data structure as the buffer
-	 * will be used to check if a string contains a pattern.
-	 */
-	ap = malloc(sizeof(*ap) + 2 * MAXPATHLEN);
-	if(ap == NULL)
+	#if defined(__amigaos4__)
 	{
-		error = ENOMEM;
-		goto out;
+		ap = AllocDosObjectTags(DOS_ANCHORPATH,
+			ADO_Strlen,	2 * MAXPATHLEN,
+			ADO_Mask,	(__check_abort_enabled) ? SIGBREAKF_CTRL_C : 0,
+		TAG_END);
+
+		if(ap == NULL)
+		{
+			error = ENOMEM;
+			goto out;
+		}
 	}
+	#else
+	{
+		/* We need some extra room in this data structure as the buffer
+		   will be used to check if a string contains a pattern. */
+		ap = malloc(sizeof(*ap) + 2 * MAXPATHLEN);
+		if(ap == NULL)
+		{
+			error = ENOMEM;
+			goto out;
+		}
 
-	/* This has to be long-word aligned. */
-	assert( (((ULONG)ap) & 3) == 0 );
+		/* This has to be long-word aligned. */
+		assert( (((ULONG)ap) & 3) == 0 );
 
+		memset(ap,0,sizeof(*ap));
+
+		ap->ap_Strlen = MAXPATHLEN;
+
+		if(__check_abort_enabled)
+			ap->ap_BreakBits = SIGBREAKF_CTRL_C;
+	}
+	#endif /* __amigaos4__ */
+
+	/* This may have to be cleaned up later. */
 	anchor = ap;
-
-	memset(ap,0,sizeof(*ap));
 
 	/* The argument list will go in here. */
 	NewList((struct List *)&argument_list);
@@ -169,13 +198,6 @@ __wildcard_expand_init(void)
 			BOOL is_first = TRUE;
 			LONG rc;
 
-			memset(ap,0,sizeof(*ap));
-
-			ap->ap_Strlen = MAXPATHLEN;
-
-			if(__check_abort_enabled)
-				ap->ap_BreakBits = SIGBREAKF_CTRL_C;
-
 			rc = MatchFirst(argv[i],ap);
 
 			while(TRUE)
@@ -190,13 +212,6 @@ __wildcard_expand_init(void)
 					if(is_first)
 					{
 						MatchEnd(ap);
-
-						memset(ap,0,sizeof(*ap));
-
-						ap->ap_Strlen = MAXPATHLEN;
-
-						if(__check_abort_enabled)
-							ap->ap_BreakBits = SIGBREAKF_CTRL_C;
 
 						rc = MatchFirst(argv[i],ap);
 					}
@@ -356,14 +371,22 @@ __wildcard_expand_init(void)
 
  out:
 
-	anchor = NULL;
-
 	if(ap != NULL)
 	{
 		MatchEnd(ap);
 
-		free(ap);
+		#if defined(__amigaos4__)
+		{
+			FreeDosObject(DOS_ANCHORPATH,anchor);
+		}
+		#else
+		{
+			free(ap);
+		}
+		#endif /* __amigaos4__ */
 	}
+
+	anchor = NULL;
 
 	if(error != OK)
 	{

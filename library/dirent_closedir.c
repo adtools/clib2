@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.4 2005-02-03 12:14:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,8 +94,12 @@ closedir(DIR * directory_pointer)
 
 	Remove((struct Node *)dh);
 
-	while((node = RemHead(&dh->dh_VolumeList)) != NULL)
-		free(node);
+	#if defined(UNIX_PATH_SEMANTICS)
+	{
+		while((node = RemHead((struct List *)&dh->dh_VolumeList)) != NULL)
+			free(node);
+	}
+	#endif /* UNIX_PATH_SEMANTICS */
 
 	PROFILE_OFF();
 	UnLock(dh->dh_DirLock);

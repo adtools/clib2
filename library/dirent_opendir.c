@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_opendir.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: dirent_opendir.c,v 1.4 2005-02-03 12:14:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -121,10 +121,10 @@ opendir(const char * path_name)
 
 	memset(dh,0,sizeof(*dh));
 
-	NewList(&dh->dh_VolumeList);
-
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
+		NewList((struct List *)&dh->dh_VolumeList);
+
 		if(__unix_path_semantics)
 		{
 			if(__translate_unix_to_amiga_path_name(&path_name,&path_name_nti) != 0)
@@ -172,7 +172,7 @@ opendir(const char * path_name)
 						/* Check if the name is already on the list. Mind you,
 						   this is not the most sophisticated algorithm but then
 						   the number of volumes should be small. */
-						if(find_by_name(&dh->dh_VolumeList,node->ln_Name) != NULL)
+						if(find_by_name((struct List *)&dh->dh_VolumeList,node->ln_Name) != NULL)
 						{
 							free(node);
 							continue;
@@ -180,14 +180,14 @@ opendir(const char * path_name)
 
 						D(("adding '%s'",node->ln_Name));
 
-						AddTail(&dh->dh_VolumeList,node);
+						AddTail((struct List *)&dh->dh_VolumeList,node);
 					}
 				}
 
 				UnLockDosList(LDF_VOLUMES|LDF_READ);
 
 				/* Bail out if we cannot present anything. */
-				if(IsListEmpty(&dh->dh_VolumeList))
+				if(IsListEmpty((struct List *)&dh->dh_VolumeList))
 				{
 					errno = ENOMEM;
 					goto out;
@@ -254,8 +254,12 @@ opendir(const char * path_name)
 	{
 		SHOWMSG("ouch. cleaning up");
 
-		while((node = RemHead(&dh->dh_VolumeList)) != NULL)
-			free(node);
+		#if defined(UNIX_PATH_SEMANTICS)
+		{
+			while((node = RemHead((struct List *)&dh->dh_VolumeList)) != NULL)
+				free(node);
+		}
+		#endif /* UNIX_PATH_SEMANTICS */
 
 		PROFILE_OFF();
 		UnLock(dh->dh_DirLock);

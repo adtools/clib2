@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.6 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.7 2005-02-03 12:14:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,7 +42,11 @@
 /****************************************************************************/
 
 /* This enables the legacy compatible 'struct AnchorPathOld'. */
+#ifndef __amigaos4__
 #define USE_OLD_ANCHORPATH
+#endif /* USE_OLD_ANCHORPATH */
+
+/****************************************************************************/
 
 #if (INCLUDE_VERSION >= 50)
 #include <dos/anchorpath.h>

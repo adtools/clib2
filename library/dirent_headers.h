@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_headers.h,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: dirent_headers.h,v 1.4 2005-02-03 12:14:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,9 +54,10 @@ struct DirectoryHandle
 	BPTR					dh_DirLock;
 	struct FileInfoBlock	dh_FileInfo;
 	struct dirent			dh_DirectoryEntry;
+
 	int						dh_Position;
 	struct Node *			dh_VolumeNode;
-	struct List				dh_VolumeList;
+	struct MinList			dh_VolumeList;
 	BOOL					dh_ScanVolumeList;
 };
 

@@ -14,6 +14,11 @@
   modified unless the library is built with the "CHECK_FOR_NULL_POINTERS"
   option.
 
+- We now allocate the AnchorPath used in the unistd_wildcard_expand.c
+  code. Also, the contents of the AnchorPath structure are no longer
+  modified between calls. MatchEnd() has to be sufficient.
+
+
 
 c.lib 1.187 (29.1.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_readdir.c,v 1.5 2005-01-09 15:58:02 obarthel Exp $
+ * $Id: dirent_readdir.c,v 1.6 2005-02-03 12:14:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -93,8 +93,8 @@ readdir(DIR * directory_pointer)
 
 				assert( (((ULONG)name) & 3) == 0 );
 
-				if(dh->dh_VolumeNode == NULL && NOT IsListEmpty(&dh->dh_VolumeList))
-					dh->dh_VolumeNode = dh->dh_VolumeList.lh_Head;
+				if(dh->dh_VolumeNode == NULL && NOT IsListEmpty((struct List *)&dh->dh_VolumeList))
+					dh->dh_VolumeNode = (struct Node *)dh->dh_VolumeList.mlh_Head;
 
 				strcpy(name,"\1:"); /* BSTR for ":" */
 
