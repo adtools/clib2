@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.19 2004-12-26 10:28:56 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.20 2005-01-10 00:56:15 theantony Exp $
 #
 # :ts=8
 #
@@ -15,7 +15,7 @@ NET_INCLUDE = netinclude
 CC = ppc-amigaos-gcc
 AR = ppc-amigaos-ar -q
 RANLIB = ppc-amigaos-ranlib
-COPY = cp
+COPY = cp -a
 DELETE = rm -r
 MAKEDIR = mkdir
 
