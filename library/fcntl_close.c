@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.5 2005-01-12 09:15:50 obarthel Exp $
+ * $Id: fcntl_close.c,v 1.6 2005-01-14 08:36:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,9 +45,12 @@ int
 __close(int file_descriptor,int * error_ptr)
 {
 	DECLARE_UTILITYBASE();
+
+	struct file_hook_message message;
 	struct fd * fd;
 	int result = -1;
 	BOOL no_close;
+	BOOL is_alias;
 
 	ENTER();
 
@@ -96,6 +99,7 @@ __close(int file_descriptor,int * error_ptr)
 		}
 
 		no_close = TRUE;
+		is_alias = TRUE;
 	}
 	else if (fd->fd_NextLink != NULL) /* this one has aliases attached; it is the 'original' resource */
 	{
@@ -117,19 +121,18 @@ __close(int file_descriptor,int * error_ptr)
 		}
 
 		no_close = TRUE;
+		is_alias = TRUE;
 	}
 	else
 	{
 		no_close = FLAG_IS_SET(fd->fd_Flags,FDF_NO_CLOSE);
+		is_alias = FALSE;
 	}
 
-	(*error_ptr) = OK;
-
-	if(NOT no_close)
+	/* Reset the console to regular buffered/unbuffered input. We don't do this
+	   for aliases and their like since the original stream is still in use. */
+	if(NOT is_alias)
 	{
-		struct file_hook_message message;
-
-		/* Reset the console to regular buffered/unbuffered input. */
 		if((FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_CLEAR(fd->fd_Flags,FDF_DEFAULT_NON_BLOCKING)) ||
 		   (FLAG_IS_CLEAR(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_SET(fd->fd_Flags,FDF_DEFAULT_NON_BLOCKING)))
 		{
@@ -142,7 +145,12 @@ __close(int file_descriptor,int * error_ptr)
 
 			CallHookPkt(fd->fd_Hook,fd,&message);
 		}
+	}
 
+	(*error_ptr) = OK;
+
+	if(NOT no_close && NOT is_alias)
+	{
 		SHOWMSG("shutting down");
 
 		message.action = file_hook_action_close;

@@ -51,6 +51,11 @@
 - Lost some more code that is not required for AmigaOS 4.x and can be
   handled conveniently through conditional compilation.
 
+- close() did not reset the non-blocking file property, as it should
+  have. This only worked for files which were closed anyway, but not
+  for the stdio streams. Fixed.
+
+
 
 c.lib 1.185 (2.1.2005)
 
