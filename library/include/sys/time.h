@@ -1,5 +1,5 @@
 /*
- * $Id: time.h,v 1.6 2004-09-10 07:39:20 obarthel Exp $
+ * $Id: time.h,v 1.7 2004-09-29 10:15:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,6 +76,9 @@ extern "C" {
 #ifndef DEVICES_TIMER_H
 #include <devices/timer.h>
 #endif /* DEVICES_TIMER_H */
+
+/* Assume that the 'struct timeval' definition is now in place. */
+#define __TIMEVAL_ALREADY_DEFINED
 
 /****************************************************************************/
 
