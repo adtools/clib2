@@ -1,3 +1,10 @@
+c.lib 1.167 (29.7.2004)
+
+- Modified __is_infinity() and __is_not_a_number() to use more portable
+  methods for accessing the low level representation of the IEEE 754
+  numbers they work on.
+
+
 c.lib 1.166 (28.7.2004)
 
 - Added h_strerror() function to libnet.a; there's a global 'h_errno'
