@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.3 2004-08-21 18:57:40 obarthel Exp $
+ * $Id: math_headers.h,v 1.4 2004-08-27 13:49:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -146,6 +146,33 @@ do {												\
   sl_u.value = (d);									\
   sl_u.parts.lsw = (v);								\
   (d) = sl_u.value;									\
+} while (0)
+
+/* A union which permits us to convert between a float and a 32 bit
+   int. */
+
+typedef union
+{
+  float value;
+  unsigned int word;
+} ieee_float_shape_type;
+
+/* Get a 32 bit int from a float.  */
+
+#define GET_FLOAT_WORD(i,d)		\
+do {							\
+  ieee_float_shape_type gf_u;	\
+  gf_u.value = (d);				\
+  (i) = gf_u.word;				\
+} while (0)
+
+/* Set a float from a 32 bit int.  */
+
+#define SET_FLOAT_WORD(d,i)		\
+do {							\
+  ieee_float_shape_type sf_u;	\
+  sf_u.word = (i);				\
+  (d) = sf_u.value;				\
 } while (0)
 
 extern double __kernel_cos(double x, double y);

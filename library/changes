@@ -5,6 +5,8 @@ c.lib 1.174 (27.8.2004)
 - Merged fdlibm 5.3 changes with __kernel_tan(), __exp() and __pow()
   functions.
 
+- Replaced the rint() and rintf() functions with the fdlibm code.
+
 
 c.lib 1.173 (25.8.2004)
 

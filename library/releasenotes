@@ -3,4 +3,5 @@ c.lib 1.174 (27.8.2004)
 - atan2() did not work correctly. Please rebuild any code that
   uses it.
 
-- tan(), exp() and pow() now should return more accurate results.
+- tan(), exp(), pow(), rint() and rintf() now should return more
+  accurate results.
