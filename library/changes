@@ -18,6 +18,13 @@
   no requester will appear unless you specifically set the value of the
   "__no_standard_io" variable to TRUE in your program.
 
+- Removed a misplaced IsInteractive() from the stdio initialization
+  function. Now this could have been big trouble...
+
+- Removed tests for FileHandle->fh_Type != NULL which used to precede
+  all IsInterative() tests. I verified that IsInteractive() will always
+  return FALSE for NIL: type file handles.
+
 
 c.lib 1.185 (2.1.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.4 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.5 2005-01-09 09:54:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,7 +67,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 	struct FileHandle * file_handle;
 	BPTR handle = ZERO;
 	BOOL create_new_file = FALSE;
-	LONG is_interactive = FALSE;
+	LONG is_interactive;
 	int fd_slot_number;
 	struct fd * fd;
 	int access_mode;
@@ -344,10 +344,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 	/* Figure out if this stream is attached to a console. */
 	PROFILE_OFF();
-
-	if(file_handle->fh_Type != NULL)
-		is_interactive = IsInteractive(handle);
-
+	is_interactive = IsInteractive(handle);
 	PROFILE_ON();
 
 	if(is_interactive)
