@@ -104,6 +104,11 @@
 - Creation and initialization of semaphores now uses the AmigaOS4
   specific functions for this purpose, if available.
 
+- In the thread-safe variant, the library now tries to allow
+  multiple concurrent callers to use the socket functions. Note
+  that this works only with the Roadshow TCP/IP stack, and the
+  results with other TCP/IP stacks are rather unpredictable.
+
 
 c.lib 1.188 (7.2.2005)
 

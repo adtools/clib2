@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.11 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.12 2005-03-04 20:08:19 obarthel Exp $
  *
  * :ts=4
  *
@@ -196,6 +196,29 @@ __socket_init(void)
 		__show_error("\"bsdsocket.library\" could not be initialized.");
 		goto out;
 	}
+
+	/* If this library is built with the Roadshow SDK header files, and
+	 * it should be thread-safe, then we'll try to allow multiple
+	 * concurred processes to share the bsdsocket.library base opened
+	 * above. This only works for Roadshow, though, and has the
+	 * drawback that error reporting through 'errno' and 'h_errno'
+	 * is no longer safe.
+	 */
+	#if defined(__THREAD_SAFE) && defined(SBTC_CAN_SHARE_LIBRARY_BASES)
+	{
+		if(SocketBase->lib_Version >= 4)
+		{
+			tags[0].ti_Tag	= SBTM_SETVAL(SBTC_CAN_SHARE_LIBRARY_BASES);
+			tags[0].ti_Data	= TRUE;
+
+			tags[1].ti_Tag	= TAG_END;
+
+			PROFILE_OFF();
+			__SocketBaseTagList(tags);
+			PROFILE_ON();
+		}
+	}
+	#endif /* __THREAD_SAFE && SBTC_CAN_SHARE_LIBRARY_BASES */
 
 	/* Check if this program was launched as a server by the Internet
 	 * superserver.
