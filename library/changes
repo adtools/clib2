@@ -31,7 +31,10 @@
 - References to the HUGE_VAL quantity now involve an accessor function, too.
 
 - Changed the manner in which the __huge_val constant is initialized by
-  the __math_init() function.
+  the __math_init() function. The new approach should be more portable.
+
+- The library no longer sends ACTION_DISK_INFO packets to the console
+  handler. The side-effects were too varied and irritating after all.
 
 
 c.lib 1.187 (29.1.2005)

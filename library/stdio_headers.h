@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.10 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.11 2005-02-04 08:49:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -268,8 +268,6 @@ struct iob
 											   mode (sockets only). */
 #define FDF_IS_INTERACTIVE		(1UL<<11)	/* File is attached to a console window or
 											   something like it. */
-#define FDF_DEFAULT_NON_BLOCKING (1UL<<12)	/* This file defaults to non-blocking I/O
-											   mode. */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.7 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: fcntl_close.c,v 1.8 2005-02-04 08:49:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -133,13 +133,12 @@ __close(int file_descriptor,int * error_ptr)
 	   for aliases and their like since the original stream is still in use. */
 	if(NOT is_alias)
 	{
-		if((FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_CLEAR(fd->fd_Flags,FDF_DEFAULT_NON_BLOCKING)) ||
-		   (FLAG_IS_CLEAR(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_SET(fd->fd_Flags,FDF_DEFAULT_NON_BLOCKING)))
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING))
 		{
 			SHOWMSG("resetting non-blocking access mode");
 
 			message.action	= file_hook_action_set_blocking;
-			message.arg		= FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING);
+			message.arg		= TRUE;
 
 			assert( fd->fd_Hook != NULL );
 

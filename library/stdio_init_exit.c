@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.15 2005-01-30 09:37:59 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.16 2005-02-04 08:49:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,28 +106,6 @@ CLIB_DESTRUCTOR(__stdio_exit)
 
 /****************************************************************************/
 
-static LONG
-get_console_mode(BPTR console_fh)
-{
-	struct FileHandle * fh;
-	LONG result = 0;
-
-	assert( console_fh != ZERO );
-
-	fh = BADDR(console_fh);
-	if(fh->fh_Type != NULL) /* Check if this is really bound to "NIL:". */
-	{
-		D_S(struct InfoData,id);
-
-		if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
-			result = id->id_DiskType;
-	}
-
-	return(result);
-}
-
-/****************************************************************************/
-
 int
 __stdio_init(void)
 {
@@ -215,22 +193,7 @@ __stdio_init(void)
 			PROFILE_OFF();
 
 			if(IsInteractive(default_file))
-			{
 				SET_FLAG(fd_flags,FDF_IS_INTERACTIVE);
-
-				/* Try to figure out if the console is in single
-				   character mode. We don't do that if we opened the
-				   output console window since this will prevent it
-				   from closing, or end up making it visible. */
-				if(__WBenchMsg == NULL)
-				{
-					if(get_console_mode(default_file) == ID_RAWCON)
-					{
-						SET_FLAG(fd_flags,FDF_NON_BLOCKING);
-						SET_FLAG(fd_flags,FDF_DEFAULT_NON_BLOCKING);
-					}
-				}
-			}
 
 			PROFILE_ON();
 		}
@@ -296,22 +259,7 @@ __stdio_init(void)
 	if(__fd[STDERR_FILENO]->fd_DefaultFile != ZERO)
 	{
 		if(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
-		{
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
-
-			/* Careful: the console handler may open an AUTO console window
-			            which so far was hidden when the ACTION_DISK_INFO
-			            packet is sent. We don't want that to happen if we
-			            can avoid it. */
-			if(__WBenchMsg == NULL)
-			{
-				if(get_console_mode(__fd[STDERR_FILENO]->fd_DefaultFile) == ID_RAWCON)
-				{
-					SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NON_BLOCKING);
-					SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_DEFAULT_NON_BLOCKING);
-				}
-			}
-		}
 	}
 
 	PROFILE_ON();
