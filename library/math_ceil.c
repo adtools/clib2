@@ -1,5 +1,5 @@
 /*
- * $Id: math_ceil.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_ceil.c,v 1.3 2005-01-26 09:24:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -150,7 +150,6 @@ __ceil(double x)
 
 #if defined(PPC_FLOATING_POINT_SUPPORT)
 
-
 static const double huge = 1.0e300;
 
 INLINE static const double
@@ -233,6 +232,7 @@ __ceil(double x)
 }
 	
 #endif /* PPC_FLOATING_POINT_SUPPORT */
+
 /****************************************************************************/
 
 double

@@ -1,5 +1,5 @@
 /*
- * $Id: math_cos.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_cos.c,v 1.3 2005-01-26 09:24:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -172,6 +172,7 @@ __cos(double x)
 	    }
 	}
 }
+
 #endif /* PPC_FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
