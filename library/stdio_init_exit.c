@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.6 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.7 2005-01-08 10:21:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -261,15 +261,6 @@ __stdio_init(void)
 
 		if(fh->fh_Type != NULL && IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
-	}
-
-	/* Check if the standard/error output refers to a console or must
-	   be considered unusable for console output. */
-	if(FLAG_IS_CLEAR(__fd[STDOUT_FILENO]->fd_Flags,FDF_IS_INTERACTIVE) ||
-	   FLAG_IS_CLEAR(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE))
-	{
-		/* The standard I/O streams are no longer attached to a console. */
-		__no_standard_io = TRUE;
 	}
 
 	PROFILE_ON();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.5 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.6 2005-01-08 10:21:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,6 +78,8 @@ __show_error(const char * message)
 
 	struct Library * IntuitionBase;
 	struct Library * DOSBase;
+	struct FileHandle * fh;
+	BPTR output;
 
 	PROFILE_OFF();
 
@@ -96,10 +98,23 @@ __show_error(const char * message)
 		IIntuition = (struct IntuitionIFace *)GetInterface(IntuitionBase, "main", 1, 0);
 		if (IIntuition == NULL)
 			goto out;
+
+		/* Try to print the error message on the default error output stream. */
+		output = ErrorOutput();
+		if(output == ZERO)
+			output = Output();
+	}
+	#else
+	{
+		output = Output();
 	}
 	#endif /* __amigaos4__ */
 
-	if(__detach || __no_standard_io || __WBenchMsg != NULL)
+	/* This is for checking if the stream was redirected to "NIL:". */
+	fh = BADDR(output);
+
+	/* If we can't hope to print the error message, show a requester instead. */
+	if(__detach || __no_standard_io || __WBenchMsg != NULL || fh == NULL || fh->fh_Type == NULL)
 	{
 		if(IntuitionBase->lib_Version >= 37)
 		{
@@ -149,10 +164,6 @@ __show_error(const char * message)
 	}
 	else
 	{
-		BPTR output;
-
-		output = Output();
-
 		Write(output,(STRPTR)message,(LONG)strlen(message));
 		Write(output,"\n",1);
 	}

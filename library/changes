@@ -1,3 +1,15 @@
+- Redirecting stderr to a file no longer has the effect of showing error
+  messages and assertion failure notifications as requesters. The exception
+  is in redirecting stderr to NIL: which will prompt the requester use.
+
+- gettimeofday() now calls GetSysTime() rather than DateStamp() to obtain
+  the current system time. This resolves granularity issues since the
+  DateStamp() result was only accurate by 1/50 of a second.
+
+- The "ptrdiff_t" definition in <stddef.h> now defaults to type 'int' rather
+  than 'long int'.
+
+
 c.lib 1.185 (2.1.2005)
 
 - Moved the environment variable cleanup code into a destructor function.

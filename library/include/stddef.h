@@ -1,5 +1,5 @@
 /*
- * $Id: stddef.h,v 1.2 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: stddef.h,v 1.3 2005-01-08 10:21:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@ extern "C" {
 
 /****************************************************************************/
 
-typedef long int ptrdiff_t;
+typedef int ptrdiff_t;
 typedef unsigned int size_t;
 typedef unsigned int wchar_t;
 

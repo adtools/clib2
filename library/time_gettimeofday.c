@@ -1,5 +1,5 @@
 /*
- * $Id: time_gettimeofday.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_gettimeofday.c,v 1.4 2005-01-08 10:21:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,9 +39,17 @@
 #include "locale_headers.h"
 #endif /* _LOCALE_HEADERS_H */
 
+#ifndef _UNISTD_HEADERS_H
+#include "unistd_headers.h"
+#endif /* _UNISTD_HEADERS_H */
+
 /****************************************************************************/
 
 #include <sys/time.h>
+
+/****************************************************************************/
+
+#include <proto/timer.h>
 
 /****************************************************************************/
 
@@ -52,17 +60,20 @@
 int
 gettimeofday(struct timeval *tp, struct timezone *tzp)
 {
+	struct Library * TimerBase = __TimerBase;
+	#if defined(__amigaos4__)
+	struct TimerIFace * ITimer = __ITimer;
+	#endif /* __amigaos4__ */
+
 	ULONG seconds,microseconds;
-	struct DateStamp ds;
+	struct timeval tv;
 
 	ENTER();
 
-	PROFILE_OFF();
-	DateStamp(&ds);
-	PROFILE_ON();
+	GetSysTime(&tv);
 
-	seconds			= UNIX_TIME_OFFSET + 60 * ((ULONG)ds.ds_Minute + 24 * 60 * (ULONG)ds.ds_Days) + (ds.ds_Tick / TICKS_PER_SECOND);
-	microseconds	= (1000000 * (ds.ds_Tick % TICKS_PER_SECOND)) / TICKS_PER_SECOND;
+	seconds			= tv.tv_sec + UNIX_TIME_OFFSET;
+	microseconds	= tv.tv_usec;
 
 	if(__default_locale != NULL)
 		seconds += 60 * __default_locale->loc_GMTOffset;
