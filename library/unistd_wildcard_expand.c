@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.8 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.9 2005-02-26 09:05:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -118,7 +118,7 @@ compare(const char **a,const char **b)
 
 	assert( UtilityBase != NULL );
 
-	return(Stricmp((STRPTR)*a,(STRPTR)*b));
+	return(Stricmp((STRPTR)(*a),(STRPTR)(*b)));
 }
 
 /****************************************************************************/
@@ -203,8 +203,7 @@ __wildcard_expand_init(void)
 		match_made = FALSE;
 
 		/* Does this string contain a wildcard pattern? We also check if the
-		 * string is quoted. Quoted strings are never expanded.
-		 */
+		   string is quoted. Quoted strings are never expanded. */
 		if(i > 0 && (__quote_vector[i / 8] & (1 << (7 - (i & 7)))) == 0 && ParsePatternNoCase(argv[i],ap->ap_Buf,2 * MAXPATHLEN) > 0)
 		{
 			BOOL is_first = TRUE;
@@ -217,8 +216,12 @@ __wildcard_expand_init(void)
 				/* Got a break signal? */
 				if(rc == ERROR_BREAK)
 				{
+					__set_process_window(old_window_pointer);
+
 					SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
 					__check_abort();
+
+					old_window_pointer = __set_process_window((APTR)-1);
 
 					/* If we ever arrive here, retry the previous match. */
 					if(is_first)
@@ -321,17 +324,15 @@ __wildcard_expand_init(void)
 			if(node->nn_wild)
 			{
 				/* Remember where we found the last parameter that was
-				 * added due to pattern matching.
-				 */
+				   added due to pattern matching. */
 				if(last_wild == 0)
 					last_wild = position;
 			}
 			else
 			{
 				/* This is not a parameter which was added due to pattern
-				 * matching. But if we added one before, we will want to
-				 * sort all these parameters alphabetically.
-				 */
+				   matching. But if we added one before, we will want to
+				   sort all these parameters alphabetically. */
 				if(last_wild != 0)
 				{
 					size_t num_elements;
@@ -383,6 +384,8 @@ __wildcard_expand_init(void)
 
  out:
 
+	__set_process_window(old_window_pointer);
+
 	if(ap != NULL)
 	{
 		MatchEnd(ap);
@@ -410,8 +413,6 @@ __wildcard_expand_init(void)
 
 	free(__quote_vector);
 	__quote_vector = NULL;
-
-	__set_process_window(old_window_pointer);
 
 	PROFILE_ON();
 
