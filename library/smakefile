@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.12 2004-11-18 09:40:37 obarthel Exp $
+# $Id: smakefile,v 1.13 2004-12-24 11:46:12 obarthel Exp $
 #
 # :ts=8
 #
@@ -357,6 +357,7 @@ STDIO_OBJ = \
 STDLIB_OBJ = \
 	stdlib_abort.o \
 	stdlib_abs.o \
+	stdlib_alloca.o \
 	stdlib_assertion_failure.o \
 	stdlib_atexit.o \
 	stdlib_atof.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.2 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.3 2004-12-24 11:46:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -100,7 +100,7 @@ extern int __swap_stack_and_call(struct StackSwapStruct * stk,APTR function);
 /****************************************************************************/
 
 /* stdlib_get_sp.c/stdlib_get_sp.s/stdlib_get_sp.asm */
-extern unsigned long __get_sp(void);
+extern void * __get_sp(void);
 
 /****************************************************************************/
 
@@ -138,11 +138,13 @@ extern int	__startup_init(void);
 /****************************************************************************/
 
 /* stdlib_malloc.c */
+extern void __memory_init(void);
 extern size_t __get_allocation_size(size_t size);
 extern void * __allocate_memory(size_t size,BOOL never_free,const char * file,int line);
 extern void * __malloc(size_t size,const char * file,int line);
 
 /* stdlib_free.c */
+extern void __memory_exit(void);
 extern struct MemoryNode * __find_memory_node(void * address);
 extern void __force_free(void * ptr,const char * file,int line);
 extern void __check_memory_allocations(const char * file,int line);

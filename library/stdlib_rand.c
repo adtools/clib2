@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_rand.c,v 1.1.1.1 2004-07-26 16:32:02 obarthel Exp $
+ * $Id: stdlib_rand.c,v 1.2 2004-12-24 11:46:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,6 +45,11 @@
 #define AA 48271		/* this does well in the spectral test */
 #define QQ 44488		/* (long)(MM/AA) */
 #define RR 3399			/* MM % AA; it is important that RR < QQ */
+
+/****************************************************************************/
+
+/* NOTE: for Knuth's algorithm below the seed must not be zero. */
+unsigned __random_seed = 1;
 
 /****************************************************************************/
 

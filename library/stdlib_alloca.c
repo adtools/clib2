@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.1.1.1 2004-07-26 16:31:50 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.2 2004-12-24 11:46:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,34 +52,55 @@ extern void * alloca(size_t size);
 struct MemoryContextNode
 {
 	struct MinNode	mcn_MinNode;
-	ULONG			mcn_StackPointer;
-	char *			mcn_Memory;
+	void *			mcn_StackPointer;
+	void *			mcn_Memory;
 };
 
 /****************************************************************************/
 
-extern unsigned long __get_sp(void);
+static struct MinList alloca_memory_list;
+
+/****************************************************************************/
+
+CLIB_DESTRUCTOR(__alloca_exit)
+{
+	ENTER();
+
+	/* Clean this up, too, just to be safe. */
+	NewList((struct List *)&alloca_memory_list);
+
+	LEAVE();
+}
 
 /****************************************************************************/
 
 void
 __alloca_cleanup(const char * file,int line)
 {
-	ULONG stack_pointer = __get_sp();
-	struct MemoryContextNode * mcn_next;
-	struct MemoryContextNode * mcn;
+	/* Initialize this if it hasn't been taken care of yet. */
+	if(alloca_memory_list.mlh_Head == NULL)
+		NewList((struct List *)&alloca_memory_list);
 
-	/* ZZZ this could be done in a much smarter fashion by paying attention
-	 * to the fact that the 'mcn_StackPointer' members are sorted...
-	 */
-	for(mcn = (struct MemoryContextNode *)__alloca_memory_list.mlh_Head ;
-	    mcn->mcn_MinNode.mln_Succ != NULL ;
-	    mcn = mcn_next)
+	/* Is this worth cleaning up? */
+	if(NOT IsListEmpty((struct List *)&alloca_memory_list))
 	{
-		mcn_next = (struct MemoryContextNode *)mcn->mcn_MinNode.mln_Succ;
+		void * stack_pointer = __get_sp();
+		struct MemoryContextNode * mcn_prev;
+		struct MemoryContextNode * mcn;
 
-		if(mcn->mcn_StackPointer < stack_pointer)
+		/* The assumption is that the stack grows downwards. If this function is
+		   called, we must get rid off all the allocations associated with stack
+		   pointers whose addresses are less than the current stack pointer.
+		   Which so happen to be stored near the end of the list. The further
+		   we move up from the end to the top of the list, the closer we get
+		   to the allocations made in the context of a stack frame near to
+		   where were currently are. */
+		for(mcn = (struct MemoryContextNode *)alloca_memory_list.mlh_TailPred ;
+		    mcn->mcn_MinNode.mln_Pred != NULL && mcn->mcn_StackPointer < stack_pointer ;
+		    mcn = mcn_prev)
 		{
+			mcn_prev = (struct MemoryContextNode *)mcn->mcn_MinNode.mln_Pred;
+
 			Remove((struct Node *)mcn);
 
 			__force_free(mcn->mcn_Memory,file,line);
@@ -93,7 +114,7 @@ __alloca_cleanup(const char * file,int line)
 void *
 __alloca(size_t size,const char * file,int line)
 {
-	ULONG stack_pointer = __get_sp();
+	void * stack_pointer = __get_sp();
 	struct MemoryContextNode * mcn;
 	void * result = NULL;
 
@@ -124,9 +145,7 @@ __alloca(size_t size,const char * file,int line)
 		goto out;
 	}
 
-	/* Allocate memory which cannot be run through realloc()
-	 * or free().
-	 */
+	/* Allocate memory which cannot be run through realloc() or free(). */
 	mcn->mcn_Memory = __allocate_memory(size,TRUE,file,line);
 	if(mcn->mcn_Memory == NULL)
 	{
@@ -138,7 +157,9 @@ __alloca(size_t size,const char * file,int line)
 
 	mcn->mcn_StackPointer = stack_pointer;
 
-	AddTail((struct List *)&__alloca_memory_list,(struct Node *)mcn);
+	assert( alloca_memory_list.mlh_Head != NULL );
+
+	AddTail((struct List *)&alloca_memory_list,(struct Node *)mcn);
 
 	result = mcn->mcn_Memory;
 

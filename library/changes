@@ -5,6 +5,12 @@
 - The common error reporting function __show_error() could throw Enforcer
   hits if the program was not launched from Shell. Fixed.
 
+- Moved the memory initialization and cleanup functions into the
+  malloc/free code itself and updated the alloca code to do its
+  own data management.
+
+- Finally optimized the alloca() memory cleanup code.
+
 
 c.lib 1.184 (28.11.2004)
 

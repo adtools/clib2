@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.1.1.1 2004-07-26 16:31:59 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.2 2004-12-24 11:46:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,16 @@ unsigned long __current_memory_allocated;
 unsigned long __maximum_num_memory_chunks_allocated;
 unsigned long __current_num_memory_chunks_allocated;
 
+#if defined(__USE_MEM_TREES)
+struct MemoryTree __memory_tree;
+#endif /* __USE_MEM_TREES */
+
 #endif /* __MEM_DEBUG */
+
+/****************************************************************************/
+
+APTR			__memory_pool;
+struct MinList	__memory_list;
 
 /****************************************************************************/
 
@@ -203,8 +212,7 @@ __malloc(size_t size,const char * file,int line)
 	void * result = NULL;
 
 	/* Try to get rid of now unused memory. */
-	/*if(NOT IsListEmpty((struct List *)&__alloca_memory_list))
-		__alloca_cleanup(file,line);*/
+	/*__alloca_cleanup(file,line);*/
 
 	#ifdef __MEM_DEBUG
 	{
@@ -249,4 +257,25 @@ malloc(size_t size)
 	result = __malloc(size,NULL,0);
 
 	return(result);
+}
+
+/****************************************************************************/
+
+void
+__memory_init(void)
+{
+	ENTER();
+
+	#if defined(__USE_MEM_TREES) && defined(__MEM_DEBUG)
+	{
+		__initialize_red_black_tree(&__memory_tree);
+	}
+	#endif /* __USE_MEM_TREES && __MEM_DEBUG */
+
+	NewList((struct List *)&__memory_list);
+
+	if(((struct Library *)SysBase)->lib_Version >= 39)
+		__memory_pool = CreatePool(MEMF_ANY,(ULONG)__default_pool_size,(ULONG)__default_puddle_size);
+
+	LEAVE();
 }

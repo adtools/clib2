@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.3 2004-12-19 16:42:51 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.4 2004-12-24 11:46:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -156,10 +156,6 @@ extern unsigned NOCOMMON __random_seed;
 extern struct MemoryTree NOCOMMON	__memory_tree;
 extern struct MinList NOCOMMON		__memory_list;
 extern APTR NOCOMMON				__memory_pool;
-
-/****************************************************************************/
-
-extern struct MinList NOCOMMON __alloca_memory_list;
 
 /****************************************************************************/
 
