@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.6 2004-11-14 11:06:27 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.7 2004-11-14 11:43:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -413,11 +413,11 @@ _main(void)
 	   running in the shell or was launched from Workbench. */
 	if(DO_NOT __detach)
 	{
-		int old_priority = 256;
+		int old_priority = this_process->pr_Task.tc_Node.ln_Pri;
 
 		/* Change the task priority, if requested. */
 		if(-128 <= __priority && __priority <= 127)
-			old_priority = SetTaskPri((struct Task *)this_process,__priority);
+			SetTaskPri((struct Task *)this_process,__priority);
 
 		/* Was a minimum stack size requested and do we
 		   need more stack space than was provided for? */
@@ -463,9 +463,8 @@ _main(void)
 			return_code = call_main();
 		}
 
-		/* Restore the task priority, if necessary. */
-		if(-128 <= old_priority && old_priority <= 127)
-			SetTaskPri((struct Task *)this_process,old_priority);
+		/* Restore the task priority. */
+		SetTaskPri((struct Task *)this_process,old_priority);
 	}
 	else
 	{
@@ -496,9 +495,9 @@ _main(void)
 		tags[i].	ti_Tag	= NP_StackSize;
 		tags[i++].	ti_Data	= stack_size;
 		tags[i].	ti_Tag	= NP_Name;
-		tags[i++].	ti_Data	= (ULONG)(__process_name != NULL ? __process_name : program_name);
+		tags[i++].	ti_Data	= (ULONG)(__process_name != NULL ? (UBYTE *)__process_name : FilePart(program_name));
 		tags[i].	ti_Tag	= NP_CommandName;
-		tags[i++].	ti_Data	= (ULONG)program_name;
+		tags[i++].	ti_Data	= (ULONG)FilePart(program_name);
 		tags[i].	ti_Tag	= NP_Cli;
 		tags[i++].	ti_Data	= TRUE;
 		tags[i].	ti_Tag	= NP_Arguments;
