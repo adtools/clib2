@@ -1,5 +1,5 @@
 /*
- * $Id: ctype.h,v 1.2 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: ctype.h,v 1.3 2004-08-07 10:42:04 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,12 +63,6 @@ extern int toupper(int c);
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-#define isascii(c) ((unsigned)(c) <= 127)
-
-/****************************************************************************/
-
 /*
  * If requested, reimplement the character classification functions as macros;
  * note that the macro variants ignore the current locale and default to the
@@ -110,6 +104,12 @@ extern const unsigned char * const __ctype_table;
 /****************************************************************************/
 
 #endif /* __C_MACROS__ */
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard. */
+
+#define isascii(c) ((unsigned)(c) <= 127)
 
 /****************************************************************************/
 
