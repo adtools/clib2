@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.10 2004-10-02 15:56:12 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.11 2004-10-07 09:20:44 obarthel Exp $
 #
 # :ts=8
 #
@@ -53,7 +53,7 @@ endif
 
 %.o : %.c
 	@echo "Compiling $<"
-	@$(CC) -c $(CFLAGS) -DPPC_FLOATING_POINT_SUPPORT $<
+	@$(CC) -c $(CFLAGS) $<
 
 $(LIBC_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):c]"
@@ -65,7 +65,7 @@ $(LIBUNIX_OBJS)/%.o : %.c
 
 $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
-	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS)  $<
+	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) -DPPC_FLOATING_POINT_SUPPORT $<
 
 $(LIBSTACK_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):stack]"
@@ -86,11 +86,11 @@ $(LIBAMIGA_OBJS)/%.o : %.c
 ##############################################################################
 
 ifeq (small_data,$(TYPE))
-CODE_TYPE := -msdata=sysv -DSMALL_DATA -DPPC_FLOATING_POINT_SUPPORT
+CODE_TYPE := -msdata=sysv -DSMALL_DATA
 endif
 
 ifeq (large_data,$(TYPE))
-CODE_TYPE := -msdata=data -DPPC_FLOATING_POINT_SUPPORT
+CODE_TYPE := -msdata=data
 endif
 
 ifeq (large_data_softfloat, $(TYPE))
