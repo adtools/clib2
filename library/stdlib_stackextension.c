@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackextension.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_stackextension.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -356,9 +356,17 @@ pushframe(ULONG requiredstack, struct StackSwapStruct *sss)
 				D(("allocating %ld bytes for a stack frame",recommendedstack + sizeof(struct stackframe)));
 
 				if(__memory_pool != NULL)
+				{
+					__memory_lock();
+
 					sf = AllocPooled(__memory_pool,recommendedstack + sizeof(struct stackframe));
+
+					__memory_unlock();
+				}
 				else
+				{
 					sf = AllocMem(recommendedstack + sizeof(struct stackframe), MEMF_ANY);
+				}
 
 				if (sf != NULL)
 					break;
@@ -381,9 +389,17 @@ pushframe(ULONG requiredstack, struct StackSwapStruct *sss)
 			break;
 
 		if(__memory_pool != NULL)
+		{
+			__memory_lock();
+
 			FreePooled(__memory_pool, sf, (char *)sf->upper - (char *)sf);
+
+			__memory_unlock();
+		}
 		else
+		{
 			FreeMem(sf, (char *)sf->upper - (char *)sf);
+		}
 	}
 
 	/* Add stackframe to the used list */

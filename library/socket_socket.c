@@ -1,5 +1,5 @@
 /*
- * $Id: socket_socket.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: socket_socket.c,v 1.4 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,8 @@ socket(int domain,int type,int protocol)
 	SHOWVALUE(type);
 	SHOWVALUE(protocol);
 
+	__stdio_lock();
+
 	fd_slot_number = __find_vacant_fd_entry();
 	if(fd_slot_number < 0)
 	{
@@ -85,6 +87,8 @@ socket(int domain,int type,int protocol)
 	result = fd_slot_number;
 
  out:
+
+	__stdio_unlock();
 
 	if(__check_abort_enabled)
 		__check_abort();

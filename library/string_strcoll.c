@@ -1,5 +1,5 @@
 /*
- * $Id: string_strcoll.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: string_strcoll.c,v 1.4 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,8 @@ strcoll(const char *s1, const char *s2)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
+	__locale_lock();
+
 	if(__locale_table[LC_COLLATE] != NULL)
 	{
 		assert( LocaleBase != NULL );
@@ -75,6 +77,8 @@ strcoll(const char *s1, const char *s2)
 	{
 		result = strcmp(s1,s2);
 	}
+
+	__locale_unlock();
 
  out:
 

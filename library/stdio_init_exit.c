@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.18 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.19 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,6 +101,8 @@ CLIB_DESTRUCTOR(__stdio_exit)
 
 	__close_all_files();
 
+	__stdio_lock_exit();
+
 	LEAVE();
 }
 
@@ -120,6 +122,9 @@ __stdio_init(void)
 	int i;
 
 	ENTER();
+
+	if(__stdio_lock_init() < 0)
+		goto out;
 
 	__iob = malloc(sizeof(*__iob) * num_standard_files);
 	if(__iob == NULL)

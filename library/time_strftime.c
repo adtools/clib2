@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.8 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: time_strftime.c,v 1.9 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -318,6 +318,8 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 
 				store_string_via_hook("GMT",3,hook);
 
+				__locale_lock();
+
 				if(__default_locale != NULL)
 				{
 					int hours_west_of_gmt;
@@ -342,6 +344,8 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 						store_string_via_hook(buffer,-1,hook);
 					}
 				}
+
+				__locale_unlock();
 
 				break;
 
@@ -408,6 +412,8 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 
 		hook.h_Data = &data;
 
+		__locale_lock();
+
 		/* Try to use the locale.library date/time conversion function. */
 		if(__locale_table[LC_TIME] != NULL)
 		{
@@ -454,6 +460,8 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 
 			format_date(format,tm,&hook);
 		}
+
+		__locale_unlock();
 
 		(*data.buffer) = '\0';
 

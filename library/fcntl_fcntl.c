@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.10 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -214,16 +214,24 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				goto out;
 			}
 
+			__stdio_lock();
+
 			/* Check if we have that many fd's already */
 			while(fdbase >= __num_fd)
 			{
+				__stdio_unlock();
+
 				if(__check_abort_enabled)
 					__check_abort();
 
 				/* No; enlarge it */
 				if(__grow_fd_table() < 0)
 					goto out;
+
+				__stdio_lock();
 			}
+
+			__stdio_unlock();
 
 			vacant_slot = -1;
 
@@ -233,6 +241,8 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				if(__check_abort_enabled)
 					__check_abort();
 
+				__stdio_lock();
+
 				for(i = fdbase ; i < __num_fd ; i++)
 				{
 					if(FLAG_IS_CLEAR(__fd[i]->fd_Flags,FDF_IN_USE))
@@ -241,6 +251,8 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 						break;
 					}
 				}
+
+				__stdio_unlock();
 
 				/* Didn't really find any, grow the table further */
 				if(vacant_slot < 0 && __grow_fd_table() < 0)

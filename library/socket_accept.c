@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: socket_accept.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,8 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 	assert( cliaddr != NULL && addrlen != NULL );
 	assert(__SocketBase != NULL);
 
+	__stdio_lock();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(cliaddr == NULL || addrlen == NULL)
@@ -116,6 +118,8 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 	result = new_fd_slot_number;
 
  out:
+
+	__stdio_unlock();
 
 	if(__check_abort_enabled)
 		__check_abort();

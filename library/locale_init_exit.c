@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,10 @@
 
 /****************************************************************************/
 
+static struct SignalSemaphore * locale_lock;
+
+/****************************************************************************/
+
 struct Library * NOCOMMON __LocaleBase;
 
 /****************************************************************************/
@@ -63,6 +67,8 @@ char NOCOMMON __locale_name_table[NUM_LOCALES][MAX_LOCALE_NAME_LEN];
 void
 __close_all_locales(void)
 {
+	__locale_lock();
+
 	if(__LocaleBase != NULL)
 	{
 		DECLARE_LOCALEBASE();
@@ -86,8 +92,9 @@ __close_all_locales(void)
 		CloseLocale(__locale_table[LC_ALL]);
 		__locale_table[LC_ALL] = NULL;
 	}
-}
 
+	__locale_unlock();
+}
 
 /****************************************************************************/
 
@@ -95,6 +102,8 @@ void
 __locale_exit(void)
 {
 	ENTER();
+
+	__locale_lock();
 
 	if(__LocaleBase != NULL)
 	{
@@ -122,6 +131,8 @@ __locale_exit(void)
 		__LocaleBase = NULL;
 	}
 
+	__locale_unlock();
+
 	LEAVE();
 }
 
@@ -135,6 +146,8 @@ __locale_init(void)
 	ENTER();
 
 	PROFILE_OFF();
+
+	__locale_lock();
 
 	if(__LocaleBase == NULL)
 	{
@@ -165,10 +178,30 @@ __locale_init(void)
 	if(__default_locale != NULL)
 		result = 0;
 
+	__locale_unlock();
+
 	PROFILE_ON();
 
 	RETURN(result);
 	return(result);
+}
+
+/****************************************************************************/
+
+void
+__locale_lock(void)
+{
+	if(locale_lock != NULL)
+		ObtainSemaphore(locale_lock);
+}
+
+/****************************************************************************/
+
+void
+__locale_unlock(void)
+{
+	if(locale_lock != NULL)
+		ReleaseSemaphore(locale_lock);
 }
 
 /****************************************************************************/
@@ -179,6 +212,9 @@ CLIB_DESTRUCTOR(__locale_exit_destructor)
 
 	__locale_exit();
 
+	FreeVec(locale_lock);
+	locale_lock = NULL;
+
 	LEAVE();
 }
 
@@ -186,9 +222,16 @@ CLIB_DESTRUCTOR(__locale_exit_destructor)
 
 CLIB_CONSTRUCTOR(__locale_init_constructor)
 {
+	BOOL success = FALSE;
 	int i;
 
 	ENTER();
+
+	locale_lock = AllocVec(sizeof(*locale_lock),MEMF_ANY|MEMF_PUBLIC);
+	if(locale_lock == NULL)
+		goto out;
+
+	InitSemaphore(locale_lock);
 
 	for(i = 0 ; i < NUM_LOCALES ; i++)
 		strcpy(__locale_name_table[i],"C");
@@ -196,7 +239,14 @@ CLIB_CONSTRUCTOR(__locale_init_constructor)
 	if(__open_locale)
 		__locale_init();
 
-	RETURN(OK);
+	success = TRUE;
 
-	CONSTRUCTOR_SUCCEED();
+ out:
+
+	RETURN(success);
+
+	if(success)
+		CONSTRUCTOR_SUCCEED();
+	else
+		CONSTRUCTOR_FAIL();
 }

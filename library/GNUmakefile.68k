@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.30 2005-02-27 18:09:07 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.31 2005-02-27 21:58:20 obarthel Exp $
 #
 # :ts=8
 #
@@ -223,6 +223,7 @@ C_LIB = \
 	stdio_initializeiob.o \
 	stdio_init_exit.o \
 	stdio_iobhookentry.o \
+	stdio_lock.o \
 	stdio_locksemaphorename.o \
 	stdio_nostdio.o \
 	stdio_openiob.o \

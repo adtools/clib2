@@ -1,5 +1,5 @@
 /*
- * $Id: ctype_isspace.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: ctype_isspace.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,6 +47,8 @@ isspace(int c)
 	DECLARE_LOCALEBASE();
 	int result;
 
+	__locale_lock();
+
 	if(__locale_table[LC_CTYPE] != NULL)
 	{
 		assert( LocaleBase != NULL );
@@ -62,6 +64,8 @@ isspace(int c)
 		          c == '\f' ||
 		          c == ' ');
 	}
+
+	__locale_unlock();
 
 	return(result);
 }

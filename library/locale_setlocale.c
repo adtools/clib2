@@ -1,5 +1,5 @@
 /*
- * $Id: locale_setlocale.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: locale_setlocale.c,v 1.4 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,8 @@ setlocale(int category, const char *locale)
 		SHOWPOINTER(locale);
 	else
 		SHOWSTRING(locale);
+
+	__locale_lock();
 
 	if(category < LC_ALL || category > LC_TIME)
 	{
@@ -154,6 +156,8 @@ setlocale(int category, const char *locale)
 	SHOWSTRING(result);
 
  out:
+
+	__locale_unlock();
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: ctype_isgraph.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_lock.c,v 1.1 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,36 +31,66 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _CTYPE_HEADERS_H
-#include "ctype_headers.h"
-#endif /* _CTYPE_HEADERS_H */
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-#undef isgraph
+static struct SignalSemaphore * stdio_lock;
+
+/****************************************************************************/
+
+void
+__stdio_lock(void)
+{
+	assert( stdio_lock != NULL );
+
+	if(stdio_lock != NULL)
+		ObtainSemaphore(stdio_lock);
+}
+
+/****************************************************************************/
+
+void
+__stdio_unlock(void)
+{
+	assert( stdio_lock != NULL );
+
+	if(stdio_lock != NULL)
+		ReleaseSemaphore(stdio_lock);
+}
+
+/****************************************************************************/
+
+void
+__stdio_lock_exit(void)
+{
+	assert( stdio_lock == NULL || stdio_lock->ss_Owner == NULL );
+
+	if(stdio_lock != NULL)
+	{
+		FreeVec(stdio_lock);
+		stdio_lock = NULL;
+	}
+}
 
 /****************************************************************************/
 
 int
-isgraph(int c)
+__stdio_lock_init(void)
 {
-	DECLARE_LOCALEBASE();
-	int result;
+	int result = -1;
 
-	__locale_lock();
+	stdio_lock = AllocVec(sizeof(*stdio_lock),MEMF_ANY|MEMF_PUBLIC);
+	if(stdio_lock == NULL)
+		goto out;
 
-	if(__locale_table[LC_CTYPE] != NULL)
-	{
-		assert( LocaleBase != NULL );
+	InitSemaphore(stdio_lock);
 
-		result = IsGraph(__locale_table[LC_CTYPE],(ULONG)c);
-	}
-	else
-	{
-		result = (' ' < c && c < 127);
-	}
+	result = 0;
 
-	__locale_unlock();
+ out:
 
 	return(result);
 }

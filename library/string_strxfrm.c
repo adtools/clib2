@@ -1,5 +1,5 @@
 /*
- * $Id: string_strxfrm.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: string_strxfrm.c,v 1.4 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,6 +73,8 @@ strxfrm(char *dest, const char *src, size_t len)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
+	__locale_lock();
+
 	if(__locale_table[LC_COLLATE] != NULL)
 	{
 		assert( LocaleBase != NULL );
@@ -106,6 +108,8 @@ strxfrm(char *dest, const char *src, size_t len)
 			result = strlen(src);
 		}
 	}
+
+	__locale_unlock();
 
  out:
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.10 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.11 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -616,6 +616,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					c = __getc(stream);
 					if(c != EOF)
 					{
+						__locale_lock();
+
 						/* Did we find the decimal point? We accept both the
 						 * locale configured decimal point and the plain old
 						 * dot.
@@ -650,6 +652,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 								D(("'%lc' is not a decimal point",c));
 							}
 						}
+
+						__locale_unlock();
 
 						if(decimal_point_matches)
 						{

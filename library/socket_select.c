@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: socket_select.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -145,6 +145,8 @@ get_file_descriptor(int file_descriptor)
 	struct fd * result = NULL;
 	struct fd * fd;
 
+	__stdio_lock();
+
 	if(file_descriptor < 0 || file_descriptor >= __num_fd)
 		goto out;
 
@@ -160,6 +162,8 @@ get_file_descriptor(int file_descriptor)
 	result = fd;
 
  out:
+
+	__stdio_unlock();
 
 	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_init_exit.c,v 1.5 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_init_exit.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -88,7 +88,7 @@ CLIB_DESTRUCTOR(__usergroup_exit)
 CLIB_CONSTRUCTOR(__usergroup_init)
 {
 	struct TagItem tags[2];
-	int result = ERROR;
+	BOOL success = FALSE;
 
 	ENTER();
 
@@ -132,15 +132,15 @@ CLIB_CONSTRUCTOR(__usergroup_init)
 		goto out;
 	}
 
-	result = OK;
+	success = TRUE;
 
  out:
 
 	PROFILE_ON();
 
-	RETURN(result);
+	RETURN(success);
 
-	if(result == OK)
+	if(success)
 		CONSTRUCTOR_SUCCEED();
 	else
 		CONSTRUCTOR_FAIL();

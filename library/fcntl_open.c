@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.10 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.11 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -116,6 +116,8 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	__stdio_lock();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -448,6 +450,8 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 		Close(handle);
 
 	UnLock(lock);
+
+	__stdio_unlock();
 
 	PROFILE_ON();
 

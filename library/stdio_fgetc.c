@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgetc.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_fgetc.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,6 +57,9 @@ __fgetc(FILE *stream)
 
 	if(__iob_read_buffer_is_empty(file))
 	{
+		if(__check_abort_enabled)
+			__check_abort();
+
 		if(__fill_iob_read_buffer(file) < 0)
 			goto out;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fflush.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_fflush.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,10 @@ fflush(FILE *stream)
 		}
 		else
 		{
+			int failed_iob = -1;
 			int i;
+
+			__stdio_lock();
 
 			/* Flush all streams which still have unwritten data in the buffer. */
 			for(i = 0 ; i < __num_iob ; i++)
@@ -82,9 +85,17 @@ fflush(FILE *stream)
 				   __iob_write_buffer_is_valid(__iob[i]))
 				{
 					if(__flush_iob_write_buffer(__iob[i]) < 0)
-						goto out;
+					{
+						failed_iob = i;
+						break;
+					}
 				}
 			}
+
+			__stdio_unlock();
+
+			if(failed_iob >= 0)
+				goto out;
 		}
 	}
 	#else

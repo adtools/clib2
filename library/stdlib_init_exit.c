@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_init_exit.c,v 1.4 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_init_exit.c,v 1.5 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,10 +64,12 @@ __stdlib_exit(void)
 int
 __stdlib_init(void)
 {
+	int result;
+
 	ENTER();
 
-	__memory_init();
+	result = __memory_init();
 
-	RETURN(OK);
-	return(OK);
+	RETURN(result);
+	return(result);
 }

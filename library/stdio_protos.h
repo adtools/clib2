@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.8 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.9 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -212,6 +212,14 @@ extern int __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int *
 
 /* stdio_remove_fd_alias.c */
 extern void __remove_fd_alias(struct fd * fd);
+
+/****************************************************************************/
+
+/* stdio_lock.c */
+extern void __stdio_lock(void);
+extern void __stdio_unlock(void);
+extern void __stdio_lock_exit(void);
+extern int __stdio_lock_init(void);
 
 /****************************************************************************/
 

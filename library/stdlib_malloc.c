@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.7 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.8 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,8 +63,9 @@ struct MemoryTree __memory_tree;
 
 /****************************************************************************/
 
-APTR			__memory_pool;
-struct MinList	__memory_list;
+struct SignalSemaphore * NOCOMMON	__memory_semaphore;
+APTR NOCOMMON						__memory_pool;
+struct MinList NOCOMMON				__memory_list;
 
 /****************************************************************************/
 
@@ -95,6 +96,8 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED file,int UNUSE
 	void * result = NULL;
 
 	assert( size > 0 );
+
+	__memory_lock();
 
 	if(__free_memory_threshold > 0 && AvailMem(MEMF_ANY|MEMF_LARGEST) < __free_memory_threshold)
 	{
@@ -202,6 +205,8 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED file,int UNUSE
 	}
 	#endif /* __MEM_DEBUG_LOG */
 
+	__memory_unlock();
+
 	return(result);
 }
 
@@ -263,9 +268,35 @@ malloc(size_t size)
 /****************************************************************************/
 
 void
+__memory_lock(void)
+{
+	if(__memory_semaphore != NULL)
+		ObtainSemaphore(__memory_semaphore);
+}
+
+/****************************************************************************/
+
+void
+__memory_unlock(void)
+{
+	if(__memory_semaphore != NULL)
+		ReleaseSemaphore(__memory_semaphore);
+}
+
+/****************************************************************************/
+
+int
 __memory_init(void)
 {
+	int result = ERROR;
+
 	ENTER();
+
+	__memory_semaphore = AllocVec(sizeof(*__memory_semaphore),MEMF_ANY|MEMF_PUBLIC);
+	if(__memory_semaphore == NULL)
+		goto out;
+
+	InitSemaphore(__memory_semaphore);
 
 	#if defined(__USE_MEM_TREES) && defined(__MEM_DEBUG)
 	{
@@ -286,5 +317,10 @@ __memory_init(void)
 	}
 	#endif /* __amigaos4__ */
 
-	LEAVE();
+	result = OK;
+
+ out:
+
+	RETURN(result);
+	return(result);
 }

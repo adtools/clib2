@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_findvacantfdentry.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_findvacantfdentry.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,6 +46,8 @@ __is_valid_fd(struct fd * fd)
 {
 	BOOL result = FALSE;
 
+	__stdio_lock();
+
 	if(__fd != NULL && __num_fd > 0)
 	{
 		int i;
@@ -59,6 +61,8 @@ __is_valid_fd(struct fd * fd)
 			}
 		}
 	}
+
+	__stdio_unlock();
 
 	return(result);
 }

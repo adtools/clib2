@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fopen.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_fopen.c,v 1.5 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,6 +59,8 @@ fopen(const char *filename, const char *mode)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	__stdio_lock();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(filename == NULL || mode == NULL)
@@ -93,6 +95,8 @@ fopen(const char *filename, const char *mode)
 	result = (FILE *)__iob[slot_number];
 
  out:
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

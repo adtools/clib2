@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_opendir.c,v 1.7 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: dirent_opendir.c,v 1.8 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -244,7 +244,11 @@ opendir(const char * path_name)
 
 	assert( __directory_list.mlh_Head != NULL );
 
+	__dirent_lock();
+
 	AddTail((struct List *)&__directory_list,(struct Node *)dh);
+
+	__dirent_unlock();
 
 	result = (DIR *)dh;
 	dh = NULL;

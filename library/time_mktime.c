@@ -1,5 +1,5 @@
 /*
- * $Id: time_mktime.c,v 1.7 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: time_mktime.c,v 1.8 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -182,10 +182,14 @@ mktime(struct tm *tm)
 
 	tm->tm_yday	= (seconds - delta) / (24 * 60 * 60);
 
+	__locale_lock();
+
 	/* The data in 'struct tm *tm' was given in local time. We need
 	   to convert the result into UTC. */
 	if(__default_locale != NULL)
 		seconds += 60 * __default_locale->loc_GMTOffset;
+
+	__locale_unlock();
 
 	/* Finally, adjust for the difference between the Unix and the
 	   AmigaOS epochs, which differ by 8 years. */

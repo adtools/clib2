@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_free.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_free.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -261,12 +261,16 @@ __check_memory_allocations(const char * file,int line)
 {
 	struct MemoryNode * mn;
 
+	__memory_lock();
+
 	for(mn = (struct MemoryNode *)__memory_list.mlh_Head ;
 	    mn->mn_MinNode.mln_Succ != NULL ;
 	    mn = (struct MemoryNode *)mn->mn_MinNode.mln_Succ)
 	{
 		check_memory_node(mn,file,line);
 	}
+
+	__memory_unlock();
 }
 
 /****************************************************************************/
@@ -277,6 +281,8 @@ __find_memory_node(void * address)
 	struct MemoryNode * result;
 
 	assert( address != NULL );
+
+	__memory_lock();
 
 	#if defined(__USE_MEM_TREES)
 	{
@@ -300,6 +306,8 @@ __find_memory_node(void * address)
 		}
 	}
 	#endif /* __USE_MEM_TREES */
+
+	__memory_unlock();
 
 	return(result);
 }
@@ -335,6 +343,8 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 
 	assert( mn != NULL );
 
+	__memory_lock();
+
 	Remove((struct Node *)mn);
 
 	#if defined(__USE_MEM_TREES) && defined(__MEM_DEBUG)
@@ -361,6 +371,8 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 		FreePooled(__memory_pool,mn,allocation_size);
 	else
 		FreeMem(mn,allocation_size);
+
+	__memory_unlock();
 }
 
 /****************************************************************************/
@@ -572,6 +584,9 @@ __memory_exit(void)
 			#endif /* __MEM_DEBUG */
 		}
 	}
+
+	FreeVec(__memory_semaphore);
+	__memory_semaphore = NULL;
 
 	LEAVE();
 }

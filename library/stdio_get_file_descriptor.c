@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_get_file_descriptor.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_get_file_descriptor.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,6 +43,8 @@ __get_file_descriptor(int file_descriptor)
 	struct fd * result = NULL;
 	struct fd * fd;
 
+	__stdio_lock();
+
 	if(file_descriptor < 0 || file_descriptor >= __num_fd)
 	{
 		SHOWMSG("invalid file descriptor");
@@ -65,6 +67,8 @@ __get_file_descriptor(int file_descriptor)
 	result = fd;
 
  out:
+
+	__stdio_unlock();
 
 	return(result);
 }

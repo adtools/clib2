@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_dup2.c,v 1.6 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: unistd_dup2.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,6 +54,8 @@ dup2(int file_descriptor1, int file_descriptor2)
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	__stdio_lock();
 
 	assert( file_descriptor1 >= 0 && file_descriptor1 < __num_fd );
 	assert( __fd[file_descriptor1] != NULL );
@@ -125,6 +127,8 @@ dup2(int file_descriptor1, int file_descriptor2)
 	result = file_descriptor2;
 
  out:
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.6 2005-02-21 16:09:28 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,6 +60,8 @@ closedir(DIR * directory_pointer)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	__dirent_lock();
+
 	if(directory_pointer == NULL)
 	{
 		__set_errno(EBADF);
@@ -111,6 +113,8 @@ closedir(DIR * directory_pointer)
 	result = 0;
 
  out:
+
+	__dirent_unlock();
 
 	RETURN(result);
 	return(result);

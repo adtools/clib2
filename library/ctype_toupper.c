@@ -1,5 +1,5 @@
 /*
- * $Id: ctype_toupper.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: ctype_toupper.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,6 +43,8 @@ toupper(int c)
 	DECLARE_LOCALEBASE();
 	int result;
 
+	__locale_lock();
+
 	if(__locale_table[LC_CTYPE] != NULL)
 	{
 		assert( LocaleBase != NULL );
@@ -53,6 +55,8 @@ toupper(int c)
 	{
 		result = ('a' <= c && c <= 'z') ? (c - ('a' - 'A')) : c;
 	}
+
+	__locale_unlock();
 
 	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_data.c,v 1.5 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: dirent_data.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,14 +42,52 @@ struct MinList NOCOMMON __directory_list;
 
 /****************************************************************************/
 
+static struct SignalSemaphore * dirent_lock;
+
+/****************************************************************************/
+
+void
+__dirent_lock(void)
+{
+	if(dirent_lock != NULL)
+		ObtainSemaphore(dirent_lock);
+}
+
+/****************************************************************************/
+
+void
+__dirent_unlock(void)
+{
+	if(dirent_lock != NULL)
+		ReleaseSemaphore(dirent_lock);
+}
+
+/****************************************************************************/
+
 CLIB_CONSTRUCTOR(__dirent_init)
 {
+	BOOL success = FALSE;
+
 	ENTER();
 
 	NewList((struct List *)&__directory_list);
 
-	RETURN(OK);
-	CONSTRUCTOR_SUCCEED();
+	dirent_lock = AllocVec(sizeof(*dirent_lock),MEMF_ANY|MEMF_PUBLIC);
+	if(dirent_lock == NULL)
+		goto out;
+
+	InitSemaphore(dirent_lock);
+
+	success = TRUE;
+
+ out:
+
+	RETURN(success);
+
+	if(success)
+		CONSTRUCTOR_SUCCEED();
+	else
+		CONSTRUCTOR_FAIL();
 }
 
 /****************************************************************************/
@@ -63,6 +101,9 @@ CLIB_DESTRUCTOR(__dirent_exit)
 		while(NOT IsListEmpty((struct List *)&__directory_list))
 			closedir((DIR *)__directory_list.mlh_Head);
 	}
+
+	FreeVec(dirent_lock);
+	dirent_lock = NULL;
 
 	LEAVE();
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_filliobreadbuffer.c,v 1.7 2005-02-21 10:21:48 obarthel Exp $
+ * $Id: stdio_filliobreadbuffer.c,v 1.8 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,13 +53,13 @@ __fill_iob_read_buffer(struct iob * file)
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_READ) );
 	assert( file->iob_BufferSize > 0 );
 
-	if(__check_abort_enabled)
-		__check_abort();
-
 	/* Flush all line buffered streams before we proceed to fill this buffer. */
 	if((file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_LINE)
 	{
+		int failed_iob = -1;
 		int i;
+
+		__stdio_lock();
 
 		for(i = 0 ; i < __num_iob ; i++)
 		{
@@ -70,9 +70,17 @@ __fill_iob_read_buffer(struct iob * file)
 			   __iob_write_buffer_is_valid(__iob[i]))
 			{
 				if(__flush_iob_write_buffer(__iob[i]) < 0)
-					goto out;
+				{
+					failed_iob = i;
+					break;
+				}
 			}
 		}
+
+		__stdio_unlock();
+
+		if(failed_iob >= 0)
+			goto out;
 	}
 
 	SHOWMSG("calling the hook");

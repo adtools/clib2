@@ -1,5 +1,5 @@
 /*
- * $Id: locale_headers.h,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: locale_headers.h,v 1.5 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,6 +78,8 @@ extern char NOCOMMON __locale_name_table[NUM_LOCALES][MAX_LOCALE_NAME_LEN];
 
 /****************************************************************************/
 
+extern void __locale_lock(void);
+extern void __locale_unlock(void);
 extern void __close_all_locales(void);
 
 /****************************************************************************/

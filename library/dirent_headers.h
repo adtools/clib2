@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_headers.h,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: dirent_headers.h,v 1.6 2005-02-27 21:58:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,6 +70,11 @@ struct DirectoryHandle
 /****************************************************************************/
 
 extern struct MinList NOCOMMON __directory_list;
+
+/****************************************************************************/
+
+extern void __dirent_lock(void);
+extern void __dirent_unlock(void);
 
 /****************************************************************************/
 
