@@ -4,9 +4,21 @@
 int
 main(void)
 {
-	int first, second, num;
+	int first, second, third, num;
 	int n,a,b,c;
 	char str[4];
+
+	num = sscanf("day-month-year", "%d-%d-%d", &first, &second, &third);
+
+	printf("%s:%d:",__FILE__,__LINE__);printf("%d %d %d %d\n", num, first, second, third);
+
+	num = sscanf("8-11-2004", "%d-%d-%d", &first, &second, &third);
+
+	printf("%s:%d:",__FILE__,__LINE__);printf("%d %d %d %d\n", num, first, second, third);
+
+	num = sscanf("", "%d-%d-%d", &first, &second, &third);
+
+	printf("%s:%d:",__FILE__,__LINE__);printf("%d %d %d %d\n", num, first, second, third);
 
 	num = sscanf("6", "%d %d", &first, &second);
 
