@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor_begin.c,v 1.9 2005-03-20 12:14:09 obarthel Exp $
+ * $Id: stdlib_constructor_begin.c,v 1.10 2005-03-25 08:50:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,12 @@ extern void	(* __far __dtors[])(void);
 
 /* With SAS/C this function is placed in front of the first constructor
    table entry. It will invoke all following constructors and
-   finally all the destructors. We don't use this approach here. */
+   finally all the destructors. We don't use this approach here and
+   we can't because the naming scheme we use for the constructor and
+   destructor functions differs from the default SAS/C usage. With
+   SAS/C the default behaviour is to invoke the constructors in
+   ascending order of priority. We invoke them in descending order of
+   priority (highest first). */
 void
 __construct(void)
 {
@@ -71,6 +76,7 @@ _init(void)
 		int num_constructors;
 		int i;
 
+		/* Count the number of constructors we have to deal with. */
 		num_constructors = 0;
 
 		while(__ctors[num_constructors] != NULL)
@@ -98,6 +104,7 @@ _fini(void)
 
 		int num_destructors;
 
+		/* Count the number of destructors we have to deal with. */
 		num_destructors = 0;
 
 		while(__dtors[num_destructors] != NULL)

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_system.c,v 1.6 2005-03-24 15:31:16 obarthel Exp $
+ * $Id: stdlib_system.c,v 1.7 2005-03-25 08:50:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -177,16 +177,12 @@ system(const char * command)
 
 		PROFILE_OFF();
 
-		/* In thread-safe mode, system() operation can interfere with
-		   regular file I/O if the same dos.library file handles are
-		   involved. Because we really cannot predict which file handles
-		   will be associated with the current Output() and Input()
-		   streams, we play it safe and just block everything. */
-		__stdio_lock();
+		/* Push all currently buffered output towards the file handles,
+		   in case the program to be launched writes to these files
+		   or the console, too. */
+		__flush_all_files(-1);
 
 		result = SystemTagList((STRPTR)command, (struct TagItem *)system_tags);
-
-		__stdio_unlock();
 
 		PROFILE_ON();
 	}

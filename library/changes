@@ -130,14 +130,11 @@
   be pulled in only if something references the HUGE_VAL
   constant.
 
-- The thread-safe system() call now blocks all standard I/O operations
-  until the function has returned. Which is harsh, but there is no
-  elegant solution to the issue of keeping the same dos.library
-  file handles from concurrent use which SystemTagList() might just
-  end up using.
-
 - Activated the dormant thread-safe standard input/output/error
   handling code.
+
+- Small fixes to fcntl() and select() to cover the thread-safe
+  fd->fd_DefaultFile == ZERO case.
 
 
 c.lib 1.189 (5.3.2005)
