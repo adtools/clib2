@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.1 2004-08-14 15:01:22 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.2 2004-09-10 07:41:13 obarthel Exp $
 #
 # :ts=8
 #
@@ -46,10 +46,10 @@ LIBS = -lm -lc -lgcc
 
 ##############################################################################
 
-all: test fgets_test iotest sscanf_test printf_test stack_size_test translate_test
+all: test fgets_test iotest sscanf_test printf_test sprintf_test stack_size_test translate_test
 
 clean:
-	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test stack_size_test translate_test
+	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test sprintf_test stack_size_test translate_test
 
 ##############################################################################
 
@@ -72,6 +72,10 @@ sscanf_test : sscanf_test.o
 printf_test : printf_test.o
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) -o $@ printf_test.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
+
+sprintf_test : sprintf_test.o
+	@echo "Linking $@"
+	$(CC) $(CFLAGS) -o $@ sprintf_test.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
 stack_size_test : stack_size_test.o
 	@echo "Linking $@"

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.1 2004-08-06 11:51:50 obarthel Exp $
+# $Id: smakefile,v 1.2 2004-09-10 07:41:13 obarthel Exp $
 #
 # :ts=8
 #
@@ -63,10 +63,10 @@ AFLAGS = \
 
 ##############################################################################
 
-all: setup test fgets_test iotest sscanf_test printf_test stack_size_test translate_test cleanup
+all: setup test fgets_test iotest sscanf_test printf_test sprintf_test stack_size_test translate_test cleanup
 
 clean:
-	-delete \#?.o \#?.map test fgets_test iotest sscanf_test printf_test stack_size_test translate_test
+	-delete \#?.o \#?.map test fgets_test iotest sscanf_test printf_test sprintf_test stack_size_test translate_test
 
 ##############################################################################
 
@@ -103,6 +103,11 @@ sscanf_test: sscanf_test.o
 printf_test: printf_test.o
 	@echo "Linking $@"
 	@slink $(LIB)startup.o printf_test.o to $@ lib $(LIB)c.lib addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+sprintf_test: sprintf_test.o
+	@echo "Linking $@"
+	@slink $(LIB)startup.o sprintf_test.o to $@ lib $(LIB)c.lib addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 stack_size_test: stack_size_test.o
