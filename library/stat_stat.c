@@ -1,5 +1,5 @@
 /*
- * $Id: stat_stat.c,v 1.4 2005-01-24 10:25:46 obarthel Exp $
+ * $Id: stat_stat.c,v 1.5 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -116,8 +116,8 @@ stat(const char * path_name, struct stat * st)
 
 				st->st_mode		= S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 				st->st_mtime	= mtime;
-				st->st_atime	= st->st_mtime;
-				st->st_ctime	= st->st_mtime;
+				st->st_atime	= mtime;
+				st->st_ctime	= mtime;
 				st->st_nlink	= 2;
 				st->st_blksize	= 512;
 

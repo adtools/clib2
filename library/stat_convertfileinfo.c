@@ -1,5 +1,5 @@
 /*
- * $Id: stat_convertfileinfo.c,v 1.5 2005-01-24 10:25:46 obarthel Exp $
+ * $Id: stat_convertfileinfo.c,v 1.6 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -129,8 +129,8 @@ __convert_file_info_to_stat(
 	st->st_dev		= (dev_t)file_system;
 	st->st_mode		= mode;
 	st->st_mtime	= mtime;
-	st->st_atime	= st->st_mtime;
-	st->st_ctime	= st->st_mtime;
+	st->st_atime	= mtime;
+	st->st_ctime	= mtime;
 	st->st_uid		= fib->fib_OwnerUID;
 	st->st_gid		= fib->fib_OwnerGID;
 	st->st_blksize	= 512;

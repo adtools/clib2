@@ -1,5 +1,5 @@
 /*
- * $Id: time_mktime.c,v 1.4 2005-01-25 11:21:00 obarthel Exp $
+ * $Id: time_mktime.c,v 1.5 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ mktime(struct tm *tm)
 	struct ClockData clock_data;
 	ULONG seconds, delta;
 	time_t result = (time_t)-1;
-	int error = EINVAL;
+	int max_month_days;
 
 	ENTER();
 
@@ -67,7 +67,7 @@ mktime(struct tm *tm)
 		{
 			SHOWMSG("invalid tm parameter");
 
-			error = EFAULT;
+			errno = EFAULT;
 			goto out;
 		}
 	}
@@ -100,16 +100,15 @@ mktime(struct tm *tm)
 	/* Is this the month of February? */
 	if(tm->tm_mon == 1)
 	{
-		char max_month_days;
 		int year;
 
 		/* We need to have the full year number for the
 		   leap year calculation below. */
 		year = tm->tm_year + 1900;
 
-		/* Now for the famous leap year calculation rules... We
-		   need to find out if the number of days in the month
-		   of February are appropriate for the data given. */
+		/* Now for the famous leap year calculation rules... In
+		   the given year, how many days are there in the month
+		   of February? */
 		if((year % 4) != 0)
 			max_month_days = 28;
 		else if ((year % 400) == 0)
@@ -118,18 +117,10 @@ mktime(struct tm *tm)
 			max_month_days = 28;
 		else
 			max_month_days = 29;
-
-		/* The day of the month must be valid. */
-		if(tm->tm_mday > max_month_days)
-		{
-			SHOWVALUE(tm->tm_mday);
-			SHOWMSG("invalid day of month");
-			goto out;
-		}
 	}
 	else
 	{
-		static const char max_month_days[12] =
+		static const char days_per_month[12] =
 		{
 			31, 0,31,
 			30,31,30,
@@ -137,13 +128,15 @@ mktime(struct tm *tm)
 			31,30,31
 		};
 
-		/* The day of the month must be valid. */
-		if(tm->tm_mday > max_month_days[tm->tm_mon])
-		{
-			SHOWVALUE(tm->tm_mday);
-			SHOWMSG("invalid day of month");
-			goto out;
-		}
+		max_month_days = days_per_month[tm->tm_mon];
+	}
+
+	/* The day of the month must be valid. */
+	if(tm->tm_mday > max_month_days)
+	{
+		SHOWVALUE(tm->tm_mday);
+		SHOWMSG("invalid day of month");
+		goto out;
 	}
 
 	/* The hour must be valid. */
@@ -198,11 +191,7 @@ mktime(struct tm *tm)
 	   AmigaOS epochs, which differ by 8 years. */
 	result = seconds + UNIX_TIME_OFFSET;
 
-	error = 0;
-
  out:
-
-	errno = error;
 
 	RETURN(result);
 	return(result);

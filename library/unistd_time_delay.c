@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_time_delay.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_time_delay.c,v 1.4 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,9 +59,10 @@ __time_delay(unsigned long seconds,unsigned long microseconds)
 
 	if((seconds > 0 || microseconds > 0) && NOT __timer_busy)
 	{
-		struct Library * TimerBase = __TimerBase;
 		#if defined(__amigaos4__)
 		struct TimerIFace * ITimer = __ITimer;
+		#else
+		struct Library * TimerBase = __TimerBase;
 		#endif /* __amigaos4__ */
 
 		ULONG signals_to_wait_for;

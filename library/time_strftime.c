@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.5 2005-01-29 18:05:14 obarthel Exp $
+ * $Id: time_strftime.c,v 1.6 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -105,24 +105,11 @@ store_string_via_hook(const char * string,int len,struct Hook * hook)
 static void
 format_date(const char *format,const struct tm *tm,struct Hook * hook)
 {
-	struct tm copy_tm;
 	char buffer[40];
 	const char * str;
 	char c;
 
 	assert( format != NULL && tm != NULL && hook != NULL);
-
-	/* Fill in the week day if it's not in proper range. */
-	if(tm->tm_wday < 0 || tm->tm_wday > 6)
-	{
-		/* We use a peculiar algorithm rather than falling back onto
-		   mktime() here in order to avoid trouble with skewed results
-		   owing to time zone influence. */
-		copy_tm = (*tm);
-		copy_tm.tm_wday = __calculate_weekday(tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
-
-		tm = &copy_tm;
-	}
 
 	while((c = (*format++)) != '\0')
 	{
@@ -224,7 +211,6 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				assert( 0 <= tm->tm_hour && tm->tm_hour <= 23 );
 
 				__number_to_string((unsigned int)((tm->tm_hour > 12) ? (tm->tm_hour - 12) : tm->tm_hour),buffer,sizeof(buffer),2);
-
 				store_string_via_hook(buffer,2,hook);
 				break;
 
@@ -374,8 +360,6 @@ size_t
 strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 {
 	DECLARE_LOCALEBASE();
-	struct format_hook_data data;
-	struct Hook hook;
 	size_t result = 0;
 
 	ENTER();
@@ -400,10 +384,12 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	data.len = 0;
-
 	if(maxsize > 0)
 	{
+		struct format_hook_data data;
+		struct Hook hook;
+
+		data.len		= 0;
 		data.buffer		= s;
 		data.max_size	= maxsize-1;
 
@@ -452,15 +438,29 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 		}
 		else
 		{
+			struct tm copy_tm;
+
+			/* Fill in the week day if it's not in proper range. */
+			if(tm->tm_wday < 0 || tm->tm_wday > 6)
+			{
+				/* We use a peculiar algorithm rather than falling back onto
+				   mktime() here in order to avoid trouble with skewed results
+				   owing to time zone influence. */
+				copy_tm = (*tm);
+				copy_tm.tm_wday = __calculate_weekday(tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+
+				tm = &copy_tm;
+			}
+
 			format_date(format,tm,&hook);
 		}
 
 		(*data.buffer) = '\0';
 
 		SHOWSTRING(s);
-	}
 
-	result = data.len;
+		result = data.len;
+	}
 
  out:
 

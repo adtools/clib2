@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.14 2005-01-15 08:17:10 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.15 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,10 +106,33 @@ CLIB_DESTRUCTOR(__stdio_exit)
 
 /****************************************************************************/
 
+static LONG
+get_console_mode(BPTR console_fh)
+{
+	struct FileHandle * fh;
+	LONG result = 0;
+
+	assert( console_fh != ZERO );
+
+	fh = BADDR(console_fh);
+	if(fh->fh_Type != NULL) /* Check if this is really bound to "NIL:". */
+	{
+		D_S(struct InfoData,id);
+
+		if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
+			result = id->id_DiskType;
+	}
+
+	return(result);
+}
+
+/****************************************************************************/
+
 int
 __stdio_init(void)
 {
-	const int num_standard_files = 3;
+	const int num_standard_files = (STDERR_FILENO-STDIN_FILENO+1);
+
 	BPTR default_file;
 	ULONG fd_flags,iob_flags;
 	int result = ERROR;
@@ -118,8 +141,6 @@ __stdio_init(void)
 	int i;
 
 	ENTER();
-
-	assert( num_standard_files == (STDERR_FILENO-STDIN_FILENO+1) );
 
 	__iob = malloc(sizeof(*__iob) * num_standard_files);
 	if(__iob == NULL)
@@ -203,21 +224,10 @@ __stdio_init(void)
 				   from closing, or end up making it visible. */
 				if(__WBenchMsg == NULL)
 				{
-					struct FileHandle * fh;
-
-					fh = BADDR(default_file);
-					if(fh->fh_Type != NULL)
+					if(get_console_mode(default_file) == ID_RAWCON)
 					{
-						D_S(struct InfoData,id);
-
-						if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
-						{
-							if(id->id_DiskType == ID_RAWCON)
-							{
-								SET_FLAG(fd_flags,FDF_NON_BLOCKING);
-								SET_FLAG(fd_flags,FDF_DEFAULT_NON_BLOCKING);
-							}
-						}
+						SET_FLAG(fd_flags,FDF_NON_BLOCKING);
+						SET_FLAG(fd_flags,FDF_DEFAULT_NON_BLOCKING);
 					}
 				}
 			}
@@ -295,21 +305,10 @@ __stdio_init(void)
 			            can avoid it. */
 			if(__WBenchMsg == NULL)
 			{
-				struct FileHandle * fh;
-
-				fh = BADDR(__fd[STDERR_FILENO]->fd_DefaultFile);
-				if(fh->fh_Type != NULL)
+				if(get_console_mode(__fd[STDERR_FILENO]->fd_DefaultFile) == ID_RAWCON)
 				{
-					D_S(struct InfoData,id);
-
-					if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
-					{
-						if(id->id_DiskType == ID_RAWCON)
-						{
-							SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NON_BLOCKING);
-							SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_DEFAULT_NON_BLOCKING);
-						}
-					}
+					SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NON_BLOCKING);
+					SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_DEFAULT_NON_BLOCKING);
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.7 2005-01-29 18:05:14 obarthel Exp $
+ * $Id: macros.h,v 1.8 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,13 +57,6 @@
 #ifndef ZERO
 #define ZERO ((BPTR)NULL)
 #endif /* ZERO */
-
-/****************************************************************************/
-
-/* This is the difference (in seconds) between the Unix epoch (which began
-   on January 1st, 1970) and the AmigaOS epoch (which began eight years
-   later on January 1st 1978). */
-#define UNIX_TIME_OFFSET 252460800
 
 /****************************************************************************/
 

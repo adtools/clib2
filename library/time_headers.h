@@ -1,5 +1,5 @@
 /*
- * $Id: time_headers.h,v 1.8 2005-01-29 18:05:14 obarthel Exp $
+ * $Id: time_headers.h,v 1.9 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,6 +81,13 @@
 #ifndef _MATH_FP_SUPPORT_H
 #include "math_fp_support.h"
 #endif /* _MATH_FP_SUPPORT_H */
+
+/****************************************************************************/
+
+/* This is the difference (in seconds) between the Unix epoch (which began
+   on January 1st, 1970) and the AmigaOS epoch (which began eight years
+   later on January 1st 1978). */
+#define UNIX_TIME_OFFSET 252460800
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: time_gettimeofday.c,v 1.5 2005-01-24 10:25:46 obarthel Exp $
+ * $Id: time_gettimeofday.c,v 1.6 2005-01-30 09:37:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,9 +60,10 @@
 int
 gettimeofday(struct timeval *tp, struct timezone *tzp)
 {
-	struct Library * TimerBase = __TimerBase;
 	#if defined(__amigaos4__)
 	struct TimerIFace * ITimer = __ITimer;
+	#else
+	struct Library * TimerBase = __TimerBase;
 	#endif /* __amigaos4__ */
 
 	ULONG seconds,microseconds;
@@ -71,7 +72,9 @@ gettimeofday(struct timeval *tp, struct timezone *tzp)
 	ENTER();
 
 	/* Obtain the current system time. */
+	PROFILE_OFF();
 	GetSysTime(&tv);
+	PROFILE_ON();
 
 	/* Convert the number of seconds so that they match the Unix epoch, which
 	   starts (January 1st, 1970) eight years before the AmigaOS epoch. */
