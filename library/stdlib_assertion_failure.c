@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_assertion_failure.c,v 1.9 2005-03-19 10:15:56 obarthel Exp $
+ * $Id: stdlib_assertion_failure.c,v 1.10 2005-03-19 11:06:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -118,17 +118,90 @@ __assertion_failure(
 		}
 		else
 		{
-			if(__program_name != NULL)
-				fprintf(stderr,"[%s] ",__program_name);
+			if(__num_iob > STDERR_FILENO)
+			{
+				if(__program_name != NULL)
+					fprintf(stderr,"[%s] ",__program_name);
 
-			fprintf(stderr,
-				"%s:%d: failed assertion \"%s\".\n",
-					file_name,
-					line_number,
-					expression);
+				fprintf(stderr,
+					"%s:%d: failed assertion \"%s\".\n",
+						file_name,
+						line_number,
+						expression);
+
+				abort();
+			}
+			else
+			{
+				#if defined(__amigaos4__)
+				struct DOSIFace * IDOS = NULL;
+				#endif /* __amigaos4__ */
+				
+				struct Library * DOSBase;
+
+				DOSBase = OpenLibrary("dos.library",37);
+
+				#if defined(__amigaos4__)
+				{
+					if(DOSBase != NULL)
+					{
+						IDOS = (struct DOSIFace *)GetInterface(DOSBase, "main", 1, 0);
+						if(IDOS == NULL)
+						{
+							CloseLibrary(DOSBase);
+							DOSBase = NULL;
+						}
+					}
+				}
+				#endif /* __amigaos4__ */
+
+				if(DOSBase != NULL)
+				{
+					BPTR output;
+
+					/* Dump all currently unwritten data, especially to the console. */
+					__flush_all_files(-1);
+
+					#if defined(__amigaos4__)
+					{
+						/* Try to print the error message on the default error output stream. */
+						output = ErrorOutput();
+					}
+					#else
+					{
+						struct Process * this_process = (struct Process *)FindTask(NULL);
+
+						output = this_process->pr_CES;
+					}
+					#endif /* __amigaos4__ */
+
+					if(output == ZERO)
+						output = Output();
+
+					if(output != ZERO)
+					{
+						if(__program_name != NULL)
+							FPrintf(output,"[%s] ",__program_name);
+
+						FPrintf(output,
+							"%s:%ld: failed assertion \"%s\".\n",
+								file_name,
+								line_number,
+								expression);
+					}
+
+					#if defined(__amigaos4__)
+					{
+						DropInterface((struct Interface *)IDOS);
+					}
+					#endif /* __amigaos4__ */
+
+					CloseLibrary(DOSBase);
+				}
+
+				_exit(EXIT_FAILURE);
+			}
 		}
-
-		abort();
 	}
 
 	been_here_before--;

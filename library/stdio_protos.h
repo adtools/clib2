@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.14 2005-03-07 11:58:50 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.15 2005-03-19 11:06:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -217,6 +217,11 @@ extern void __remove_fd_alias(struct fd * fd);
 
 /* stdio_file_init.c */
 extern int __stdio_file_init(void);
+
+/****************************************************************************/
+
+/* stdio_flush_all_files.c */
+extern int __flush_all_files(int buffer_mode);
 
 /****************************************************************************/
 

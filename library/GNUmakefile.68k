@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.44 2005-03-18 12:38:20 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.45 2005-03-19 11:06:56 obarthel Exp $
 #
 # :ts=8
 #
@@ -202,6 +202,7 @@ C_LIB = \
 	stdio_findvacantiobentry.o \
 	stdio_flockfile.o \
 	stdio_flush.o \
+	stdio_flush_all_files.o \
 	stdio_flushiobwritebuffer.o \
 	stdio_fopen.o \
 	stdio_fprintf.o \
@@ -523,6 +524,7 @@ MATH_LIB = \
 	math_tanh.o \
 	stdio_asprintf.o \
 	stdio_flush.o \
+	stdio_flush_all_files.o \
 	stdio_fprintf.o \
 	stdio_fscanf.o \
 	stdio_printf.o \

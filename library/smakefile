@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.34 2005-03-18 12:38:22 obarthel Exp $
+# $Id: smakefile,v 1.35 2005-03-19 11:06:57 obarthel Exp $
 #
 # :ts=8
 #
@@ -299,6 +299,7 @@ STDIO_OBJ = \
 	stdio_findvacantiobentry.o \
 	stdio_flockfile.o \
 	stdio_flush.o \
+	stdio_flush_all_files.o \
 	stdio_flushiobwritebuffer.o \
 	stdio_fopen.o \
 	stdio_fprintf.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.18 2005-03-19 10:15:56 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.19 2005-03-19 11:06:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -117,11 +117,8 @@ call_main(void)
 		   complicated than they already are. */
 		__check_abort_enabled = FALSE;
 
-		if(stdout != NULL)
-			fflush(stdout);
-
-		if(stderr != NULL)
-			fflush(stderr);
+		/* Dump all currently unwritten data, especially to the console. */
+		__flush_all_files(-1);
 
 		__show_error("Stack overflow detected");
 

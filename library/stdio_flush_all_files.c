@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_filliobreadbuffer.c,v 1.9 2005-03-19 11:06:57 obarthel Exp $
+ * $Id: stdio_flush_all_files.c,v 1.1 2005-03-19 11:06:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,60 +38,34 @@
 /****************************************************************************/
 
 int
-__fill_iob_read_buffer(struct iob * file)
+__flush_all_files(int buffer_mode)
 {
-	struct file_action_message fam;
-	int num_bytes_read;
-	int result = -1;
+	int result;
+	int i;
 
-	ENTER();
+	__stdio_lock();
 
-	SHOWPOINTER(file);
-
-	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
-	assert( file != NULL && (file->iob_BufferReadBytes == 0 || file->iob_BufferPosition == file->iob_BufferReadBytes) && file->iob_BufferWriteBytes == 0 );
-	assert( FLAG_IS_SET(file->iob_Flags,IOBF_READ) );
-	assert( file->iob_BufferSize > 0 );
-
-	/* Flush all line buffered streams before we proceed to fill this buffer. */
-	if((file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_LINE)
+	for(i = 0 ; i < __num_iob ; i++)
 	{
-		if(__flush_all_files(IOBF_BUFFER_MODE_LINE) < 0)
-			goto out;
+		if(__iob[i] != NULL &&
+		   FLAG_IS_SET(__iob[i]->iob_Flags,IOBF_IN_USE) &&
+		   FLAG_IS_SET(__iob[i]->iob_Flags,IOBF_WRITE) &&
+		   (buffer_mode < 0 || (__iob[i]->iob_Flags & IOBF_BUFFER_MODE) == (ULONG)buffer_mode) && 
+		   __iob_write_buffer_is_valid(__iob[i]))
+		{
+			if(__flush_iob_write_buffer(__iob[i]) < 0)
+			{
+				result = -1;
+				goto out;
+			}
+		}
 	}
-
-	SHOWMSG("calling the hook");
-
-	SHOWPOINTER(file->iob_Buffer);
-	SHOWVALUE(file->iob_BufferSize);
-
-	fam.fam_Action	= file_action_read;
-	fam.fam_Data	= file->iob_Buffer;
-	fam.fam_Size	= file->iob_BufferSize;
-
-	assert( file->iob_Action != NULL );
-
-	num_bytes_read = (*file->iob_Action)(file,&fam);
-	if(num_bytes_read < 0)
-	{
-		D(("got error %ld",fam.fam_Error));
-
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
-
-		__set_errno(fam.fam_Error);
-
-		goto out;
-	}
-
-	file->iob_BufferReadBytes	= num_bytes_read;
-	file->iob_BufferPosition	= 0;
-
-	SHOWVALUE(file->iob_BufferReadBytes);
 
 	result = 0;
 
  out:
 
-	RETURN(result);
+	__stdio_unlock();
+
 	return(result);
 }
