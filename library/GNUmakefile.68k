@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.14 2004-11-13 12:55:39 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.15 2004-11-14 11:06:27 obarthel Exp $
 #
 # :ts=8
 #
@@ -286,6 +286,10 @@ C_LIB = \
 	stdlib_modsi3.o \
 	stdlib_mulsi3.o \
 	stdlib_never_free.o \
+	stdlib_osliberror.o \
+	stdlib_oslibversion.o \
+	stdlib_priority.o \
+	stdlib_process_name.o \
 	stdlib_putenv.o \
 	stdlib_qsort.o \
 	stdlib_rand.o \
@@ -318,6 +322,7 @@ C_LIB = \
 	stdlib_umodsi3.o \
 	stdlib_unsetenv.o \
 	stdlib_wildcard_expand.o \
+	stdlib_stdio_window_spec.o \
 	strings_strcasecmp.o \
 	strings_strncasecmp.o \
 	string_bcmp.o \
@@ -338,6 +343,8 @@ C_LIB = \
 	string_strcspn.o \
 	string_strdup.o \
 	string_strerror.o \
+	string_strlcat.o \
+	string_strlcpy.o \
 	string_strlen.o \
 	string_strncat.o \
 	string_strncmp.o \
@@ -677,6 +684,7 @@ AMIGA_LIB = \
 	amiga_newlist.o \
 	amiga_rangerand.o \
 	amiga_remtof.o \
+	amiga_rexxvars.o \
 	amiga_setsuperattrs.o \
 	amiga_timedelay.o \
 	amiga_waitbeam.o
@@ -686,7 +694,7 @@ AMIGA_LIB = \
 LIBS_68K := $(LIBC_OBJS)/libc.a $(LIBSTACK_OBJS)/libstack.a $(LIBUNIX_OBJS)/libunix.a \
             $(LIBNET_OBJS)/libnet.a $(LIBDEBUG_OBJS)/libdebug.a $(LIBAMIGA_OBJS)/libamiga.a \
             $(LIBM_OBJS)/libm.a
- LIBS_020 := $(LIBM881_OBJS)/libm881.a $(LIBS_68K)
+LIBS_020 := $(LIBM881_OBJS)/libm881.a $(LIBS_68K)
 
 ##############################################################################
 
@@ -985,28 +993,3 @@ mainb.o : stdlib_main.c
 
 mainnb.o : stdlib_main.c
 	$(CC) -o mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -m68000 stdlib_main.c
-
-##############################################################################
-
-#test: test.o ncrt0.o libc.a libunix.a libm.a libdebug.a libamiga.a
-#	$(CC) -Wl,--verbose $(CFLAGS) -DIEEE_FLOATING_POINT_SUPPORT \
-#		-o $@ -nostdlib ncrt0.o test.o -L. -lm -lunix -ldebug -lc -lamiga
-
-#test: test.o ncrt0.o nbcrt0.o nrcrt0.o libc.a libunix.a libm.a libdebug.a libamiga.a
-#	$(CC) -resident -Wl,--verbose $(CFLAGS) -DIEEE_FLOATING_POINT_SUPPORT -fbaserel32 -DSMALL_DATA \
-#		-o $@ -nostdlib nbcrt0.o test.o -L. -lm -lunix -ldebug -lc -lamiga
-
-test : test.c
-	gcc -o test test.c -D__MEM_DEBUG -DFLOATING_POINT_SUPPORT -Llib -lunix -lm
-
-#test: test.o ncrt0.o nbcrt0.o nrcrt0.o libc.a libunix.a libm.a libdebug.a libamiga.a
-#	$(CC) -resident -Wl,--verbose $(CFLAGS) -DIEEE_FLOATING_POINT_SUPPORT -fbaserel -DSMALL_DATA \
-#		-o $@ -nostdlib nrcrt0.o test.o -L. -lm -lunix -ldebug -lc -lamiga
-
-##############################################################################
-
-mkid:
-	mkid -v #?.(c|h|asm|i) include/#?.(c|h|asm|i) include/sys/#?.(c|h|asm|i)
-
-update:
-	mkid -v -u

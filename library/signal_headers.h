@@ -1,5 +1,5 @@
 /*
- * $Id: signal_headers.h,v 1.1.1.1 2004-07-26 16:31:05 obarthel Exp $
+ * $Id: signal_headers.h,v 1.2 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,20 +68,20 @@ typedef void (*signal_handler_t)(int sig);
 
 /****************************************************************************/
 
-extern signal_handler_t	__signal_handler_table[NUM_SIGNALS];
+extern signal_handler_t	NOCOMMON __signal_handler_table[NUM_SIGNALS];
 
 /****************************************************************************/
 
-extern int __signals_blocked;
+extern int NOCOMMON __signals_blocked;
 
 /****************************************************************************/
 
-extern BOOL __termination_message_printed;
-extern BOOL __termination_message_disabled;
+extern BOOL NOCOMMON __termination_message_printed;
+extern BOOL NOCOMMON __termination_message_disabled;
 
 /****************************************************************************/
 
-extern const char __abnormal_program_termination[];
+extern const char NOCOMMON __abnormal_program_termination[];
 
 /****************************************************************************/
 

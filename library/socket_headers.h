@@ -1,5 +1,5 @@
 /*
- * $Id: socket_headers.h,v 1.2 2004-07-28 15:50:45 obarthel Exp $
+ * $Id: socket_headers.h,v 1.3 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,19 +48,19 @@
 
 /****************************************************************************/
 
-extern struct Library * __SocketBase;
+extern struct Library * NOCOMMON __SocketBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
 
-extern struct SocketIFace *__ISocket;
+extern struct SocketIFace * NOCOMMON __ISocket;
 
 #endif /* __amigaos4__ */
 
 /****************************************************************************/
 
-extern int h_errno;
+extern int NOCOMMON h_errno;
 
 /****************************************************************************/
 

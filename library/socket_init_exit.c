@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.4 2004-09-29 17:03:57 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.5 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,13 +39,13 @@
 #include "socket_headers.h"
 #endif /* _SOCKET_HEADERS_H */
 
+#ifndef _SIGNAL_HEADERS_H
+#include "signal_headers.h"
+#endif /* _SIGNAL_HEADERS_H */
+
 /****************************************************************************/
 
 #include "stdlib_protos.h"
-
-/****************************************************************************/
-
-extern BOOL __detach;
 
 /****************************************************************************/
 
@@ -75,16 +75,6 @@ struct DaemonMessage
 	UBYTE			dm_Family;
 	UBYTE			dm_Type;
 };
-
-/****************************************************************************/
-
-extern BOOL		__termination_message_disabled;
-extern char *	__program_name;
-extern BOOL		__is_daemon;
-
-/****************************************************************************/
-
-extern void __socket_hook_entry(struct Hook * hook,struct fd * fd,struct file_hook_message * message);
 
 /****************************************************************************/
 
@@ -192,7 +182,7 @@ __socket_init(void)
 
 	/* Wire the library's h_errno variable to our local h_errno. */
 	tags[3].ti_Tag	= SBTM_SETVAL(SBTC_HERRNOLONGPTR);
-	tags[3].ti_Data	= (ULONG)&errno;
+	tags[3].ti_Data	= (ULONG)&h_errno;
 
 	tags[4].ti_Tag = TAG_END;
 

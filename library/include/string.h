@@ -1,5 +1,5 @@
 /*
- * $Id: string.h,v 1.3 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: string.h,v 1.4 2004-11-14 11:06:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -119,6 +119,11 @@ extern char * __strdup(const char *s,const char *file,int line);
 extern void bcopy(const void *from,void *to,size_t len);
 extern void bzero(void *m,size_t len);
 extern int bcmp(const void *a,const void *b,size_t len);
+
+/****************************************************************************/
+
+extern size_t strlcpy(char *dst, const char *src, size_t siz);
+extern size_t strlcat(char *dst, const char *src, size_t siz);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.10 2004-09-29 14:17:44 obarthel Exp $
+# $Id: smakefile,v 1.11 2004-11-14 11:06:27 obarthel Exp $
 #
 # :ts=8
 #
@@ -88,6 +88,7 @@ AMIGA_OBJ = \
 	amiga_newlist.o \
 	amiga_rangerand.o \
 	amiga_remtof.o \
+	amiga_rexxvars.o \
 	amiga_setsuperattrs.o \
 	amiga_timedelay.o \
 	amiga_waitbeam.o \
@@ -394,6 +395,10 @@ STDLIB_OBJ = \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
 	stdlib_never_free.o \
+	stdlib_osliberror.o \
+	stdlib_oslibversion.o \
+	stdlib_priority.o \
+	stdlib_process_name.o \
 	stdlib_putenv.o \
 	stdlib_qsort.o \
 	stdlib_rand.o \
@@ -419,7 +424,8 @@ STDLIB_OBJ = \
 	stdlib_swapstack.o \
 	stdlib_system.o \
 	stdlib_unsetenv.o \
-	stdlib_wildcard_expand.o
+	stdlib_wildcard_expand.o \
+	stdlib_stdio_window_spec.o
 
 STRING_OBJ = \
 	string_bcmp.o \
@@ -440,6 +446,8 @@ STRING_OBJ = \
 	string_strcspn.o \
 	string_strdup.o \
 	string_strerror.o \
+	string_strlcat.o \
+	string_strlcpy.o \
 	string_strlen.o \
 	string_strncat.o \
 	string_strncmp.o \

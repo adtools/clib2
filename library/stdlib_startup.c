@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_startup.c,v 1.3 2004-09-29 19:57:58 obarthel Exp $
+ * $Id: stdlib_startup.c,v 1.4 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -347,7 +347,11 @@ __startup_init(void)
 		__original_current_directory = CurrentDir(__WBenchMsg->sm_ArgList[0].wa_Lock);
 		__current_directory_changed = TRUE;
 
-		if(__WBenchMsg->sm_ToolWindow != NULL)
+		if (__stdio_window_specification != NULL)
+		{
+			input = Open(__stdio_window_specification,MODE_NEWFILE);	
+		}
+		else if (__WBenchMsg->sm_ToolWindow != NULL)
 		{
 			input = Open(__WBenchMsg->sm_ToolWindow,MODE_NEWFILE);	
 		}

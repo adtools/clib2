@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_headers.h,v 1.3 2004-09-29 19:57:58 obarthel Exp $
+ * $Id: usergroup_headers.h,v 1.4 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,14 +54,14 @@ extern struct UserGroupIFace * NOCOMMON __IUserGroup;
 
 /****************************************************************************/
 
-extern BOOL __root_mode;
+extern BOOL NOCOMMON __root_mode;
 
 /****************************************************************************/
 
-extern int __root_uid;
-extern int __root_gid;
-extern int __root_euid;
-extern int __root_egid;
+extern int NOCOMMON __root_uid;
+extern int NOCOMMON __root_gid;
+extern int NOCOMMON __root_euid;
+extern int NOCOMMON __root_egid;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_data.c,v 1.2 2004-07-28 15:50:45 obarthel Exp $
+ * $Id: socket_data.c,v 1.3 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,9 +46,7 @@ struct Library * __SocketBase;
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-
 struct SocketIFace *__ISocket;
-
 #endif /* __amigaos4__ */
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.5 2004-10-02 15:56:13 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.6 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,9 +111,8 @@ static int
 call_main(void)
 {
 	/* Initialization functions; must be called exactly in this
-	 * order because there are dependencies between the
-	 * individual functions.
-	 */
+	   order because there are dependencies between the
+	   individual functions. */
 	static init_func_ptr init_functions[] =
 	{
 		__stdlib_init,
@@ -129,10 +128,9 @@ call_main(void)
 	};
 
 	/* Finalization functions; these may be called
-	 * essentially in any order. But this one makes the
-	 * most sense (roll-back of the corresponding
-	 * initialization functions).
-	 */
+	   essentially in any order. But this one makes the
+	   most sense (roll-back of the corresponding
+	   initialization functions). */
 	static exit_func_ptr exit_functions[] =
 	{
 		__stdlib_exit,
@@ -189,20 +187,18 @@ call_main(void)
 	#endif /* __USE_SAS_PROFILING_FOR_MONITORING */
 
 	/* If we end up here with the __stack_overflow variable
-	 * set then the stack overflow handler dropped into
-	 * longjmp() and _exit() did not get called. This
-	 * means that we will have to show the error message
-	 * and invoke _exit() all on our own.
-	 */
+	   set then the stack overflow handler dropped into
+	   longjmp() and _exit() did not get called. This
+	   means that we will have to show the error message
+	   and invoke _exit() all on our own. */
 	if(__stack_overflow)
 	{
 		SHOWMSG("we have a stack overflow");
 
 		/* Dump whatever is waiting to be written to the
-		 * standard I/O streams, and make sure that no
-		 * break signal is about to make things any more
-		 * complicated than they already are.
-		 */
+		   standard I/O streams, and make sure that no
+		   break signal is about to make things any more
+		   complicated than they already are. */
 		__check_abort_enabled = FALSE;
 
 		if(stdout != NULL)
@@ -230,10 +226,9 @@ call_main(void)
 	SHOWMSG("calling the exit functions");
 
 	/* Any of the following cleanup routines may call
-	 * _exit() by way of abort() or through a hook
-	 * function. Which is why we redirect the exit
-	 * return procedure.
-	 */
+	   _exit() by way of abort() or through a hook
+	   function. Which is why we redirect the exit
+	   return procedure. */
 	for(i = 0 ; exit_functions[i] != NULL ; i++)
 	{
 		D(("calling exit function #%ld",i));
@@ -265,13 +260,12 @@ detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list
 	if(((struct Library *)DOSBase)->lib_Version < 50)
 	{
 		/* Now for the slightly shady part. We need to unload the segment
-		 * list this program was originally loaded with. We have to close
-		 * dos.library, though, which means that either we can close the
-		 * library or unload the code, but not both. But there's a loophole
-		 * in that we can enter Forbid(), unload the code, close the library
-		 * and exit and nobody will be able to allocate this program's
-		 * memory until after the process has been terminated.
-		 */
+		   list this program was originally loaded with. We have to close
+		   dos.library, though, which means that either we can close the
+		   library or unload the code, but not both. But there's a loophole
+		   in that we can enter Forbid(), unload the code, close the library
+		   and exit and nobody will be able to allocate this program's
+		   memory until after the process has been terminated. */
 		Forbid();
 
 		UnLoadSeg(segment_list);
@@ -316,6 +310,7 @@ _main(void)
 	int return_code = RETURN_FAIL;
 	ULONG current_stack_size;
 	APTR old_window_pointer;
+	int os_version;
 
 	SysBase = *(struct Library **)4;
 
@@ -349,13 +344,26 @@ _main(void)
 
 	__WBenchMsg = startup_message;
 
+	/* Check which minimum operating system version we actually require. */
+	os_version = 37;
+	if(__minimum_os_lib_version > 37)
+		os_version = __minimum_os_lib_version;
+
 	/* We will need dos.library V37 and utility.library V37. */
-	DOSBase			= (struct Library *)OpenLibrary("dos.library",37);
-	__UtilityBase	= OpenLibrary("utility.library",37);
+	DOSBase			= (struct Library *)OpenLibrary("dos.library",os_version);
+	__UtilityBase	= OpenLibrary("utility.library",os_version);
 
 	if(DOSBase == NULL || __UtilityBase == NULL)
 	{
-		__show_error("This program requires AmigaOS 2.04 or higher.");
+		char * error_message;
+
+		/* If available, use the error message provided by the client. */
+		if(__minimum_os_lib_error != NULL)
+			error_message = __minimum_os_lib_error;
+		else
+			error_message = "This program requires AmigaOS 2.04 or higher.";
+
+		__show_error(error_message);
 		goto out;
 	}
 
@@ -374,9 +382,8 @@ _main(void)
 	#endif /* __amigaos4__ */
 
 	/* If a callback was provided which can fill us in on which
-	 * minimum stack size should be used, invoke it now and
-	 * store its result in the global __stack_size variable.
-	 */
+	   minimum stack size should be used, invoke it now and
+	   store its result in the global __stack_size variable. */
 	if(__get_default_stack_size != NULL)
 	{
 		unsigned int size;
@@ -390,9 +397,8 @@ _main(void)
 	current_stack_size = get_stack_size(&this_process->pr_Task);
 
 	/* If this is a resident program, don't allow for the detach
-	 * code to run. Same goes for launching the program from
-	 * Workbench.
-	 */
+	   code to run. Same goes for launching the program from
+	   Workbench. */
 	if(__is_resident || startup_message != NULL)
 	{
 		__detach = FALSE;
@@ -404,13 +410,17 @@ _main(void)
 	}
 
 	/* The following code will be executed if the program is to keep
-	 * running in the shell or was launched from Workbench.
-	 */
+	   running in the shell or was launched from Workbench. */
 	if(DO_NOT __detach)
 	{
+		int old_priority = 256;
+
+		/* Change the task priority, if requested. */
+		if(-128 <= __priority && __priority <= 127)
+			old_priority = SetTaskPri((struct Task *)this_process,__priority);
+
 		/* Was a minimum stack size requested and do we
-		 * need more stack space than was provided for?
-		 */
+		   need more stack space than was provided for? */
 		if(__stack_size > 0 && current_stack_size < (ULONG)__stack_size)
 		{
 			struct StackSwapStruct * stk;
@@ -452,19 +462,22 @@ _main(void)
 			/* We have enough room to make the call or just don't care. */
 			return_code = call_main();
 		}
+
+		/* Restore the task priority, if necessary. */
+		if(-128 <= old_priority && old_priority <= 127)
+			SetTaskPri((struct Task *)this_process,old_priority);
 	}
 	else
 	{
 		struct CommandLineInterface * cli = Cli();
-		struct TagItem tags[11];
+		struct TagItem tags[12];
 		UBYTE program_name[256];
 		unsigned int stack_size;
 		int i;
 
 		/* Now for the interesting part: detach from the shell we're
-		 * currently executing in. This works only if the program is
-		 * not reentrant and has not been launched from Workbench.
-		 */
+		   currently executing in. This works only if the program is
+		   not reentrant and has not been launched from Workbench. */
 
 		stack_size = __stack_size;
 
@@ -483,7 +496,7 @@ _main(void)
 		tags[i].	ti_Tag	= NP_StackSize;
 		tags[i++].	ti_Data	= stack_size;
 		tags[i].	ti_Tag	= NP_Name;
-		tags[i++].	ti_Data	= (ULONG)program_name;
+		tags[i++].	ti_Data	= (ULONG)(__process_name != NULL ? __process_name : program_name);
 		tags[i].	ti_Tag	= NP_CommandName;
 		tags[i++].	ti_Data	= (ULONG)program_name;
 		tags[i].	ti_Tag	= NP_Cli;
@@ -494,6 +507,13 @@ _main(void)
 		tags[i++].	ti_Data	= (ULONG)detach_cleanup;
 		tags[i].	ti_Tag	= NP_ExitData;
 		tags[i++].	ti_Data	= (ULONG)cli->cli_Module;
+
+		/* Use a predefined task priority, if requested. */
+		if(-128 <= __priority && __priority <= 127)
+		{
+			tags[i].	ti_Tag	= NP_Priority;
+			tags[i++].	ti_Data	= (ULONG)__priority;
+		}
 
 		/* dos.library V50 will free the segment list upon exit. */
 		if(((struct Library *)DOSBase)->lib_Version >= 50)
@@ -581,11 +601,10 @@ _main(void)
 /****************************************************************************/
 
 /* The following is automatically called by the main() function through code
- * inserted by GCC. In theory, this could be removed by updating the machine
- * definition, but for now we'll just keep this stub around. It is intended
- * to call the constructor functions, but we do this in our own _main()
- * anyway.
- */
+   inserted by GCC. In theory, this could be removed by updating the machine
+   definition, but for now we'll just keep this stub around. It is intended
+   to call the constructor functions, but we do this in our own _main()
+   anyway. */
 
 #if defined(__GNUC__)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_exit.c,v 1.2 2004-11-14 11:06:27 obarthel Exp $
+ * $Id: stdlib_process_name.c,v 1.1 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,32 +31,4 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_HEADERS_H
-#include "stdlib_headers.h"
-#endif /* _STDLIB_HEADERS_H */
-
-/****************************************************************************/
-
-jmp_buf	__exit_jmp_buf;
-int		__exit_value = RETURN_FAIL;
-
-/****************************************************************************/
-
-void
-_exit(int return_code)
-{
-	__exit_value = return_code;
-
-	longjmp(__exit_jmp_buf,1);
-}
-
-/****************************************************************************/
-
-void
-exit(int return_code)
-{
-	/* ZZZ what about inifinite recursion in __exit_trap_trigger()? */
-	__exit_trap_trigger();
-
-	_exit(return_code);
-}
+char * __process_name;

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.3 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -347,22 +347,22 @@ struct file_hook_message
 /****************************************************************************/
 
 /* The file handle table. */
-extern struct iob **	__iob;
-extern int				__num_iob;
+extern struct iob ** NOCOMMON	__iob;
+extern int NOCOMMON				__num_iob;
 
 /****************************************************************************/
 
 /* The file descriptor table. */
-extern struct fd **		__fd;
-extern int				__num_fd;
+extern struct fd ** NOCOMMON	__fd;
+extern int NOCOMMON				__num_fd;
 
 /****************************************************************************/
 
-extern char * __file_lock_semaphore_name;
+extern char * NOCOMMON __file_lock_semaphore_name;
 
 /****************************************************************************/
 
-extern BOOL __no_standard_io;
+extern BOOL NOCOMMON __no_standard_io;
 
 /****************************************************************************/
 

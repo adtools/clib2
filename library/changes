@@ -1,3 +1,32 @@
+- Added stubs for the Rexx Variables Interface code that used to
+  be part of amiga.lib. While comparable functionality is available
+  in rexxsyslib.library V45, the new stubs might be helpful during
+  porting. Care must be taken since these functions don't work
+  exactly like the originals.
+
+- Integrated strlcpy() and strlcat() which are intended to be safer
+  replacements for strncpy() and strncat().
+
+- The program's task priority is now configurable through an external
+  variable '__priority'.
+
+- The process name to be used when detaching can be configured through
+  the new '__process_name' variable.
+
+- The minimum required operating system version can be configured
+  through the new '__minimum_os_lib_version' variable; a matching
+  error message can be provided through the new '__minimum_os_lib_error'
+  variable.
+
+- The default console window specification can be overriden through
+  the new '__stdio_window_specification' variable.
+
+- The socket initialization code did not set up a reference to the
+  'h_errno' variable correctly. This had the effect of making name
+  and address resolution errors trash the 'errno' variable instead
+  and leaving 'h_errno' always set to 0. Fixed.
+
+
 c.lib 1.183 (13.11.2004)
 
 - Cleaned up the OS4 build makefile, losing redundant libraries,

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_headers.h,v 1.3 2004-09-29 19:57:58 obarthel Exp $
+ * $Id: unistd_headers.h,v 1.4 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,7 +42,7 @@
 
 /****************************************************************************/
 
-extern char __current_path_name[MAXPATHLEN];
+extern char NOCOMMON __current_path_name[MAXPATHLEN];
 
 /****************************************************************************/
 
@@ -73,7 +73,7 @@ extern BOOL NOCOMMON __unlock_current_directory;
 
 /****************************************************************************/
 
-extern BOOL __unix_path_semantics;
+extern BOOL NOCOMMON __unix_path_semantics;
 
 /****************************************************************************/
 

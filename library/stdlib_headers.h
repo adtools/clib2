@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.1.1.1 2004-07-26 16:31:56 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.2 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -157,81 +157,79 @@ struct LocalVariable
 
 /****************************************************************************/
 
-extern struct LocalVariable * __lv_root;
+extern struct LocalVariable * NOCOMMON __lv_root;
 
 /****************************************************************************/
 
-extern unsigned __random_seed;
+extern unsigned NOCOMMON __random_seed;
 
 /****************************************************************************/
 
-extern struct MemoryTree	__memory_tree;
-extern struct MinList		__memory_list;
-extern APTR					__memory_pool;
+extern struct MemoryTree NOCOMMON	__memory_tree;
+extern struct MinList NOCOMMON		__memory_list;
+extern APTR NOCOMMON				__memory_pool;
 
 /****************************************************************************/
 
-extern struct MinList __alloca_memory_list;
+extern struct MinList NOCOMMON __alloca_memory_list;
 
 /****************************************************************************/
 
-extern unsigned long __maximum_memory_allocated;
-extern unsigned long __current_memory_allocated;
-extern unsigned long __maximum_num_memory_chunks_allocated;
-extern unsigned long __current_num_memory_chunks_allocated;
+extern unsigned long NOCOMMON __maximum_memory_allocated;
+extern unsigned long NOCOMMON __current_memory_allocated;
+extern unsigned long NOCOMMON __maximum_num_memory_chunks_allocated;
+extern unsigned long NOCOMMON __current_num_memory_chunks_allocated;
 
 /****************************************************************************/
 
-extern jmp_buf	__exit_jmp_buf;
-extern int		__exit_value;
+extern jmp_buf NOCOMMON	__exit_jmp_buf;
+extern int NOCOMMON		__exit_value;
 
 /****************************************************************************/
 
-extern unsigned int (* __get_default_stack_size)(void);
+extern unsigned int NOCOMMON (* __get_default_stack_size)(void);
 
 /****************************************************************************/
 
-extern unsigned int __stack_size;
-extern BOOL __stack_overflow;
-extern UBYTE * __stk_limit;
-/*extern UBYTE ** __stackborders;*/
-/*extern UBYTE * __SaveSP;*/
-extern UBYTE * __base;
+extern unsigned int NOCOMMON __stack_size;
+extern BOOL NOCOMMON __stack_overflow;
+extern UBYTE * NOCOMMON __stk_limit;
+extern UBYTE * NOCOMMON __base;
 
 /****************************************************************************/
 
-extern ULONG __stk_argbytes;
-extern ULONG __stk_safezone;
-extern ULONG __stk_maxsize;
-extern ULONG __stk_size;
-extern ULONG __stk_extensions;
-extern ULONG __stk_minframe;
+extern ULONG NOCOMMON __stk_argbytes;
+extern ULONG NOCOMMON __stk_safezone;
+extern ULONG NOCOMMON __stk_maxsize;
+extern ULONG NOCOMMON __stk_size;
+extern ULONG NOCOMMON __stk_extensions;
+extern ULONG NOCOMMON __stk_minframe;
 
 /****************************************************************************/
 
-extern BOOL __is_resident;
+extern BOOL NOCOMMON __is_resident;
 
 /****************************************************************************/
 
-extern BOOL __free_program_name;
+extern BOOL NOCOMMON __free_program_name;
 
 /****************************************************************************/
 
-extern UBYTE __shell_escape_character;
+extern UBYTE NOCOMMON __shell_escape_character;
 
 /****************************************************************************/
 
-extern char ** __argv;
-extern int __argc;
+extern char ** NOCOMMON	__argv;
+extern int NOCOMMON		__argc;
 
 /****************************************************************************/
 
-extern UBYTE * __quote_vector;
+extern UBYTE * NOCOMMON __quote_vector;
 
 /****************************************************************************/
 
-extern int __default_pool_size;
-extern int __default_puddle_size;
+extern int NOCOMMON __default_pool_size;
+extern int NOCOMMON __default_puddle_size;
 
 /****************************************************************************/
 

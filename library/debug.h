@@ -1,5 +1,5 @@
 /*
- * $Id: debug.h,v 1.1.1.1 2004-07-26 16:30:26 obarthel Exp $
+ * $Id: debug.h,v 1.2 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=8
  *
@@ -57,9 +57,17 @@
 
 /****************************************************************************/
 
+#ifndef _STDLIB_H
+#include <stdlib.h>
+#endif /* _STDLIB_H */
+
+#ifndef _DOS_H
+#include <dos.h>
+#endif /* _DOS_H */
+
+/****************************************************************************/
+
 extern void kprintf(const char *format,...);
-extern void abort(void);
-extern char * __program_name;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_data.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: stdlib_data.c,v 1.3 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,6 +84,14 @@ ULONG __stk_extensions;
 
 /****************************************************************************/
 
+#if defined(__SASC)
+
+UBYTE * __base;
+
+#endif /* __SASC */
+
+/****************************************************************************/
+
 struct Library * __UtilityBase;
 
 /****************************************************************************/
@@ -91,11 +99,3 @@ struct Library * __UtilityBase;
 #if defined(__amigaos4__)
 struct UtilityIFace * __IUtility;
 #endif /* __amigaos4__ */
-
-/****************************************************************************/
-
-#if defined(__SASC)
-
-UBYTE * __base;
-
-#endif /* __SASC */

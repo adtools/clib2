@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_init_exit.c,v 1.3 2004-09-29 19:57:58 obarthel Exp $
+ * $Id: usergroup_init_exit.c,v 1.4 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,12 +45,8 @@
 
 /****************************************************************************/
 
-/* Pointer to errno, length == sizeof(errno) */
+/* Pointer to errno, length == sizeof(long) */
 #define UGT_ERRNOLPTR 0x80000004
-
-/****************************************************************************/
-
-extern char * __program_name;
 
 /****************************************************************************/
 

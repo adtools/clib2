@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.3 2004-08-25 15:27:28 obarthel Exp $
+ * $Id: dos.h,v 1.4 2004-11-14 11:06:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -165,6 +165,28 @@ extern ULONG __free_memory_threshold;
  */
 
 /*
+ * The minimum required operating system version number is 37, which
+ * corresponds to Workbench/Kickstart 2.04. You may request a higher
+ * version number by defining the following variable; if you do so,
+ * please provide a fitting error message, too. Note that you cannot
+ * request a minimum version number lower than 37.
+ */
+extern int __minimum_os_lib_version;
+extern char * __minimum_os_lib_error;
+
+/*
+ * If your program is launched from Workbench it will not necessarily
+ * have a window to send console output to and from which console
+ * input can be read. The startup code attempts to set up such a console
+ * window for you, but it uses defaults for the window specification.
+ * These defaults can be overridden by your program if you define a
+ * variable to point to the specification string. Note that if you
+ * request a specific window specification, this will also override
+ * any tool window definition stored in the program's icon.
+ */
+extern char * __stdio_window_specification;
+
+/*
  * If set to TRUE, your program's process->pr_WindowPtr will be set to -1
  * when it starts. The process->pr_WindowPtr will be automatically restored
  * to the initial value before it exits.
@@ -191,6 +213,20 @@ extern BOOL __detach;
  * have already been opened for you.
  */
 extern BOOL (* __check_detach)(void);
+
+/*
+ * If this pointer is not NULL, it refers the name that will be given to
+ * the process which is created when the program detaches. The default
+ * is to reuse the program name instead.
+ */
+extern char * __process_name;
+
+/*
+ * This variable controls the task priority of the program, when running.
+ * It must be in the range -128..127 to be useful. By default, the task
+ * priority will not be changed.
+ */
+extern int __priority;
 
 /*
  * This variable can be set up to contain the minimum stack size the program

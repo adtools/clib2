@@ -1,5 +1,5 @@
 /*
- * $Id: time_headers.h,v 1.2 2004-09-29 19:57:58 obarthel Exp $
+ * $Id: time_headers.h,v 1.3 2004-11-14 11:06:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,10 +84,10 @@
 
 /****************************************************************************/
 
-extern const char * const __abbreviated_week_day_names[7];
-extern const char * const __week_day_names[7];
-extern const char * const __abbreviated_month_names[12];
-extern const char * const __month_names[12];
+extern const char * const NOCOMMON __abbreviated_week_day_names[7];
+extern const char * const NOCOMMON __week_day_names[7];
+extern const char * const NOCOMMON __abbreviated_month_names[12];
+extern const char * const NOCOMMON __month_names[12];
 
 /****************************************************************************/
 
