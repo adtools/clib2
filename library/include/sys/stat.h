@@ -1,5 +1,5 @@
 /*
- * $Id: stat.h,v 1.3 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: stat.h,v 1.4 2005-03-10 11:40:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -79,6 +79,15 @@ extern "C" {
 #define	S_IWOTH	0000002		/* W for other */
 #define	S_IXOTH	0000001		/* X for other */
 
+/****************************************************************************/
+
+/* Aliases for the owner RWX mask. */
+#define	S_IREAD		S_IRUSR
+#define	S_IWRITE	S_IWUSR
+#define	S_IEXEC		S_IXUSR
+
+/****************************************************************************/
+
 #define	S_IFMT	 0170000	/* type of file */
 #define	S_IFIFO	 0010000	/* named pipe (fifo) */
 #define	S_IFDIR	 0040000	/* directory */
@@ -86,6 +95,8 @@ extern "C" {
 #define	S_IFREG	 0100000	/* regular */
 #define	S_IFLNK	 0120000	/* symbolic link */
 #define	S_IFSOCK 0140000	/* socket */
+
+/****************************************************************************/
 
 #define	S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)	/* directory */
 #define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)	/* regular file */
