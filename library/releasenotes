@@ -1,7 +1,11 @@
-c.lib 1.174 (27.8.2004)
+c.lib 1.175 (10.9.2004)
 
-- atan2() did not work correctly. Please rebuild any code that
-  uses it.
+- The timeval definition in <sys/time.h> can now be used without
+  having to include <exec/types.h> and <devices/timer.h>. Just
+  define the __USE_CLIB2_TIMEVAL preprocessor symbol. However,
+  this is intended only for code which for certain reasons cannot
+  include these header files. Don't use this approach if your
+  code may include <devices/timer.h> at some point.
 
-- tan(), exp(), pow(), rint() and rintf() now should return more
-  accurate results.
+- The sprintf() function family did not properly terminate the
+  output string if the format string itself was empty. Fixed.

@@ -1,5 +1,5 @@
 /*
- * $Id: time.h,v 1.5 2004-09-09 10:56:24 obarthel Exp $
+ * $Id: time.h,v 1.6 2004-09-10 07:39:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,11 +52,7 @@ extern "C" {
    structure and try to get by with this definition. Sometimes it works,
    sometimes it doesn't. Not sure if there really is a good solution for
    this problem... */
-#ifndef __TIMEVAL_ALREADY_DEFINED
-
-/****************************************************************************/
-
-#ifndef DEVICES_TIMER_H
+#if !defined(__TIMEVAL_ALREADY_DEFINED) && !defined(__USE_CLIB2_TIMEVAL)
 
 /****************************************************************************/
 
@@ -77,11 +73,23 @@ extern "C" {
 /****************************************************************************/
 
 /* This will define the 'struct timeval' */
+#ifndef DEVICES_TIMER_H
 #include <devices/timer.h>
+#endif /* DEVICES_TIMER_H */
 
 /****************************************************************************/
 
-#else
+#endif /* INCLUDE_VERSION */
+
+/****************************************************************************/
+
+#endif /* !__TIMEVAL_ALREADY_DEFINED && !__USE_CLIB2_TIMEVAL */
+
+/****************************************************************************/
+
+/* If the timeval is still undefined or should be defined locally,
+   define our own now... */
+#if !defined(__TIMEVAL_ALREADY_DEFINED)
 
 /****************************************************************************/
 
@@ -98,19 +106,7 @@ struct timeval
 
 /****************************************************************************/
 
-#endif /* INCLUDE_VERSION */
-
-/****************************************************************************/
-
-#endif /* DEVICES_TIMER_H */
-
-/****************************************************************************/
-
-#endif /* __TIMEVAL_ALREADY_DEFINED */
-
-/****************************************************************************/
-
-#ifdef DEVICES_TIMER_H
+#endif /* !__TIMEVAL_ALREADY_DEFINED */
 
 /****************************************************************************/
 
@@ -121,10 +117,6 @@ struct timeval
 #ifndef tv_usec
 #define tv_usec tv_micro
 #endif /* tv_usec */
-
-/****************************************************************************/
-
-#endif /* DEVICES_TIMER_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.4 2004-08-14 11:11:01 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.5 2004-09-10 07:39:19 obarthel Exp $
  *
  * :ts=4
  *
@@ -262,7 +262,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					if(arg == NULL)
 					{
 						errno = EFAULT;
-						result = EOF;
 						goto out;
 					}
 				}
@@ -344,7 +343,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					if(arg == NULL)
 					{
 						errno = EFAULT;
-						result = EOF;
 						goto out;
 					}
 				}
@@ -566,7 +564,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				if(arg == NULL)
 				{
 					errno = EFAULT;
-					result = EOF;
 					goto out;
 				}
 			}
@@ -623,7 +620,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				if(arg == NULL)
 				{
 					errno = EFAULT;
-					result = EOF;
 					goto out;
 				}
 			}
@@ -1013,7 +1009,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				if(arg == NULL)
 				{
 					errno = EFAULT;
-					result = EOF;
 					goto out;
 				}
 			}
@@ -1168,7 +1163,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				if(arg == NULL)
 				{
 					errno = EFAULT;
-					result = EOF;
 					goto out;
 				}
 			}
@@ -1224,7 +1218,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				if(arg == NULL)
 				{
 					errno = EFAULT;
-					result = EOF;
 					goto out;
 				}
 			}
@@ -1243,7 +1236,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					if(short_ptr == NULL)
 					{
 						errno = EFAULT;
-						result = EOF;
 						goto out;
 					}
 				}
@@ -1268,7 +1260,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 							if(int_ptr == NULL)
 							{
 								errno = EFAULT;
-								result = EOF;
 								goto out;
 							}
 						}
@@ -1289,7 +1280,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 							if(int_ptr == NULL)
 							{
 								errno = EFAULT;
-								result = EOF;
 								goto out;
 							}
 						}
@@ -1311,7 +1301,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 						if(int_ptr == NULL)
 						{
 							errno = EFAULT;
-							result = EOF;
 							goto out;
 						}
 					}
@@ -1524,7 +1513,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 	   may have buffered data around, queued to be printed right now.
 	   This is intended to improve performance as it takes more effort
 	   to write a single character to a file than to write a bunch. */
-	if(result > 0 && (iob->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
+	if(result != EOF && (iob->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
 	{
 		if(__iob_write_buffer_is_valid(iob) && __flush_iob_write_buffer(iob) < 0)
 			result = EOF;

@@ -1,9 +1,20 @@
+c.lib 1.175 (10.9.2004)
+
 - <stdarg.h> now tries to use the compiler supplied, machine specific
   <stdarg.h> file and also includes the OS4-specifc <sys/amigaos-va.h>
   file, if necessary.
 
 - Added another test to <sys/time.h> to check if the "timeval" definition is
   already in place. If it is, <exec/types.h> will not be included.
+
+- <sys/time.h> can be made to define the timeval data structure locally if
+  the __USE_CLIB2_TIMEVAL preprocessor symbol is defined. In this case no
+  <exec/types.h> or <devices/timer.h> file will be read.
+
+- The sprintf() family did not properly handle empty strings as format
+  specifications. This would result in a necessary buffer flush action
+  getting skipped, which consequently did not put the string termination
+  character into the output buffer.
 
 
 c.lib 1.174 (27.8.2004)

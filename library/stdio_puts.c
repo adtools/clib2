@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_puts.c,v 1.1.1.1 2004-07-26 16:31:40 obarthel Exp $
+ * $Id: stdio_puts.c,v 1.2 2004-09-10 07:39:19 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,7 +94,7 @@ puts(const char *s)
 
  out:
 
-	/* Note: if buffering is disabled for this stdout, then we still
+	/* Note: if buffering is disabled for this stream, then we still
 	   may have buffered data around, queued to be printed right now.
 	   This is intended to improve performance as it takes more effort
 	   to write a single character to a file than to write a bunch. */
