@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_popen.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: stdio_popen.c,v 1.3 2004-11-28 09:33:19 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,20 +94,6 @@ pclose(FILE *stream)
 
 /****************************************************************************/
 
-#define SET_TAG(t,v,d)					\
-	do									\
-	{									\
-		(t)->ti_Tag		= (Tag)(v);		\
-		(t)->ti_Data	= (ULONG)(d);	\
-		(t)++;							\
-	}									\
-	while(0)
-
-#define END_TAG(t) \
-	(void)((t)->ti_Tag = TAG_END)
-
-/****************************************************************************/
-
 FILE *
 popen(const char *command, const char *type)
 {
@@ -118,14 +104,10 @@ popen(const char *command, const char *type)
 	BPTR input = ZERO;
 	BPTR output = ZERO;
 	char pipe_file_name[40];
-	struct TagItem tags[5];
-	struct TagItem * tag;
 	FILE * result = NULL;
 	LONG status;
 	unsigned long task_address;
 	time_t now;
-	size_t type_len;
-	char actual_type[8];
 	int i;
 
 	ENTER();
@@ -149,6 +131,36 @@ popen(const char *command, const char *type)
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	/* The first character selects the access mode: read or write. We don't
+	   support anything else. */
+	switch(type[0])
+	{
+		case 'r':
+
+			SHOWMSG("read mode");
+			break;
+
+		case 'w':
+
+			SHOWMSG("write mode");
+			break;
+
+		default:
+
+			D(("unsupported access mode '%lc'",type[0]));
+			errno = EINVAL;
+			goto out;
+	}
+
+	/* The current PIPE: device only supports unidirectional connections. */
+	if((type[1] == '+') || (type[1] != '\0' && type[2] == '+'))
+	{
+		D(("unsupported access mode '%s'",type));
+
+		errno = EINVAL;
+		goto out;
+	}
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
@@ -237,33 +249,10 @@ popen(const char *command, const char *type)
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
-	/* Skip any options following the comma. */
-	type_len = strlen(type);
-	for(i = 0 ; i < (int)type_len ; i++)
-	{
-		if(type[i] == ',')
-		{
-			type_len = i;
-			break;
-		}
-	}
-
-	/* Keep only the first few letters of the type string. */
-	if(type_len > sizeof(actual_type)-1)
-		type_len = sizeof(actual_type)-1;
-
-	memmove(actual_type,type,type_len);
-	actual_type[type_len] = '\0';
-
-	/* The current PIPE: device only supports unidirectional connections. */
-	if(strcmp(actual_type,"r+") == SAME)
-	{
-		SHOWMSG("unsupported access mode");
-
-		errno = EINVAL;
-		goto out;
-	}
-
+	/* Build a (hopefully) unique name for the pipe stream to open. We
+	   construct it from the current process address, converted into
+	   an octal number, followed by the current time (in seconds),
+	   converted into another octal number. */
 	strcpy(pipe_file_name,"PIPE:");
 
 	task_address = (unsigned long)FindTask(NULL);
@@ -290,26 +279,27 @@ popen(const char *command, const char *type)
 
 	PROFILE_OFF();
 
-	if(strcmp(actual_type,"r") == SAME)
+	/* Now open the input and output streams for the program to launch. */
+	if(type[0] == 'r')
 	{
+		/* Read mode: we want to read the output of the program; the program
+		   should read from "NIL:". */
 		input = Open("NIL:",MODE_NEWFILE);
 		if(input != ZERO)
 			output = Open(pipe_file_name,MODE_NEWFILE);
 	}
-	else if (strcmp(actual_type,"w") == SAME)
+	else
 	{
+		/* Write mode: we want to send data to the program; the program
+		   should write to "NIL:". */
 		input = Open(pipe_file_name,MODE_NEWFILE);
 		if(input != ZERO)
 			output = Open("NIL:",MODE_NEWFILE);
 	}
-	else
-	{
-		errno = EINVAL;
-		goto out;
-	}
 
 	PROFILE_ON();
 
+	/* Check if both I/O streams could be opened. */
 	if(input == ZERO || output == ZERO)
 	{
 		SHOWMSG("couldn't open the streams");
@@ -318,18 +308,20 @@ popen(const char *command, const char *type)
 		goto out;
 	}
 
-	tag = tags;
-
-	SET_TAG(tag,SYS_Input,		input);
-	SET_TAG(tag,SYS_Output,		output);
-	SET_TAG(tag,SYS_Asynch,		TRUE);
-	SET_TAG(tag,SYS_UserShell,	TRUE);
-	END_TAG(tag);
-
 	PROFILE_OFF();
-	status = SystemTagList((STRPTR)command,tags);
+
+	/* Now try to launch the program. */
+	status = SystemTags((STRPTR)command,
+		SYS_Input,		input,
+		SYS_Output,		output,
+		SYS_Asynch,		TRUE,
+		SYS_UserShell,	TRUE,
+	TAG_END);
+
 	PROFILE_ON();
 
+	/* If launching the program returned -1 then it could not be started.
+	   We'll need to close the I/O streams we opened above. */
 	if(status == -1)
 	{
 		SHOWMSG("SystemTagList() failed");
@@ -338,8 +330,11 @@ popen(const char *command, const char *type)
 		goto out;
 	}
 
+	/* OK, the program is running. Once it terminates, it will automatically
+	   shut down the streams we opened for it. */
 	input = output = ZERO;
 
+	/* Now try to open the pipe we will use to exchange data with the program. */
 	result = fopen(pipe_file_name,type);
 
  out:

@@ -31,6 +31,9 @@
 - For sockets, ioctl() and fcntl() now interact on the FIONBIO/FIOASYNC
   requests (ioctl) and the O_NOBLOCK/O_ASYNC flags (fcntl).
 
+- popen() now accepts "rb" and "wb" as mode parameters. However, "r+",
+  "w+" and variants thereof are still unsupported due to the
+  unidirectional pipe support in the standard "PIPE:" device.
 
 
 c.lib 1.183 (13.11.2004)
