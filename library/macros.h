@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.11 2005-03-10 07:47:51 obarthel Exp $
+ * $Id: macros.h,v 1.12 2005-03-10 07:53:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -166,11 +166,27 @@
 
 #ifdef __GNUC__
 
+#define CONSTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((used)) name##_ctor(void); \
+	STATIC VOID (*__##name##_ctor)(void) __attribute__((used,section(".ctors._" #pri))) = name##_ctor; \
+	STATIC VOID name##_ctor(void)
+
+#define DESTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((used)) name##_dtor(void); \
+	STATIC VOID (*__##name##_dtor)(void) __attribute__((used,section(".dtors._" #pri))) = name##_dtor; \
+	STATIC VOID name##_dtor(void)
+
+#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	00500)
+#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	00500)
+#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	00150)
+#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	00150)
+
+/*
 #define CLIB_CONSTRUCTOR(name) \
 	STATIC VOID __attribute__((used)) name##_ctor(void); \
 	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors._00500"))) = name##_ctor; \
 	STATIC VOID name##_ctor(void)
-	
+
 #define CLIB_DESTRUCTOR(name) \
 	STATIC VOID __attribute__((used)) name##_dtor(void); \
 	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors._00500"))) = name##_dtor; \
@@ -185,6 +201,7 @@
 	STATIC VOID __attribute__((used)) name##_dtor(void); \
 	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors._00150"))) = name##_dtor; \
 	STATIC VOID name##_ctor(void)
+*/
 	
 #define CONSTRUCTOR_SUCCEED() \
 	return
