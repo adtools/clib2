@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_lock.c,v 1.2 2005-03-12 09:43:47 obarthel Exp $
+ * $Id: fcntl_lock.c,v 1.3 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,11 +44,6 @@
 void
 __fd_lock(struct fd * fd)
 {
-	/* If this descriptor is really an alias, use the semaphore
-	   associated with the original instead. */
-	if(fd != NULL && fd->fd_Original != NULL)
-		fd = fd->fd_Original;
-
 	if(fd != NULL && fd->fd_Lock != NULL)
 		ObtainSemaphore(fd->fd_Lock);
 }
@@ -58,11 +53,6 @@ __fd_lock(struct fd * fd)
 void
 __fd_unlock(struct fd * fd)
 {
-	/* If this descriptor is really an alias, use the semaphore
-	   associated with the original instead. */
-	if(fd != NULL && fd->fd_Original != NULL)
-		fd = fd->fd_Original;
-
 	if(fd != NULL && fd->fd_Lock != NULL)
 		ReleaseSemaphore(fd->fd_Lock);
 }

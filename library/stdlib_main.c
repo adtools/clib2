@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.21 2005-03-30 19:37:43 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.22 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,6 +98,9 @@ call_main(void)
 	/* Switch off function name printing, if it was enabled. */
 	__hide_profile_names();
 
+	/* From this point on, don't worry about ^C checking any more. */
+	__check_abort_enabled = FALSE;
+
 	/* If we end up here with the __stack_overflow variable
 	   set then the stack overflow handler dropped into
 	   longjmp() and _exit() did not get called. This
@@ -106,12 +109,6 @@ call_main(void)
 	if(__stack_overflow)
 	{
 		SHOWMSG("we have a stack overflow");
-
-		/* Dump whatever is waiting to be written to the
-		   standard I/O streams, and make sure that no
-		   break signal is about to make things any more
-		   complicated than they already are. */
-		__check_abort_enabled = FALSE;
 
 		/* Dump all currently unwritten data, especially to the console. */
 		__flush_all_files(-1);

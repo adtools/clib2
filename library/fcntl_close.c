@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.10 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: fcntl_close.c,v 1.11 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,7 +59,9 @@ close(int file_descriptor)
 	if(__check_abort_enabled)
 		__check_abort();
 
-	fd = __get_file_descriptor(file_descriptor);
+	/* We want to affect this very file descriptor and not the
+	   original one associated with an alias of it. */
+	fd = __get_file_descriptor_dont_resolve(file_descriptor);
 	if(fd == NULL)
 	{
 		__set_errno(EBADF);

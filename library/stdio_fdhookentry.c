@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.24 2005-03-24 16:40:16 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.25 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,7 @@ __fd_hook_entry(
 	int new_mode;
 	char * buffer = NULL;
 	int result = -1;
+	BOOL is_aliased;
 	BPTR file;
 
 	ENTER();
@@ -74,52 +75,61 @@ __fd_hook_entry(
 
 	__fd_lock(fd);
 
-	file = fd->fd_DefaultFile;
-
 	#if defined(__THREAD_SAFE)
 	{
 		/* Check if this file should be dynamically bound to one of the
 		   three standard I/O streams. */
-		if(file == ZERO && FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
 		{
-			/* We assume that the file descriptors are organized in the
-			   default layout, i.e. 0 = stdin, 1 = stdout, 2 = stderr.
-			   It might be that the table does not hold more than one
-			   entry, though, hence the __num_fd checks prior to
-			   accessing the table entries. The first test is really
-			   redundant since there has to be at least one file
-			   descriptor table entry around or this function would
-			   not have been invoked in the first place. */
-			if (/*__num_fd > STDIN_FILENO &&*/ fd == __fd[STDIN_FILENO])
+			switch(fd->fd_DefaultFile)
 			{
-				file = Input();
-			}
-			else if (__num_fd > STDOUT_FILENO && fd == __fd[STDOUT_FILENO])
-			{
-				file = Output();
-			}
-			else if (__num_fd > STDERR_FILENO && fd == __fd[STDERR_FILENO])
-			{
-				#if defined(__amigaos4__)
-				{
-					file = ErrorOutput();
-				}
-				#else
-				{
-					struct Process * this_process = (struct Process *)FindTask(NULL);
+				case STDIN_FILENO:
 
-					file = this_process->pr_CES;
-				}
-				#endif /* __amigaos4__ */
+					file = Input();
+					break;
 
-				/* The following is rather controversial; if the standard error stream
-				   is unavailable, we default to reuse the standard output stream. This
-				   is problematic if the standard output stream was redirected and should
-				   not be the same as the standard error output stream. */
-				if(file == ZERO)
+				case STDOUT_FILENO:
+
 					file = Output();
+					break;
+
+				case STDERR_FILENO:
+
+					#if defined(__amigaos4__)
+					{
+						file = ErrorOutput();
+					}
+					#else
+					{
+						struct Process * this_process = (struct Process *)FindTask(NULL);
+
+						file = this_process->pr_CES;
+					}
+					#endif /* __amigaos4__ */
+
+					/* The following is rather controversial; if the standard error stream
+					   is unavailable, we default to reuse the standard output stream. This
+					   is problematic if the standard output stream was redirected and should
+					   not be the same as the standard error output stream. */
+					if(file == ZERO)
+						file = Output();
+
+					break;
+
+				default:
+
+					file = ZERO;
+					break;
 			}
 		}
+		else
+		{
+			file = fd->fd_DefaultFile;
+		}
+	}
+	#else
+	{
+		file = fd->fd_DefaultFile;
 	}
 	#endif /* __THREAD_SAFE */
 
@@ -223,11 +233,12 @@ __fd_hook_entry(
 			result = 0;
 
 			/* If this is an alias, just remove it. */
-			if(__fd_is_aliased(fd))
+			is_aliased = __fd_is_aliased(fd);
+			if(is_aliased)
 			{
 				__remove_fd_alias(fd);
 			}
-			else if (fd->fd_DefaultFile != ZERO)
+			else if (FLAG_IS_CLEAR(fd->fd_Flags,FDF_STDIO))
 			{
 				/* Are we disallowed to close this file? */
 				if(FLAG_IS_SET(fd->fd_Flags,FDF_NO_CLOSE))
@@ -405,7 +416,8 @@ __fd_hook_entry(
 			#if defined(__THREAD_SAFE)
 			{
 				/* Free the lock semaphore now. */
-				__delete_semaphore(fd->fd_Lock);
+				if(NOT is_aliased)
+					__delete_semaphore(fd->fd_Lock);
 			}
 			#endif /* __THREAD_SAFE */
 

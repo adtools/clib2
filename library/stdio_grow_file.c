@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_grow_file.c,v 1.2 2005-03-14 10:03:06 obarthel Exp $
+ * $Id: stdio_grow_file.c,v 1.3 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,6 +66,8 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	block_size = 0;
 
 	PROFILE_OFF();
+
+	assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_STDIO) );
 
 	fh = BADDR(fd->fd_DefaultFile);
 	if(fh != NULL && fh->fh_Type != NULL && DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))

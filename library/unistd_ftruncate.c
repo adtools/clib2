@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.9 2005-03-16 09:28:37 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.10 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -80,7 +80,7 @@ ftruncate(int file_descriptor, off_t length)
 		goto out;
 	}
 
-	if(fd->fd_DefaultFile == ZERO)
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
 	{
 		__set_errno(EBADF);
 		goto out;

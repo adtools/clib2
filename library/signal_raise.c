@@ -1,5 +1,5 @@
 /*
- * $Id: signal_raise.c,v 1.6 2005-03-27 10:02:50 obarthel Exp $
+ * $Id: signal_raise.c,v 1.7 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -112,10 +112,6 @@ raise(int sig)
 					__print_termination_message(break_string);
 
 					SHOWMSG("bye, bye...");
-
-					/* Note that we drop into the exit() function which
-					   does not trigger the exit trap. */
-					_exit(EXIT_FAILURE);
 				}
 
 				/* Drop straight into abort(), which might call signal()

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_get_file_descriptor.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_get_file_descriptor.c,v 1.4 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,8 +37,16 @@
 
 /****************************************************************************/
 
-struct fd *
-__get_file_descriptor(int file_descriptor)
+enum resolution_mode_t
+{
+	resolution_mode_exact,	/* Return the descriptor exactly as it is. */
+	resolution_mode_alias	/* Resolve the descriptor's alias, if necessary. */
+};
+
+/****************************************************************************/
+
+STATIC struct fd *
+get_file_descriptor(int file_descriptor,enum resolution_mode_t resolution_mode)
 {
 	struct fd * result = NULL;
 	struct fd * fd;
@@ -64,11 +72,39 @@ __get_file_descriptor(int file_descriptor)
 		goto out;
 	}
 
+	/* Move up to the original file, if this is an alias. */
+	if(resolution_mode == resolution_mode_alias && fd->fd_Original != NULL)
+		fd = fd->fd_Original;
+
 	result = fd;
 
  out:
 
 	__stdio_unlock();
+
+	return(result);
+}
+
+/****************************************************************************/
+
+struct fd *
+__get_file_descriptor(int file_descriptor)
+{
+	struct fd * result;
+
+	result = get_file_descriptor(file_descriptor,resolution_mode_alias);
+
+	return(result);
+}
+
+/****************************************************************************/
+
+struct fd *
+__get_file_descriptor_dont_resolve(int file_descriptor)
+{
+	struct fd * result;
+
+	result = get_file_descriptor(file_descriptor,resolution_mode_exact);
 
 	return(result);
 }

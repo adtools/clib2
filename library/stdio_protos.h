@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.16 2005-03-20 11:18:06 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.17 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,6 +84,7 @@ extern int __translate_access_io_error_to_errno(LONG io_error);
 
 /* stdio_get_file_descriptor.c */
 extern struct fd * __get_file_descriptor(int file_descriptor);
+extern struct fd * __get_file_descriptor_dont_resolve(int file_descriptor);
 
 /****************************************************************************/
 

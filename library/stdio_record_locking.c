@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.8 2005-03-26 10:53:35 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.9 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -772,6 +772,7 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 	assert( F_RDLCK <= l->l_type && l->l_type <= F_WRLCK );
 	assert( SEEK_SET <= l->l_whence && l->l_whence <= SEEK_END );
 	assert( error_ptr != NULL );
+	assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_STDIO) );
 
 	/* Remember to unlock any records before closing the file. */
 	fd->fd_Cleanup = cleanup_locked_records;

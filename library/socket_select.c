@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.9 2005-03-25 08:50:59 obarthel Exp $
+ * $Id: socket_select.c,v 1.10 2005-04-01 18:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -309,9 +309,9 @@ map_descriptor_sets(
 			else
 			{
 				/* We only watch files bound to console streams. */
-				if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_INTERACTIVE) || fd->fd_DefaultFile == ZERO)
+				if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_INTERACTIVE) || FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
 				{
-					SHOWMSG("this is a file");
+					SHOWMSG("this is a file, or otherwise unsuitable");
 					continue;
 				}
 
@@ -761,7 +761,7 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 						{
 							if(FLAG_IS_SET(fd->fd_Flags,FDF_READ))
 							{
-								assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET) && fd->fd_DefaultFile != ZERO );
+								assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET) && FLAG_IS_CLEAR(fd->fd_Flags,FDF_STDIO) );
 
 								/* Does this one have input? */
 								PROFILE_OFF();
@@ -921,7 +921,7 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 						{
 							if(FLAG_IS_SET(fd->fd_Flags,FDF_READ))
 							{
-								assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET) && fd->fd_DefaultFile != ZERO );
+								assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET) && FLAG_IS_CLEAR(fd->fd_Flags,FDF_STDIO) );
 
 								PROFILE_OFF();
 

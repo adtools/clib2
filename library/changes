@@ -20,6 +20,15 @@
 
 - Simplified the library/open close code in "stdlib_main.c".
 
+- File descriptors produced by dup() or dup2() now work exactly like
+  the original file descriptors they are duplicates of. I modified the
+  function which maps file descriptor numbers to file descriptor
+  table entries to return the table entries of the original files.
+
+- In the thread-safe library, duplicated stdin/stdout/stderr
+  descriptors now work like the "real" ones. This is true even if
+  the "real" ones were closed and only their former aliases remain.
+
 
 c.lib 1.190 (25.3.2005)
 
