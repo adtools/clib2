@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.23 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.24 2005-03-24 16:40:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,33 +76,52 @@ __fd_hook_entry(
 
 	file = fd->fd_DefaultFile;
 
-	/* Check if this file should be dynamically bound to one of the
-	   three standard I/O streams. */
-	if(file == ZERO && FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+	#if defined(__THREAD_SAFE)
 	{
-		if (fd == __fd[STDIN_FILENO])
+		/* Check if this file should be dynamically bound to one of the
+		   three standard I/O streams. */
+		if(file == ZERO && FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
 		{
-			file = Input();
-		}
-		else if (__num_fd > STDOUT_FILENO && fd == __fd[STDOUT_FILENO])
-		{
-			file = Output();
-		}
-		else if (__num_fd > STDERR_FILENO && fd == __fd[STDERR_FILENO])
-		{
-			#if defined(__amigaos4__)
+			/* We assume that the file descriptors are organized in the
+			   default layout, i.e. 0 = stdin, 1 = stdout, 2 = stderr.
+			   It might be that the table does not hold more than one
+			   entry, though, hence the __num_fd checks prior to
+			   accessing the table entries. The first test is really
+			   redundant since there has to be at least one file
+			   descriptor table entry around or this function would
+			   not have been invoked in the first place. */
+			if (/*__num_fd > STDIN_FILENO &&*/ fd == __fd[STDIN_FILENO])
 			{
-				file = ErrorOutput();
+				file = Input();
 			}
-			#else
+			else if (__num_fd > STDOUT_FILENO && fd == __fd[STDOUT_FILENO])
 			{
-				struct Process * this_process = (struct Process *)FindTask(NULL);
+				file = Output();
+			}
+			else if (__num_fd > STDERR_FILENO && fd == __fd[STDERR_FILENO])
+			{
+				#if defined(__amigaos4__)
+				{
+					file = ErrorOutput();
+				}
+				#else
+				{
+					struct Process * this_process = (struct Process *)FindTask(NULL);
 
-				file = this_process->pr_CES;
+					file = this_process->pr_CES;
+				}
+				#endif /* __amigaos4__ */
+
+				/* The following is rather controversial; if the standard error stream
+				   is unavailable, we default to reuse the standard output stream. This
+				   is problematic if the standard output stream was redirected and should
+				   not be the same as the standard error output stream. */
+				if(file == ZERO)
+					file = Output();
 			}
-			#endif /* __amigaos4__ */
 		}
 	}
+	#endif /* __THREAD_SAFE */
 
 	if(file == ZERO)
 	{

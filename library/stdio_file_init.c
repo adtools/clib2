@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.6 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.7 2005-03-24 16:40:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -273,24 +273,31 @@ FILE_CONSTRUCTOR(stdio_file_init)
 
 				goto out;
 			}
+
+			/* We ignore the file handle and let the file I/O code
+			   in the fd hook pick up the appropriate Input/Output/ErrorOutput
+			   handle. */
+			default_file = ZERO;
+
+			fd_flags |= FDF_NO_CLOSE | FDF_STDIO;
 		}
 		#else
 		{
 			stdio_lock	= NULL;
 			fd_lock		= NULL;
+
+			/* Check if this stream is attached to a console window. */
+			if(default_file != ZERO)
+			{
+				PROFILE_OFF();
+
+				if(IsInteractive(default_file))
+					SET_FLAG(fd_flags,FDF_IS_INTERACTIVE);
+
+				PROFILE_ON();
+			}
 		}
 		#endif /* __THREAD_SAFE */
-
-		/* Check if this stream is attached to a console window. */
-		if(default_file != ZERO)
-		{
-			PROFILE_OFF();
-
-			if(IsInteractive(default_file))
-				SET_FLAG(fd_flags,FDF_IS_INTERACTIVE);
-
-			PROFILE_ON();
-		}
 
 		/* Align the buffer start address to a cache line boundary. */
 		aligned_buffer = (char *)((ULONG)(buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
@@ -306,62 +313,66 @@ FILE_CONSTRUCTOR(stdio_file_init)
 			stdio_lock);
 	}
 
-	/* If the program was launched from Workbench, we continue by
-	   duplicating the default output stream for use as the
-	   standard error stream. */
-	if(__WBenchMsg != NULL)
+	#if NOT defined(__THREAD_SAFE)
 	{
-		PROFILE_OFF();
-		__fd[STDERR_FILENO]->fd_DefaultFile = Output();
-		PROFILE_ON();
-
-		SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
-	}
-	else
-	{
-		BPTR ces;
-
-		PROFILE_OFF();
-
-		/* Figure out what the default error output stream is. */
-		#if defined(__amigaos4__)
+		/* If the program was launched from Workbench, we continue by
+		   duplicating the default output stream for use as the
+		   standard error stream. */
+		if(__WBenchMsg != NULL)
 		{
-			ces = ErrorOutput();
-		}
-		#else
-		{
-			struct Process * this_process = (struct Process *)FindTask(NULL);
-
-			ces = this_process->pr_CES;
-		}
-		#endif /* __amigaos4__ */
-
-		PROFILE_ON();
-
-		/* Is the standard error stream configured? If so, use it.
-		   Otherwise, try to duplicate the standard output stream. */
-		if(ces != ZERO)
-		{
-			__fd[STDERR_FILENO]->fd_DefaultFile = ces;
+			PROFILE_OFF();
+			__fd[STDERR_FILENO]->fd_DefaultFile = Output();
+			PROFILE_ON();
 
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
 		}
 		else
 		{
-			__fd[STDERR_FILENO]->fd_DefaultFile = Open("CONSOLE:",MODE_NEWFILE);
+			BPTR ces;
+
+			PROFILE_OFF();
+
+			/* Figure out what the default error output stream is. */
+			#if defined(__amigaos4__)
+			{
+				ces = ErrorOutput();
+			}
+			#else
+			{
+				struct Process * this_process = (struct Process *)FindTask(NULL);
+
+				ces = this_process->pr_CES;
+			}
+			#endif /* __amigaos4__ */
+
+			PROFILE_ON();
+
+			/* Is the standard error stream configured? If so, use it.
+			   Otherwise, try to duplicate the standard output stream. */
+			if(ces != ZERO)
+			{
+				__fd[STDERR_FILENO]->fd_DefaultFile = ces;
+
+				SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
+			}
+			else
+			{
+				__fd[STDERR_FILENO]->fd_DefaultFile = Open("CONSOLE:",MODE_NEWFILE);
+			}
 		}
+
+		PROFILE_OFF();
+
+		/* Figure out if the standard error stream is bound to a console. */
+		if(__fd[STDERR_FILENO]->fd_DefaultFile != ZERO)
+		{
+			if(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
+				SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
+		}
+
+		PROFILE_ON();
 	}
-
-	PROFILE_OFF();
-
-	/* Figure out if the standard error stream is bound to a console. */
-	if(__fd[STDERR_FILENO]->fd_DefaultFile != ZERO)
-	{
-		if(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
-			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
-	}
-
-	PROFILE_ON();
+	#endif /* __THREAD_SAFE */
 
 	success = TRUE;
 

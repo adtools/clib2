@@ -136,6 +136,9 @@
   file handles from concurrent use which SystemTagList() might just
   end up using.
 
+- Activated the dormant thread-safe standard input/output/error
+  handling code.
+
 
 c.lib 1.189 (5.3.2005)
 
