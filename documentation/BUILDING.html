@@ -1,0 +1,30 @@
+<!DOCTYPE html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Notes on building the library</title>
+<body>
+
+<h1>Notes on building the library</h1>
+
+<p>In order to build the library, you need a 'C' compiler (obvious, isn't it?) and
+a set of header files for the networking API definitions. The networking header
+files go into a directory <tt>netinclude</tt> which has to sit in the same directory as
+the source code and the <tt>include</tt> directory you find in there. I'm not currently
+supplying these header files here. Drop me a line, and I'll take care of that.</p>
+
+<p>The SAS/C flavour (<tt>smakefile</tt>) should get the library built using the "large data"
+model. This rules out the use of residentable programs as the startup code I'm
+using is very primitive (<tt>startup.o</tt>) and doesn't tinker with A4 relative data
+addressing (and how this may be set up).</p>
+
+<p>There are two makefiles for GCC, each a different flavour. There is <tt>GNUmakefile.68k</tt>,
+which will build the library for GCC on the 68k platform ("classic" Amiga). This
+builds all variants of the library, for large data, small data, resident, whatever
+model. It's a lot of work and I don't recommend you do this on a plain 68k machine.
+It will literally (!) take hours. The other makefile flavour is for AmigaOS4 using
+the PowerPC hosted GCC system (<tt>GNUmakefile.os4</tt>). This builds only the large data
+version of the library, but this is usually all you need. Small data support is
+currently not implemented but might follow in the future.</p>
+
+</body>
+</html>

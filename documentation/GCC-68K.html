@@ -1,0 +1,67 @@
+<!DOCTYPE html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Notes on using the library with Amiga GCC (68k)</title>
+<body>
+
+<h1>Notes on using the library with Amiga GCC (68k)</h1>
+
+<p>You can use the 68k build of clib2 with the existing Amiga 68k ports of the
+GNU 'C' compiler. In order to do so, you need to modify the <tt>specs</tt> file which
+controls how the compiler(s) and the linker interact, and where the linker
+will look for the program startup code and library files. Also, you will need
+to copy the header files, startup code and library files to the locations
+where the 'C' compiler and linker expects them.</p>
+
+<p>Please read the following description before you follow the instructions. The
+changes suggested may have unexpected side-effects!</p>
+
+<p>I have provided a working <tt>specs</tt> file with this documentation file. To switch
+over an existing Amiga 68k port of GCC to use clib2, you would proceed as
+follows:</p>
+
+<ul>
+<li> Locate the directory within which GCC is installed. For example, this
+could be within a directory to which the name <tt>ADE:</tt>, <tt>GG:</tt> or <tt>GCC:</tt>
+is assigned. For the sake of simplicity, the following notes assume
+that the assignment name is <tt>GCC:</tt>
+
+<li> Make backup copies of the following directories and files:
+<ol>
+<li> <tt>GCC:lib/gcc-lib/amigaos/2.95.3/specs</tt><br>
+
+<p>(NOTE: Check the directory called <tt>GCC:lib/gcc-lib/amigaos</tt>
+first; the "2.95.3" quoted above refers to the version,
+revision and patch number of the GCC installed and your
+version number may differ!)</p>
+
+<li> <tt>GCC:include</tt>
+<li> <tt>GCC:lib</tt>
+
+</ol>
+
+<li> Now you can proceed to install clib2; just copy the <tt>include</tt> and <tt>lib</tt>
+directories over, like this:
+<ol>
+<li><kbd>Copy include GCC:include all quiet</kbd>
+<li><kbd>Copy lib GCC:lib all quiet</kbd>
+</ol>
+
+<li> Finally, replace the <tt>specs</tt> file with the one provided:
+<ol>
+
+<li> <kbd>Copy specs GCC:lib/gcc-lib/amigaos/2.95.3/specs</kbd><br>
+
+<p>(NOTE: Check the directory called <tt>GCC:lib/gcc-lib/amigaos</tt>
+first; the "2.95.3" quoted above refers to the version,
+revision and patch number of the GCC installed and your
+version number may differ!)</p>
+</ol>
+</ul>
+
+<p>Once you have completed these steps you should be able to build programs using
+the 68k build of clib2 and you currently installed GCC. Note that these
+changes may have the effect of rendering your C++ compiler unusable, so make
+sure that you've made backup copies of all files and directories first!</p>
+</body>
+</html>
