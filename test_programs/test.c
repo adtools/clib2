@@ -1,5 +1,5 @@
 /*
- * $Id: test.c,v 1.1.1.1 2004-07-26 16:36:08 obarthel Exp $
+ * $Id: test.c,v 1.2 2005-01-25 11:21:58 obarthel Exp $
  *
  * :ts=4
  */
@@ -65,9 +65,12 @@ int bar = 9;
 int
 main(int argc,char ** argv)
 {
+	struct timeval tv;
 	time_t now;
+	struct tm tm;
 	int i,j,k;
 	long n,r;
+	char time_buffer[100];
 
 	for(i = 0 ; i < argc ; i++)
 		printf("%2d) \"%s\"\n",i,argv[i]);
@@ -76,6 +79,32 @@ main(int argc,char ** argv)
 
 	time(&now);
 	printf("%s",ctime(&now));
+
+	tm = (*localtime(&now));
+	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
+	printf("local time = %s\n",time_buffer);
+
+	tm = (*gmtime(&now));
+	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
+	printf("gmt = %s\n",time_buffer);
+
+	tm.tm_year	= 105;
+	tm.tm_mon	= 0;
+	tm.tm_mday	= 25;
+	tm.tm_hour	= 12;
+	tm.tm_min	= 3;
+	tm.tm_sec	= 53;
+	tm.tm_isdst	= -1;
+
+	now = mktime(&tm);
+
+	tm = (*localtime(&now));
+	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
+	printf("2005-01-25 12:03:53 -> local time = %s\n",time_buffer);
+
+	tm = (*gmtime(&now));
+	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
+	printf("2005-01-25 12:03:53 -> gmt = %s\n",time_buffer);
 
 	#if defined(IEEE_FLOATING_POINT_SUPPORT) || defined(M68881_FLOATING_POINT_SUPPORT)
 	{
@@ -154,6 +183,9 @@ main(int argc,char ** argv)
 		printf("%.02fx%.02f\n", xres, yres);
 	}
 	#endif*/
+
+	gettimeofday(&tv,0);
+	printf("time = %d.%06d\n",tv.tv_sec,tv.tv_usec);
 
 	if(argc > 1)
 	{
