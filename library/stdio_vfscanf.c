@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.4 2004-10-26 16:25:03 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.5 2004-11-03 15:35:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -305,9 +305,11 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				break;
 
 			/* It's a floating point number. */
-			case 'f':
 			case 'e':
+			case 'E':
+			case 'f':
 			case 'g':
+			case 'G':
 
 				conversion_type = 'f';
 				format++;
@@ -321,6 +323,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 			case 's':	/* string */
 			case 'u':	/* unsigned integer */
 			case 'x':	/* unsigned integer in hexadecimal format */
+			case 'X':	/* unsigned integer in hexadecimal format */
 			case '%':	/* the % character */
 			case '[':	/* a range of characters */
 
@@ -1307,7 +1310,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				/* The conversion is considered to have failed if an EOF was
 				   encountered before any non-whitespace characters could be
 				   converted. We also bail out if we hit an error. */
-				if(c == EOF && (num_chars_processed == 0 || ferror(stream)))
+				if(c == EOF && ((num_chars_processed == 0 && num_conversions == 0) || ferror(stream)))
 					goto out;
 			}
 

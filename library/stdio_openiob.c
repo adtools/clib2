@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_openiob.c,v 1.1.1.1 2004-07-26 16:31:37 obarthel Exp $
+ * $Id: stdio_openiob.c,v 1.2 2004-11-03 15:35:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,9 +48,7 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 {
 	ULONG file_flags;
 	int result = -1;
-	char actual_mode[8];
 	int open_mode;
-	size_t mode_len,len,i;
 	struct fd * fd = NULL;
 	STRPTR buffer = NULL;
 	STRPTR aligned_buffer;
@@ -86,77 +84,57 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 		}
 	}
 
-	/* Options can follow the mode string, separated by a comma.
-	 * We don't support any of those.
-	 */
-	len = mode_len = strlen(mode);
-	for(i = 0 ; i < len ; i++)
+	/* The first character selects the access mode: read, write or append. */
+	switch(mode[0])
 	{
-		if(mode[i] == ',')
-		{
-			mode_len = i;
+		case 'r':
+
+			SHOWMSG("read mode");
+
+			open_mode = O_RDONLY;
 			break;
-		}
+
+		case 'w':
+
+			SHOWMSG("write mode");
+
+			open_mode = O_WRONLY | O_CREAT | O_TRUNC;
+			break;
+
+		case 'a':
+
+			SHOWMSG("append mode");
+
+			open_mode = O_WRONLY | O_CREAT | O_APPEND;
+			break;
+
+		default:
+
+			D(("unsupported file open mode '%lc'",mode[0]));
+
+			errno = EINVAL;
+			goto out;
 	}
 
-	/* Keep only the first few letters of the mode string. */
-	if(mode_len > sizeof(actual_mode)-1)
-		mode_len = sizeof(actual_mode)-1;
-
-	memmove(actual_mode,mode,mode_len);
-	actual_mode[mode_len] = '\0';
-
-	SHOWSTRING(actual_mode);
-
-	if(strcmp(actual_mode,"r") == SAME || strcmp(actual_mode,"rb") == SAME)
+	/* If the second or third character is a '+', switch to read/write mode. */
+	if((mode[1] == '+') || (mode[1] != '\0' && mode[2] == '+'))
 	{
-		SHOWMSG("read-only");
+		SHOWMSG("read/write access");
 
-		open_mode	= O_RDONLY;
-		file_flags	= IOBF_READ;
-	}
-	else if (strcmp(actual_mode,"w") == SAME || strcmp(actual_mode,"wb") == SAME)
-	{
-		SHOWMSG("write-only");
+		CLEAR_FLAG(open_mode,O_RDONLY);
+		CLEAR_FLAG(open_mode,O_WRONLY);
 
-		open_mode	= O_WRONLY | O_CREAT | O_TRUNC;
-		file_flags	= IOBF_WRITE;
+		SET_FLAG(open_mode,O_RDWR);
 	}
-	else if (strcmp(actual_mode,"a") == SAME || strcmp(actual_mode,"ab") == SAME)
-	{
-		SHOWMSG("write-only; append");
 
-		open_mode	= O_WRONLY | O_CREAT | O_APPEND;
-		file_flags	= IOBF_WRITE;
-	}
-	else if (strcmp(actual_mode,"r+") == SAME || strcmp(actual_mode,"rb+") == SAME || strcmp(actual_mode,"r+b") == SAME)
-	{
-		SHOWMSG("read/write; don't overwrite");
+	/* Figure out the buffered file access mode by looking at the open mode. */
+	file_flags = 0;
 
-		open_mode	= O_RDWR;
-		file_flags	= IOBF_READ | IOBF_WRITE;
-	}
-	else if (strcmp(actual_mode,"w+") == SAME || strcmp(actual_mode,"wb+") == SAME || strcmp(actual_mode,"w+b") == SAME)
-	{
-		SHOWMSG("read/write; overwrite");
+	if(FLAG_IS_SET(open_mode,O_RDONLY) || FLAG_IS_SET(open_mode,O_RDWR))
+		SET_FLAG(file_flags,IOBF_READ);
 
-		open_mode	= O_RDWR | O_CREAT | O_TRUNC;
-		file_flags	= IOBF_READ | IOBF_WRITE;
-	}
-	else if (strcmp(actual_mode,"a+") == SAME || strcmp(actual_mode,"ab+") == SAME || strcmp(actual_mode,"a+b") == SAME)
-	{
-		SHOWMSG("read/write; append; don't overwrite");
-
-		open_mode	= O_RDWR | O_CREAT | O_APPEND;
-		file_flags	= IOBF_READ | IOBF_WRITE;
-	}
-	else
-	{
-		SHOWMSG("unsupported file open mode");
-
-		errno = EINVAL;
-		goto out;
-	}
+	if(FLAG_IS_SET(open_mode,O_WRONLY) || FLAG_IS_SET(open_mode,O_RDWR))
+		SET_FLAG(file_flags,IOBF_WRITE);
 
 	SHOWMSG("allocating file buffer");
 

@@ -1,3 +1,17 @@
+- Changed the error abort condition for the %s conversion of the
+  scanf() family. It now matches the abort conditions for all other
+  conversions and no longer ignores whether any other parameters were
+  converted before. This was a quirk in the older implementation.
+
+- The scanf() family now accepts %E and %G in place of %f and %X in
+  place of %x.
+
+- Simplified the common code that fopen(), freopen() and fdopen()
+  share and which has to figure out by looking at a file access
+  mode specification which parameters should be used.
+
+
+
 c.lib 1.181 (26.10.2004)
 
 - The scanf() family now always returns the number of assignments made
