@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.2 2004-09-29 19:57:57 obarthel Exp $
+ * $Id: macros.h,v 1.3 2004-12-19 16:42:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -172,7 +172,7 @@
 #define PROFILE_CONSTRUCTOR(name)	static void __attribute__((constructor)) name##_ctor(void)
 #define PROFILE_DESTRUCTOR(name)	static void __attribute__((destructor)) name##_dtor(void)
 #define CONSTRUCTOR_SUCCEED()		return
-#define CONSTRUCTOR_FAIL()			exit(20)	/* ZZZ not a nice thing to do; fix the constructor invocation code! */
+#define CONSTRUCTOR_FAIL()			exit(RETURN_FAIL)	/* ZZZ not a nice thing to do; fix the constructor invocation code! */
 #endif /* __GNUC__ */
 
 /****************************************************************************/

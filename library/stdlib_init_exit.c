@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_init_exit.c,v 1.1.1.1 2004-07-26 16:31:57 obarthel Exp $
+ * $Id: stdlib_init_exit.c,v 1.2 2004-12-19 16:42:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,20 +59,6 @@ __stdlib_exit(void)
 		__check_memory_allocations(__FILE__,__LINE__);
 	}
 	#endif /* __MEM_DEBUG */
-
-	/* Now for the local variables that may still be set. */
-	if(__lv_root != NULL)
-	{
-		/* ZZZ why is this being done here? */
-
-		do
-		{
-			D(("deleting variable '%s'",__lv_root->lv_Name));
-
-			DeleteVar(__lv_root->lv_Name,0);
-		}
-		while((__lv_root = __lv_root->lv_Next) != NULL);
-	}
 
 	/* Clean this up, too, just to be safe. */
 	NewList((struct List *)&__alloca_memory_list);

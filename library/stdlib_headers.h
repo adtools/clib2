@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.2 2004-11-14 11:06:27 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.3 2004-12-19 16:42:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -146,18 +146,6 @@ struct MemoryTree
 };
 
 #endif /* __USE_MEM_TREES */
-
-/****************************************************************************/
-
-struct LocalVariable
-{
-	struct LocalVariable *	lv_Next;
-	char *					lv_Name;
-};
-
-/****************************************************************************/
-
-extern struct LocalVariable * NOCOMMON __lv_root;
 
 /****************************************************************************/
 

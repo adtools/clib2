@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hstrerror.c,v 1.2 2004-07-29 08:35:15 obarthel Exp $
+ * $Id: socket_hstrerror.c,v 1.3 2004-12-19 16:42:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -118,7 +118,7 @@ hstrerror(int error_number)
 
 			case 3:	/* NO_RECOVERY */
 
-				result = "Unknown server error_number";
+				result = "Unknown server error";
 				break;
 
 			default:
