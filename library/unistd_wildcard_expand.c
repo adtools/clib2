@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.5 2005-02-03 12:14:55 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -390,7 +390,7 @@ __wildcard_expand_init(void)
 
 	if(error != OK)
 	{
-		errno = error;
+		__set_errno(error);
 
 		perror(__argv[0]);
 		abort();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_asprintf.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_asprintf.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ asprintf(char **ret, const char *format, ...)
 	{
 		if(ret == NULL || format == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

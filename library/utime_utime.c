@@ -1,5 +1,5 @@
 /*
- * $Id: utime_utime.c,v 1.5 2005-01-29 18:05:14 obarthel Exp $
+ * $Id: utime_utime.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ utime(const char * path_name,const struct utimbuf * times)
 	{
 		if(path_name == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -86,7 +86,7 @@ utime(const char * path_name,const struct utimbuf * times)
 	{
 		if(CANNOT __convert_time_to_datestamp(times->modtime,&ds))
 		{
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			goto out;
 		}
 	}
@@ -106,7 +106,7 @@ utime(const char * path_name,const struct utimbuf * times)
 
 			if(path_name_nti.is_root)
 			{
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -119,7 +119,7 @@ utime(const char * path_name,const struct utimbuf * times)
 
 	if(status == DOSFALSE)
 	{
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

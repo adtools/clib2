@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fclose.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_fclose.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,7 +72,7 @@ fclose(FILE *stream)
 
 			result = EOF;
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -91,7 +91,7 @@ fclose(FILE *stream)
 
 		result = EOF;
 
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -111,8 +111,9 @@ fclose(FILE *stream)
 
 	if(result != EOF)
 	{
-		result	= message.result;
-		errno	= message.error;
+		result = message.result;
+
+		__set_errno(message.error);
 	}
 
 	/* Now that the file is closed and we are in fact

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_select.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -726,7 +726,7 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 				PROFILE_ON();
 
 				/* Stop if a break signal arrives. */
-				if((result < 0 && errno == EINTR) || FLAG_IS_SET(break_mask,SIGBREAKF_CTRL_C))
+				if((result < 0 && __get_errno() == EINTR) || FLAG_IS_SET(break_mask,SIGBREAKF_CTRL_C))
 				{
 					SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
 					__check_abort();
@@ -837,7 +837,7 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 			result = __WaitSelect(total_socket_fd,socket_read_fds,socket_write_fds,socket_except_fds,timeout,&break_mask);
 			PROFILE_ON();
 
-			if((result < 0 && errno == EINTR) || FLAG_IS_SET(break_mask,SIGBREAKF_CTRL_C))
+			if((result < 0 && __get_errno() == EINTR) || FLAG_IS_SET(break_mask,SIGBREAKF_CTRL_C))
 			{
 				SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
 				__check_abort();

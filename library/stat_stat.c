@@ -1,5 +1,5 @@
 /*
- * $Id: stat_stat.c,v 1.5 2005-01-30 09:37:59 obarthel Exp $
+ * $Id: stat_stat.c,v 1.6 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -80,7 +80,7 @@ stat(const char * path_name, struct stat * st)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -138,7 +138,7 @@ stat(const char * path_name, struct stat * st)
 	{
 		SHOWMSG("that didn't work");
 
-		__translate_access_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_access_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
@@ -150,7 +150,7 @@ stat(const char * path_name, struct stat * st)
 	{
 		SHOWMSG("couldn't examine it");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

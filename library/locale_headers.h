@@ -1,5 +1,5 @@
 /*
- * $Id: locale_headers.h,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: locale_headers.h,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,9 +53,9 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_LOCALE_UTILITY_H
-#include "stdlib_locale_utility.h"
-#endif /* _STDLIB_LOCALE_UTILITY_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 

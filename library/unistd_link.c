@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_link.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_link.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ link(const char * existing_path,const char * new_path)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -92,7 +92,7 @@ link(const char * existing_path,const char * new_path)
 
 			if(existing_path_name_nti.is_root || new_path_name_nti.is_root)
 			{
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -109,7 +109,7 @@ link(const char * existing_path,const char * new_path)
 	{
 		SHOWMSG("that didn't work");
 
-		__translate_access_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_access_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
@@ -123,7 +123,7 @@ link(const char * existing_path,const char * new_path)
 	{
 		SHOWMSG("that didn't work");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

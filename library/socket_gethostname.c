@@ -1,5 +1,5 @@
 /*
- * $Id: socket_gethostname.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_gethostname.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ gethostname(const char *hostname,int size)
 		{
 			SHOWMSG("invalid host name parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

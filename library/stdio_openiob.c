@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_openiob.c,v 1.5 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_openiob.c,v 1.6 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -79,7 +79,7 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 		fd = __get_file_descriptor(file_descriptor);
 		if(fd == NULL)
 		{
-			errno = EBADF;
+			__set_errno(EBADF);
 			goto out;
 		}
 	}
@@ -112,7 +112,7 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 
 			D(("unsupported file open mode '%lc'",mode[0]));
 
-			errno = EINVAL;
+			__set_errno(EINVAL);
 			goto out;
 	}
 
@@ -135,7 +135,7 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 	{
 		SHOWMSG("that didn't work");
 
-		errno = ENOBUFS;
+		__set_errno(ENOBUFS);
 		goto out;
 	}
 

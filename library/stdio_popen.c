@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_popen.c,v 1.4 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_popen.c,v 1.5 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ pclose(FILE *stream)
 		{
 			SHOWMSG("invalid stream parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -123,7 +123,7 @@ popen(const char *command, const char *type)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -149,7 +149,8 @@ popen(const char *command, const char *type)
 		default:
 
 			D(("unsupported access mode '%lc'",type[0]));
-			errno = EINVAL;
+
+			__set_errno(EINVAL);
 			goto out;
 	}
 
@@ -158,7 +159,7 @@ popen(const char *command, const char *type)
 	{
 		D(("unsupported access mode '%s'",type));
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -199,7 +200,8 @@ popen(const char *command, const char *type)
 			/* This may be too long for proper translation... */
 			if(command_len > MAXPATHLEN)
 			{
-				errno = ENAMETOOLONG;
+				__set_errno(ENAMETOOLONG);
+
 				result = NULL;
 				goto out;
 			}
@@ -226,7 +228,8 @@ popen(const char *command, const char *type)
 			command_copy = malloc(1 + strlen(command_name) + 1 + strlen(&command[command_len]) + 1);
 			if(command_copy == NULL)
 			{
-				errno = ENOMEM;
+				__set_errno(ENOMEM);
+
 				result = NULL;
 				goto out;
 			}
@@ -304,7 +307,7 @@ popen(const char *command, const char *type)
 	{
 		SHOWMSG("couldn't open the streams");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
@@ -326,7 +329,7 @@ popen(const char *command, const char *type)
 	{
 		SHOWMSG("SystemTagList() failed");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

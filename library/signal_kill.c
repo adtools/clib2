@@ -1,5 +1,5 @@
 /*
- * $Id: signal_kill.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: signal_kill.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ kill(pid_t pid, int signal_number)
 			{
 				SHOWMSG("didn't find the process");
 
-				errno = ESRCH;
+				__set_errno(ESRCH);
 				goto out;
 			}
 
@@ -95,7 +95,7 @@ kill(pid_t pid, int signal_number)
 			{
 				SHOWMSG("didn't find the process");
 
-				errno = ESRCH;
+				__set_errno(ESRCH);
 				goto out;
 			}
 

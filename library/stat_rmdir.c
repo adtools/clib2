@@ -1,5 +1,5 @@
 /*
- * $Id: stat_rmdir.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stat_rmdir.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ rmdir(const char * path_name)
 		{
 			SHOWMSG("invalid path name parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -88,7 +88,7 @@ rmdir(const char * path_name)
 
 			if(path_name_nti.is_root)
 			{
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -105,7 +105,7 @@ rmdir(const char * path_name)
 	{
 		SHOWMSG("that didn't work");
 
-		__translate_access_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_access_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
@@ -117,7 +117,7 @@ rmdir(const char * path_name)
 	{
 		SHOWMSG("couldn't examine it");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
@@ -125,7 +125,7 @@ rmdir(const char * path_name)
 	{
 		SHOWMSG("this is not a directory");
 
-		errno = ENOTDIR;
+		__set_errno(ENOTDIR);
 		goto out;
 	}
 
@@ -145,7 +145,7 @@ rmdir(const char * path_name)
 	{
 		SHOWMSG("that didn't work");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.4 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,7 +73,7 @@ __socket_hook_entry(
 			PROFILE_OFF();
 
 			result	= __recv((LONG)fd->fd_DefaultFile,message->data,message->size,0);
-			error	= errno;
+			error	= __get_errno();
 
 			PROFILE_ON();
 
@@ -92,7 +92,7 @@ __socket_hook_entry(
 			PROFILE_OFF();
 
 			result	= __send((LONG)fd->fd_DefaultFile,message->data,message->size,0);
-			error	= errno;
+			error	= __get_errno();
 
 			PROFILE_ON();
 
@@ -141,7 +141,7 @@ __socket_hook_entry(
 			param = (int)(message->arg == 0);
 
 			result	= __IoctlSocket(fd->fd_DefaultFile,FIONBIO,&param);
-			error	= errno;
+			error	= __get_errno();
 
 			break;
 
@@ -152,7 +152,7 @@ __socket_hook_entry(
 			param = (int)(message->arg != 0);
 
 			result	= __IoctlSocket(fd->fd_DefaultFile,FIOASYNC,&param);
-			error	= errno;
+			error	= __get_errno();
 
 			break;
 

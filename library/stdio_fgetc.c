@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgetc.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_fgetc.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,7 +89,7 @@ __fgetc_check(FILE * stream)
 	{
 		if(stream == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -107,7 +107,7 @@ __fgetc_check(FILE * stream)
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -115,7 +115,7 @@ __fgetc_check(FILE * stream)
 	{
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -142,7 +142,7 @@ fgetc(FILE *stream)
 	{
 		if(stream == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

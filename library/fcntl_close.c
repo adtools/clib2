@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.6 2005-01-14 08:36:54 obarthel Exp $
+ * $Id: fcntl_close.c,v 1.7 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -178,10 +178,12 @@ int
 close(int file_descriptor)
 {
 	int result;
+	int error;
 
 	ENTER();
 
-	result = __close(file_descriptor,&errno);
+	result = __close(file_descriptor,&error);
+	__set_errno(error);
 
 	RETURN(result);
 	return(result);

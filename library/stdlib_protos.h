@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.6 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.7 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -187,6 +187,16 @@ extern void __print_termination_message(const char * termination_message);
 
 /* stdlib_set_process_window.c */
 APTR __set_process_window(APTR new_window_pointer);
+
+/****************************************************************************/
+
+/* stdlib_set_errno.c */
+void __set_errno(int new_errno);
+
+/****************************************************************************/
+
+/* stdlib_get_errno.c */
+int __get_errno(void);
 
 /****************************************************************************/
 

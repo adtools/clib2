@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fread.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_fread.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,7 +65,7 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -82,7 +82,7 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 	{
 		SHOWMSG("this file is not even in use");
 
-		errno = EBADF;
+		__set_errno(EBADF);
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
@@ -92,7 +92,7 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 	{
 		SHOWMSG("this file is not read-enabled");
 
-		errno = EBADF;
+		__set_errno(EBADF);
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;

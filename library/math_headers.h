@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.5 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_headers.h,v 1.6 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -192,8 +192,14 @@ extern double __scalbn(double x, int n);
 
 /****************************************************************************/
 
-extern double __not_a_number;
-extern double __infinity;
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+/* math_huge_val.c */
+double __get_huge_val(void);
 
 /****************************************************************************/
 

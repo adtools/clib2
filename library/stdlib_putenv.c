@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_putenv.c,v 1.3 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_putenv.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ putenv(const char *string)
 		{
 			SHOWMSG("invalid string");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

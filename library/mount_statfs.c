@@ -1,5 +1,5 @@
 /*
- * $Id: mount_statfs.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: mount_statfs.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,7 +74,7 @@ statfs(const char *path, struct statfs *buf)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -123,7 +123,7 @@ statfs(const char *path, struct statfs *buf)
 	{
 		SHOWMSG("that didn't work");
 
-		__translate_access_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_access_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
@@ -135,7 +135,7 @@ statfs(const char *path, struct statfs *buf)
 	{
 		SHOWMSG("didn't get the info");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtod.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_strtod.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,14 @@
 
 #if defined(FLOATING_POINT_SUPPORT)
 
+/****************************************************************************/
+
+#ifndef _MATH_HEADERS_H
+#include "math_headers.h"
+#endif /* _MATH_HEADERS_H */
+
+/****************************************************************************/
+
 double
 strtod(const char *str, char ** ptr)
 {
@@ -79,8 +87,9 @@ strtod(const char *str, char ** ptr)
 		{
 			SHOWMSG("invalid str parameter");
 
-			result = HUGE_VAL;
-			errno = EFAULT;
+			__set_errno(EFAULT);
+
+			result = __get_huge_val();
 			goto out;
 		}
 	}
@@ -282,9 +291,9 @@ strtod(const char *str, char ** ptr)
 
 	if(error != 0)
 	{
-		errno = error;
+		__set_errno(error);
 
-		sum = HUGE_VAL;
+		sum = __get_huge_val();
 	}
 
 	if(is_negative)
@@ -303,5 +312,7 @@ strtod(const char *str, char ** ptr)
 	RETURN(result);
 	return(result);
 }
+
+/****************************************************************************/
 
 #endif /* FLOATING_POINT_SUPPORT */

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.5 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.6 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -94,7 +94,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				SHOWMSG("invalid flock type");
 				va_end(arg);
 
-				errno = EINVAL;
+				__set_errno(EINVAL);
 				break;
 			}
 
@@ -103,7 +103,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				SHOWMSG("invalid flock offset");
 				va_end(arg);
 
-				errno = EINVAL;
+				__set_errno(EINVAL);
 				break;
 			}
 
@@ -116,7 +116,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			CallHookPkt(fd->fd_Hook,fd,&message);
 
 			result = message.result;
-			errno = message.error;
+			__set_errno(message.error);
 
 			va_end(arg);
 
@@ -159,7 +159,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				result = message.result;
 				if(result < 0)
 				{
-					errno = message.error;
+					__set_errno(message.error);
 
 					va_end(arg);
 					goto out;
@@ -184,7 +184,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				result = message.result;
 				if(result < 0)
 				{
-					errno = message.error;
+					__set_errno(message.error);
 
 					va_end(arg);
 					goto out;
@@ -210,7 +210,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			
 			if(fdbase < 0)
 			{
-				errno = EINVAL;
+				__set_errno(EINVAL);
 				goto out;
 			}
 			
@@ -257,14 +257,14 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 					goto out;
 			}
 
-			errno = EMFILE;
+			__set_errno(EMFILE);
 			break;		
 			
 		default:
 
 			SHOWMSG("something else");
 
-			errno = ENOSYS;
+			__set_errno(ENOSYS);
 			break;
 	}
 

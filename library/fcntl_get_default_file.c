@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_get_default_file.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: fcntl_get_default_file.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ __get_default_file(int file_descriptor,long * file_ptr)
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 

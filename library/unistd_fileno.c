@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fileno.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_fileno.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,7 +65,7 @@ fileno(FILE * file)
 		{
 			SHOWMSG("invalid file parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -79,7 +79,7 @@ fileno(FILE * file)
 
 	if(FLAG_IS_CLEAR(iob->iob_Flags,IOBF_IN_USE))
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 

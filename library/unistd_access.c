@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_access.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_access.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ access(const char * path_name, int mode)
 		{
 			SHOWMSG("invalid path name");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -82,7 +82,7 @@ access(const char * path_name, int mode)
 	{
 		SHOWMSG("invalid mode");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -106,7 +106,7 @@ access(const char * path_name, int mode)
 			lock = Lock(actual_path_name,SHARED_LOCK);
 			if(lock == ZERO)
 			{
-				__translate_access_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_access_io_error_to_errno(IoErr()));
 				goto out;
 			}
 		}
@@ -121,7 +121,7 @@ access(const char * path_name, int mode)
 
 		if(lock == ZERO)
 		{
-			__translate_access_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_access_io_error_to_errno(IoErr()));
 			goto out;
 		}
 	}
@@ -155,7 +155,7 @@ access(const char * path_name, int mode)
 				{
 					SHOWMSG("couldn't examine");
 
-					__translate_io_error_to_errno(IoErr(),&errno);
+					__set_errno(__translate_io_error_to_errno(IoErr()));
 					goto out;
 				}
 			}
@@ -172,7 +172,7 @@ access(const char * path_name, int mode)
 			{
 				SHOWMSG("couldn't examine");
 
-				__translate_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_io_error_to_errno(IoErr()));
 				goto out;
 			}
 		}
@@ -186,7 +186,7 @@ access(const char * path_name, int mode)
 			{
 				SHOWMSG("not readable");
 
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -198,7 +198,7 @@ access(const char * path_name, int mode)
 			{
 				SHOWMSG("not writable");
 
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}	
 		}
@@ -212,7 +212,7 @@ access(const char * path_name, int mode)
 			{
 				SHOWMSG("not executable");
 
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}	
 		}

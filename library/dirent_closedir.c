@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.4 2005-02-03 12:14:55 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,7 +63,7 @@ closedir(DIR * directory_pointer)
 
 	if(directory_pointer == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -84,7 +84,7 @@ closedir(DIR * directory_pointer)
 
 		if(NOT directory_pointer_is_valid)
 		{
-			errno = EBADF;
+			__set_errno(EBADF);
 			goto out;
 		}
 	}

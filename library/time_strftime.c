@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.6 2005-01-30 09:37:59 obarthel Exp $
+ * $Id: time_strftime.c,v 1.7 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -378,7 +378,7 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

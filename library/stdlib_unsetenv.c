@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_unsetenv.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_unsetenv.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,7 +68,7 @@ unsetenv(const char *original_name)
 	{
 		if(name == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.23 2005-01-29 18:05:13 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.24 2005-02-03 16:56:15 obarthel Exp $
 #
 # :ts=8
 #
@@ -275,6 +275,7 @@ C_LIB = \
 	stdlib_exit.o \
 	stdlib_free.o \
 	stdlib_getdefstacksize.o \
+	stdlib_get_errno.o \
 	stdlib_getenv.o \
 	stdlib_getsp.o \
 	stdlib_init_exit.o \
@@ -299,6 +300,7 @@ C_LIB = \
 	stdlib_rand.o \
 	stdlib_realloc.o \
 	stdlib_red_black.o \
+	stdlib_set_errno.o \
 	stdlib_setenv.o \
 	stdlib_setjmp.o \
 	stdlib_set_process_window.o \
@@ -479,6 +481,7 @@ MATH_LIB = \
 	math_floor.o \
 	math_fmod.o \
 	math_frexp.o \
+	math_huge_val.o \
 	math_hypot.o \
 	math_init_exit.o \
 	math_isnan.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_opendir.c,v 1.4 2005-02-03 12:14:55 obarthel Exp $
+ * $Id: dirent_opendir.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,7 +106,7 @@ opendir(const char * path_name)
 		{
 			SHOWMSG("invalid parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -159,7 +159,7 @@ opendir(const char * path_name)
 						{
 							UnLockDosList(LDF_VOLUMES|LDF_READ);
 
-							errno = ENOMEM;
+							__set_errno(ENOMEM);
 							goto out;
 						}
 
@@ -189,7 +189,7 @@ opendir(const char * path_name)
 				/* Bail out if we cannot present anything. */
 				if(IsListEmpty((struct List *)&dh->dh_VolumeList))
 				{
-					errno = ENOMEM;
+					__set_errno(ENOMEM);
 					goto out;
 				}
 			}
@@ -212,7 +212,7 @@ opendir(const char * path_name)
 		{
 			SHOWMSG("couldn't get a lock on it");
 
-			__translate_access_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_access_io_error_to_errno(IoErr()));
 			goto out;
 		}
 
@@ -226,7 +226,7 @@ opendir(const char * path_name)
 		{
 			SHOWMSG("couldn't examine it");
 
-			__translate_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
 
@@ -234,7 +234,7 @@ opendir(const char * path_name)
 		{
 			SHOWMSG("this isn't a directory");
 
-			errno = ENOTDIR;
+			__set_errno(ENOTDIR);
 			goto out;
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.7 2005-01-12 09:15:50 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.8 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -1249,7 +1249,7 @@ handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 	{
 		SetIoErr(error);
 
-		__translate_io_error_to_errno(IoErr(),error_ptr);
+		(*error_ptr) = __translate_io_error_to_errno(error);
 	}
 
 	RETURN(result);
@@ -1332,7 +1332,7 @@ grow_file_size(struct fd * fd,int num_bytes,int * error_ptr)
 	{
 		SHOWMSG("could not move to the end of the file");
 
-		__translate_io_error_to_errno(IoErr(),error_ptr);
+		(*error_ptr) = __translate_io_error_to_errno(IoErr());
 		goto out;
 	}
 
@@ -1374,7 +1374,7 @@ grow_file_size(struct fd * fd,int num_bytes,int * error_ptr)
 
 		if(bytes_written != size)
 		{
-			__translate_io_error_to_errno(IoErr(),error_ptr);
+			(*error_ptr) = __translate_io_error_to_errno(IoErr());
 			goto out;
 		}
 
@@ -1439,7 +1439,8 @@ __fd_hook_entry(
 			if(result < 0)
 			{
 				D(("read failed ioerr=%ld",IoErr()));
-				__translate_io_error_to_errno(IoErr(),&error);
+
+				error = __translate_io_error_to_errno(IoErr());
 				break;
 			}
 
@@ -1490,7 +1491,7 @@ __fd_hook_entry(
 			{
 				D(("write failed ioerr=%ld",IoErr()));
 
-				__translate_io_error_to_errno(IoErr(),&error);
+				error = __translate_io_error_to_errno(IoErr());
 				break;
 			}
 
@@ -1600,7 +1601,7 @@ __fd_hook_entry(
 					{
 						D(("seek failed, mode=%ld (%ld), offset=%ld, ioerr=%ld",mode,message->mode,message->position,IoErr()));
 
-						__translate_io_error_to_errno(IoErr(),&error);
+						error = __translate_io_error_to_errno(IoErr());
 
 						#if defined(UNIX_PATH_SEMANTICS)
 						{
@@ -1665,7 +1666,7 @@ __fd_hook_entry(
 				}
 
 				if(CANNOT Close(fd->fd_DefaultFile))
-					__translate_io_error_to_errno(IoErr(),&error);
+					error = __translate_io_error_to_errno(IoErr());
 
 				PROFILE_ON();
 
@@ -1913,7 +1914,7 @@ __fd_hook_entry(
 							{
 								SHOWMSG("that didn't work");
 
-								__translate_io_error_to_errno(IoErr(),&error);
+								error = __translate_io_error_to_errno(IoErr());
 							}
 						}
 						#else
@@ -1930,7 +1931,7 @@ __fd_hook_entry(
 								{
 									SHOWMSG("that didn't work");
 
-									__translate_io_error_to_errno(IoErr(),&error);
+									error = __translate_io_error_to_errno(IoErr());
 								}
 							}
 							else
@@ -1954,13 +1955,13 @@ __fd_hook_entry(
 									if(DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)message->owner) << 16) | message->group),0,0))
 										result = 0;
 									else
-										__translate_io_error_to_errno(IoErr(),&error);
+										error = __translate_io_error_to_errno(IoErr());
 
 									FreeDeviceProc(dvp);
 								}
 								else
 								{
-									__translate_io_error_to_errno(IoErr(),&error);
+									error = __translate_io_error_to_errno(IoErr());
 								}
 							}
 						}
@@ -1974,14 +1975,14 @@ __fd_hook_entry(
 					{
 						SHOWMSG("couldn't find parent directory");
 	
-						__translate_io_error_to_errno(IoErr(),&error);
+						error = __translate_io_error_to_errno(IoErr());
 					}
 				}
 				else
 				{
 					SHOWMSG("couldn't examine file handle");
 
-					__translate_io_error_to_errno(IoErr(),&error);
+					error = __translate_io_error_to_errno(IoErr());
 				}
 
 				PROFILE_ON();
@@ -2007,7 +2008,7 @@ __fd_hook_entry(
 
 				if(CANNOT safe_examine_file_handle(fd->fd_DefaultFile,fib))
 				{
-					__translate_io_error_to_errno(IoErr(),&error);
+					error = __translate_io_error_to_errno(IoErr());
 					break;
 				}
 
@@ -2025,7 +2026,7 @@ __fd_hook_entry(
 					}
 					else
 					{
-						__translate_io_error_to_errno(IoErr(),&error);
+						error = __translate_io_error_to_errno(IoErr());
 					}
 				}
 				else if (message->size > fib->fib_Size)
@@ -2039,7 +2040,7 @@ __fd_hook_entry(
 					}
 					else
 					{
-						__translate_io_error_to_errno(IoErr(),&error);
+						error = __translate_io_error_to_errno(IoErr());
 					}
 				}
 				else
@@ -2071,7 +2072,7 @@ __fd_hook_entry(
 				{
 					SHOWMSG("couldn't examine the file");
 
-					__translate_io_error_to_errno(IoErr(),&error);
+					error = __translate_io_error_to_errno(IoErr());
 					break;
 				}
 
@@ -2111,7 +2112,7 @@ __fd_hook_entry(
 					{
 						SHOWMSG("couldn't get info on drive");
 
-						__translate_io_error_to_errno(IoErr(),&error);
+						error = __translate_io_error_to_errno(IoErr());
 					}
 
 					UnLock(parent_dir);
@@ -2120,7 +2121,7 @@ __fd_hook_entry(
 				{
 					SHOWMSG("couldn't find parent directory");
 
-					__translate_io_error_to_errno(IoErr(),&error);
+					error = __translate_io_error_to_errno(IoErr());
 				}
 
 				PROFILE_ON();
@@ -2163,7 +2164,7 @@ __fd_hook_entry(
 						{
 							SHOWMSG("couldn't change protection bits; oh well, it was worth the effort...");
 
-							__translate_io_error_to_errno(IoErr(),&error);
+							error = __translate_io_error_to_errno(IoErr());
 						}
 
 						CurrentDir(old_current_dir);
@@ -2172,7 +2173,7 @@ __fd_hook_entry(
 					{
 						SHOWMSG("couldn't examine file");
 
-						__translate_io_error_to_errno(IoErr(),&error);
+						error = __translate_io_error_to_errno(IoErr());
 					}
 
 					UnLock(parent_dir);
@@ -2181,7 +2182,7 @@ __fd_hook_entry(
 				{
 					SHOWMSG("couldn't get a lock on the parent directory");
 
-					__translate_io_error_to_errno(IoErr(),&error);
+					error = __translate_io_error_to_errno(IoErr());
 				}
 
 				PROFILE_ON();

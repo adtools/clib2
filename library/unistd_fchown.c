@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fchown.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_fchown.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,7 +67,7 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -81,8 +81,9 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 
 	CallHookPkt(fd->fd_Hook,fd,&message);
 
-	result	= message.result;
-	errno	= message.error;
+	result = message.result;
+
+	__set_errno(message.error);
 
  out:
 

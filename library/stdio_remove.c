@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_remove.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_remove.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,7 @@ remove(const char *filename)
 		{
 			SHOWMSG("invalid path name");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -85,7 +85,7 @@ remove(const char *filename)
 
 		if(status == DOSFALSE)
 		{
-			__translate_access_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_access_io_error_to_errno(IoErr()));
 			goto out;
 		}
 

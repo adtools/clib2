@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_qsort.c,v 1.3 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_qsort.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -168,7 +168,7 @@ qsort(void * base, size_t count, size_t size, int (*comp)(const void * element1,
 			{
 				SHOWMSG("invalid parameters");
 
-				errno = EFAULT;
+				__set_errno(EFAULT);
 				goto out;
 			}
 		}

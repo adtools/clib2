@@ -1,5 +1,5 @@
 /*
- * $Id: string_strncat.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: string_strncat.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ strncat(char *dest, const char *src, size_t n)
 	{
 		if(dest == NULL || src == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

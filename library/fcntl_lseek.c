@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_lseek.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: fcntl_lseek.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -115,10 +115,12 @@ off_t
 lseek(int file_descriptor, off_t offset, int mode)
 {
 	off_t result;
+	int error;
 
 	ENTER();
 
-	result = __lseek(file_descriptor,offset,mode,&errno);
+	result = __lseek(file_descriptor,offset,mode,&error);
+	__set_errno(error);
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: string_strlen.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: string_strlen.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ strlen(const char *s)
 	{
 		if(s == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

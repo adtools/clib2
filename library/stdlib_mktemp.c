@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_mktemp.c,v 1.5 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_mktemp.c,v 1.6 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -85,7 +85,7 @@ mktemp(char * name_template)
 		{
 			SHOWMSG("invalid name template");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -102,7 +102,7 @@ mktemp(char * name_template)
 	{
 		SHOWMSG("invalid name template");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -133,7 +133,7 @@ mktemp(char * name_template)
 	{
 		SHOWMSG("invalid name template");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -183,7 +183,7 @@ mktemp(char * name_template)
 
 				if(name_template_nti.is_root)
 				{
-					errno = EACCES;
+					__set_errno(EACCES);
 					goto out;
 				}
 			}
@@ -213,7 +213,7 @@ mktemp(char * name_template)
 			}
 
 			/* Looks like a serious error. */
-			__translate_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
 

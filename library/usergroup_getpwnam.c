@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_getpwnam.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_getpwnam.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,7 +65,7 @@ getpwnam(const char *name)
 		{
 			SHOWMSG("invalid name");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

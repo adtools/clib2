@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_symlink.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_symlink.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ symlink(const char * actual_path, const char * symbolic_path)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -88,7 +88,7 @@ symlink(const char * actual_path, const char * symbolic_path)
 	{
 		SHOWMSG("that didn't work");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

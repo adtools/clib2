@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_headers.h,v 1.5 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_headers.h,v 1.6 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,6 +39,12 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 

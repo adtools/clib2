@@ -1,5 +1,5 @@
 /*
- * $Id: math_modf.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_modf.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -150,8 +150,9 @@ modf(double x,double *nptr)
 	{
 		if(nptr == NULL)
 		{
-			errno = EFAULT;
-			result = HUGE_VAL;
+			__set_errno(EFAULT);
+
+			result = __get_huge_val();
 			goto out;
 		}
 	}

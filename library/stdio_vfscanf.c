@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.7 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.8 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,6 +47,12 @@
 
 /****************************************************************************/
 
+#if defined(FLOATING_POINT_SUPPORT) && !defined(_MATH_HEADERS_H)
+#include "math_headers.h"
+#endif /* FLOATING_POINT_SUPPORT && !_MATH_HEADERS_H */
+
+/****************************************************************************/
+
 /*
  * Uncomment this to activate '%lld' support and the like. Better still,
  * define this is in the Makefile!
@@ -86,7 +92,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 	{
 		if(stream == NULL || format == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -383,7 +389,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(arg == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -397,7 +403,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(c_ptr == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -458,7 +464,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						if(arg == NULL)
 						{
-							errno = EFAULT;
+							__set_errno(EFAULT);
 							goto out;
 						}
 					}
@@ -489,7 +495,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						if(next_parameter == NULL)
 						{
-							errno = EFAULT;
+							__set_errno(EFAULT);
 							goto out;
 						}
 					}
@@ -827,7 +833,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 										if(new_sum >= sum)
 											sum = new_sum;
 										else
-											sum = HUGE_VAL;
+											sum = __get_huge_val();
 									}
 								}
 							}
@@ -875,7 +881,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						if(arg == NULL)
 						{
-							errno = EFAULT;
+							__set_errno(EFAULT);
 							goto out;
 						}
 					}
@@ -906,7 +912,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						if(next_parameter == NULL)
 						{
-							errno = EFAULT;
+							__set_errno(EFAULT);
 							goto out;
 						}
 					}
@@ -942,7 +948,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(arg == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -974,7 +980,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(next_parameter == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -1234,7 +1240,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(arg == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -1248,7 +1254,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(s_ptr == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -1311,7 +1317,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(arg == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -1329,7 +1335,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						if(short_ptr == NULL)
 						{
-							errno = EFAULT;
+							__set_errno(EFAULT);
 							goto out;
 						}
 					}
@@ -1353,7 +1359,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 							{
 								if(int_ptr == NULL)
 								{
-									errno = EFAULT;
+									__set_errno(EFAULT);
 									goto out;
 								}
 							}
@@ -1373,7 +1379,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 							{
 								if(int_ptr == NULL)
 								{
-									errno = EFAULT;
+									__set_errno(EFAULT);
 									goto out;
 								}
 							}
@@ -1394,7 +1400,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 						{
 							if(int_ptr == NULL)
 							{
-								errno = EFAULT;
+								__set_errno(EFAULT);
 								goto out;
 							}
 						}
@@ -1448,7 +1454,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(arg == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}
@@ -1462,7 +1468,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				{
 					if(s_ptr == NULL)
 					{
-						errno = EFAULT;
+						__set_errno(EFAULT);
 						goto out;
 					}
 				}

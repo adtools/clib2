@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.7 2005-01-09 16:07:27 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.8 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,7 +123,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 		{
 			SHOWMSG("path name is invalid");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -134,7 +134,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 	{
 		SHOWMSG("access mode is invalid");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -160,7 +160,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 			if(path_name_nti.is_root)
 			{
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -187,7 +187,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 			{
 				SHOWMSG("the file already exists");
 
-				errno = EEXIST;
+				__set_errno(EEXIST);
 				goto out;
 			}
 
@@ -197,14 +197,14 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 			{
 				SHOWMSG("there's something not a directory on the path");
 
-				errno = ENOTDIR;
+				__set_errno(ENOTDIR);
 				goto out;
 			}
 			else if (error != ERROR_OBJECT_NOT_FOUND && error != ERROR_ACTION_NOT_KNOWN)
 			{
 				SHOWMSG("error accessing the object");
 
-				__translate_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_io_error_to_errno(IoErr()));
 				goto out;
 			}
 
@@ -233,7 +233,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 				{
 					SHOWMSG("could not examine the object");
 
-					__translate_io_error_to_errno(IoErr(),&errno);
+					__set_errno(__translate_io_error_to_errno(IoErr()));
 					goto out;
 				}
 
@@ -242,7 +242,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 				{
 					SHOWMSG("can't open a directory");
 
-					errno = EISDIR;
+					__set_errno(EISDIR);
 					goto out;
 				}
 
@@ -251,7 +251,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 				{
 					SHOWMSG("this object is not write enabled");
 
-					errno = EACCES;
+					__set_errno(EACCES);
 					goto out;
 				}
 
@@ -274,14 +274,14 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 				{
 					SHOWMSG("there's something not a directory on the path");
 
-					errno = ENOTDIR;
+					__set_errno(ENOTDIR);
 					goto out;
 				}
 				else if (error != ERROR_OBJECT_NOT_FOUND && error != ERROR_ACTION_NOT_KNOWN)
 				{
 					SHOWMSG("error accessing the object");
 
-					__translate_io_error_to_errno(IoErr(),&errno);
+					__set_errno(__translate_io_error_to_errno(IoErr()));
 					goto out;
 				}
 			}
@@ -305,7 +305,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 		LONG io_err = IoErr();
 
 		D(("the file '%s' didn't open in mode %ld",path_name,open_mode));
-		__translate_access_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_access_io_error_to_errno(io_err));
 
 		/* Check if ended up trying to open a directory as if
 		   it were a plain file. */
@@ -317,7 +317,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 			if(lock != ZERO)
 			{
 				if(Examine(lock,fib) && fib->fib_DirEntryType >= 0)
-					errno = EISDIR;
+					__set_errno(EISDIR);
 			}
 
 			PROFILE_ON();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf.c,v 1.5 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_vasprintf.c,v 1.6 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,7 +77,7 @@ __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

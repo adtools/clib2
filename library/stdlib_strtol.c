@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtol.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_strtol.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ strtol(const char *str, char **ptr, int base)
 		{
 			SHOWMSG("invalid str parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -76,7 +76,7 @@ strtol(const char *str, char **ptr, int base)
 	{
 		SHOWMSG("invalid base parameter");
 
-		errno = ERANGE;
+		__set_errno(ERANGE);
 		goto out;
 	}
 
@@ -160,7 +160,7 @@ strtol(const char *str, char **ptr, int base)
 			new_sum = base * sum + c;
 			if(new_sum < sum) /* overflow? */
 			{
-				errno = ERANGE;
+				__set_errno(ERANGE);
 
 				if(is_negative)
 					result = LONG_MIN;

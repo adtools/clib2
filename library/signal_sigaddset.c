@@ -1,5 +1,5 @@
 /*
- * $Id: signal_sigaddset.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: signal_sigaddset.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,7 @@ sigaddset(sigset_t * set,int sig)
 	{
 		if(set == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

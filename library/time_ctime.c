@@ -1,5 +1,5 @@
 /*
- * $Id: time_ctime.c,v 1.4 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_ctime.c,v 1.5 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,7 +58,7 @@ ctime(const time_t *tptr)
 		{
 			SHOWMSG("invalid tptr parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

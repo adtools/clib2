@@ -1,5 +1,5 @@
 /*
- * $Id: socket_get_descriptor.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_get_descriptor.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,13 +50,13 @@ __get_socket_descriptor(int socket_descriptor)
 	fd = __get_file_descriptor(socket_descriptor);
 	if(fd == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
 	if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET))
 	{
-		errno = ENOTSOCK;
+		__set_errno(ENOTSOCK);
 		goto out;
 	}
 

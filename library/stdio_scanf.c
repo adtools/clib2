@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_scanf.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_scanf.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,7 +61,7 @@ scanf(const char *format, ...)
 		{
 			SHOWMSG("invalid format parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

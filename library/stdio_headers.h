@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.9 2005-01-12 09:15:50 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.10 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,9 +81,9 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_LOCALE_UTILITY_H
-#include "stdlib_locale_utility.h"
-#endif /* _STDLIB_LOCALE_UTILITY_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 

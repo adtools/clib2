@@ -1,5 +1,5 @@
 /*
- * $Id: time_mktime.c,v 1.6 2005-01-30 16:10:59 obarthel Exp $
+ * $Id: time_mktime.c,v 1.7 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,7 +67,7 @@ mktime(struct tm *tm)
 		{
 			SHOWMSG("invalid tm parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

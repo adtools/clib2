@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_initgroups.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_initgroups.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ initgroups(const char *name, gid_t basegroup)
 		{
 			SHOWMSG("invalid name");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

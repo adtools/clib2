@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_crypt.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_crypt.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,8 @@ crypt(const char *key,const char *salt)
 		if(key == NULL || salt == NULL)
 		{
 			SHOWMSG("invalid parameters");
-			errno = EFAULT;
+
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

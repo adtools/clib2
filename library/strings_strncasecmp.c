@@ -1,5 +1,5 @@
 /*
- * $Id: strings_strncasecmp.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: strings_strncasecmp.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ strncasecmp(const char * _s1, const char * _s2,size_t n)
 	{
 		if(s1 == NULL || s2 == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

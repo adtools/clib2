@@ -1,5 +1,5 @@
 /*
- * $Id: stat_headers.h,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stat_headers.h,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,6 +39,12 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: string_memset.c,v 1.4 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: string_memset.c,v 1.5 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -146,7 +146,7 @@ memset(void *ptr, int val, size_t len)
 	{
 		if(ptr == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

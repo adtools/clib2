@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_truncate.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_truncate.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ truncate(const char * path_name, off_t length)
 		{
 			SHOWMSG("invalid path name");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -79,7 +79,7 @@ truncate(const char * path_name, off_t length)
 	{
 		SHOWMSG("invalid length");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 

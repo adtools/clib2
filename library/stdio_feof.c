@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_feof.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_feof.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,8 +65,10 @@ feof(FILE *stream)
 		{
 			SHOWMSG("invalid stream parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
+
 			result = 0;
+
 			goto out;
 		}
 	}

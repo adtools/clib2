@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rename.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_rename.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ rename(const char *oldname,const char *newname)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -87,7 +87,7 @@ rename(const char *oldname,const char *newname)
 
 			if(old_nti.is_root || new_nti.is_root)
 			{
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -112,7 +112,7 @@ rename(const char *oldname,const char *newname)
 			{
 				SHOWMSG("that was some other error");
 
-				__translate_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_io_error_to_errno(IoErr()));
 				goto out;
 			}
 
@@ -128,13 +128,13 @@ rename(const char *oldname,const char *newname)
 			{
 				SHOWMSG("that didn't work");
 
-				__translate_access_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_access_io_error_to_errno(IoErr()));
 				goto out;
 			}
 		}
 		#else
 		{
-			__translate_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
 		#endif /* UNIX_PATH_SEMANTICS */

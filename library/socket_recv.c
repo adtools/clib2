@@ -1,5 +1,5 @@
 /*
- * $Id: socket_recv.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_recv.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ recv(int sockfd,void *buff,size_t nbytes,int flags)
 		{
 			SHOWMSG("invalid buffer parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_growfdtable.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_growfdtable.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,7 +59,7 @@ __grow_fd_table(void)
 	{
 		SHOWMSG("not enough memory for new file descriptor table");
 
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		goto out;
 	}
 
@@ -77,7 +77,7 @@ __grow_fd_table(void)
 
 			free(new_fd);
 
-			errno = ENOMEM;
+			__set_errno(ENOMEM);
 			goto out;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime_r.c,v 1.5 2005-01-30 09:37:59 obarthel Exp $
+ * $Id: time_asctime_r.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -85,7 +85,7 @@ __asctime_r(const struct tm *tm,char * buffer,size_t buffer_size)
 	{
 		if(tm == NULL || buffer == NULL )
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

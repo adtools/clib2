@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_headers.h,v 1.4 2005-02-03 12:14:55 obarthel Exp $
+ * $Id: dirent_headers.h,v 1.5 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,6 +39,12 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.6 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.7 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -127,82 +127,28 @@ __math_init(void)
 	   the largest representable floating point value. */
 	if(sizeof(__huge_val) == 4) /* single precision */
 	{
-		static const unsigned long largest_fp_value[1] =
-		{
-			/* Exponent = +126, Mantissa = 8,388,607 */
-			0x7f7fffff
-		};
+		union ieee_single * x = (union ieee_single *)&__huge_val;
 
-		static const unsigned long not_a_number[1] =
-		{
-			/* Exponent = 255 and fraction != 0.0 */
-			0x7fffffff
-		};
-
-		static const unsigned long infinity[1] =
-		{
-			/* Exponent = 255 and fraction = 0.0 */
-			0x7f800000
-		};
-
-		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
-
-		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
-		memmove((void *)&__not_a_number,not_a_number,sizeof(not_a_number));
-		memmove((void *)&__infinity,infinity,sizeof(infinity));
+		/* Exponent = +126, Mantissa = 8,388,607 */
+		x->raw[0] = 0x7f7fffff;
 	}
 	else if (sizeof(__huge_val) == 8) /* double precision */
 	{
-		static const unsigned long largest_fp_value[2] =
-		{
-			/* Exponent = +1022, Mantissa = 4,503,599,627,370,495 */
-			0x7fefffff,0xffffffff
-		};
+		union ieee_double * x = (union ieee_double *)&__huge_val;
 
-		static const unsigned long not_a_number[2] =
-		{
-			/* Exponent = 2047 and fraction != 0.0 */
-			0x7fffffff,0xffffffff
-		};
-
-		static const unsigned long infinity[2] =
-		{
-			/* Exponent = 2047 and fraction = 0.0 */
-			0x7ff00000,0x00000000
-		};
-
-		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
-
-		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
-		memmove((void *)&__not_a_number,not_a_number,sizeof(not_a_number));
-		memmove((void *)&__infinity,infinity,sizeof(infinity));
+		/* Exponent = +1022, Mantissa = 4,503,599,627,370,495 */
+		x->raw[0] = 0x7fefffff;
+		x->raw[1] = 0xffffffff;
 	}
 #if defined(USE_LONG_DOUBLE)
 	else if (sizeof(__huge_val) == 12) /* extended precision */
 	{
-		static const unsigned long largest_fp_value[3] =
-		{
-			/* Exponent = +32766, Mantissa = 18,446,744,073,709,551,615 */
-			0x7ffe0000,0xffffffff,0xffffffff
-		};
+		union ieee_long_double * x = (union ieee_long_double *)&__huge_val;
 
-		static const unsigned long not_a_number[3] =
-		{
-			/* Exponent = 32767 and fraction != 0.0 */
-			0x7fff0000,0xffffffff,0xffffffff
-		};
-
-		static const unsigned long infinity[3] =
-		{
-			/* Exponent = 32767 and fraction = 0.0 */
-			0x7fff0000,0x00000000,0x00000000
-		};
-
-		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
-
-		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
-		memmove((void *)&__not_a_number,not_a_number,sizeof(not_a_number));
-		memmove((void *)&__infinity,infinity,sizeof(infinity));
+		/* Exponent = +32766, Mantissa = 18,446,744,073,709,551,615 */
+		x->raw[0] = 0x7ffe0000;
+		x->raw[1] = 0xffffffff;
+		x->raw[2] = 0xffffffff;
 	}
 #endif /* USE_LONG_DOUBLE */
 

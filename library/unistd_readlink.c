@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_readlink.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_readlink.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,7 +72,7 @@ readlink(const char * path_name, char * buffer, int buffer_size)
 		{
 			SHOWSTRING("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -108,7 +108,7 @@ readlink(const char * path_name, char * buffer, int buffer_size)
 		{
 			SHOWMSG("that didn't work");
 
-			__translate_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
 	}
@@ -124,7 +124,7 @@ readlink(const char * path_name, char * buffer, int buffer_size)
 		{
 			SHOWMSG("didn't get deviceproc");
 
-			__translate_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
 
@@ -136,14 +136,14 @@ readlink(const char * path_name, char * buffer, int buffer_size)
 		{
 			SHOWMSG("couldn't read the link");
 
-			__translate_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
 		else if (read_link_result == -2)
 		{
 			SHOWMSG("buffer was too short");
 
-			errno = ENOBUFS;
+			__set_errno(ENOBUFS);
 			goto out;
 		}
 	}

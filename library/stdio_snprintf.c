@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_snprintf.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_snprintf.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ snprintf(char *s, size_t size, const char *format, ...)
 	{
 		if((size > 0 && s == NULL) || format == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

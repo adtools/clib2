@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translatea2u.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_translatea2u.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 	{
 		D(("path name '%s' is too long (%ld characters total; maximum is %ld)!",name,len,sizeof(nti->substitute)-1));
 
-		errno = ENAMETOOLONG;
+		__set_errno(ENAMETOOLONG);
 		goto out;
 	}
 
@@ -83,7 +83,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 		/* We will need to make a copy of the name. Make sure that it fits. */
 		if(len > max_unix_len)
 		{
-			errno = ENAMETOOLONG;
+			__set_errno(ENAMETOOLONG);
 			goto out;
 		}
 
@@ -136,7 +136,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 		{
 			if(replace_len + 3 > max_unix_len)
 			{
-				errno = ENAMETOOLONG;
+				__set_errno(ENAMETOOLONG);
 				goto out;
 			}
 
@@ -159,7 +159,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 			{
 				if(replace_len + 3 > max_unix_len)
 				{
-					errno = ENAMETOOLONG;
+					__set_errno(ENAMETOOLONG);
 					goto out;
 				}
 
@@ -170,7 +170,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 			{
 				if(replace_len + 1 > max_unix_len)
 				{
-					errno = ENAMETOOLONG;
+					__set_errno(ENAMETOOLONG);
 					goto out;
 				}
 
@@ -189,7 +189,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 			   case scenario. */
 			if(1 + volume_name_len + 1 + replace_len > max_unix_len)
 			{
-				errno = ENAMETOOLONG;
+				__set_errno(ENAMETOOLONG);
 				goto out;
 			}
 
@@ -239,7 +239,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 					{
 						if(path_prefix_len + 1 + replace_len > max_unix_len)
 						{
-							errno = ENAMETOOLONG;
+							__set_errno(ENAMETOOLONG);
 							goto out;
 						}
 

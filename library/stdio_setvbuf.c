@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_setvbuf.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_setvbuf.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 		{
 			SHOWMSG("invalid stream parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -85,7 +85,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	{
 		SHOWMSG("invalid buffer mode");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -93,7 +93,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	{
 		SHOWMSG("invalid buffer size");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -105,7 +105,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	{
 		SHOWMSG("this file is not even in use");
 
-		errno = EBADF;
+		__set_errno(EBADF);
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
@@ -123,7 +123,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 		new_buffer = malloc(size + (CACHE_LINE_SIZE-1));
 		if(new_buffer == NULL)
 		{
-			errno = ENOBUFS;
+			__set_errno(ENOBUFS);
 			goto out;
 		}
 	}

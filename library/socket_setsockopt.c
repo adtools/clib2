@@ -1,5 +1,5 @@
 /*
- * $Id: socket_setsockopt.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_setsockopt.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ setsockopt(int sockfd,int level,int optname,const void *optval,int optlen)
 		{
 			SHOWMSG("invalid optval parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

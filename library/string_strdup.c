@@ -1,5 +1,5 @@
 /*
- * $Id: string_strdup.c,v 1.5 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: string_strdup.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ __strdup(const char *s,const char * file,int line)
 	{
 		if(s == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

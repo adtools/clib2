@@ -1,5 +1,5 @@
 /*
- * $Id: math_frexp.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_frexp.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -189,8 +189,9 @@ frexp(double x,int *nptr)
 	{
 		if(nptr == NULL)
 		{
-			result = HUGE_VAL;
-			errno = EFAULT;
+			__set_errno(EFAULT);
+
+			result = __get_huge_val();
 			goto out;
 		}
 	}

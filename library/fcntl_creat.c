@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_creat.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: fcntl_creat.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ creat(const char * path_name, mode_t mode)
 	{
 		if(path_name == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

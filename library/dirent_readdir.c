@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_readdir.c,v 1.6 2005-02-03 12:14:55 obarthel Exp $
+ * $Id: dirent_readdir.c,v 1.7 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,7 +61,7 @@ readdir(DIR * directory_pointer)
 	{
 		SHOWMSG("ouch. invalid parameter");
 
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -164,7 +164,7 @@ readdir(DIR * directory_pointer)
 					{
 						if(CANNOT Examine(parent_directory,fib))
 						{
-							__translate_io_error_to_errno(IoErr(),&errno);
+							__set_errno(__translate_io_error_to_errno(IoErr()));
 							goto out;
 						}
 					}
@@ -206,7 +206,7 @@ readdir(DIR * directory_pointer)
 				{
 					SHOWMSG("error scanning directory");
 
-					__translate_io_error_to_errno(IoErr(),&errno);
+					__set_errno(__translate_io_error_to_errno(IoErr()));
 					goto out;
 				}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_atexit.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdlib_atexit.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,7 +77,7 @@ atexit(void (*function)(void))
 	{
 		if(function == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -85,7 +85,7 @@ atexit(void (*function)(void))
 
 	if(atexit_blocked)
 	{
-		errno = EACCES;
+		__set_errno(EACCES);
 		goto out;
 	}
 
@@ -102,7 +102,7 @@ atexit(void (*function)(void))
 		etn = malloc(sizeof(*etn));
 		if(etn == NULL)
 		{
-			errno = ENOMEM;
+			__set_errno(ENOMEM);
 			goto out;
 		}
 	}

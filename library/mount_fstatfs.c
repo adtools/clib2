@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: mount_fstatfs.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ fstatfs(int file_descriptor, struct statfs *buf)
 		{
 			SHOWMSG("invalid buffer parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -86,7 +86,7 @@ fstatfs(int file_descriptor, struct statfs *buf)
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -102,7 +102,7 @@ fstatfs(int file_descriptor, struct statfs *buf)
 	result = message.result;
 	if(result != 0)
 	{
-		errno = message.error;
+		__set_errno(message.error);
 		goto out;
 	}
 

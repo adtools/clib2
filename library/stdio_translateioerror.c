@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_translateioerror.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_translateioerror.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,8 +37,8 @@
 
 /****************************************************************************/
 
-void
-__translate_io_error_to_errno(LONG io_err,int * errno_ptr)
+int
+__translate_io_error_to_errno(LONG io_err)
 {
 	static const struct { LONG io_err; LONG errno; } map_table[] =
 	{
@@ -84,35 +84,35 @@ __translate_io_error_to_errno(LONG io_err,int * errno_ptr)
 	};
 
 	unsigned int i;
-	int error;
+	int result;
 
-	assert( errno_ptr != NULL );
-
-	error = EIO;
+	result = EIO;
 
 	for(i = 0 ; i < NUM_ENTRIES(map_table) ; i++)
 	{
 		if(map_table[i].io_err == io_err)
 		{
-			error = map_table[i].errno;
+			result = map_table[i].errno;
 			break;
 		}
 	}
 
-	(*errno_ptr) = error;
+	return(result);
 }
 
 /****************************************************************************/
 
 /* Same as above, except that we translate ERROR_OBJECT_WRONG_TYPE
    into ENOTDIR by default. */
-void
-__translate_access_io_error_to_errno(LONG io_err,int * errno_ptr)
+int
+__translate_access_io_error_to_errno(LONG io_err)
 {
-	assert( errno_ptr != NULL );
+	int result;
 
 	if(io_err == ERROR_OBJECT_WRONG_TYPE)
-		(*errno_ptr) = ENOTDIR;
+		result = ENOTDIR;
 	else
-		__translate_io_error_to_errno(io_err,errno_ptr);
+		result = __translate_io_error_to_errno(io_err);
+
+	return(result);
 }

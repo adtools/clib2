@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_dup2.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_dup2.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,7 +65,7 @@ dup2(int file_descriptor1, int file_descriptor2)
 	fd1 = __get_file_descriptor(file_descriptor1);
 	if(fd1 == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -135,7 +135,7 @@ dup2(int file_descriptor1, int file_descriptor2)
 		result = message.result;
 		if(result != 0)
 		{
-			errno = message.error;
+			__set_errno(message.error);
 			goto out;
 		}
 	}

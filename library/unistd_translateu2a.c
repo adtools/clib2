@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,7 +67,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 	{
 		D(("path name '%s' is too long (%ld characters total; maximum is %ld)!",name,len,sizeof(nti->substitute)-1));
 
-		errno = ENAMETOOLONG;
+		__set_errno(ENAMETOOLONG);
 		goto out;
 	}
 
@@ -325,7 +325,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 				{
 					D(("name '%s' still contains colon characters",name));
 
-					errno = EINVAL; /* invalid name */
+					__set_errno(EINVAL); /* invalid name */
 					goto out;
 				}
 			}
@@ -352,7 +352,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 		{
 			D(("name '%s' still contains colon characters",name));
 
-			errno = EINVAL; /* invalid name */
+			__set_errno(EINVAL); /* invalid name */
 			goto out;
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: math_log10.c,v 1.3 2005-01-18 20:00:08 obarthel Exp $
+ * $Id: math_log10.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -186,18 +186,16 @@ log10(double x)
 {
 	double result;
 
-	/* When do we consider 'x' to be invalid? If it's close
-	 * enough to zero or negative.
-	 */
 	if(x > DBL_EPSILON)
 	{
 		result = __log10(x);
 	}
 	else
 	{
-		/* ZZZ this should be minus infinity */
-		result = -HUGE_VAL;
-		errno = ERANGE;
+		__set_errno(ERANGE);
+
+		/* This should really be minus infinity. */
+		result = (-__get_huge_val());
 	}
 
 	return(result);

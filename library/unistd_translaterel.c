@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translaterel.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_translaterel.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,7 +78,7 @@ __translate_relative_path_name(char const ** name_ptr,char *replacement_buffer,s
 		/* Check if the complete string will fit, including the terminating NUL byte. */
 		if(total_len+1 > replacement_buffer_size)
 		{
-			errno = ENAMETOOLONG;
+			__set_errno(ENAMETOOLONG);
 			goto out;
 		}
 

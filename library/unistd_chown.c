@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chown.c,v 1.4 2005-01-09 15:58:02 obarthel Exp $
+ * $Id: unistd_chown.c,v 1.5 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 		{
 			SHOWMSG("invalid path name");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -84,7 +84,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 	{
 		SHOWMSG("invalid owner or group");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -97,7 +97,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 
 			if(path_name_nti.is_root)
 			{
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -128,7 +128,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 			len = strlen(path_name);
 			if(len >= sizeof(new_name->name))
 			{
-				errno = ENAMETOOLONG;
+				__set_errno(ENAMETOOLONG);
 				goto out;
 			}
 
@@ -138,7 +138,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 
 			if(dvp == NULL)
 			{
-				__translate_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_io_error_to_errno(IoErr()));
 				goto out;
 			}
 
@@ -154,7 +154,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 
 	if(status == DOSFALSE)
 	{
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

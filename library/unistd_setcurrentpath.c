@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_setcurrentpath.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_setcurrentpath.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@ __set_current_path(const char * path_name)
 	{
 		SHOWMSG("path is too long");
 
-		errno = ENAMETOOLONG;
+		__set_errno(ENAMETOOLONG);
 		goto out;
 	}
 

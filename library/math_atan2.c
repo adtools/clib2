@@ -1,5 +1,5 @@
 /*
- * $Id: math_atan2.c,v 1.4 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_atan2.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -108,7 +108,7 @@ __atan2(double y,double x)
 			else
 			{
 				result = 0;
-				errno = EDOM;
+				__set_errno(EDOM);
 			}
 		}
 	}
@@ -187,7 +187,7 @@ __atan2(double y,double x)
 			else
 			{
 				result = 0;
-				errno = EDOM;
+				__set_errno(EDOM);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_setgroups.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_setgroups.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ setgroups(int ngroups,const gid_t *groups)
 		{
 			SHOWMSG("invalid groups parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

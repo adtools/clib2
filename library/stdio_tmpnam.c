@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_tmpnam.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_tmpnam.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -102,7 +102,7 @@ tmpnam(char *buf)
 			if(IoErr() == ERROR_OBJECT_NOT_FOUND)
 				result = buf;
 			else
-				__translate_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_io_error_to_errno(IoErr()));
 
 			break;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_read.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: fcntl_read.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -136,10 +136,12 @@ ssize_t
 read(int file_descriptor, void * buffer, size_t num_bytes)
 {
 	ssize_t result;
+	int error;
 
 	ENTER();
 
-	result = __read(file_descriptor,buffer,num_bytes,&errno);
+	result = __read(file_descriptor,buffer,num_bytes,&error);
+	__set_errno(error);
 
 	RETURN(result);
 	return(result);

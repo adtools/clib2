@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fputc.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_fputc.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ __fputc_check(FILE *stream)
 	{
 		if(stream == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -72,7 +72,7 @@ __fputc_check(FILE *stream)
 	{
 		SHOWMSG("this file is not even in use");
 
-		errno = EBADF;
+		__set_errno(EBADF);
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
@@ -82,7 +82,7 @@ __fputc_check(FILE *stream)
 	{
 		SHOWMSG("this stream is not write enabled");
 
-		errno = EBADF;
+		__set_errno(EBADF);
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;

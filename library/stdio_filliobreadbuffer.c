@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_filliobreadbuffer.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_filliobreadbuffer.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -92,9 +92,9 @@ __fill_iob_read_buffer(struct iob * file)
 
 	if(message.result < 0)
 	{
-		errno = message.error;
+		__set_errno(message.error);
 
-		D(("got error %ld",errno));
+		D(("got error %ld",message.error));
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;

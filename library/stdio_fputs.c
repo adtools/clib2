@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fputs.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_fputs.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ fputs(const char *s, FILE *stream)
 	{
 		if(s == NULL || stream == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

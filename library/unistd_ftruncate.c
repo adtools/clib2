@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,7 +67,7 @@ ftruncate(int file_descriptor, off_t length)
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -75,7 +75,7 @@ ftruncate(int file_descriptor, off_t length)
 	{
 		SHOWMSG("invalid length");
 
-		errno = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
@@ -85,7 +85,7 @@ ftruncate(int file_descriptor, off_t length)
 	{
 		SHOWMSG("file descriptor is not write-enabled");
 
-		errno = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -105,7 +105,7 @@ ftruncate(int file_descriptor, off_t length)
 
 	if(message.result < 0)
 	{
-		errno = message.error;
+		__set_errno(message.error);
 		goto out;
 	}
 

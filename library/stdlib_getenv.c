@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_getenv.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_getenv.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,7 +61,7 @@ getenv(const char * name)
 		{
 			SHOWMSG("invalid name parameter");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -74,7 +74,7 @@ getenv(const char * name)
 	{
 		SHOWMSG("couldn't get the variable");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

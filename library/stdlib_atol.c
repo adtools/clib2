@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_atol.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdlib_atol.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ atol(const char *str)
 	{
 		if(str == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

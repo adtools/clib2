@@ -1,5 +1,5 @@
 /*
- * $Id: socket_getsockopt.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_getsockopt.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ getsockopt(int sockfd,int level,int optname,void *optval,int *optlen)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

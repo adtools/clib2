@@ -1,5 +1,5 @@
 /*
- * $Id: math_fmod.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_fmod.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -285,7 +285,7 @@ fmod(double x,double y)
 	else
 	{
 		result = x;
-		errno = EDOM;
+		__set_errno(EDOM);
 	}
 
 	return(result);

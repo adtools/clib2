@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_unlink.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_unlink.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,7 +76,7 @@ unlink(const char * path_name)
 		{
 			SHOWMSG("invalid path name");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -94,7 +94,7 @@ unlink(const char * path_name)
 
 			if(path_name_nti.is_root)
 			{
-				errno = EACCES;
+				__set_errno(EACCES);
 				goto out;
 			}
 		}
@@ -119,7 +119,7 @@ unlink(const char * path_name)
 
 			if(IoErr() != ERROR_OBJECT_IN_USE)
 			{
-				__translate_access_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_access_io_error_to_errno(IoErr()));
 				goto out;
 			}
 
@@ -134,7 +134,7 @@ unlink(const char * path_name)
 
 			if(current_dir == ZERO)
 			{
-				__translate_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_io_error_to_errno(IoErr()));
 				goto out;
 			}
 
@@ -172,7 +172,7 @@ unlink(const char * path_name)
 		}
 		#else
 		{
-			__translate_io_error_to_errno(IoErr(),&errno);
+			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
 		#endif /* UNIX_PATH_SEMANTICS */

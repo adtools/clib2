@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.18 2005-01-29 18:05:14 obarthel Exp $
+# $Id: smakefile,v 1.19 2005-02-03 16:56:15 obarthel Exp $
 #
 # :ts=8
 #
@@ -190,6 +190,7 @@ MATH_OBJ = \
 	math_floor.o \
 	math_fmod.o \
 	math_frexp.o \
+	math_huge_val.o \
 	math_hypot.o \
 	math_init_exit.o \
 	math_isinf.o \
@@ -375,6 +376,8 @@ STDLIB_OBJ = \
 	stdlib_destructor.o \
 	stdlib_detach.o \
 	stdlib_dosbase.o \
+	stdlib_get_errno.o \
+	stdlib_set_errno.o \
 	stdlib_sysbase.o \
 	stdlib_termination_message.o \
 	stdlib_threshold.o \

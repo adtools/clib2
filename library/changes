@@ -22,6 +22,17 @@
   functions which is not required unless the code is built for
   Unix compatibility mode.
 
+- Lost the __not_a_number and __infinity variables, including the
+  code which initialized them.
+
+- Reading/changing the errno variable is no longer done directly, but
+  involves accessor functions.
+
+- References to the HUGE_VAL quantity now involve an accessor function, too.
+
+- Changed the manner in which the __huge_val constant is initialized by
+  the __math_init() function.
+
 
 c.lib 1.187 (29.1.2005)
 

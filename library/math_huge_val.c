@@ -1,5 +1,5 @@
 /*
- * $Id: mount_headers.h,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_huge_val.c,v 1.1 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,29 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _MOUNT_HEADERS_H
-#define _MOUNT_HEADERS_H
+#ifndef _MATH_HEADERS_H
+#include "math_headers.h"
+#endif /* _MATH_HEADERS_H */
 
 /****************************************************************************/
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
-
-/****************************************************************************/
-
-#ifndef _STDLIB_HEADERS_H
-#include "stdlib_headers.h"
-#endif /* _STDLIB_HEADERS_H */
-
-/****************************************************************************/
-
-#include <sys/mount.h>
-
-/****************************************************************************/
-
-extern void __convert_info_to_statfs(struct InfoData * id,struct statfs * f);
-
-/****************************************************************************/
-
-#endif /* _MOUNT_HEADERS_H */
+double
+__get_huge_val(void)
+{
+	return(__huge_val);
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: string_memchr.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: string_memchr.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -182,7 +182,7 @@ memchr(const void * ptr, int val, size_t len)
 	{
 		if(ptr == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.6 2005-01-09 15:58:02 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.7 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -100,7 +100,7 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED file,int UNUSE
 	{
 		SHOWMSG("not enough free memory available to safely proceed with allocation");
 
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		goto out;
 	}
 
@@ -130,7 +130,7 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED file,int UNUSE
 	{
 		SHOWMSG("not enough memory");
 
-		errno = ENOMEM;
+		__set_errno(ENOMEM);
 		goto out;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_bsearch.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdlib_bsearch.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,7 +72,7 @@ bsearch(const void *key, const void *base, size_t count, size_t size, int (*comp
 			{
 				SHOWMSG("invalid parameters");
 
-				errno = EFAULT;
+				__set_errno(EFAULT);
 				goto out;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_tmpfile.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_tmpfile.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,7 +75,7 @@ tmpfile(void)
 	{
 		SHOWMSG("couldn't get a temp_file_lock on the current directory");
 
-		__translate_io_error_to_errno(IoErr(),&errno);
+		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 

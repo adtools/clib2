@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_rewinddir.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: dirent_rewinddir.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,7 +76,7 @@ rewinddir(DIR * directory_pointer)
 			if(CANNOT Examine(dh->dh_DirLock,&dh->dh_FileInfo))
 			{
 				SHOWMSG("ouch. that didn't work");
-				__translate_io_error_to_errno(IoErr(),&errno);
+				__set_errno(__translate_io_error_to_errno(IoErr()));
 			}
 		}
 	}

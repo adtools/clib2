@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_dropiobreadbuffer.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_dropiobreadbuffer.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,8 +94,9 @@ __drop_iob_read_buffer(struct iob * file)
 
 					SET_FLAG(file->iob_Flags,IOBF_ERROR);
 
-					result	= -1;
-					errno	= message.error;
+					result = -1;
+
+					__set_errno(message.error);
 
 					goto out;
 				}

@@ -1,5 +1,5 @@
 /*
- * $Id: string_strstr.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: string_strstr.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ strstr(const char *src, const char *sub)
 	{
 		if(src == NULL || sub == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

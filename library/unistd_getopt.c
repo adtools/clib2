@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_getopt.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_getopt.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,7 +76,7 @@ getopt(int argc, char * argv[], char *opts)
 		{
 			SHOWMSG("invalid parameters");
 
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
