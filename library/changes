@@ -1,3 +1,5 @@
+c.lib 1.187 (29.1.2005)
+
 - The default console output window opened when a program is launched
   from Workbench would open and stay open. This was not intended to
   happen and is a side-effect of the new stdio initialization code which
@@ -17,6 +19,19 @@
 - Plugged in a different algorithm for calculating the day of the week in
   strftime() and asctime_r(). This one isn't sensitive to the effects of
   adding/subtracting the local time zone.
+
+- Changed the algorithm that calculates the number of days that have passed
+  so far as used by the the __convert_time() function and the conversion
+  code in strftime().
+
+- Also changed the algorithm used by strftime() to produce the week numbers
+  (the '%U' and '%W' format specifiers). The new method is much simpler
+  than the old one.
+
+- Made the code that converts a 'time_t' value into the 'struct DateStamp',
+  as used by strftime() and utime(), into its own function. This also
+  fixes a bug in the code strftime() would use which was completely
+  unaware of the local time zone settings.
 
 
 c.lib 1.186 (14.1.2005)

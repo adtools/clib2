@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.22 2005-01-26 18:41:38 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.23 2005-01-29 18:05:13 obarthel Exp $
 #
 # :ts=8
 #
@@ -364,9 +364,11 @@ C_LIB = \
 	time_clock.o \
 	time_converttime.o \
 	time_convert_datestamp.o \
+	time_convert_time.o \
 	time_ctime.o \
 	time_ctime_r.o \
 	time_data.o \
+	time_days_per_date.o \
 	time_gettimeofday.o \
 	time_gmtime.o \
 	time_gmtime_r.o \

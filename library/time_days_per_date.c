@@ -1,5 +1,5 @@
 /*
- * $Id: time_converttime.c,v 1.3 2005-01-29 18:05:14 obarthel Exp $
+ * $Id: time_days_per_date.c,v 1.1 2005-01-29 18:05:14 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,57 +31,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/****************************************************************************/
+
 #ifndef _TIME_HEADERS_H
 #include "time_headers.h"
 #endif /* _TIME_HEADERS_H */
 
 /****************************************************************************/
 
-struct tm *
-__convert_time(ULONG seconds, LONG gmt_offset, struct tm * tm)
+/* This calculates the number of days that have passed up to the
+   given date. */
+int
+__calculate_days_per_date(int year,int month,int day)
 {
-	DECLARE_UTILITYBASE();
-	struct ClockData clock_data;
-	struct tm * result;
+	int result;
 
-	ENTER();
+	month	= month + 9;
+	year	= year - 1 + (month / 12);
+	month	= (month % 12) * 306 + 5;
 
-	assert( UtilityBase != NULL );
+	result = (year * 365) + (year / 4) - (year / 100) + (year / 400) + (month / 10) + day - 1;
 
-	/* We need to convert the time from Unix-style UTC
-	 * back into Amiga style local time.
-	 *
-	 * First, the Unix time offset will have to go.
-	 */
-	if(seconds < UNIX_TIME_OFFSET)
-		seconds = 0;
-	else
-		seconds -= UNIX_TIME_OFFSET;
-
-	/* Now the local time offset will have to go. */
-	seconds -= gmt_offset;
-
-	/* Convert the number of seconds into a more useful format. */
-	Amiga2Date(seconds, &clock_data);
-
-	/* The 'struct clockdata' layout and contents are very similar
-	 * to the 'struct tm' contents. We don't have to convert much,
-	 * except for the 'tm.tm_yday' field below.
-	 */
-	tm->tm_sec		= clock_data.sec;
-	tm->tm_min		= clock_data.min;
-	tm->tm_hour		= clock_data.hour;
-	tm->tm_mday		= clock_data.mday;
-	tm->tm_mon		= clock_data.month - 1;
-	tm->tm_year		= clock_data.year - 1900;
-	tm->tm_wday		= clock_data.wday;
-	tm->tm_isdst	= -1;
-
-	/* Now figure out how many days have passed since January 1st. */
-	tm->tm_yday = __calculate_days_per_date(clock_data.year,clock_data.month,clock_data.mday) - __calculate_days_per_date(clock_data.year,1,1);
-
-	result = tm;
-
-	RETURN(result);
 	return(result);
 }

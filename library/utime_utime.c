@@ -1,5 +1,5 @@
 /*
- * $Id: utime_utime.c,v 1.4 2005-01-24 10:25:46 obarthel Exp $
+ * $Id: utime_utime.c,v 1.5 2005-01-29 18:05:14 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,6 +45,10 @@
 #include "locale_headers.h"
 #endif /* _LOCALE_HEADERS_H */
 
+#ifndef _TIME_HEADERS_H
+#include "time_headers.h"
+#endif /* _TIME_HEADERS_H */
+
 /****************************************************************************/
 
 /* The following is not part of the ISO 'C' (1994) standard. */
@@ -80,28 +84,11 @@ utime(const char * path_name,const struct utimbuf * times)
 	   DateStamp format, as used by the SetFileDate() function. */
 	if(times != NULL)
 	{
-		time_t seconds;
-
-		seconds = times->modtime;
-
-		/* The modification time has to lie within the AmigaOS epoch. */
-		if(seconds < UNIX_TIME_OFFSET)
+		if(CANNOT __convert_time_to_datestamp(times->modtime,&ds))
 		{
 			errno = EINVAL;
 			goto out;
 		}
-
-		/* Adjust the modification time to the AmigaOS epoch. */
-		seconds -= UNIX_TIME_OFFSET;
-
-		/* If possible, adjust the modification time to match the
-		   local time zone settings. */
-		if(__default_locale != NULL)
-			seconds -= 60 * __default_locale->loc_GMTOffset;
-
-		ds.ds_Days		= (seconds / (24 * 60 * 60));
-		ds.ds_Minute	= (seconds % (24 * 60 * 60)) / 60;
-		ds.ds_Tick		= (seconds % 60) * TICKS_PER_SECOND;
 	}
 	else
 	{

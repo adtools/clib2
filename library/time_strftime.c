@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.4 2005-01-26 18:41:39 obarthel Exp $
+ * $Id: time_strftime.c,v 1.5 2005-01-29 18:05:14 obarthel Exp $
  *
  * :ts=4
  *
@@ -103,15 +103,12 @@ store_string_via_hook(const char * string,int len,struct Hook * hook)
 /****************************************************************************/
 
 static void
-format_date(const char *format,const struct tm *tm,time_t time_value,struct Hook * hook)
+format_date(const char *format,const struct tm *tm,struct Hook * hook)
 {
-	struct tm other_tm;
 	struct tm copy_tm;
-	time_t other_time_value = 0; /* ZZZ compiler claims that this assignment is unnecessary. */
 	char buffer[40];
 	const char * str;
 	char c;
-	int i;
 
 	assert( format != NULL && tm != NULL && hook != NULL);
 
@@ -200,7 +197,7 @@ format_date(const char *format,const struct tm *tm,time_t time_value,struct Hook
 			/* Locale specific date and time ("%a %b %d %H:%M:%S %Y"). */
 			case 'c':
 
-				format_date("%a %b %d %H:%M:%S %Y",tm,time_value,hook);
+				format_date("%a %b %d %H:%M:%S %Y",tm,hook);
 				break;
 
 			/* Day of the month ("01"-"31"). */
@@ -234,13 +231,7 @@ format_date(const char *format,const struct tm *tm,time_t time_value,struct Hook
 			/* Day of the year ("001"-"366"). */
 			case 'j':
 
-				other_tm = (*tm);
-				other_tm.tm_mday = 1;
-				other_tm.tm_mon = 0;
-
-				other_time_value = mktime(&other_tm);
-
-				__number_to_string((unsigned int)(other_time_value - time_value) / (24 * 60 * 60) + 1,buffer,sizeof(buffer),3);
+				__number_to_string(1 + __calculate_days_per_date(tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday) - __calculate_days_per_date(tm->tm_year+1900,1,1),buffer,sizeof(buffer),3);
 				store_string_via_hook(buffer,-1,hook);
 				break;
 
@@ -284,32 +275,7 @@ format_date(const char *format,const struct tm *tm,time_t time_value,struct Hook
 			 */
 			case 'U':
 
-				/* Go back to January and find the first Sunday. */
-				other_tm = (*tm);
-				other_tm.tm_mon = 0;
-
-				for(i = 0 ; i < 7 ; i++)
-				{
-					other_tm.tm_mday = i+1;
-
-					other_time_value = mktime(&other_tm);
-					if(other_tm.tm_wday == 0)
-						break;
-				}
-
-				/* Store the number of weeks difference between
-				 * the given day and the first Sunday.
-				 */
-				if(time_value < other_time_value)
-				{
-					/* This must be week zero. */
-					__number_to_string((unsigned int)0,buffer,sizeof(buffer),2);
-				}
-				else
-				{
-					__number_to_string((unsigned int)(time_value - other_time_value) / (7 * 24 * 60 * 60) + 1,buffer,sizeof(buffer),2);
-				}
-
+				__number_to_string((tm->tm_yday + 7 - tm->tm_wday) / 7,buffer,sizeof(buffer),2);
 				store_string_via_hook(buffer,2,hook);
 				break;
 
@@ -327,45 +293,20 @@ format_date(const char *format,const struct tm *tm,time_t time_value,struct Hook
 			 */
 			case 'W':
 
-				/* Go back to January and find the first Monday. */
-				other_tm = (*tm);
-				other_tm.tm_mon = 0;
-
-				for(i = 0 ; i < 7 ; i++)
-				{
-					other_tm.tm_mday = i+1;
-
-					other_time_value = mktime(&other_tm);
-					if(other_tm.tm_wday == 1)
-						break;
-				}
-
-				/* Store the number of weeks difference between
-				 * the given day and the first Monday.
-				 */
-				if(time_value < other_time_value)
-				{
-					/* This must be week zero. */
-					__number_to_string((unsigned int)0,buffer,sizeof(buffer),2);
-				}
-				else
-				{
-					__number_to_string((unsigned int)(time_value - other_time_value) / (7 * 24 * 60 * 60) + 1,buffer,sizeof(buffer),2);
-				}
-
+				__number_to_string((tm->tm_yday + 7 - ((tm->tm_wday + 6) % 7)) / 7,buffer,sizeof(buffer),2);
 				store_string_via_hook(buffer,2,hook);
 				break;
 
 			/* Locale-specific date ("%a %b %d, %Y"). */
 			case 'x':
 
-				format_date("%a %b %d, %Y",tm,time_value,hook);
+				format_date("%a %b %d, %Y",tm,hook);
 				break;
 
 			/* Locale-specific time ("%H:%M:%S"). */
 			case 'X':
 
-				format_date("%H:%M:%S",tm,time_value,hook);
+				format_date("%H:%M:%S",tm,hook);
 				break;
 
 			/* Year without century ("00"-"99"). */
@@ -436,8 +377,6 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 	struct format_hook_data data;
 	struct Hook hook;
 	size_t result = 0;
-	struct tm tm_copy;
-	time_t time_value;
 
 	ENTER();
 
@@ -465,15 +404,6 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 
 	if(maxsize > 0)
 	{
-		tm_copy = (*tm);
-
-		time_value = mktime(&tm_copy);
-		if(time_value == (time_t)-1)
-		{
-			SHOWMSG("invalid time");
-			goto out;
-		}
-
 		data.buffer		= s;
 		data.max_size	= maxsize-1;
 
@@ -496,12 +426,25 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 		if(__locale_table[LC_TIME] != NULL)
 		{
 			struct DateStamp ds;
+			struct tm tm_copy;
+			time_t time_value;
 
-			time_value -= UNIX_TIME_OFFSET;
+			tm_copy = (*tm);
 
-			ds.ds_Days		= time_value / (24 * 60 * 60);
-			ds.ds_Minute	= (time_value % (24 * 60 * 60)) / 60;
-			ds.ds_Tick		= (time_value % 60) * TICKS_PER_SECOND;
+			time_value = mktime(&tm_copy);
+			if(time_value == (time_t)-1)
+			{
+				SHOWMSG("invalid time");
+				goto out;
+			}
+
+			/* Convert the number of seconds into a DateStamp, as to be
+			   submitted to the FormatDate() function below. */
+			if(CANNOT __convert_time_to_datestamp(time_value,&ds))
+			{
+				SHOWMSG("time conversion to datestamp failed");
+				goto out;
+			}
 
 			assert( LocaleBase != NULL );
 
@@ -509,7 +452,7 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *tm)
 		}
 		else
 		{
-			format_date(format,tm,time_value,&hook);
+			format_date(format,tm,&hook);
 		}
 
 		(*data.buffer) = '\0';

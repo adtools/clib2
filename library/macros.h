@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.6 2005-01-24 10:25:46 obarthel Exp $
+ * $Id: macros.h,v 1.7 2005-01-29 18:05:14 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,10 +64,6 @@
    on January 1st, 1970) and the AmigaOS epoch (which began eight years
    later on January 1st 1978). */
 #define UNIX_TIME_OFFSET 252460800
-
-/****************************************************************************/
-
-#define MILLION (1000000)
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.17 2005-01-26 18:41:39 obarthel Exp $
+# $Id: smakefile,v 1.18 2005-01-29 18:05:14 obarthel Exp $
 #
 # :ts=8
 #
@@ -472,9 +472,11 @@ TIME_OBJ = \
 	time_clock.o \
 	time_converttime.o \
 	time_convert_datestamp.o \
+	time_convert_time.o \
 	time_ctime.o \
 	time_ctime_r.o \
 	time_data.o \
+	time_days_per_date.o \
 	time_difftime.o \
 	time_gettimeofday.o \
 	time_gmtime.o \
