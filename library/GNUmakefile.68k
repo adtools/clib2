@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.40 2005-03-11 09:37:27 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.41 2005-03-11 13:23:17 obarthel Exp $
 #
 # :ts=8
 #
@@ -110,7 +110,7 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -Inetinclude
- OPTIONS = -DNDEBUG -fno-builtin
+ OPTIONS = -DNDEBUG -fno-builtin -fno-common
 #OPTIONS = -D__MEM_DEBUG -fno-builtin
 #OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O -fomit-frame-pointer -fstrength-reduce -finline-functions
@@ -940,7 +940,7 @@ $(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_mem_debug.h
 
 ##############################################################################
 
-# The -fbaserel32 option requires the CPU type to be 68010/68020, too.
+# The -fbaserel32 option requires the CPU type to be 68020, too.
 ifneq (,$(findstring fbaserel32,$(CODE_FLAGS)))
 LOCAL_CODE_FLAGS := $(CODE_FLAGS) $(CODE_TYPE)
 else

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.26 2005-03-11 09:37:29 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.27 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -99,25 +99,20 @@ __close_all_files(void)
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__stdio_exit)
+STDIO_DESTRUCTOR(__stdio_exit)
 {
-	ENTER();
-
 	__close_all_files();
 
 	__stdio_lock_exit();
-
-	LEAVE();
 }
 
 /****************************************************************************/
 
-int
-__stdio_init(void)
+STDIO_CONSTRUCTOR(__stdio_init)
 {
 	const int num_standard_files = (STDERR_FILENO - STDIN_FILENO + 1);
 
-	int result = ERROR;
+	BOOL success = FALSE;
 
 	ENTER();
 
@@ -130,10 +125,12 @@ __stdio_init(void)
 	if(__grow_fd_table(num_standard_files) < 0)
 		goto out;
 
-	result = OK;
+	success = TRUE;
 
  out:
 
-	RETURN(result);
-	return(result);
+	if(success)
+		CONSTRUCTOR_SUCCEED();
+	else
+		CONSTRUCTOR_FAIL();
 }

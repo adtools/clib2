@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.14 2005-03-11 09:37:29 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.15 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -115,53 +115,11 @@ _EPILOG(REG(a0,char * id))
 STATIC int
 call_main(void)
 {
-	/* Initialization functions; must be called exactly in this
-	   order because there are dependencies between the
-	   individual functions. */
-	static init_func_ptr init_functions[] =
-	{
-		__stdlib_init,
-		__stk_init,
-		__stdio_init,
-		__stdio_file_init,
-		__math_init,
-		__socket_init,
-		__arg_init,
-
-		NULL
-	};
-
-	/* Finalization functions; these may be called
-	   essentially in any order. But this one makes the
-	   most sense (roll-back of the corresponding
-	   initialization functions). */
-	static exit_func_ptr exit_functions[] =
-	{
-		__stdlib_exit,
-
-		NULL
-	};
-
-	static size_t i;
-
 	ENTER();
 
 	/* This plants the return buffer for _exit(). */
 	if(setjmp(__exit_jmp_buf) != 0)
 		goto out;
-
-	SHOWMSG("calling init functions");
-
-	for(i = 0 ; init_functions[i] != NULL ; i++)
-	{
-		D(("calling init function #%ld",i));
-
-		if((*init_functions[i])() != OK)
-		{
-			SHOWMSG("that didn't work");
-			goto out;
-		}
-	}
 
 	SHOWMSG("now invoking the constructors");
 
@@ -230,20 +188,6 @@ call_main(void)
 	_fini();
 
 	SHOWMSG("done.");
-
-	SHOWMSG("calling the exit functions");
-
-	/* Any of the following cleanup routines may call
-	   _exit() by way of abort() or through a hook
-	   function. Which is why we redirect the exit
-	   return procedure. */
-	for(i = 0 ; exit_functions[i] != NULL ; i++)
-	{
-		D(("calling exit function #%ld",i));
-
-		if(setjmp(__exit_jmp_buf) == 0)
-			(*exit_functions[i])();
-	}
 
 	RETURN(__exit_value);
 	return(__exit_value);
@@ -322,11 +266,11 @@ struct UtilityIFace * __IUtility;
 int
 _main(void)
 {
-	struct Process * child_process = NULL;
-	struct WBStartup * startup_message;
+	volatile struct Process * child_process = NULL;
+	volatile struct WBStartup * startup_message;
+	volatile APTR old_window_pointer = NULL;
+	volatile BOOL old_window_pointer_valid = FALSE;
 	struct Process * this_process;
-	APTR old_window_pointer = NULL;
-	BOOL old_window_pointer_valid = FALSE;
 	int return_code = RETURN_FAIL;
 	ULONG current_stack_size;
 	int os_version;
@@ -356,7 +300,7 @@ _main(void)
 		startup_message = NULL;
 	}
 
-	__WBenchMsg = startup_message;
+	__WBenchMsg = (struct WBStartup *)startup_message;
 
 	/* Check which minimum operating system version we actually require. */
 	os_version = 37;

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.18 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.19 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -363,6 +363,10 @@ struct bcpl_name
 {
 	unsigned char name[256];
 };
+
+/****************************************************************************/
+
+extern struct WBStartup * NOCOMMON __WBenchMsg;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.2 2005-03-11 09:37:29 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.3 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ struct WBStartup * __WBenchMsg;
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(workbench_exit)
+FILE_DESTRUCTOR(workbench_exit)
 {
 	ENTER();
 
@@ -196,19 +196,16 @@ wb_file_init(void)
 
 /****************************************************************************/
 
-int
-__stdio_file_init(void)
+FILE_CONSTRUCTOR(__stdio_file_init)
 {
 	struct SignalSemaphore * stdio_lock;
 	struct SignalSemaphore * fd_lock;
 	BPTR default_file;
 	ULONG fd_flags,iob_flags;
-	int result = ERROR;
+	BOOL success = FALSE;
 	char * buffer;
 	char * aligned_buffer;
 	int i;
-
-	ENTER();
 
 	/* If we were invoked from Workbench, set up the standard I/O streams. */
 	if(__WBenchMsg != NULL)
@@ -358,10 +355,12 @@ __stdio_file_init(void)
 
 	PROFILE_ON();
 
-	result = OK;
+	success = TRUE;
 
  out:
 
-	RETURN(result);
-	return(result);
+	if(success)
+		CONSTRUCTOR_SUCCEED();
+	else
+		CONSTRUCTOR_FAIL();
 }

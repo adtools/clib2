@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.8 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.9 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,22 +41,22 @@
 
 /****************************************************************************/
 
-struct Library * NOCOMMON __LocaleBase;
+struct Library * __LocaleBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-struct LocaleIFace * NOCOMMON __ILocale;
+struct LocaleIFace * __ILocale;
 #endif /* __amigaos4__ */
 
 /****************************************************************************/
 
-struct Locale * NOCOMMON __default_locale;
-struct Locale * NOCOMMON __locale_table[NUM_LOCALES];
+struct Locale * __default_locale;
+struct Locale * __locale_table[NUM_LOCALES];
 
 /****************************************************************************/
 
-char NOCOMMON __locale_name_table[NUM_LOCALES][MAX_LOCALE_NAME_LEN];
+char __locale_name_table[NUM_LOCALES][MAX_LOCALE_NAME_LEN];
 
 /****************************************************************************/
 

@@ -62,6 +62,10 @@
 - Introduced new constructor types and changed the overall priority
   order.
 
+- Switched over the startup code and the library itself to use
+  constructor/destructor functions for initialization and cleanup
+  purposes.
+
 
 c.lib 1.189 (5.3.2005)
 

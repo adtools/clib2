@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackextension.c,v 1.7 2005-03-11 09:37:29 obarthel Exp $
+ * $Id: stdlib_stackextension.c,v 1.8 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -282,12 +282,9 @@ ULONG __stk_size;
 
 /****************************************************************************/
 
-int
-__stk_init(void)
+STK_CONSTRUCTOR(__stk_init)
 {
 	struct Task *task = FindTask(NULL);
-
-	ENTER();
 
 	__stk_initial_sp_lower = __stk_sp_lower = task->tc_SPLower; /* Lower stack bound */
 	__stk_initial_sp_upper = __stk_sp_upper = task->tc_SPUpper; /* Upper stack bound +1 */
@@ -297,17 +294,14 @@ __stk_init(void)
 
 	D(("stack size = %ld",(ULONG)__stk_sp_upper - (ULONG)__stk_sp_lower));
 
-	RETURN(OK);
-	return(OK);
+	CONSTRUCTOR_SUCCEED();
 }
 
 /****************************************************************************/
 
 /* Free all spare stackframes */
-CLIB_DESTRUCTOR(__stk_exit)
+STK_DESTRUCTOR(__stk_exit)
 {
-	ENTER();
-
 	if(__memory_pool == NULL)
 	{
 		struct stackframe *sf, *sf_next;
@@ -323,8 +317,6 @@ CLIB_DESTRUCTOR(__stk_exit)
 	}
 
 	__stk_spare = NULL;
-
-	LEAVE();
 }
 
 /****************************************************************************/

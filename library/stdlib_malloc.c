@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.10 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.11 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,8 +63,8 @@ struct MemoryTree __memory_tree;
 
 /****************************************************************************/
 
-APTR NOCOMMON						__memory_pool;
-struct MinList NOCOMMON				__memory_list;
+APTR			__memory_pool;
+struct MinList	__memory_list;
 
 /****************************************************************************/
 

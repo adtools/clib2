@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_timer.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_timer.c,v 1.4 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,15 +46,15 @@
 /****************************************************************************/
 
 /* Local timer I/O. */
-struct MsgPort *		NOCOMMON __timer_port;
-struct timerequest *	NOCOMMON __timer_request;
-BOOL					NOCOMMON __timer_busy;
-struct Library *		NOCOMMON __TimerBase;
+struct MsgPort *		__timer_port;
+struct timerequest *	__timer_request;
+BOOL					__timer_busy;
+struct Library *		__TimerBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-struct TimerIFace * NOCOMMON __ITimer;
+struct TimerIFace * __ITimer;
 #endif /* __amigaos4__ */
 
 /****************************************************************************/

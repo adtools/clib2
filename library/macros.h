@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.15 2005-03-11 11:35:31 obarthel Exp $
+ * $Id: macros.h,v 1.16 2005-03-11 13:23:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -131,12 +131,12 @@
 #else
 
 #define CONSTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((constructor)) __ctor##pri##_##name##(VOID); \
-	STATIC void __ctor##pri##_##name##(VOID)
+	VOID __attribute__((constructor)) __ctor##pri##_##name##(VOID); \
+	VOID __attribute__((constructor)) __ctor##pri##_##name##(VOID)
 
 #define DESTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((destructor)) __dtor##pri##_##name##(VOID); \
-	STATIC VOID __dtor##pri##_##name##(VOID)
+	VOID __attribute__((destructor)) __dtor##pri##_##name##(VOID); \
+	VOID __attribute__((destructor)) __dtor##pri##_##name##(VOID)
 
 #endif /* __amigaos4__ */
 
@@ -158,32 +158,32 @@
    constructors and the user-supplied destructors before the library
    destructors. */
 
-#define STDLIB_CONSTRUCTOR(name)	CONSTRUCTOR(name,	100)
-#define STDLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	100)
+#define STDLIB_CONSTRUCTOR(name)	CONSTRUCTOR(name,	1)
+#define STDLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	1)
 
-#define STK_CONSTRUCTOR(name)		CONSTRUCTOR(name,	110)
-#define STK_DESTRUCTOR(name)		DESTRUCTOR(name,	110)
+#define STK_CONSTRUCTOR(name)		CONSTRUCTOR(name,	2)
+#define STK_DESTRUCTOR(name)		DESTRUCTOR(name,	2)
 
-#define STDIO_CONSTRUCTOR(name)		CONSTRUCTOR(name,	120)
-#define STDIO_DESTRUCTOR(name)		DESTRUCTOR(name,	120)
+#define STDIO_CONSTRUCTOR(name)		CONSTRUCTOR(name,	3)
+#define STDIO_DESTRUCTOR(name)		DESTRUCTOR(name,	3)
 
-#define FILE_CONSTRUCTOR(name)		CONSTRUCTOR(name,	130)
-#define FILE_DESTRUCTOR(name)		DESTRUCTOR(name,	130)
+#define FILE_CONSTRUCTOR(name)		CONSTRUCTOR(name,	4)
+#define FILE_DESTRUCTOR(name)		DESTRUCTOR(name,	4)
 
-#define MATH_CONSTRUCTOR(name)		CONSTRUCTOR(name,	140)
-#define MATH_DESTRUCTOR(name)		DESTRUCTOR(name,	140)
+#define MATH_CONSTRUCTOR(name)		CONSTRUCTOR(name,	5)
+#define MATH_DESTRUCTOR(name)		DESTRUCTOR(name,	5)
 
-#define SOCKET_CONSTRUCTOR(name)	CONSTRUCTOR(name,	150)
-#define SOCKET_DESTRUCTOR(name)		DESTRUCTOR(name,	150)
+#define SOCKET_CONSTRUCTOR(name)	CONSTRUCTOR(name,	6)
+#define SOCKET_DESTRUCTOR(name)		DESTRUCTOR(name,	6)
 
-#define ARG_CONSTRUCTOR(name)		CONSTRUCTOR(name,	160)
-#define ARG_DESTRUCTOR(name)		DESTRUCTOR(name,	160)
+#define ARG_CONSTRUCTOR(name)		CONSTRUCTOR(name,	7)
+#define ARG_DESTRUCTOR(name)		DESTRUCTOR(name,	7)
 
-#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	170)
-#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	170)
+#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	8)
+#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	8)
 
-#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	180)
-#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	180)
+#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	9)
+#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	9)
 
 /****************************************************************************/
 
