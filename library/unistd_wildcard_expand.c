@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.9 2005-02-26 09:05:54 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.10 2005-03-03 09:32:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,21 +57,47 @@
 
 /****************************************************************************/
 
-UBYTE *
-__allocate_quote_vector(int num_parameters)
+static size_t	quote_vector_size;
+static UBYTE *	quote_vector;
+
+/****************************************************************************/
+
+int
+__wildcard_quote_parameter(unsigned int parameter)
 {
-	UBYTE * vector;
 	size_t num_bytes;
+	int result = -1;
 
-	assert( num_parameters > 0 );
+	/* Can we mark this parameter as quoted or do we need more
+	   room in the buffer? */
+	num_bytes = (parameter + 7) / 8;
+	if(num_bytes >= quote_vector_size)
+	{
+		size_t new_quote_vector_size = quote_vector_size + 8;
+		UBYTE * new_quote_vector;
 
-	num_bytes = (num_parameters + 7) / 8;
+		/* Allocate a larger buffer. */
+		new_quote_vector = realloc(quote_vector,new_quote_vector_size);
+		if(new_quote_vector == NULL)
+			goto out;
 
-	vector = malloc(num_bytes);
-	if(vector != NULL)
-		memset(vector,0,num_bytes);
+		/* Set the bits in the new buffer portion to 0. */
+		memset(&new_quote_vector[quote_vector_size],0,new_quote_vector_size - quote_vector_size);
 
-	return(vector);
+		quote_vector_size	= new_quote_vector_size;
+		quote_vector		= new_quote_vector;
+	}
+
+	assert( quote_vector != NULL );
+	assert( num_bytes < quote_vector_size );
+
+	quote_vector[parameter / 8] |= 1 << (7 - (parameter & 7));
+
+	result = 0;
+
+ out:
+
+	return(result);
 }
 
 /****************************************************************************/
@@ -146,7 +172,7 @@ __wildcard_expand_init(void)
 	old_window_pointer = __set_process_window((APTR)-1);
 
 	/* No work to be done? */
-	if(__quote_vector == NULL || __argc == 0 || __argv == NULL)
+	if(quote_vector == NULL || __argc == 0 || __argv == NULL)
 	{
 		error = OK;
 		goto out;
@@ -204,7 +230,7 @@ __wildcard_expand_init(void)
 
 		/* Does this string contain a wildcard pattern? We also check if the
 		   string is quoted. Quoted strings are never expanded. */
-		if(i > 0 && (__quote_vector[i / 8] & (1 << (7 - (i & 7)))) == 0 && ParsePatternNoCase(argv[i],ap->ap_Buf,2 * MAXPATHLEN) > 0)
+		if(i > 0 && (quote_vector[i / 8] & (1 << (7 - (i & 7)))) == 0 && ParsePatternNoCase(argv[i],ap->ap_Buf,2 * MAXPATHLEN) > 0)
 		{
 			BOOL is_first = TRUE;
 			LONG rc;
@@ -411,8 +437,10 @@ __wildcard_expand_init(void)
 		abort();
 	}
 
-	free(__quote_vector);
-	__quote_vector = NULL;
+	free(quote_vector);
+	quote_vector = NULL;
+
+	quote_vector_size = 0;
 
 	PROFILE_ON();
 

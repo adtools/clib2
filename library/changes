@@ -83,6 +83,14 @@
 - Added atoll(), ffs(), ftw(), nftw(), lstat() and uname() code
   contributed by Peter Bengtsson. Thank you very much!
 
+- Reworked the code that handles quoting for the wildcard expansion
+  routine. We no longer allocate memory and then modify it, but
+  call a function for each quoted parameter which does whatever is
+  necessary.
+
+- The shell command parameter parser now considers the non-breaking
+  space character (ISO code 160) to be a blank space character, too.
+
 
 c.lib 1.188 (7.2.2005)
 

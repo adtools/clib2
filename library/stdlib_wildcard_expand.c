@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_wildcard_expand.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_wildcard_expand.c,v 1.4 2005-03-03 09:32:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,15 +37,15 @@
 
 /****************************************************************************/
 
-UBYTE * WEAK __allocate_quote_vector(int num_parameters UNUSED);
+int WEAK __wildcard_quote_parameter(unsigned int parameter UNUSED);
 int WEAK __wildcard_expand_init(void);
 
 /****************************************************************************/
 
-UBYTE *
-__allocate_quote_vector(int UNUSED num_parameters)
+int
+__wildcard_quote_parameter(unsigned int parameter UNUSED)
 {
-	return(NULL);
+	return(0);
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_startup.c,v 1.7 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_startup.c,v 1.8 2005-03-03 09:32:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -86,12 +86,26 @@ int		__argc;
 
 /****************************************************************************/
 
-UBYTE * __quote_vector;
+STATIC BOOL
+is_space(unsigned char c)
+{
+	BOOL result;
+
+	result = (BOOL)(c == '\t' ||	/* tab */
+	                c == '\r' ||	/* carriage return */
+	                c == '\n' ||	/* line feed */
+	                c == '\v' ||	/* vertical tab */
+	                c == '\f' ||	/* form feed */
+	                c == ' '  ||	/* blank space */
+	                c == '\240');	/* non-breaking space */
+
+	return(result);
+}
 
 /****************************************************************************/
 
 STATIC BOOL
-is_escape_character(UBYTE c)
+is_escape_character(unsigned char c)
 {
 	BOOL result;
 
@@ -103,11 +117,11 @@ is_escape_character(UBYTE c)
 /****************************************************************************/
 
 STATIC BOOL
-is_final_quote_character(const char * str)
+is_final_quote_character(const unsigned char * str)
 {
 	BOOL result;
 
-	result = (BOOL)(str[0] == '\"' && (str[1] == '\0' || isspace(str[1])));
+	result = (BOOL)(str[0] == '\"' && (str[1] == '\0' || is_space(str[1])));
 
 	return(result);
 }
@@ -122,32 +136,31 @@ __startup_init(void)
 	/* Shell startup? */
 	if(__WBenchMsg == NULL)
 	{
-		int		number_of_arguments;
-		char *	command_name;
-		int		command_name_len;
-		char *	arg_str;
-		int		arg_len;
-		char *	command_line;
-		char *	str;
+		size_t			number_of_arguments;
+		unsigned char *	command_name;
+		size_t			command_name_len;
+		unsigned char *	arg_str;
+		size_t			arg_len;
+		unsigned char *	command_line;
+		unsigned char *	str;
 
 		/* Make a copy of the current command name string. */
-		command_name_len = (int)((UBYTE *)BADDR(Cli()->cli_CommandName))[0];
+		command_name_len = (size_t)((UBYTE *)BADDR(Cli()->cli_CommandName))[0];
 
 		__free_program_name = TRUE;
 
-		command_name = AllocVec((ULONG)(command_name_len+1),MEMF_ANY);
+		command_name = AllocVec((ULONG)(command_name_len + 1),MEMF_ANY);
 		if(command_name == NULL)
 			goto out;
 
-		if(CANNOT GetProgramName(command_name,command_name_len+1))
+		if(CANNOT GetProgramName(command_name,command_name_len + 1))
 			goto out;
 
 		__program_name = (char *)command_name;
 
 		/* Get the shell parameter string and find out
-		 * how long it is, stripping a trailing line
-		 * feed and blank spaces if necessary.
-		 */
+		   how long it is, stripping a trailing line
+		   feed and blank spaces if necessary. */
 		arg_str = GetArgStr();
 
 		while((*arg_str) == ' ' || (*arg_str) == '\t')
@@ -155,20 +168,19 @@ __startup_init(void)
 
 		arg_len = strlen(arg_str);
 
-		while(arg_len > 0 && (arg_str[arg_len-1] == '\n' || arg_str[arg_len-1] == ' ' || arg_str[arg_len-1] == '\t'))
+		while(arg_len > 0 && (arg_str[arg_len - 1] == '\n' || arg_str[arg_len - 1] == ' ' || arg_str[arg_len - 1] == '\t'))
 			arg_len--;
 
 		/* Make a copy of the shell parameter string. */
-		command_line = malloc((size_t)(arg_len+1));
+		command_line = malloc(arg_len + 1);
 		if(command_line == NULL)
 			goto out;
 
-		memmove(command_line,arg_str,(size_t)arg_len);
+		memmove(command_line,arg_str,arg_len);
 		command_line[arg_len] = '\0';
 
 		/* If we have a valid command line string and a command
-		 * name, proceed to set up the argument vector.
-		 */
+		   name, proceed to set up the argument vector. */
 		str = command_line;
 
 		/* Count the number of arguments. */
@@ -177,7 +189,7 @@ __startup_init(void)
 		while(TRUE)
 		{
 			/* Skip leading blank space. */
-			while((*str) != '\0' && isspace(*str))
+			while((*str) != '\0' && is_space(*str))
 				str++;
 
 			if((*str) == '\0')
@@ -214,7 +226,7 @@ __startup_init(void)
 			else
 			{
 				/* Skip the parameter. */
-				while((*str) != '\0' && NOT isspace(*str))
+				while((*str) != '\0' && NOT is_space(*str))
 					str++;
 
 				if((*str) == '\0')
@@ -223,17 +235,11 @@ __startup_init(void)
 		}
 
 		/* Put all this together into an argument vector.
-		 * We allocate one extra slot to put a NULL pointer
-		 * into.
-		 */
-		__argv = (char **)malloc((number_of_arguments+1) * sizeof(*__argv));
+		   We allocate one extra slot to put a NULL pointer
+		   into. */
+		__argv = (char **)malloc((number_of_arguments + 1) * sizeof(*__argv));
 		if(__argv == NULL)
 			goto out;
-
-		/* If necessary, allocate a bit vector to keep track of
-		 * which parameters are quoted and which ones are not.
-		 */
-		__quote_vector = __allocate_quote_vector(number_of_arguments+1);
 
 		/* The first parameter is the program name. */
 		__argv[0] = command_name;
@@ -245,7 +251,7 @@ __startup_init(void)
 		while(TRUE)
 		{
 			/* Skip leading blank space. */
-			while((*str) != '\0' && isspace(*str))
+			while((*str) != '\0' && is_space(*str))
 				str++;
 
 			if((*str) == '\0')
@@ -257,8 +263,8 @@ __startup_init(void)
 				char * arg;
 
 				/* If necessary, indicate that this parameter was quoted. */
-				if(__quote_vector != NULL)
-					__quote_vector[__argc / 8] |= 1 << (7 - (__argc & 7));
+				if(__wildcard_quote_parameter(__argc) < 0)
+					goto out;
 
 				str++;
 
@@ -291,9 +297,7 @@ __startup_init(void)
 
 							case '\0':
 
-								/* NOTE: the termination is handled
-								 *       down below.
-								 */
+								/* NOTE: the termination is handled down below. */
 								break;
 
 							default:
@@ -323,7 +327,7 @@ __startup_init(void)
 			{
 				__argv[__argc++] = str;
 
-				while((*str) != '\0' && NOT isspace(*str))
+				while((*str) != '\0' && NOT is_space(*str))
 					str++;
 
 				if((*str) == '\0')
@@ -333,7 +337,7 @@ __startup_init(void)
 			}
 		}
 
-		assert( __argc == number_of_arguments );
+		assert( __argc == (int)number_of_arguments );
 		assert( str <= &command_line[arg_len] );
 
 		__argv[__argc] = NULL;
@@ -428,8 +432,7 @@ CLIB_DESTRUCTOR(__startup_exit)
 	PROFILE_OFF();
 
 	/* Now clean up after the streams set up for the Workbench
-	 * startup...
-	 */
+	   startup... */
 	if(restore_console_task)
 	{
 		SetConsoleTask((struct MsgPort *)old_console_task);

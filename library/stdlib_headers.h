@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.11 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.12 2005-03-03 09:32:08 obarthel Exp $
  *
  * :ts=4
  *
@@ -250,10 +250,6 @@ extern UBYTE NOCOMMON __shell_escape_character;
 
 extern char ** NOCOMMON	__argv;
 extern int NOCOMMON		__argc;
-
-/****************************************************************************/
-
-extern UBYTE * NOCOMMON __quote_vector;
 
 /****************************************************************************/
 

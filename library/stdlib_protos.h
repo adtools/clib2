@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.9 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.10 2005-03-03 09:32:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -105,8 +105,8 @@ extern void * __get_sp(void);
 /****************************************************************************/
 
 /* stdlib_wildcard_expand.c */
-extern UBYTE *	__allocate_quote_vector(int num_parameters);
-extern int		__wildcard_expand_init(void);
+extern int __wildcard_quote_parameter(unsigned int parameter);
+extern int __wildcard_expand_init(void);
 
 /****************************************************************************/
 
