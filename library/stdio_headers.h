@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.5 2004-11-28 10:01:26 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.6 2004-12-26 13:14:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,6 +101,14 @@
 
 #include "macros.h"
 #include "debug.h"
+
+/****************************************************************************/
+
+/* CPU cache line size; used for alignment purposes with some data structures.
+   This should be determined dynamically rather than preset here. For the
+   68040/68060 the cache line size is 16 bytes, for the PowerPC G4 it's
+   32 bytes and 128 bytes (gross!) for the PowerPC G5. */
+#define CACHE_LINE_SIZE 32UL
 
 /****************************************************************************/
 

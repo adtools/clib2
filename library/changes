@@ -27,6 +27,11 @@
   handler, the localized "*** BREAK" string will be printed rather
   than the built-in one.
 
+- The data structure alignment (file I/O buffer) is now configurable
+  at compile time. The default used to be 16 bytes, which is appropriate
+  for the 68040/68060 but not for the PowerPC, which uses 32 or 128
+  bytes per cache line.
+
 
 c.lib 1.184 (28.11.2004)
 

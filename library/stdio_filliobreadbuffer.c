@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_filliobreadbuffer.c,v 1.1.1.1 2004-07-26 16:31:29 obarthel Exp $
+ * $Id: stdio_filliobreadbuffer.c,v 1.2 2004-12-26 13:14:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,22 +37,6 @@
 
 /****************************************************************************/
 
-/*
-int
-__iob_read_buffer_is_empty(struct iob * file)
-{
-	int result;
-
-	assert( file != NULL );
-
-	result = (file->iob_BufferReadBytes == 0 || file->iob_BufferPosition == file->iob_BufferReadBytes);
-
-	return(result);
-}
-*/
-
-/****************************************************************************/
-
 int
 __fill_iob_read_buffer(struct iob * file)
 {
@@ -72,9 +56,6 @@ __fill_iob_read_buffer(struct iob * file)
 
 	if(__check_abort_enabled)
 		__check_abort();
-
-	if(FLAG_IS_CLEAR(file->iob_Flags,IOBF_IN_USE)) /* ZZZ this does not really belong here; paranoia? */
-		goto out;
 
 	/* Flush all line buffered streams before we proceed to fill this buffer. */
 	if((file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_LINE)

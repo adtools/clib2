@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.2 2004-11-28 10:01:26 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.3 2004-12-26 13:14:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -1290,7 +1290,7 @@ grow_file_size(struct fd * fd,int num_bytes,int * error_ptr)
 	/* Allocate a little more memory than required to allow for
 	 * the buffer to be aligned to a cache line boundary.
 	 */
-	buffer = malloc((size_t)buffer_size + 15);
+	buffer = malloc((size_t)buffer_size + (CACHE_LINE_SIZE-1));
 	if(buffer == NULL)
 	{
 		SHOWMSG("not enough memory for write buffer");
@@ -1300,7 +1300,7 @@ grow_file_size(struct fd * fd,int num_bytes,int * error_ptr)
 	}
 
 	/* Align the buffer to a cache line boundary. */
-	aligned_buffer = (unsigned char *)(((ULONG)(buffer + 15)) & ~15UL);
+	aligned_buffer = (unsigned char *)(((ULONG)(buffer + (CACHE_LINE_SIZE-1))) & ~(CACHE_LINE_SIZE-1));
 
 	memset(aligned_buffer,0,(size_t)buffer_size);
 

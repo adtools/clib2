@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_readdir.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: dirent_readdir.c,v 1.3 2004-12-26 13:14:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -87,16 +87,17 @@ readdir(DIR * directory_pointer)
 			else
 			{
 				D_S(struct FileInfoBlock,fib);
+				D_S(struct bcpl_name,bcpl_name);
+				UBYTE * name = bcpl_name->name;
 				struct MsgPort * port;
-				UBYTE * bcpl_name;
 				BPTR dir_lock;
-				UBYTE name[8];
+
+				assert( (((ULONG)name) & 3) == 0 );
 
 				if(dh->dh_VolumeNode == NULL && NOT IsListEmpty(&dh->dh_VolumeList))
 					dh->dh_VolumeNode = dh->dh_VolumeList.lh_Head;
 
-				bcpl_name = (STRPTR)((((ULONG)&name[0]) + 3UL) & ~3UL);
-				strcpy(bcpl_name,"\1:"); /* BSTR for ":" */
+				strcpy(name,"\1:"); /* BSTR for ":" */
 
 				while(result == NULL && dh->dh_VolumeNode != NULL && dh->dh_VolumeNode->ln_Succ != NULL)
 				{
@@ -105,7 +106,7 @@ readdir(DIR * directory_pointer)
 						port = DeviceProc(dh->dh_VolumeNode->ln_Name);
 						if(port != NULL)
 						{
-							dir_lock = DoPkt(port,ACTION_LOCATE_OBJECT,ZERO,MKBADDR(bcpl_name),SHARED_LOCK,	0,0);
+							dir_lock = DoPkt(port,ACTION_LOCATE_OBJECT,ZERO,MKBADDR(name),SHARED_LOCK,	0,0);
 							if(dir_lock != ZERO)
 							{
 								if(Examine(dir_lock,fib))

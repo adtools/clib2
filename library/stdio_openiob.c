@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_openiob.c,v 1.3 2004-11-03 15:39:04 obarthel Exp $
+ * $Id: stdio_openiob.c,v 1.4 2004-12-26 13:14:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -130,7 +130,7 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 	SHOWMSG("allocating file buffer");
 
 	/* Allocate a little more memory than necessary. */
-	buffer = malloc(BUFSIZ + 15);
+	buffer = malloc(BUFSIZ + (CACHE_LINE_SIZE-1));
 	if(buffer == NULL)
 	{
 		SHOWMSG("that didn't work");
@@ -140,7 +140,7 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 	}
 
 	/* Align the buffer start address to a cache line boundary. */
-	aligned_buffer = (char *)((ULONG)(buffer + 15) & ~15UL);
+	aligned_buffer = (char *)((ULONG)(buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
 
 	if(file_descriptor < 0)
 	{
