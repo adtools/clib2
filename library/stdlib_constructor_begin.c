@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor_begin.c,v 1.4 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_constructor_begin.c,v 1.5 2005-03-10 09:55:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,8 +62,8 @@ __construct(void)
 
 /****************************************************************************/
 
-STATIC VOID
-_do_ctors(void)
+void
+_init(void)
 {
 	void * volatile p = &__ctors;
 
@@ -82,8 +82,8 @@ _do_ctors(void)
 
 /****************************************************************************/
 
-STATIC VOID
-_do_dtors(void)
+void
+_fini(void)
 {
 	void * volatile p = &__dtors;
 
@@ -113,7 +113,11 @@ _do_dtors(void)
 
 /****************************************************************************/
 
-#else
+#endif /* __SASC */
+
+/****************************************************************************/
+
+#if defined(__GNUC__) && !defined(__amigaos4__)
 
 /****************************************************************************/
 
@@ -121,80 +125,28 @@ typedef void (*func_ptr)(void);
 
 /****************************************************************************/
 
-STATIC VOID
-_do_ctors(void)
+void
+_init(void)
 {
 	extern func_ptr __CTOR_LIST__[];
-	ULONG nptrs = (ULONG)__CTOR_LIST__[0];
+	ULONG num_ctors = (ULONG)__CTOR_LIST__[0];
 	ULONG i;
 
 	ENTER();
 
-	D(("there are %ld constructors to be called",nptrs));
+	D(("there are %ld constructors to be called",num_ctors));
 
-	/* Call all constructors in forward order */
-	for(i = 0 ; i < nptrs ; i++)
+	/* Call all constructors in reverse order */
+	for(i = 0 ; i < num_ctors ; i++)
 	{
 		D(("calling constructor #%ld, 0x%08lx",i,__CTOR_LIST__[1+i]));
 
-		__CTOR_LIST__[1+i]();
+		__CTOR_LIST__[num_ctors - i]();
 	}
 
 	SHOWMSG("all done.");
 
 	LEAVE();
-}
-
-/****************************************************************************/
-
-STATIC VOID
-_do_dtors(void)
-{
-	extern func_ptr __DTOR_LIST__[];
-	extern jmp_buf __exit_jmp_buf;
-	ULONG nptrs = (ULONG)__DTOR_LIST__[0];
-	static ULONG i;
-
-	ENTER();
-
-	D(("there are %ld destructors to be called",nptrs));
-
-	/* If one of the destructors drops into
-	 * exit(), processing will continue with
-	 * the next following destructor.
-	 */
-	(void)setjmp(__exit_jmp_buf);
-
-	/* Call all destructors in reverse order */
-	while(i++ < nptrs)
-	{
-		D(("calling destructor #%ld, 0x%08lx",i,__DTOR_LIST__[1+nptrs - i]));
-
-		__DTOR_LIST__[1+nptrs - i]();
-	}
-
-	SHOWMSG("all done.");
-
-	LEAVE();
-}
-
-/****************************************************************************/
-
-#endif /*__amigaos4__ */
-
-/****************************************************************************/
-
-/* FIXME: Do we need to put these in .init/.fini sections? */
-
-//void _init(void) __attribute__((section(".init")));
-//void _fini(void) __attribute__((section(".fini")));
-
-/****************************************************************************/
-
-void
-_init(void)
-{
-	_do_ctors();
 }
 
 /****************************************************************************/
@@ -202,5 +154,34 @@ _init(void)
 void
 _fini(void)
 {
-	_do_dtors();
+	extern func_ptr __DTOR_LIST__[];
+	extern jmp_buf __exit_jmp_buf;
+	ULONG num_dtors = (ULONG)__DTOR_LIST__[0];
+	static ULONG i;
+
+	ENTER();
+
+	D(("there are %ld destructors to be called",num_dtors));
+
+	/* If one of the destructors drops into
+	 * exit(), processing will continue with
+	 * the next following destructor.
+	 */
+	(void)setjmp(__exit_jmp_buf);
+
+	/* Call all destructors in forward order */
+	while(i++ < num_dtors)
+	{
+		D(("calling destructor #%ld, 0x%08lx",i,__DTOR_LIST__[i]));
+
+		__DTOR_LIST__[i]();
+	}
+
+	SHOWMSG("all done.");
+
+	LEAVE();
 }
+
+/****************************************************************************/
+
+#endif /* __GNUC__ && !__amigaos4__ */

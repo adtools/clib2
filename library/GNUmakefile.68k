@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.38 2005-03-09 10:48:58 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.39 2005-03-10 09:55:03 obarthel Exp $
 #
 # :ts=8
 #
@@ -280,7 +280,6 @@ C_LIB = \
 	stdlib_checkdetach.o \
 	stdlib_constructor.o \
 	stdlib_constructor_begin.o \
-	stdlib_constructor_end.o \
 	stdlib_data.o \
 	stdlib_default_pool_size.o \
 	stdlib_default_puddle_size.o \
@@ -1120,3 +1119,26 @@ mainb.o : stdlib_main.c
 mainnb.o : stdlib_main.c
 	@echo "Compiling $< [large_data]"
 	@$(CC) -o mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -m68000 stdlib_main.c
+
+##############################################################################
+
+CONSTRUCTOR_FILES = \
+	amiga_rexxvars.c  \
+	dirent_closedir.c \
+	locale_init_exit.c \
+	math_init_exit.c \
+	socket_init_exit.c \
+	stdio_file_init.c \
+	stdio_init_exit.c \
+	stdlib_alloca.c \
+	stdlib_setenv.c \
+	stdlib_stackextension.c \
+	time_clock.c \
+	unistd_chdir_exit.c \
+	unistd_init_exit.c \
+	unistd_timer.c \
+	unistd_wildcard_expand.c \
+	usergroup_init_exit.c
+
+touch_constructor_files:
+	touch $(CONSTRUCTOR_FILES)

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.30 2005-03-09 10:48:59 obarthel Exp $
+# $Id: smakefile,v 1.31 2005-03-10 09:55:03 obarthel Exp $
 #
 # :ts=8
 #
@@ -382,7 +382,6 @@ STDLIB_OBJ = \
 	stdlib_checkdetach.o \
 	stdlib_constructor_begin.o \
 	stdlib_constructor.o \
-	stdlib_constructor_end.o \
 	stdlib_data.o \
 	stdlib_default_pool_size.o \
 	stdlib_default_puddle_size.o \

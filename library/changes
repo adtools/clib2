@@ -40,11 +40,17 @@
 - Moved a few __delete_semaphore() calls into conditional compilation
   sections where they should have been in the first place.
 
-- Thanks to Joerg Strohmayer, the GCC library build now manages to
+- Thanks to Jörg Strohmayer, the GCC library build now manages to
   invoke the library's constructor/destructor functions in a
   very particular order. That way, you can use constructor/destructor
   functions in your own code and not have them clash with the library's
   own functions.
+
+- Reimplemented the constructor/destructor invocation code for GCC.
+  Both the 68k and PowerPC platform now invoke them in the same order
+  and the 68k code uses the designated invocation priorities. The
+  PowerPC destructor function now sets up the exit() jmp_buf before
+  the destructor functions are called.
 
 
 c.lib 1.189 (5.3.2005)

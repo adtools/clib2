@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.12 2005-03-10 07:53:57 obarthel Exp $
+ * $Id: macros.h,v 1.13 2005-03-10 09:55:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -155,54 +155,50 @@
 
 #ifdef __SASC
 
-#define CLIB_CONSTRUCTOR(name)		int __stdargs _STI_500_##name(void)
-#define CLIB_DESTRUCTOR(name)		void __stdargs _STD_500_##name(void)
-#define PROFILE_CONSTRUCTOR(name)	int __stdargs _STI_150_##name(void)
-#define PROFILE_DESTRUCTOR(name)	void __stdargs _STD_150_##name(void)
-#define CONSTRUCTOR_SUCCEED()		return(0)
-#define CONSTRUCTOR_FAIL()			return(1)
+#define CONSTRUCTOR(name,pri) \
+	int __stdargs _STI_##pri##_##name(void); \
+	int __stdargs _STI_##pri##_##name(void)
+
+#define DESTRUCTOR(name,pri) \
+	int __stdargs _STD_##pri##_##name(void); \
+	int __stdargs _STD_##pri##_##name(void)
+
+#define CONSTRUCTOR_SUCCEED() \
+	return(0)
+
+#define CONSTRUCTOR_FAIL() \
+	return(1)
 
 #endif /* __SASC */
 
+/****************************************************************************/
+
 #ifdef __GNUC__
 
+#if defined(__amigaos4__)
+
 #define CONSTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((used)) name##_ctor(void); \
-	STATIC VOID (*__##name##_ctor)(void) __attribute__((used,section(".ctors._" #pri))) = name##_ctor; \
-	STATIC VOID name##_ctor(void)
+	STATIC VOID __attribute__((used)) name##_ctor(VOID); \
+	STATIC VOID (*__##name##_ctor)(VOID) __attribute__((used,section(".ctors._" #pri))) = name##_ctor; \
+	STATIC VOID name##_ctor(VOID)
 
 #define DESTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((used)) name##_dtor(void); \
-	STATIC VOID (*__##name##_dtor)(void) __attribute__((used,section(".dtors._" #pri))) = name##_dtor; \
-	STATIC VOID name##_dtor(void)
+	STATIC VOID __attribute__((used)) name##_dtor(VOID); \
+	STATIC VOID (*__##name##_dtor)(VOID) __attribute__((used,section(".dtors._" #pri))) = name##_dtor; \
+	STATIC VOID name##_dtor(VOID)
 
-#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	00500)
-#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	00500)
-#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	00150)
-#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	00150)
+#else
 
-/*
-#define CLIB_CONSTRUCTOR(name) \
-	STATIC VOID __attribute__((used)) name##_ctor(void); \
-	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors._00500"))) = name##_ctor; \
-	STATIC VOID name##_ctor(void)
+#define CONSTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((constructor)) __ctor##pri##_##name##(VOID); \
+	STATIC void __ctor##pri##_##name##(VOID)
 
-#define CLIB_DESTRUCTOR(name) \
-	STATIC VOID __attribute__((used)) name##_dtor(void); \
-	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors._00500"))) = name##_dtor; \
-	STATIC VOID name##_dtor(void)
+#define DESTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((destructor)) __dtor##pri##_##name##(VOID); \
+	STATIC VOID __dtor##pri##_##name##(VOID)
 
-#define PROFILE_CONSTRUCTOR(name) \
-	STATIC VOID __attribute__((used)) name##_ctor(void); \
-	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors._00150"))) = name##_ctor; \
-	STATIC VOID name##_ctor(void)
+#endif /* __amigaos4__ */
 
-#define PROFILE_DESTRUCTOR(name) \
-	STATIC VOID __attribute__((used)) name##_dtor(void); \
-	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors._00150"))) = name##_dtor; \
-	STATIC VOID name##_ctor(void)
-*/
-	
 #define CONSTRUCTOR_SUCCEED() \
 	return
 
@@ -211,6 +207,13 @@
 
 #endif /* __GNUC__ */
 
+/****************************************************************************/
+
+#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	500)
+#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	500)
+#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	150)
+#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	150)
+	
 /****************************************************************************/
 
 #ifdef __SASC
@@ -225,6 +228,8 @@ extern void ASM _EPILOG(REG(a0,char *));
 #define PROFILE_ON()	((void)0)
 #endif /* _PROFILE */
 #endif /* __SASC */
+
+/****************************************************************************/
 
 #ifdef __GNUC__
 #define PROFILE_OFF()	((void)0)

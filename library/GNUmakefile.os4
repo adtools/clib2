@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.39 2005-03-09 21:07:20 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.40 2005-03-10 09:55:03 obarthel Exp $
 #
 # :ts=8
 #
@@ -279,7 +279,6 @@ C_LIB = \
 	stdlib_checkdetach.o \
 	stdlib_constructor.o \
 	stdlib_constructor_begin.o \
-	stdlib_constructor_end.o \
 	stdlib_data.o \
 	stdlib_default_pool_size.o \
 	stdlib_default_puddle_size.o \
