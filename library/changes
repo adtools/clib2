@@ -57,6 +57,10 @@
 
 - Added vfscanf() to <stdio.h>.
 
+- The stdio locking in fcntl() wasn't working correctly. Fixed.
+
+- Made the clearerr(), feof() and ferror() macros thread-safe.
+
 
 c.lib 1.190 (25.3.2005)
 

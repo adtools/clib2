@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fwrite.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_fwrite.c,v 1.8 2005-04-04 10:09:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -118,12 +118,14 @@ fwrite(const void *ptr,size_t element_size,size_t count,FILE *stream)
 		buffer_mode = (file->iob_Flags & IOBF_BUFFER_MODE);
 		if(buffer_mode == IOBF_BUFFER_MODE_NONE)
 		{
-			__stdio_lock();
+			struct fd * fd = __fd[file->iob_Descriptor];
 
-			if(FLAG_IS_SET(__fd[file->iob_Descriptor]->fd_Flags,FDF_IS_INTERACTIVE))
+			__fd_lock(fd);
+
+			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
 				buffer_mode = IOBF_BUFFER_MODE_LINE;
 
-			__stdio_unlock();
+			__fd_unlock(fd);
 		}
 
 		if(buffer_mode == IOBF_BUFFER_MODE_LINE)

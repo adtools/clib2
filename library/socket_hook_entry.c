@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.13 2005-03-12 09:43:47 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.14 2005-04-04 10:09:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,10 +51,17 @@ __socket_hook_entry(
 	struct file_action_message *	fam)
 {
 	struct FileInfoBlock * fib;
+	BOOL is_aliased;
 	int result;
 	int param;
 
 	assert( fam != NULL && fd != NULL );
+
+	/* Careful: file_action_close has to monkey with the file descriptor
+	            table and therefore needs to obtain the stdio lock before
+	            it locks this particular descriptor entry. */
+	if(fam->fam_Action == file_action_close)
+		__stdio_lock();
 
 	__fd_lock(fd);
 
@@ -107,7 +114,8 @@ __socket_hook_entry(
 			result = 0;
 
 			/* If this is an alias, just remove it. */
-			if(__fd_is_aliased(fd))
+			is_aliased = __fd_is_aliased(fd);
+			if(is_aliased)
 			{
 				__remove_fd_alias(fd);
 			}
@@ -129,7 +137,8 @@ __socket_hook_entry(
 			#if defined(__THREAD_SAFE)
 			{
 				/* Free the lock semaphore now. */
-				__delete_semaphore(fd->fd_Lock);
+				if(NOT is_aliased)
+					__delete_semaphore(fd->fd_Lock);
 			}
 			#endif /* __THREAD_SAFE */
 
@@ -202,6 +211,9 @@ __socket_hook_entry(
 	}
 
 	__fd_unlock(fd);
+
+	if(fam->fam_Action == file_action_close)
+		__stdio_unlock();
 
 	RETURN(result);
 	return(result);

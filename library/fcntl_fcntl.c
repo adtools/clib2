@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.15 2005-03-25 08:59:22 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.16 2005-04-04 10:09:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,6 +66,12 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	/* F_DUPFD will need to modify the file descriptor table, which is why
+	   the stdio lock needs to be obtained here, before the individual
+	   file descriptor lock is held. */
+	if(cmd == F_DUPFD)
+		__stdio_lock();
 
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
@@ -267,6 +273,9 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
  out:
 
 	__fd_unlock(fd);
+
+	if(cmd == F_DUPFD)
+		__stdio_unlock();
 
 	RETURN(result);
 	return(result);

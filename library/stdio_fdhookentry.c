@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.27 2005-04-02 18:02:54 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.28 2005-04-04 10:09:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,6 +72,12 @@ __fd_hook_entry(
 
 	assert( fam != NULL && fd != NULL );
 	assert( __is_valid_fd(fd) );
+
+	/* Careful: file_action_close has to monkey with the file descriptor
+	            table and therefore needs to obtain the stdio lock before
+	            it locks this particular descriptor entry. */
+	if(fam->fam_Action == file_action_close)
+		__stdio_lock();
 
 	__fd_lock(fd);
 
@@ -240,15 +246,12 @@ __fd_hook_entry(
 			}
 			else if (FLAG_IS_CLEAR(fd->fd_Flags,FDF_STDIO))
 			{
-				/* Are we disallowed to close this file? */
-				if(FLAG_IS_SET(fd->fd_Flags,FDF_NO_CLOSE))
-				{
-					/* OK, so we cannot close it. But we might be obliged to
-					   reset a console into buffered mode. */
-					if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-						SetMode(fd->fd_DefaultFile,DOSFALSE);
-				}
-				else
+				/* Should we reset this file into line buffered mode? */
+				if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+					SetMode(fd->fd_DefaultFile,DOSFALSE);
+
+				/* Are we allowed to close this file? */
+				if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_NO_CLOSE))
 				{
 					BOOL name_and_path_valid = FALSE;
 					D_S(struct FileInfoBlock,fib);
@@ -620,6 +623,9 @@ __fd_hook_entry(
  out:
 
 	__fd_unlock(fd);
+
+	if(fam->fam_Action == file_action_close)
+		__stdio_unlock();
 
 	if(buffer != NULL)
 		free(buffer);
