@@ -40,6 +40,10 @@
 
 - Switched over the last use of DeviceProc() to GetDeviceProc(), etc.
 
+- open() no longer examines a file after opening it in order to figure
+  out whether read/write accesses are permitted. This decision is now
+  for the file system to make.
+
 
 c.lib 1.185 (2.1.2005)
 

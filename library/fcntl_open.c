@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.6 2005-01-09 15:58:02 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.7 2005-01-09 16:07:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,39 +53,9 @@
 
 /****************************************************************************/
 
-/* This is used in place of ExamineFH() in order to work around a bug in
+/* This is used in place of ChangeMode() in order to work around a bug in
    dos.library V40 and below: a "NIL:" file handle will crash the
-   ExamineFH() function. */
-static LONG
-safe_examine_file_handle(BPTR file_handle,struct FileInfoBlock *fib)
-{
-	LONG result = DOSFALSE;
-
-	assert( fib != NULL );
-
-	#ifndef __amigaos4__
-	{
-		struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
-
-		if(fh == NULL || fh->fh_Type == NULL)
-		{
-			SetIoErr(ERROR_OBJECT_WRONG_TYPE);
-			goto out;
-		}
-	}
-	#endif /* __amigaos4__ */
-
-	PROFILE_OFF();
-	result = ExamineFH(file_handle,fib);
-	PROFILE_ON();
-
- out:
-
-	return(result);
-}
-
-/* Same thing as above, but for ChangeMode(), which suffers from
-   the same problem. */
+   caller of the ChangeMode() function. */
 static LONG
 safe_change_mode(LONG type,BPTR file_handle,LONG mode)
 {
@@ -354,36 +324,6 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 		}
 
 		goto out;
-	}
-
-	if(safe_examine_file_handle(handle,fib) != DOSFALSE)
-	{
-		BOOL operation_permitted = TRUE;
-
-		/* Check if the file is readable. */
-		if(FLAG_IS_SET(fib->fib_Protection,FIBF_READ))
-		{
-			if(access_mode == O_RDONLY ||
-			   access_mode == O_RDWR)
-			{
-				operation_permitted = FALSE;
-			}
-		}
-
-		/* Check if the file can be written to. */
-		if(FLAG_IS_SET(fib->fib_Protection,FIBF_WRITE))
-		{
-			if(access_mode == O_WRONLY)
-				operation_permitted = FALSE;
-		}
-
-		if(NOT operation_permitted)
-		{
-			SHOWMSG("this object must not be opened");
-
-			errno = EACCES;
-			goto out;
-		}
 	}
 
 	fd = __fd[fd_slot_number];
