@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.16 2004-11-28 12:30:53 tfrieden Exp $
+# $Id: GNUmakefile.os4,v 1.17 2004-12-13 11:11:57 obarthel Exp $
 #
 # :ts=8
 #
@@ -97,7 +97,7 @@ FLOAT_TYPE :=
 endif
 
 ifeq (baserel,$(TYPE))
-CODE_TYPE := -mbaserel -DBASEREL_DATA 
+CODE_TYPE := -mbaserel -DBASEREL_DATA
 FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
 endif
 
@@ -659,7 +659,7 @@ AMIGA_LIB = \
 	amiga_rexxvars.o \
 	amiga_setsuperattrs.o \
 	amiga_timedelay.o \
-	amiga_waitbeam.o 
+	amiga_waitbeam.o
 
 ##############################################################################
 
@@ -759,7 +759,7 @@ lib/small-data: lib
 
 lib/soft-float: lib
 	-$(MAKEDIR) $@
-	
+
 lib/baserel: lib
 	-$(MAKEDIR) $@
 
@@ -771,7 +771,7 @@ large_data:
 
 large_data_softfloat:
 	-$(MAKEDIR) $@
-	
+
 baserel:
 	-$(MAKEDIR) $@
 
@@ -843,7 +843,7 @@ lib/bcrtbegin.o : lib bcrtbegin.o
 
 lib/bcrtend.o : lib bcrtend.o
 	$(COPY) bcrtend.o lib
-	
+
 lib/baserel/crt0.o : lib baserel/crt0.o
 	$(COPY) baserel/crt0.o lib/baserel
 
@@ -991,10 +991,10 @@ mainb.o : stdlib_main.c
 	@$(CC) -o mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA stdlib_main.c
 
 bcrtbegin.o : crtbegin.c
-	$(CC) -o bcrtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c 
+	$(CC) -o bcrtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c
 
 bcrtend.o : crtend.c
-	$(CC) -o bcrtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c 
+	$(CC) -o bcrtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c
 
 baserel/crt0.o : crt0.S
 	@echo "Assembling $<"
@@ -1009,7 +1009,7 @@ baserel/mainb.o : stdlib_main.c
 	@$(CC) -o baserel/mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA stdlib_main.c
 
 baserel/crtbegin.o : crtbegin.c
-	$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c 
+	$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c
 
 baserel/crtend.o : crtend.c
-	$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c 
+	$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c

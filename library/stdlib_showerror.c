@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.1.1.1 2004-07-26 16:32:06 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.2 2004-12-13 11:11:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -110,13 +110,21 @@ __show_error(const char * message)
 		}
 		else
 		{
-			static struct TextAttr default_font	= { (STRPTR)"topaz.font",8,FS_NORMAL,FPF_ROMFONT|FPF_DESIGNED };
-			static struct IntuiText sorry_text	= {0,1,JAM1,6,3,&default_font,(STRPTR)"Sorry",NULL};
-			static struct IntuiText body_text	= {0,1,JAM1,5,3,&default_font,(STRPTR)NULL,NULL};
+			/* The following does not make great sense on OS4. */
+			#if NOT defined(__amigaos4__)
+			{
+				static struct TextAttr default_font	= { (STRPTR)"topaz.font",8,FS_NORMAL,FPF_ROMFONT|FPF_DESIGNED };
+				static struct IntuiText sorry_text	= {0,1,JAM1,6,3,(struct IText *)NULL,(STRPTR)"Sorry",NULL};
+				static struct IntuiText body_text	= {0,1,JAM1,5,3,(struct IText *)NULL,(STRPTR)NULL,NULL};
 
-			body_text.IText = (STRPTR)message;
+				sorry_text.ITextFont	= &default_font;
+				body_text.ITextFont		= &default_font;
 
-			AutoRequest(NULL,&body_text,NULL,&sorry_text,0,0,37 + 8 * strlen(message),46);
+				body_text.IText = (STRPTR)message;
+
+				AutoRequest(NULL,&body_text,NULL,&sorry_text,0,0,37 + 8 * strlen(message),46);
+			}
+			#endif /* __amigaos4__ */
 		}
 	}
 	else
