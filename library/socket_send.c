@@ -1,5 +1,5 @@
 /*
- * $Id: socket_send.c,v 1.1.1.1 2004-07-26 16:31:19 obarthel Exp $
+ * $Id: socket_send.c,v 1.2 2004-09-29 14:31:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-send(int sockfd,void *buff,size_t nbytes,int flags)
+send(int sockfd,const void *buff,size_t nbytes,int flags)
 {
 	struct fd * fd;
 	int result = -1;
