@@ -1,5 +1,5 @@
 /* 
- * $Id: crtbegin.c,v 1.2 2004-09-29 14:31:56 obarthel Exp $
+ * $Id: crtbegin.c,v 1.3 2004-09-29 16:54:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@ _do_ctors(void)
 static void
 _do_dtors(void)
 {
-	unsigned long i = (unsigned long)__DTOR_LIST__[0];
+	ULONG i = (ULONG)__DTOR_LIST__[0];
 	void (**pFuncPtr)(void);
 
 	if (i == ~0UL)
