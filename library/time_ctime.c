@@ -1,5 +1,5 @@
 /*
- * $Id: time_ctime.c,v 1.1.1.1 2004-07-26 16:32:22 obarthel Exp $
+ * $Id: time_ctime.c,v 1.2 2004-11-17 19:07:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,6 +40,36 @@
 #ifndef _TIME_HEADERS_H
 #include "time_headers.h"
 #endif /* _TIME_HEADERS_H */
+
+/****************************************************************************/
+
+char *
+ctime_r(const time_t *tptr,char * buffer)
+{
+	char * result = NULL;
+	struct tm tm;
+
+	ENTER();
+
+	assert( tptr != NULL && buffer != NULL );
+
+	#if defined(CHECK_FOR_NULL_POINTERS)
+	{
+		if(tptr == NULL || buffer == NULL)
+		{
+			errno = EFAULT;
+			goto out;
+		}
+	}
+	#endif /* CHECK_FOR_NULL_POINTERS */
+
+	result = asctime_r(localtime_r(tptr,&tm),buffer);
+
+ out:
+
+	RETURN(result);
+	return(result);
+}
 
 /****************************************************************************/
 

@@ -1,3 +1,5 @@
+- Added asctime_r(), ctime_r(), gmtime_r(), localtime_r() and strtok_r().
+
 - Added stubs for the Rexx Variables Interface code that used to
   be part of amiga.lib. While comparable functionality is available
   in rexxsyslib.library V45, the new stubs might be helpful during

@@ -1,5 +1,5 @@
 /*
- * $Id: string_strtok.c,v 1.2 2004-10-25 19:53:15 obarthel Exp $
+ * $Id: string_strtok.c,v 1.3 2004-11-17 19:07:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,24 +44,25 @@
 /****************************************************************************/
 
 char *
-strtok(char *str, const char *separator_set)
+strtok_r(char *str, const char *separator_set,char ** state_ptr)
 {
-	static char * last;
-
 	char * result = NULL;
+	char * last;
 	size_t size;
 
-	assert( separator_set != NULL );
+	assert( separator_set != NULL && state_ptr != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		if(separator_set == NULL)
+		if(separator_set == NULL || state_ptr == NULL)
 		{
 			errno = EFAULT;
 			goto out;
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
+
+	last = (*state_ptr);
 
 	/* Did we get called before? Restart at the last valid position. */
 	if(str == NULL)
@@ -104,5 +105,25 @@ strtok(char *str, const char *separator_set)
 
  out:
 
+	if(state_ptr != NULL)
+		(*state_ptr) = last;
+
+	return(result);
+}
+
+/****************************************************************************/
+
+char *
+strtok(char *str, const char *separator_set)
+{
+	static char * last;
+
+	char * result;
+
+	ENTER();
+
+	result = strtok_r(str,separator_set,&last);
+	
+	RETURN(result);
 	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime.c,v 1.1.1.1 2004-07-26 16:32:21 obarthel Exp $
+ * $Id: time_asctime.c,v 1.2 2004-11-17 19:07:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,11 +74,9 @@ add_to_string(char * to,int to_size,const char * string,int * offset_ptr)
 
 /****************************************************************************/
 
-char *
-asctime(const struct tm *tm)
+static char *
+__asctime_r(const struct tm *tm,char * buffer,size_t buffer_size)
 {
-	static char buffer[40];
-
 	struct tm copy_tm;
 	char number[16];
 	char * result = NULL;
@@ -89,11 +87,11 @@ asctime(const struct tm *tm)
 
 	SHOWPOINTER(tm);
 
-	assert( tm != NULL );
+	assert( tm != NULL || buffer == NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		if(tm == NULL)
+		if(tm == NULL || buffer == NULL )
 		{
 			errno = EFAULT;
 			goto out;
@@ -126,66 +124,98 @@ asctime(const struct tm *tm)
 	else
 		b = "---";
 
-	add_to_string(buffer,sizeof(buffer),b,		&offset);
-	add_to_string(buffer,sizeof(buffer)," ",	&offset);
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
 
 	if(0 <= tm->tm_mon && tm->tm_mon <= 11)
 		b = __abbreviated_month_names[tm->tm_mon];
 	else
 		b = "---";
 
-	add_to_string(buffer,sizeof(buffer),b,		&offset);
-	add_to_string(buffer,sizeof(buffer)," ",	&offset);
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
 
 	if(1 <= tm->tm_mday && tm->tm_mday <= 31)
 		b = __number_to_string((unsigned int)tm->tm_mday,number,sizeof(number),2);
 	else
 		b = "--";
 
-	add_to_string(buffer,sizeof(buffer),b,		&offset);
-	add_to_string(buffer,sizeof(buffer)," ",	&offset);
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
 
 	if(0 <= tm->tm_hour && tm->tm_hour <= 23)
 		b = __number_to_string((unsigned int)tm->tm_hour,number,sizeof(number),2);
 	else
 		b = "--";
 
-	add_to_string(buffer,sizeof(buffer),b,		&offset);
-	add_to_string(buffer,sizeof(buffer),":",	&offset);
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size,":",	&offset);
 
 	if(0 <= tm->tm_min && tm->tm_min <= 59)
 		b = __number_to_string((unsigned int)tm->tm_min,number,sizeof(number),2);
 	else
 		b = "--";
 
-	add_to_string(buffer,sizeof(buffer),b,		&offset);
-	add_to_string(buffer,sizeof(buffer),":",	&offset);
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size,":",	&offset);
 
 	if(0 <= tm->tm_sec && tm->tm_sec <= 59)
 		b = __number_to_string((unsigned int)tm->tm_sec,number,sizeof(number),2);
 	else
 		b = "--";
 
-	add_to_string(buffer,sizeof(buffer),b,		&offset);
-	add_to_string(buffer,sizeof(buffer)," ",	&offset);
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
 
 	if(0 <= tm->tm_year)
 		b = __number_to_string((unsigned int)1900 + tm->tm_year,number,sizeof(number),0);
 	else
 		b = "----";
 
-	add_to_string(buffer,sizeof(buffer),b,&offset);
+	add_to_string(buffer,buffer_size,b,&offset);
 
 	SHOWSTRING(buffer);
 
-	add_to_string(buffer,sizeof(buffer),"\n",&offset);
+	add_to_string(buffer,buffer_size,"\n",&offset);
 
-	assert( offset < sizeof(buffer) );
-	assert( strlen(buffer) < sizeof(buffer) );
+	assert( offset < buffer_size );
+	assert( strlen(buffer) < buffer_size );
 
 	result = buffer;
 
  out:
+
+	RETURN(result);
+	return(result);
+}
+
+/****************************************************************************/
+
+char *
+asctime_r(const struct tm *tm,char * buffer)
+{
+	char * result;
+
+	ENTER();
+
+	result = __asctime_r(tm,buffer,40);
+
+	RETURN(result);
+	return(result);
+}
+
+/****************************************************************************/
+
+char *
+asctime(const struct tm *tm)
+{
+	static char buffer[40];
+
+	char * result;
+
+	ENTER();
+
+	result = __asctime_r(tm,buffer,sizeof(buffer));
 
 	RETURN(result);
 	return(result);

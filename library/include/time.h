@@ -1,5 +1,5 @@
 /*
- * $Id: time.h,v 1.1.1.1 2004-07-26 16:32:56 obarthel Exp $
+ * $Id: time.h,v 1.2 2004-11-17 19:07:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -92,6 +92,17 @@ extern double difftime(time_t t1,time_t t0);
 
 extern size_t strftime(char *s, size_t maxsize, const char *format,
 	const struct tm *tm);
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+extern char * asctime_r(const struct tm *tm,char * buffer);
+extern char * ctime_r(const time_t *tptr,char * buffer);
+extern struct tm * gmtime_r(const time_t *t,struct tm * tm_ptr);
+extern struct tm * localtime_r(const time_t *t,struct tm * tm_ptr);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: time_gmtime.c,v 1.1.1.1 2004-07-26 16:32:22 obarthel Exp $
+ * $Id: time_gmtime.c,v 1.2 2004-11-17 19:07:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,30 +44,43 @@
 /****************************************************************************/
 
 struct tm *
-gmtime(const time_t *t)
+gmtime_r(const time_t *t,struct tm * tm_ptr)
 {
-	static struct tm tm;
 	struct tm * result = NULL;
 
 	ENTER();
 
-	assert( t != NULL );
+	assert( t != NULL && tm_ptr != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		if(t == NULL)
+		if(t == NULL || tm_ptr == NULL)
 		{
-			SHOWMSG("invalid t parameter");
-
 			errno = EFAULT;
 			goto out;
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	result = __convert_time((*t), 0, &tm);
+	result = __convert_time((*t), 0, tm_ptr);
 
  out:
+
+	RETURN(result);
+	return(result);
+}
+
+/****************************************************************************/
+
+struct tm *
+gmtime(const time_t *t)
+{
+	static struct tm tm;
+	struct tm * result;
+
+	ENTER();
+
+	result = gmtime_r(t,&tm);
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: string.h,v 1.4 2004-11-14 11:06:29 obarthel Exp $
+ * $Id: string.h,v 1.5 2004-11-17 19:07:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -124,6 +124,10 @@ extern int bcmp(const void *a,const void *b,size_t len);
 
 extern size_t strlcpy(char *dst, const char *src, size_t siz);
 extern size_t strlcat(char *dst, const char *src, size_t siz);
+
+/****************************************************************************/
+
+extern char * strtok_r(char *str, const char *separator_set,char ** state_ptr);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: time_localtime.c,v 1.1.1.1 2004-07-26 16:32:23 obarthel Exp $
+ * $Id: time_localtime.c,v 1.2 2004-11-17 19:07:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,22 +48,19 @@
 /****************************************************************************/
 
 struct tm *
-localtime(const time_t *t)
+localtime_r(const time_t *t,struct tm * tm_ptr)
 {
-	static struct tm tm;
 	struct tm * result = NULL;
 	LONG gmt_offset;
 
 	ENTER();
 
-	assert( t != NULL );
+	assert( t != NULL && tm_ptr != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		if(t == NULL)
+		if(t == NULL || tm_ptr == NULL)
 		{
-			SHOWMSG("invalid t parameter");
-
 			errno = EFAULT;
 			goto out;
 		}
@@ -80,9 +77,26 @@ localtime(const time_t *t)
 
 	SHOWVALUE(gmt_offset);
 
-	result = __convert_time((*t), gmt_offset, &tm);
+	result = __convert_time((*t), gmt_offset, tm_ptr);
 
  out:
+
+	RETURN(result);
+	return(result);
+}
+
+/****************************************************************************/
+
+struct tm *
+localtime(const time_t *t)
+{
+	static struct tm tm;
+
+	struct tm * result;
+
+	ENTER();
+
+	result = localtime_r(t,&tm);
 
 	RETURN(result);
 	return(result);
