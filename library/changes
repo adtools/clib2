@@ -1,3 +1,5 @@
+c.lib 1.182 (8.11.2004)
+
 - Changed the error abort condition for the %s conversion of the
   scanf() family. It now matches the abort conditions for all other
   conversions and no longer ignores whether any other parameters were
@@ -9,6 +11,9 @@
 - Simplified the common code that fopen(), freopen() and fdopen()
   share and which has to figure out by looking at a file access
   mode specification which parameters should be used.
+
+- Dropped error detection in the scanf() family. The EOF has to be
+  good enough. Also, ungetc() failure still leads to error handling.
 
 
 

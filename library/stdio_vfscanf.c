@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.5 2004-11-03 15:35:56 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.6 2004-11-08 17:57:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -105,24 +105,12 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 
 		if(isspace(c))
 		{
-			BOOL finished = FALSE;
-
 			/* Skip all blank spaces in the stream. */
 			format++;
 
-			while(TRUE)
+			while((c = __getc(stream)) != EOF)
 			{
-				c = __getc(stream);
-				if(c == EOF)
-				{
-					/* Hit the end of the stream. Due to an error? */
-					if(num_conversions == 0 || ferror(stream))
-						goto out;
-
-					finished = TRUE;
-					break;
-				}
-				else if (isspace(c))
+				if(isspace(c))
 				{
 					total_num_chars_read++;
 				}
@@ -139,8 +127,17 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				}
 			}
 
-			if(finished)
+			if(c == EOF)
+			{
+				SHOWMSG("end of file");
+
+				/* Hit the end of the stream? */
+				if(num_conversions == 0)
+					goto out;
+
+				/* Finished... */
 				break;
+			}
 
 			/* Resume scanning. */
 			continue;
@@ -159,8 +156,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 			{
 				SHOWMSG("end of file");
 
-				/* Hit the end of the stream. Due to an error? */
-				if(num_conversions == 0 || ferror(stream))
+				/* Hit the end of the stream. */
+				if(num_conversions == 0)
 					goto out;
 
 				break;
@@ -342,21 +339,9 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 		   conversion_type != 'n' &&
 		   conversion_type != '[')
 		{
-			BOOL finished = FALSE;
-
-			while(TRUE)
+			while((c = __getc(stream)) != EOF)
 			{
-				c = __getc(stream);
-				if(c == EOF)
-				{
-					/* Hit the end of the stream. Due to an error? */
-					if(num_conversions == 0 || ferror(stream))
-						goto out;
-
-					finished = TRUE;
-					break;
-				}
-				else if (isspace(c))
+				if(isspace(c))
 				{
 					total_num_chars_read++;
 				}
@@ -372,9 +357,6 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					break;
 				}
 			}
-
-			if(finished)
-				break;
 		}
 
 		num_chars_processed = 0;
@@ -431,8 +413,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				c = __getc(stream);
 				if(c == EOF)
 				{
-					/* Bail out if we hit the end of the stream or an error occured. */
-					if(num_conversions == 0 || ferror(stream))
+					/* Bail out if we hit the end of the stream. */
+					if(num_conversions == 0)
 						goto out;
 
 					break;
@@ -612,7 +594,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 							maximum_field_width--;
 					}
 
-					if(c == EOF && ((num_chars_processed == 0 && num_conversions == 0) || ferror(stream)))
+					if(c == EOF && num_chars_processed == 0 && num_conversions == 0)
 						goto out;
 				}
 
@@ -1203,7 +1185,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 					}
 				}
 
-				if(c == EOF && ((num_chars_processed == 0 && num_conversions == 0) || ferror(stream)))
+				if(c == EOF && num_chars_processed == 0 && num_conversions == 0)
 					goto out;
 			}
 
@@ -1309,8 +1291,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 
 				/* The conversion is considered to have failed if an EOF was
 				   encountered before any non-whitespace characters could be
-				   converted. We also bail out if we hit an error. */
-				if(c == EOF && ((num_chars_processed == 0 && num_conversions == 0) || ferror(stream)))
+				   converted. */
+				if(c == EOF && num_chars_processed == 0 && num_conversions == 0)
 					goto out;
 			}
 
@@ -1433,8 +1415,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 			{
 				SHOWMSG("end of file");
 
-				/* Hit the end of the stream. Due to an error? */
-				if(num_conversions == 0 || ferror(stream))
+				/* Hit the end of the stream. */
+				if(num_conversions == 0)
 					goto out;
 
 				break;
@@ -1566,7 +1548,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 						maximum_field_width--;
 				}
 
-				if(c == EOF && ((num_chars_processed == 0 && num_conversions == 0) || ferror(stream)))
+				if(c == EOF && num_chars_processed == 0 && num_conversions == 0)
 					goto out;
 			}
 
