@@ -1,3 +1,5 @@
+c.lib 1.185 (2.1.2005)
+
 - Moved the environment variable cleanup code into a destructor function.
 
 - Fixed a typo in the hstrerror() function.

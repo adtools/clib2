@@ -1,10 +1,10 @@
 /*
- * $Id: stdlib_headers.h,v 1.5 2004-12-24 18:31:38 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.6 2005-01-02 09:07:18 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2004 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

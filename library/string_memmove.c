@@ -1,10 +1,10 @@
 /*
- * $Id: string_memmove.c,v 1.2 2004-08-14 11:11:01 obarthel Exp $
+ * $Id: string_memmove.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2004 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

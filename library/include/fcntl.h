@@ -1,10 +1,10 @@
 /*
- * $Id: fcntl.h,v 1.3 2004-11-27 12:43:12 obarthel Exp $
+ * $Id: fcntl.h,v 1.4 2005-01-02 09:07:21 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2004 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
