@@ -1,5 +1,5 @@
 /*
- * $Id: time.h,v 1.3 2004-09-09 08:25:31 obarthel Exp $
+ * $Id: time.h,v 1.4 2004-09-09 08:30:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,11 @@ extern "C" {
    structure and try to get by with this definition. Sometimes it works,
    sometimes it doesn't. Not sure if there really is a good solution for
    this problem... */
-#if !defined(__TIMEVAL_ALREADY_DEFINED) && !defined(DEVICES_TIMER_H)
+#ifndef __TIMEVAL_ALREADY_DEFINED
+
+/****************************************************************************/
+
+#ifndef DEVICES_TIMER_H
 
 /****************************************************************************/
 
@@ -98,10 +102,6 @@ struct timeval
 
 /****************************************************************************/
 
-#endif /* __TIMEVAL_ALREADY_DEFINED && DEVICES_TIMER_H */
-
-/****************************************************************************/
-
 #ifndef tv_sec
 #define tv_sec tv_secs
 #endif /* tv_sec */
@@ -109,6 +109,14 @@ struct timeval
 #ifndef tv_usec
 #define tv_usec tv_micro
 #endif /* tv_usec */
+
+/****************************************************************************/
+
+#endif /* DEVICES_TIMER_H */
+
+/****************************************************************************/
+
+#endif /* __TIMEVAL_ALREADY_DEFINED */
 
 /****************************************************************************/
 
