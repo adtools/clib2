@@ -1,5 +1,5 @@
 /*
- * $Id: time_headers.h,v 1.10 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: time_headers.h,v 1.11 2005-03-30 19:37:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,9 +90,13 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_LOCALE_UTILITY_H
-#include "stdlib_locale_utility.h"
-#endif /* _STDLIB_LOCALE_UTILITY_H */
+#ifndef _STDLIB_LOCALEBASE_H
+#include "stdlib_localebase.h"
+#endif /* _STDLIB_LOCALEBASE_H */
+
+#ifndef _STDLIB_UTILITYBASE_H
+#include "stdlib_utilitybase.h"
+#endif /* _STDLIB_UTILITYBASE_H */
 
 /****************************************************************************/
 

@@ -15,6 +15,11 @@
   effect of printing a different termination message but otherwise
   program flow takes the same path as abort().
 
+- Moved the __UtilityBase/__IUtility variable declarations into
+  a separate file.
+
+- Simplified the library/open close code in "stdlib_main.c".
+
 
 c.lib 1.190 (25.3.2005)
 

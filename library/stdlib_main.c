@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.20 2005-03-20 11:18:06 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.21 2005-03-30 19:37:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -147,18 +147,86 @@ call_main(void)
 
 /****************************************************************************/
 
-STATIC VOID ASM
-detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list))
+STATIC BOOL
+open_libraries(VOID)
+{
+	BOOL success = FALSE;
+	int os_version;
+
+	/* Check which minimum operating system version we actually require. */
+	os_version = 37;
+	if(__minimum_os_lib_version > 37)
+		os_version = __minimum_os_lib_version;
+
+	/* Open the minimum required libraries. */
+	DOSBase = (struct Library *)OpenLibrary("dos.library",os_version);
+	if(DOSBase == NULL)
+		goto out;
+
+	__UtilityBase = OpenLibrary("utility.library",os_version);
+	if(__UtilityBase == NULL)
+		goto out;
+
+	#if defined(__amigaos4__)
+	{
+		/* Obtain the interfaces for these libraries. */
+		IDOS = (struct DOSIFace *)GetInterface(DOSBase, "main", 1, 0);
+		if(IDOS == NULL)
+			goto out;
+
+		__IUtility = (struct UtilityIFace *)GetInterface(__UtilityBase, "main", 1, 0);
+		if(__IUtility == NULL)
+			goto out;
+	}
+	#endif /* __amigaos4__ */
+
+	success = TRUE;
+
+ out:
+
+	return(success);
+}
+
+/****************************************************************************/
+
+STATIC VOID
+close_libraries(VOID)
 {
 	#if defined(__amigaos4__)
 	{
 		if(__IUtility != NULL)
+		{
 			DropInterface((struct Interface *)__IUtility);
+			__IUtility = NULL;
+		}
 
 		if(IDOS != NULL)
+		{
 			DropInterface((struct Interface *)IDOS);
+			IDOS = NULL;
+		}
 	}
-	#else
+	#endif /* __amigaos4__ */
+
+	if(__UtilityBase != NULL)
+	{
+		CloseLibrary(__UtilityBase);
+		__UtilityBase = NULL;
+	}
+
+	if(DOSBase != NULL)
+	{
+		CloseLibrary(DOSBase);
+		DOSBase = NULL;
+	}
+}
+
+/****************************************************************************/
+
+STATIC VOID ASM
+detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list))
+{
+	#if NOT defined(__amigaos4__)
 	{
 		/* The following trick is necessary only under dos.library V40 and below. */
 		if(((struct Library *)DOSBase)->lib_Version < 50)
@@ -177,11 +245,7 @@ detach_cleanup(REG(d0, LONG UNUSED unused_return_code),REG(d1, BPTR segment_list
 	}
 	#endif /* __amigaos4__ */
 
-	if(__UtilityBase != NULL)
-		CloseLibrary(__UtilityBase);
-
-	if(DOSBase != NULL)
-		CloseLibrary(DOSBase);
+	close_libraries();
 }
 
 /****************************************************************************/
@@ -204,17 +268,6 @@ get_stack_size(void)
 
 /****************************************************************************/
 
-/* The global utility.library base, as required by clib2. */
-struct Library * __UtilityBase;
-
-/****************************************************************************/
-
-#if defined(__amigaos4__)
-struct UtilityIFace * __IUtility;
-#endif /* __amigaos4__ */
-
-/****************************************************************************/
-
 int
 _main(void)
 {
@@ -225,7 +278,6 @@ _main(void)
 	struct Process * this_process;
 	int return_code = RETURN_FAIL;
 	ULONG current_stack_size;
-	int os_version;
 
 	SysBase = *(struct Library **)4;
 
@@ -254,42 +306,29 @@ _main(void)
 
 	__WBenchMsg = (struct WBStartup *)startup_message;
 
-	/* Check which minimum operating system version we actually require. */
-	os_version = 37;
-	if(__minimum_os_lib_version > 37)
-		os_version = __minimum_os_lib_version;
-
-	/* We will need dos.library V37 and utility.library V37. */
-	DOSBase			= (struct Library *)OpenLibrary("dos.library",os_version);
-	__UtilityBase	= OpenLibrary("utility.library",os_version);
-
-	if(DOSBase == NULL || __UtilityBase == NULL)
+	/* Try to open the libraries we need to proceed. */
+	if(CANNOT open_libraries())
 	{
 		char * error_message;
 
 		/* If available, use the error message provided by the client. */
-		if(__minimum_os_lib_error != NULL)
-			error_message = __minimum_os_lib_error;
-		else
-			error_message = "This program requires AmigaOS 2.04 or higher.";
+		error_message = __minimum_os_lib_error;
+
+		#if defined(__amigaos4__)
+		{
+			if(error_message == NULL)
+				error_message = "This program requires AmigaOS 4.0 or higher.";
+		}
+		#else
+		{
+			if(error_message == NULL)
+				error_message = "This program requires AmigaOS 2.04 or higher.";
+		}
+		#endif /* __amigaos4__ */
 
 		__show_error(error_message);
 		goto out;
 	}
-
-	#if defined(__amigaos4__)
-	{
-		/* Get interfaces for DOS and Utility */
-		IDOS		= (struct DOSIFace *)GetInterface(DOSBase, "main", 1, 0);
-		__IUtility	= (struct UtilityIFace *)GetInterface(__UtilityBase, "main", 1, 0);
-
-		if (IDOS == NULL || __IUtility == NULL)
-		{
-			__show_error("This program requires AmigaOS 4.0 or higher.");
-			goto out;
-		}
-	}
-	#endif /* __amigaos4__ */
 
 	if(__disable_dos_requesters)
 	{
@@ -483,39 +522,7 @@ _main(void)
 		__set_process_window(old_window_pointer);
 
 	if(child_process == NULL)
-	{
-		#if defined(__amigaos4__)
-		{
-			if(__IUtility != NULL)
-			{
-				DropInterface((struct Interface *)__IUtility);
-				__IUtility = NULL;
-			}
-		}
-		#endif /* __amigaos4__ */
-
-		if(__UtilityBase != NULL)
-		{
-			CloseLibrary(__UtilityBase);
-			__UtilityBase = NULL;
-		}
-
-		#if defined(__amigaos4__)
-		{
-			if(IDOS != NULL)
-			{
-				DropInterface((struct Interface *)IDOS);
-				IDOS = NULL;
-			}
-		}
-		#endif /* __amigaos4__ */
-
-		if(DOSBase != NULL)
-		{
-			CloseLibrary(DOSBase);
-			DOSBase = NULL;
-		}
-	}
+		close_libraries();
 
 	if(startup_message != NULL)
 	{

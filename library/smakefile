@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.35 2005-03-19 11:06:57 obarthel Exp $
+# $Id: smakefile,v 1.36 2005-03-30 19:37:26 obarthel Exp $
 #
 # :ts=8
 #
@@ -439,6 +439,7 @@ STDLIB_OBJ = \
 	stdlib_swapstack.o \
 	stdlib_system.o \
 	stdlib_unsetenv.o \
+	stdlib_utilitybase.o \
 	stdlib_wildcard_expand.o \
 	stdlib_stdio_window_spec.o
 

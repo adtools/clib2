@@ -1,5 +1,5 @@
 /*
- * $Id: string_headers.h,v 1.6 2005-03-30 19:37:47 obarthel Exp $
+ * $Id: stdlib_utilitybase.h,v 1.1 2005-03-30 19:37:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,28 +31,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STRING_HEADERS_H
-#define _STRING_HEADERS_H
-
-/****************************************************************************/
-
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <locale.h>
-#include <errno.h>
-#include <ctype.h>
-#include <dos.h>
-
-/****************************************************************************/
-
-#ifndef _STDLIB_LOCALEBASE_H
-#include "stdlib_localebase.h"
-#endif /* _STDLIB_LOCALEBASE_H */
-
 #ifndef _STDLIB_UTILITYBASE_H
-#include "stdlib_utilitybase.h"
-#endif /* _STDLIB_UTILITYBASE_H */
+#define _STDLIB_UTILITYBASE_H
+
+/****************************************************************************/
+
+#ifndef __NOLIBBASE__
+#define __NOLIBBASE__
+#endif /* __NOLIBBASE__ */
+
+#ifndef __NOGLOBALIFACE__
+#define __NOGLOBALIFACE__
+#endif /* __NOGLOBALIFACE__ */
+
+#include <proto/utility.h>
 
 /****************************************************************************/
 
@@ -60,27 +52,37 @@
 #include "macros.h"
 #endif /* _MACROS_H */
 
-#ifndef _DEBUG_H
-#include "debug.h"
-#endif /* _DEBUG_H */
+/****************************************************************************/
+
+extern struct Library * NOCOMMON __UtilityBase;
 
 /****************************************************************************/
 
-/* Address is neither aligned to a word or long word boundary. */
-#define IS_UNALIGNED(a) ((((unsigned long)(a)) & 1) != 0)
+#if defined(__amigaos4__)
 
-/* Address is aligned to a word boundary, but not to a long
-   word boundary. */
-#define IS_SHORT_ALIGNED(a) ((((unsigned long)(a)) & 3) == 2)
+/****************************************************************************/
 
-/* Address is aligned to a long word boundary. For an 68030 and beyond the
-   alignment does not matter. */
-#if defined(M68020)
-#define IS_LONG_ALIGNED(a) (1)
+extern struct UtilityIFace NOCOMMON * __IUtility;
+
+/****************************************************************************/
+
+#define DECLARE_UTILITYBASE() \
+	struct Library *		UNUSED	UtilityBase	= __UtilityBase; \
+	struct UtilityIFace *			IUtility	= __IUtility
+
+/****************************************************************************/
+
 #else
-#define IS_LONG_ALIGNED(a) ((((unsigned long)(a)) & 3) == 0)
-#endif /* M68020 */
 
 /****************************************************************************/
 
-#endif /* _STRING_HEADERS_H */
+#define DECLARE_UTILITYBASE() \
+	struct Library * UtilityBase = __UtilityBase
+
+/****************************************************************************/
+
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
+#endif /* _STDLIB_UTILITYBASE_H */

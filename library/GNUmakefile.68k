@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.46 2005-03-20 17:14:58 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.47 2005-03-30 19:37:13 obarthel Exp $
 #
 # :ts=8
 #
@@ -346,6 +346,7 @@ C_LIB = \
 	stdlib_system.o \
 	stdlib_termination_message.o \
 	stdlib_threshold.o \
+	stdlib_utilitybase.o \
 	stdlib_udivsi3.o \
 	stdlib_udivsi4.o \
 	stdlib_umodsi3.o \

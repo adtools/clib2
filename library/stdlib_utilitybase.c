@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_locale_utility.h,v 1.3 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_utilitybase.c,v 1.1 2005-03-30 19:37:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,68 +31,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_LOCALE_UTILITY_H
-#define _STDLIB_LOCALE_UTILITY_H
-
-/****************************************************************************/
-
-#ifndef __NOLIBBASE__
 #define __NOLIBBASE__
-#endif /* __NOLIBBASE__ */
 
-#ifndef __NOGLOBALIFACE__
-#define __NOGLOBALIFACE__
-#endif /* __NOGLOBALIFACE__ */
-
+#ifndef PROTO_UTILITY_H
 #include <proto/utility.h>
-#include <proto/locale.h>
+#endif /* PROTO_UTILITY_H */
 
 /****************************************************************************/
 
-#ifndef _MACROS_H
-#include "macros.h"
-#endif /* _MACROS_H */
-
-/****************************************************************************/
-
-extern struct Library * NOCOMMON __UtilityBase;
-extern struct Library * NOCOMMON __LocaleBase;
+struct Library * __UtilityBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
 
-/****************************************************************************/
-
-extern struct UtilityIFace NOCOMMON *	__IUtility;
-extern struct LocaleIFace NOCOMMON *	__ILocale;
-
-/****************************************************************************/
-
-#define DECLARE_UTILITYBASE() \
-	struct Library *		UNUSED	UtilityBase	= __UtilityBase; \
-	struct UtilityIFace *			IUtility	= __IUtility
-
-#define DECLARE_LOCALEBASE() \
-	struct Library *		UNUSED	LocaleBase	= __LocaleBase; \
-	struct LocaleIFace *			ILocale		= __ILocale
-
-/****************************************************************************/
-
-#else
-
-/****************************************************************************/
-
-#define DECLARE_UTILITYBASE() \
-	struct Library * UtilityBase = __UtilityBase
-
-#define DECLARE_LOCALEBASE() \
-	struct Library * LocaleBase = __LocaleBase
-
-/****************************************************************************/
+struct UtilityIFace * __IUtility;
 
 #endif /* __amigaos4__ */
-
-/****************************************************************************/
-
-#endif /* _STDLIB_LOCALE_UTILITY_H */
