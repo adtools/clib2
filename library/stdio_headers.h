@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.21 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.22 2005-04-02 13:25:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -164,6 +164,9 @@ struct iob;
 
 /* The directory entry type a socket is identified with (in a FileInfoBlock). */
 #define ST_SOCKET (31082002)
+
+/* The same for a console stream. */
+#define ST_CONSOLE (20050402)
 
 /****************************************************************************/
 

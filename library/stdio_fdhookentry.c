@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.25 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.26 2005-04-02 13:25:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,6 +49,16 @@
 
 #include <strings.h>
 #include <limits.h>
+
+/****************************************************************************/
+
+#ifndef ID_CON
+#define ID_CON (0x434F4E00L)
+#endif /* ID_CON */
+
+#ifndef ID_RAWCON
+#define ID_RAWCON (0x52415700L)
+#endif /* ID_RAWCON */
 
 /****************************************************************************/
 
@@ -567,15 +577,51 @@ __fd_hook_entry(
 
 			SHOWMSG("file_action_examine");
 
+			fh = BADDR(file);
+
 			if(CANNOT __safe_examine_file_handle(file,fam->fam_FileInfo))
 			{
-				SHOWMSG("couldn't examine the file");
+				D_S(struct InfoData,id);
+				LONG error;
 
-				fam->fam_Error = __translate_io_error_to_errno(IoErr());
-				goto out;
+				/* So that didn't work. Did the file system simply fail to
+				   respond to the request or is something more sinister
+				   at work? */
+				error = IoErr();
+				if(error != ERROR_ACTION_NOT_KNOWN)
+				{
+					SHOWMSG("couldn't examine the file");
+
+					fam->fam_Error = __translate_io_error_to_errno(error);
+					goto out;
+				}
+
+				/* OK, let's have another look at this file. Could it be a
+				   console stream? */
+				if(CANNOT DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),	0,0,0,0))
+				{
+					SHOWMSG("couldn't examine the file");
+
+					fam->fam_Error = __translate_io_error_to_errno(IoErr());
+					goto out;
+				}
+
+				if(id->id_DiskType != ID_CON &&
+				   id->id_DiskType != ID_RAWCON)
+				{
+					SHOWMSG("whatever it is, we don't know");
+
+					fam->fam_Error = ENOSYS;
+					goto out;
+				}
+
+				/* Make up some stuff for this stream. */
+				memset(fam->fam_FileInfo,0,sizeof(*fam->fam_FileInfo));
+
+				DateStamp(&fam->fam_FileInfo->fib_Date);
+
+				fam->fam_FileInfo->fib_DirEntryType = ST_CONSOLE;
 			}
-
-			fh = BADDR(file);
 
 			fam->fam_FileSystem = fh->fh_Type;
 

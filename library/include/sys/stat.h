@@ -1,5 +1,5 @@
 /*
- * $Id: stat.h,v 1.4 2005-03-10 11:40:57 obarthel Exp $
+ * $Id: stat.h,v 1.5 2005-04-02 13:25:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -88,22 +88,23 @@ extern "C" {
 
 /****************************************************************************/
 
-#define	S_IFMT	 0170000	/* type of file */
-#define	S_IFIFO	 0010000	/* named pipe (fifo) */
-#define	S_IFDIR	 0040000	/* directory */
-#define	S_IFBLK	 0060000	/* block special */
-#define	S_IFREG	 0100000	/* regular */
-#define	S_IFLNK	 0120000	/* symbolic link */
-#define	S_IFSOCK 0140000	/* socket */
+#define	S_IFMT		0170000	/* type of file */
+#define	S_IFIFO		0010000	/* named pipe (fifo) */
+#define	S_IFCHR		0020000	/* character special */
+#define	S_IFDIR		0040000	/* directory */
+#define	S_IFBLK		0060000	/* block special */
+#define	S_IFREG		0100000	/* regular */
+#define	S_IFLNK		0120000	/* symbolic link */
+#define	S_IFSOCK	0140000	/* socket */
 
 /****************************************************************************/
 
 #define	S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)	/* directory */
+#define	S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)	/* char special */
 #define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)	/* regular file */
 #define	S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)	/* symbolic link */
 #define	S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)	/* fifo */
 #define	S_ISBLK(m)	(0)							/* block special */
-#define	S_ISCHR(m)	(0)							/* character special */
 
 /****************************************************************************/
 

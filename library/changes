@@ -29,6 +29,11 @@
   descriptors now work like the "real" ones. This is true even if
   the "real" ones were closed and only their former aliases remain.
 
+- Invoking fstat() on what maps to a con-handler stream now produces
+  information identifying it as a character special file. Side-effect:
+  if the input/output went to a CON:/AUTO window, that window will
+  pop open and stay open.
+
 
 c.lib 1.190 (25.3.2005)
 
