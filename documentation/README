@@ -19,159 +19,172 @@ rewrite that library from scratch.
 
 2. What does it do?
 
-Using "'C' - A reference manual" as a reference I wrote a set of header
-files, then proceeded to implement each single function referenced in them.
-With few exceptions in the area of wide character support, the result
+Using "'C' - A reference manual" (4th edition) as a reference I wrote a set of
+header files, then proceeded to implement each single function referenced in
+them. With few exceptions in the area of wide character support, the result
 should be a feature complete implementation of the ISO 'C' (1994) runtime
 library.
 
 Because Samba needs a few POSIX-like routines to be supported, the library
 functionality is complemented by a set of routines described in "Advanced
-programming in the Unix environent". This set is not complete, however. It
-will have to grow even further to accomodate for Samba's needs, but this is
-a good start. I specifically added hooks for integrating socket I/O at a
-later point of time.
+programming in the Unix environent".
 
 This is not a portable implementation of the library in the sense that you
 could move it from one 'C' compiler on one operating system to another.
 This is an Amiga specific implementation.
 
-The library supports floating point math, which is limited to IEEE single
-and double precision or M68881 inline math. There is no support for the
-fast floating point (FFP) format or exclusive IEEE single precision. You
-either get double precision (IEEE math) or extended precision (M68881
-inline math). What it is that you get is determined at compile time. Use
-the IEEE_FLOATING_POINT_SUPPORT preprocessor symbol to activate IEEE math
+The library supports floating point math, which, for the 68k platform, is
+limited to IEEE single and double precision or M68881 inline math. There is no
+support for the fast floating point (FFP) format or exclusive IEEE single
+precision. You either get double precision (IEEE math) or extended precision
+(M68881 inline math). What it is that you get is determined at compile time.
+Use the IEEE_FLOATING_POINT_SUPPORT preprocessor symbol to activate IEEE math
 code and the M68881_FLOATING_POINT_SUPPORT symbol for M68881 inline math.
 
-Not unlike SAS/C, you can configure a minimum stack size the program is to
-use when it starts up. This is controlled via the '__stack_size' variable
-(see "stdlib_main.c").
+For the PowerPC platform, the library uses code borrowed from fdlibm 5.3,
+which is a portable library of arithmetic functions developed by Sun
+Microsystems which, for example, is also used within the Java platform.
 
-I added some amiga.lib and debug.lib functionality to the library, but
-don't count on it to be complete.
+Not unlike SAS/C, you can configure a minimum stack size the program is to use
+when it starts up. This is controlled via the '__stack_size' variable (see
+"stdlib_main.c").
+
+I added some amiga.lib and debug.lib functionality to the library, but don't
+count on it to be complete.
+
+The library code is supposed to be thread-safe if built with the __THREAD_SAFE
+preprocesssor symbold defined. Note that 'thread-safe' does not mean
+'reentrant'. Multiple callers for certain library functions are permitted, but
+not for all of them. For example, mkdtemp() is not thread-safe, and neither is
+rand() or localtime(). But as per POSIX 1003.1c-1995 there are thread-safe
+variants of rand() and localtime() called rand_r(), localtime_r(), and others.
+The use of the socket I/O functions is still problematic because the
+underlying bsdsocket.library API is not supposed to be used by any process
+other than the one that opened it. Also yet unsolved is the issue of reading
+error codes from the 'errno' variable which currently always contains the
+error code left by the last caller.
+
+Take care: thread-safety does not imply that you can have multiple callers
+access and close the same file. There is no resource tracking to that degree
+yet. All the thread-safety tries to afford you is not to get into big trouble
+if simultaneous and overlapping accesses to files, memory allocation and other
+resources are taking place.
 
 
 3. What does it not do?
 
-This library is a departure from the typical 'C' runtime environments of
-the past which had to run on all AmigaOS releases, down to Kickstart 1.1.
-This very library was designed to take advantage of the routines available
-since Kickstart 2.04 was introduced and virtually nobody ever put to use.
-This helps to cut the code size, and it also helps to keep bugs out of the
-library by falling back onto well-tested implementations. However, the
-catch is that the code won't run under Kickstart 1.3 and below. But then
-these operating system releases have been obsolete for more than a decade,
-and you can always go back to a compiler environment which supports them.
+This library is a departure from the typical 'C' runtime environments of the
+past which had to run on all AmigaOS releases, down to Kickstart 1.1. This
+very library was designed to take advantage of the routines available since
+Kickstart 2.04 was introduced and virtually nobody ever put to use. This helps
+to cut the code size, and it also helps to keep bugs out of the library by
+falling back onto well-tested implementations. However, the catch is that the
+code won't run under Kickstart 1.3 and below. But then these operating system
+releases have been obsolete for more than a decade, and you can always go back
+to a compiler environment which supports them.
 
-Practically all library routines are implemented in a sort of naïve
-fashion. That is, they contain virtually no optimizations whatsoever. This
-is particularly apparent in workhorses such as memset() or memmove(). But
-then, the issue is easy testability and Amiga platform portability.
+Practically all library routines are implemented in a sort of naïve fashion.
+That is, they contain virtually no optimizations whatsoever. This is
+particularly apparent in workhorses such as memset() or memmove(). But then,
+the issue is easy testability and Amiga platform portability.
 
-There is very little support for amiga.lib functionality. There is
-NewList(), HookEntry(), CallHook(), CallHookA(), the DoMethod() family, the
-RexxVars family, but that's all. If you need more, you would have to
-implement it yourself. Put another way, if you absolutely need
-functionality that is only found in amiga.lib, you really shouldn't need in
-in the first place.
+There is very little support for amiga.lib functionality. There is NewList(),
+HookEntry(), CallHook(), CallHookA(), the DoMethod() family, the RexxVars
+family, but that's all. If you need more, you would have to implement it
+yourself. Put another way, if you absolutely need functionality that is only
+found in amiga.lib, you really shouldn't need in in the first place.
 
 
 4. Where does the source code come from?
 
-I originally thought that it might be helpful to piece this library
-together from various sources, such as the BSD libc. Turned out that this
-code was so 'portable' that it became much more complex than it ought to
-be. Also, some side-effects were present which considerably changed the
-behaviour of the library. For example, the BSD libc uses bcopy() as an
-alias for memcpy(), and unlike memcpy() is documented to, bcopy() supports
-overlapping copies.
+I originally thought that it might be helpful to piece this library together
+from various sources, such as the BSD libc. Turned out that this code was so
+'portable' that it became much more complex than it ought to be. Also, some
+side-effects were present which considerably changed the behaviour of the
+library. For example, the BSD libc uses bcopy() as an alias for memcpy(), and
+unlike memcpy() is documented to, bcopy() supports overlapping copies.
 
-Eventually, I wrote virtually all the code myself, borrowing algorithmic
-ideas from the BSD libc and the Manx Aztec 'C' runtime library. Because I
-don't know much about the environment GCC expects, I borrowed code snippets
-from libnix, which was written by Matthias Fleischer and Gunther Nikl. This
-in particular concerns the integer and floating point math support, the
-setjmp/longjmp routines and the startup code. The M68881 inline math code
-comes from the <math-68881.h> file written by Matthew Self
-(self@bayes.arc.nasa.gov).
+Eventually, I wrote virtually all the code myself, borrowing algorithmic ideas
+from the BSD libc and the Manx Aztec 'C' runtime library. Because I don't know
+much about the environment GCC expects, I borrowed code snippets from libnix,
+which was written by Matthias Fleischer and Gunther Nikl. This in particular
+concerns the integer and floating point math support, the setjmp/longjmp
+routines and the startup code. The M68881 inline math code comes from the
+<math-68881.h> file written by Matthew Self (self@bayes.arc.nasa.gov).
 
 
 5. Limitations and caveats
 
-There is hardly any documentation on the code I wrote. In part this is due
-to the fact that the code itself is very simple in design. It should speak
-for itself. However, to make a usable runtime library you have to have a
-user documentation as in man pages or autodocs. We will eventually have to
-have autodocs for this library.
+There is hardly any documentation on the code I wrote. In part this is due to
+the fact that the code itself is very simple in design. It should speak for
+itself. However, to make a usable runtime library you have to have a user
+documentation as in man pages or autodocs. We will eventually have to have
+autodocs for this library.
 
 The code is currently plastered with assertions and debug code. It is
-therefore much larger than it ought to be and runs much slower than it
-ought to be. For example, the malloc() routine will set the contents of the
-memory allocated to a 'dirty' bit pattern which is likely to break software
-which makes assumptions about its contents. Likewise, the free() routine
-will trash the memory to deallocate with a different 'dirty' bit pattern to
-turn up reuse of memory after deallocation. All these debugging features
-can be disabled by defining the NDEBUG preprocessor symbol at compile time
-(see <assert.h>).
+therefore much larger than it ought to be and runs much slower than it ought
+to be. For example, the malloc() routine will set the contents of the memory
+allocated to a 'dirty' bit pattern which is likely to break software which
+makes assumptions about its contents. Likewise, the free() routine will trash
+the memory to deallocate with a different 'dirty' bit pattern to turn up reuse
+of memory after deallocation. All these debugging features can be disabled by
+defining the NDEBUG preprocessor symbol at compile time (see <assert.h>).
 
-The exception handling in the math code is not particularly effective. For
-one part this is due to the fact that there is no exception handler
-installed by the runtime library when it starts up which could catch and
-process the error conditions the CPU or FPU generates. The idea was to
-provide for a portable runtime library with little to no assembly language
-involved. To make the exception handling complete, such code would be
-necessary.
+The exception handling in the math code is not particularly effective. For one
+part this is due to the fact that there is no exception handler installed by
+the runtime library when it starts up which could catch and process the error
+conditions the CPU or FPU generates. The idea was to provide for a portable
+runtime library with little to no assembly language involved. To make the
+exception handling complete, such code would be necessary.
 
 The library currently builds under SAS/C, but because the 'normal' program
-startup code is not utilized, the base relative (A4) addressing does not
-work. If you are going to test it, use the data=faronly option to compile
-the library and the programs.
+startup code is not utilized, the base relative (A4) addressing does not work.
+If you are going to test it, use the data=faronly option to compile the
+library and the programs.
 
-If you are going to rebuild the library with SAS/C you will need to
-reassign INCLUDE: to point to the local 'include' directory or things won't
-work.
+Different build makefiles are supplied for use with GCC. There is
+GNUmakefile.68k for the 68k platform and GNUmakefile.os4 for the AmigaOS4
+PowerPC version.
 
 
 6. Conventions and design issues
 
-You will have noticed the 330+ files in this directory. This is not the
-best way to organize a runtime library, but at least all the bits and
-pieces are in plain sight. Each file stands for the one or two routines it
-contains. The name indicates what routine(s) that might be. Each file name
-is prefixed by the name of the header file in which the corresponding
-routine is defined. So, for example, you will find that "unistd_lchown.c"
-contains the definition of the lchown() routine, which has its prototype
-defined in the <unistd.h> header file.
+You will have noticed the 330+ files in this directory. This is not the best
+way to organize a runtime library, but at least all the bits and pieces are in
+plain sight. Each file stands for the one or two routines it contains. The
+name indicates what routine(s) that might be. Each file name is prefixed by
+the name of the header file in which the corresponding routine is defined. So,
+for example, you will find that "unistd_lchown.c" contains the definition of
+the lchown() routine, which has its prototype defined in the <unistd.h> header
+file.
 
-Internal function and variable names are prefixed with two underscores, as
-in '__stdio_init()'.
+Internal function and variables which need to be visible across several
+modules have names prefixed with two underscores, as in '__stdio_init()'.
 
 All routines attempt to do error checking on their parameters. They will
 either drop into an assert() or set an errno value and refuse to go any
-further. This cuts performance but should help to catch the simple bugs
-quite easily (NULL pointers).
+further. This cuts performance but should help to catch the simple bugs quite
+easily (NULL pointers).
 
-Just like any halfway sane Amiga 'C' runtime library, this one performs its
-^C checking in the I/O routines. Typically once upon entry and in every
-iteration of the loop there might be it will quickly poll the ^C signal and
-drop into raise(SIGINT) in case the signal is set. This is just about the
-safest method to solve the problem and should be much more robust than the
-ixemul approach of 'interrupt anywhere - crash anywhere' using the task
-switch/launch hooks to test for signals.
+Just like any halfway sane Amiga 'C' runtime library, this one performs its ^C
+checking in the I/O routines. Typically once upon entry and in every iteration
+of the loop there might be it will quickly poll the ^C signal and drop into
+raise(SIGINT) in case the signal is set. This is just about the safest method
+to solve the problem and should be much more robust than the ixemul approach
+of 'interrupt anywhere - crash anywhere' using the task switch/launch hooks to
+test for signals.
 
-By default all library routines follow the ISO 'C' conventions in that
-where implementation defined behaviour is permitted, the AmigaOS rules are
-followed. For example, unlink() will by default operate like DeleteFile()
-and rename() will return with an error code set if the name of the
-file/directory to be renamed would collide with an existing directory
-entry. However, your program can set a global variable '__unix_semantics'
-which will cause some routines to perform like their Unix counterparts.
-This is necessary for Samba to work but not a generally desirable feature.
-You have some Unix-like behaviour, but the environment itself is not
-completely Unix- or POSIX-compliant. And it shouldn't be. Don't make the
-mistake of trying to mold the environment into a POSIX emulation. It
-doesn't work; AmigaOS is not Unix.
+By default all library routines follow the ISO 'C' conventions in that where
+implementation defined behaviour is permitted, the AmigaOS rules are followed.
+For example, unlink() will by default operate like DeleteFile() and rename()
+will return with an error code set if the name of the file/directory to be
+renamed would collide with an existing directory entry. However, your program
+can set a global variable '__unix_semantics' which will cause some routines to
+perform like their Unix counterparts. This is necessary for Samba to work but
+not a generally desirable feature. You have some Unix-like behaviour, but the
+environment itself is not completely Unix- or POSIX-compliant. And it
+shouldn't be. Don't make the mistake of trying to mold the environment into a
+POSIX emulation. It doesn't work; AmigaOS is not Unix.
 
 
 7. The startup code
@@ -181,18 +194,17 @@ There are three program startup files provided. The most simplistic is in
 eventually calls main() and drops straight into exit().
 
 The ncrt0.S file was adapted from the libnix startup code which sets up the
-base relative data area, if necessary (the SMALL_DATA preprocessor symbol
-must be defined).
+base relative data area, if necessary (the SMALL_DATA preprocessor symbol must
+be defined).
 
-The nrcrt0.S file was adapted from libnix startup code, too, and sets up
-the base relative data area for programs to be made resident. Note that the
-geta4() stub is missing here; it wouldn't work in a resident program
-anyway.
+The nrcrt0.S file was adapted from libnix startup code, too, and sets up the
+base relative data area for programs to be made resident. Note that the
+geta4() stub is missing here; it wouldn't work in a resident program anyway.
 
-The ncrt0.S and nrcrt0.S files are considerably smaller and less complex
-than the libnix code they are based on. This is because in this library
-design all the more complex tasks are performed in the stdlib_main.c file
-rather than in assembly language.
+The ncrt0.S and nrcrt0.S files are considerably smaller and less complex than
+the libnix code they are based on. This is because in this library design all
+the more complex tasks are performed in the stdlib_main.c file rather than in
+assembly language.
 
 
 8. Documentation
@@ -204,9 +216,9 @@ Specification at <http://www.opengroup.org/onlinepubs/007904975>.
 
 9. Legal status
 
-Because this library is in part based upon free software it would be uncourteous
-not to make it free software itself. The BSD license would probably be
-appropriate here.
+Because this library is in part based upon free software it would be
+uncourteous not to make it free software itself. The BSD license would
+probably be appropriate here.
 
 The PowerPC math library is based in part on work by Sun Microsystems:
 
