@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ungetc.c,v 1.5 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_putc_unlocked.c,v 1.1 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,106 +43,30 @@
 
 /****************************************************************************/
 
+#undef putc_unlocked
+
+/****************************************************************************/
+
 int
-ungetc(int c,FILE *stream)
+putc_unlocked(int c,FILE *stream)
 {
-	struct iob * file = (struct iob *)stream;
-	int result = EOF;
+	int result = -1;
 
 	assert( stream != NULL );
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	flockfile(stream);
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
 		{
-			SHOWMSG("null file pointer!");
-
 			__set_errno(EFAULT);
 			goto out;
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	assert( __is_valid_iob(file) );
-	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
-	assert( file->iob_BufferSize > 0 );
-
-	if(FLAG_IS_CLEAR(file->iob_Flags,IOBF_IN_USE))
-	{
-		SHOWMSG("this file is not even in use");
-
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
-
-		__set_errno(EBADF);
-
-		goto out;
-	}
-
-	/* Pushing back characters only works for files that can be read from. */
-	if(FLAG_IS_CLEAR(file->iob_Flags,IOBF_READ))
-	{
-		SHOWMSG("can't even read from this file");
-
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
-
-		__set_errno(EACCES);
-
-		goto out;
-	}
-
-	/* Pushing back an EOF is forbidden. */
-	if(c == EOF)
-	{
-		SHOWMSG("cannot push back an EOF");
-
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
-
-		__set_errno(EINVAL);
-
-		goto out;
-	}
-
-	/* The following should never happen. */
-	if(c < 0)
-		D(("warning -- pushback of negative number %ld!",c));
-
-	/* Get rid of the write buffer, if it's still around. */
-	if(__iob_write_buffer_is_valid(file) > 0 && __flush_iob_write_buffer(file) < 0)
-	{
-		SHOWMSG("could not flush write buffer");
-		goto out;
-	}
-
-	/* We need to replace one of the characters in the buffer, which must
-	 * have been read before. The ISO standard requires that it must
-	 * be possible to push back at least one single character.
-	 */
-	if(file->iob_BufferPosition == 0)
-	{
-		SHOWMSG("no room to push back");
-
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
-
-		__set_errno(ENOBUFS);
-
-		goto out;
-	}
-
-	CLEAR_FLAG(file->iob_Flags,IOBF_EOF_REACHED);
-
-	/* Replace the character just read. */
-	file->iob_Buffer[--file->iob_BufferPosition] = c;
-
-	result = c;
+	result = __putc_unlocked(c,stream);
 
  out:
-
-	funlockfile(stream);
 
 	return(result);
 }

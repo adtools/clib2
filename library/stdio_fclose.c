@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fclose.c,v 1.5 2005-02-21 10:21:44 obarthel Exp $
+ * $Id: stdio_fclose.c,v 1.6 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,6 +61,8 @@ fclose(FILE *stream)
 	SHOWPOINTER(stream);
 
 	assert( stream != NULL );
+
+	assert( file->iob_Lock == NULL || file->iob_Lock->ss_Owner == NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -138,6 +140,9 @@ fclose(FILE *stream)
 	/* Get rid of any custom file buffer allocated. */
 	if(file->iob_CustomBuffer != NULL)
 		free(file->iob_CustomBuffer);
+
+	/* Free the lock semaphore now. */
+	FreeVec(file->iob_Lock);
 
 	memset(file,0,sizeof(*file));
 

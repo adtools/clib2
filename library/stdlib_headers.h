@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.8 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.9 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -194,7 +194,7 @@ struct MemoryTree
 
 /****************************************************************************/
 
-extern unsigned NOCOMMON __random_seed;
+extern unsigned int NOCOMMON __random_seed;
 
 /****************************************************************************/
 

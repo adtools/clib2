@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_gets.c,v 1.4 2005-02-21 10:21:49 obarthel Exp $
+ * $Id: stdio_gets.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,11 @@ gets(char *s)
 
 	assert( s != NULL && stdin != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stdin);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(s == NULL || stdin == NULL)
@@ -68,9 +73,6 @@ gets(char *s)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	/* Take care of the checks and data structure changes that
 	 * need to be handled only once for this stream.
@@ -117,6 +119,8 @@ gets(char *s)
 	SHOWSTRING(result);
 
  out:
+
+	funlockfile(stdin);
 
 	RETURN(result);
 	return(result);

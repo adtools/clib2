@@ -48,6 +48,20 @@
   qualifier. This was done in preparation for changes that will
   deal with global and local data and the issue of thread safety.
 
+- Added stdio thread locking functions flockfile(), funlockfile(),
+  and ftrylockfile().
+
+- Modified the internal FILE structure to allow for thread locking.
+  Note that this again requires that the library is rebuilt!
+
+- Added or modified macros for getc_unlocked(), getchar_unlocked(),
+  putc_unlocked() and putchar_unlocked().
+
+- Added rand_r().
+
+- Added flockfile()/funlockfile() wrappers around all stdio
+  functions.
+
 
 c.lib 1.188 (7.2.2005)
 

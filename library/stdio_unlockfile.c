@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fopen.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_unlockfile.c,v 1.1 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,69 +31,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_NULL_POINTER_CHECK_H
-#include "stdlib_null_pointer_check.h"
-#endif /* _STDLIB_NULL_POINTER_CHECK_H */
-
-/****************************************************************************/
-
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-FILE *
-fopen(const char *filename, const char *mode)
+int
+__unlockfile(FILE *stream,int c)
 {
-	FILE * result = NULL;
-	int slot_number;
+	funlockfile(stream);
 
-	ENTER();
-
-	SHOWSTRING(filename);
-	SHOWSTRING(mode);
-
-	assert( filename != NULL && mode != NULL );
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
-	{
-		if(filename == NULL || mode == NULL)
-		{
-			SHOWMSG("invalid parameters");
-
-			__set_errno(EFAULT);
-			goto out;
-		}
-	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	slot_number = __find_vacant_iob_entry();
-	if(slot_number < 0)
-	{
-		if(__grow_iob_table() < 0)
-		{
-			SHOWMSG("couldn't find a free file table, and no memory for a new one");
-			goto out;
-		}
-
-		slot_number = __find_vacant_iob_entry();
-		assert( slot_number >= 0 );
-	}
-
-	if(__open_iob(filename,mode,-1,slot_number) < 0)
-	{
-		SHOWMSG("couldn't open the file");
-		goto out;
-	}
-
-	result = (FILE *)__iob[slot_number];
-
- out:
-
-	RETURN(result);
-	return(result);
+	return(c);
 }

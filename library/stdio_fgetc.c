@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgetc.c,v 1.4 2005-02-21 10:21:48 obarthel Exp $
+ * $Id: stdio_fgetc.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -95,9 +95,6 @@ __fgetc_check(FILE * stream)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__check_abort_enabled)
-		__check_abort();
-
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
 	assert( file->iob_BufferSize > 0 );
 
@@ -138,6 +135,11 @@ fgetc(FILE *stream)
 
 	assert( stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -154,6 +156,8 @@ fgetc(FILE *stream)
 	result = __getc(stream);
 
  out:
+
+	funlockfile(stream);
 
 	return(result);
 }

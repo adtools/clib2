@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.11 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.12 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -150,6 +150,11 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 	SHOWSTRING(format);
 
 	assert( stream != NULL && format != NULL && arg != NULL );
+
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -1511,6 +1516,8 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 		if(__iob_write_buffer_is_valid(iob) && __flush_iob_write_buffer(iob) < 0)
 			result = EOF;
 	}
+
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result);

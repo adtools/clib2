@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fileno.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_fileno.c,v 1.5 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,6 +59,11 @@ fileno(FILE * file)
 
 	assert( file != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(file);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(file == NULL)
@@ -70,9 +75,6 @@ fileno(FILE * file)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	assert( __is_valid_iob(iob) );
 	assert( FLAG_IS_SET(iob->iob_Flags,IOBF_IN_USE) );
@@ -90,6 +92,8 @@ fileno(FILE * file)
 	result = iob->iob_Descriptor;
 
  out:
+
+	funlockfile(file);
 
 	RETURN(result);
 	return(result);

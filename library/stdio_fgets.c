@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgets.c,v 1.4 2005-02-21 10:21:48 obarthel Exp $
+ * $Id: stdio_fgets.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,6 +57,11 @@ fgets(char *s,int n,FILE *stream)
 
 	assert( s != NULL && stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(s == NULL || stream == NULL)
@@ -69,9 +74,6 @@ fgets(char *s,int n,FILE *stream)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	if(n <= 0)
 	{
@@ -129,6 +131,8 @@ fgets(char *s,int n,FILE *stream)
 	SHOWSTRING(result);
 
  out:
+
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_openiob.c,v 1.7 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_openiob.c,v 1.8 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,6 +46,7 @@
 int
 __open_iob(const char *filename, const char *mode, int file_descriptor, int slot_number)
 {
+	struct SignalSemaphore * lock;
 	ULONG file_flags;
 	int result = -1;
 	int open_mode;
@@ -162,6 +163,14 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 			CLEAR_FLAG(fd->fd_Flags,FDF_APPEND);
 	}
 
+	/* Allocate memory for an arbitration mechanism, then
+	   initialize it. */
+	lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
+	if(lock == NULL)
+		goto out;
+
+	InitSemaphore(lock);
+
 	/* Figure out the buffered file access mode by looking at the open mode. */
 	file_flags = IOBF_IN_USE | IOBF_NO_NUL;
 
@@ -176,7 +185,8 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 		aligned_buffer,BUFSIZ,
 		file_descriptor,
 		slot_number,
-		file_flags);
+		file_flags,
+		lock);
 
 	buffer = NULL;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vsnprintf.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_vsnprintf.c,v 1.6 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -83,7 +83,8 @@ vsnprintf(char *buffer,size_t size,const char *format,va_list arg)
 		local_buffer,sizeof(local_buffer),
 		-1,
 		-1,
-		IOBF_IN_USE | IOBF_WRITE | IOBF_NO_NUL | IOBF_BUFFER_MODE_NONE | IOBF_INTERNAL);
+		IOBF_IN_USE | IOBF_WRITE | IOBF_NO_NUL | IOBF_BUFFER_MODE_NONE | IOBF_INTERNAL,
+		NULL);
 
 	/* Store up to 'size-1' characters in the output buffer. This
 	   does not include the terminating NUL character, which we

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_setvbuf.c,v 1.5 2005-02-21 10:22:00 obarthel Exp $
+ * $Id: stdio_setvbuf.c,v 1.6 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,11 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 
 	assert( stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -76,9 +81,6 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	if(bufmode < IOBF_BUFFER_MODE_FULL ||
 	   bufmode > IOBF_BUFFER_MODE_NONE)
@@ -187,6 +189,8 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	result = 0;
 
  out:
+
+	funlockfile(stream);
 
 	if(new_buffer != NULL)
 		free(new_buffer);

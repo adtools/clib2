@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_flush.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_flush.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,6 +62,11 @@ __flush(FILE *stream)
 
 	assert( stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -73,9 +78,6 @@ __flush(FILE *stream)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	assert( __is_valid_iob(iob) );
 	assert( iob->iob_BufferWriteBytes > 0 );
@@ -94,6 +96,8 @@ __flush(FILE *stream)
 	result = last_c;
 
  out:
+
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result);

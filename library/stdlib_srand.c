@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_srand.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_srand.c,v 1.3 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,6 +40,5 @@
 void
 srand(unsigned seed)
 {
-	/* We have to make sure that the seed is never zero. */
-	__random_seed = (seed & 0x7FFFFFFF) | 1;
+	__random_seed = seed;
 }

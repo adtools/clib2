@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.29 2005-02-25 10:14:20 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.30 2005-02-27 18:09:07 obarthel Exp $
 #
 # :ts=8
 #
@@ -130,23 +130,23 @@ C_LIB = \
 	ctype_isspace.o \
 	ctype_isupper.o \
 	ctype_isxdigit.o \
+	ctype_table.o \
 	ctype_tolower.o \
 	ctype_toupper.o \
-	ctype_table.o \
 	dirent_closedir.o \
 	dirent_data.o \
-	dirent_rewinddir.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
+	dirent_rewinddir.o \
 	errno_data.o \
 	fcntl_close.o \
 	fcntl_creat.o \
 	fcntl_fcntl.o \
+	fcntl_get_default_file.o \
 	fcntl_lseek.o \
 	fcntl_open.o \
 	fcntl_read.o \
 	fcntl_write.o \
-	fcntl_get_default_file.o \
 	libgen_basename.o \
 	libgen_dirname.o \
 	locale_init_exit.o \
@@ -188,13 +188,14 @@ C_LIB = \
 	stdio_feof.o \
 	stdio_ferror.o \
 	stdio_fflush.o \
-	stdio_flush.o \
 	stdio_fgetc.o \
 	stdio_fgetpos.o \
 	stdio_fgets.o \
 	stdio_filliobreadbuffer.o \
 	stdio_findvacantfdentry.o \
 	stdio_findvacantiobentry.o \
+	stdio_flockfile.o \
+	stdio_flush.o \
 	stdio_flushiobwritebuffer.o \
 	stdio_fopen.o \
 	stdio_fprintf.o \
@@ -206,11 +207,15 @@ C_LIB = \
 	stdio_fseek.o \
 	stdio_fsetpos.o \
 	stdio_ftell.o \
+	stdio_ftrylockfile.o \
+	stdio_funlockfile.o \
 	stdio_fwrite.o \
 	stdio_getc.o \
+	stdio_getc_unlocked.o \
 	stdio_getchar.o \
-	stdio_get_file_descriptor.o \
+	stdio_getchar_unlocked.o \
 	stdio_gets.o \
+	stdio_get_file_descriptor.o \
 	stdio_growfdtable.o \
 	stdio_growiobtable.o \
 	stdio_grow_file.o \
@@ -226,7 +231,9 @@ C_LIB = \
 	stdio_popen.o \
 	stdio_printf.o \
 	stdio_putc.o \
+	stdio_putc_unlocked.o \
 	stdio_putchar.o \
+	stdio_putchar_unlocked.o \
 	stdio_puts.o \
 	stdio_remove.o \
 	stdio_remove_fd_alias.o \
@@ -243,6 +250,7 @@ C_LIB = \
 	stdio_tmpnam.o \
 	stdio_translateioerror.o \
 	stdio_ungetc.o \
+	stdio_unlockfile.o \
 	stdio_vasprintf.o \
 	stdio_vasprintf_hook_entry.o \
 	stdio_vfprintf.o \
@@ -277,10 +285,10 @@ C_LIB = \
 	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
-	stdlib_get_errno.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
 	stdlib_getsp.o \
+	stdlib_get_errno.o \
 	stdlib_init_exit.o \
 	stdlib_isresident.o \
 	stdlib_labs.o \
@@ -301,11 +309,12 @@ C_LIB = \
 	stdlib_putenv.o \
 	stdlib_qsort.o \
 	stdlib_rand.o \
+	stdlib_rand_r.o \
 	stdlib_realloc.o \
 	stdlib_red_black.o \
 	stdlib_setenv.o \
-	stdlib_set_errno.o \
 	stdlib_setjmp.o \
+	stdlib_set_errno.o \
 	stdlib_set_process_window.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
@@ -318,9 +327,10 @@ C_LIB = \
 	stdlib_stacksize.o \
 	stdlib_stack_usage.o \
 	stdlib_startup.o \
+	stdlib_stdio_window_spec.o \
 	stdlib_strtol.o \
-	stdlib_strtoul.o \
 	stdlib_strtoll.o \
+	stdlib_strtoul.o \
 	stdlib_strtoull.o \
 	stdlib_swapstack.o \
 	stdlib_sysbase.o \
@@ -332,7 +342,6 @@ C_LIB = \
 	stdlib_umodsi3.o \
 	stdlib_unsetenv.o \
 	stdlib_wildcard_expand.o \
-	stdlib_stdio_window_spec.o \
 	strings_strcasecmp.o \
 	strings_strncasecmp.o \
 	string_bcmp.o \

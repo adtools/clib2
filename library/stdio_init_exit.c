@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.17 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.18 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,6 +111,7 @@ __stdio_init(void)
 {
 	const int num_standard_files = (STDERR_FILENO-STDIN_FILENO+1);
 
+	struct SignalSemaphore * lock;
 	BPTR default_file;
 	ULONG fd_flags,iob_flags;
 	int result = ERROR;
@@ -187,6 +188,14 @@ __stdio_init(void)
 		if(buffer == NULL)
 			goto out;
 
+		/* Allocate memory for an arbitration mechanism, then
+		   initialize it. */
+		lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
+		if(lock == NULL)
+			goto out;
+
+		InitSemaphore(lock);
+
 		/* Check if this stream is attached to a console window. */
 		if(default_file != ZERO)
 		{
@@ -208,7 +217,8 @@ __stdio_init(void)
 			aligned_buffer,BUFSIZ,
 			i,
 			i,
-			iob_flags);
+			iob_flags,
+			lock);
 	}
 
 	/* If the program was launched from Workbench, we continue by

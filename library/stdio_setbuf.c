@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_setbuf.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_setbuf.c,v 1.4 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,6 +53,9 @@ setbuf(FILE *stream,char *buf)
 
 	assert(stream != NULL);
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -64,9 +67,6 @@ setbuf(FILE *stream,char *buf)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	if(buf == NULL)
 		setvbuf(stream,NULL,IOBF_BUFFER_MODE_NONE,0);

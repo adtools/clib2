@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ftell.c,v 1.6 2005-02-21 10:21:49 obarthel Exp $
+ * $Id: stdio_ftell.c,v 1.7 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,6 +53,11 @@ ftell(FILE *stream)
 
 	assert( stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -62,9 +67,6 @@ ftell(FILE *stream)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	assert( __is_valid_iob(file) );
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
@@ -122,6 +124,8 @@ ftell(FILE *stream)
 	result = position;
 
  out:
+
+	funlockfile(stream);
 
 	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fopen.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdlib_rand_r.c,v 1.1 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,69 +31,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_NULL_POINTER_CHECK_H
-#include "stdlib_null_pointer_check.h"
-#endif /* _STDLIB_NULL_POINTER_CHECK_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+/* Parameters of a pseudo-random-number generator from Knuth's
+   "The Art of Computer Programming, Volume 2: Seminumerical Algorithms"
+   (3rd edition), pp. 185-186. */
+
+#define MM 2147483647	/* a Mersenne prime */
+#define AA 48271		/* this does well in the spectral test */
+#define QQ 44488		/* (long)(MM/AA) */
+#define RR 3399			/* MM % AA; it is important that RR < QQ */
 
 /****************************************************************************/
 
-FILE *
-fopen(const char *filename, const char *mode)
+int
+rand_r(unsigned int * seed)
 {
-	FILE * result = NULL;
-	int slot_number;
+	int X;
 
-	ENTER();
+	X = (int)((*seed) & 0x7fffffff);
+	if(X == 0)
+		X = 1; /* NOTE: for Knuth's algorithm the seed must not be zero. */
 
-	SHOWSTRING(filename);
-	SHOWSTRING(mode);
+	X = AA * (X % QQ) - RR * (long)(X / QQ);
+	if(X < 0)
+		X += MM;
 
-	assert( filename != NULL && mode != NULL );
+	(*seed) = (unsigned int)X;
 
-	if(__check_abort_enabled)
-		__check_abort();
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
-	{
-		if(filename == NULL || mode == NULL)
-		{
-			SHOWMSG("invalid parameters");
-
-			__set_errno(EFAULT);
-			goto out;
-		}
-	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	slot_number = __find_vacant_iob_entry();
-	if(slot_number < 0)
-	{
-		if(__grow_iob_table() < 0)
-		{
-			SHOWMSG("couldn't find a free file table, and no memory for a new one");
-			goto out;
-		}
-
-		slot_number = __find_vacant_iob_entry();
-		assert( slot_number >= 0 );
-	}
-
-	if(__open_iob(filename,mode,-1,slot_number) < 0)
-	{
-		SHOWMSG("couldn't open the file");
-		goto out;
-	}
-
-	result = (FILE *)__iob[slot_number];
-
- out:
-
-	RETURN(result);
-	return(result);
+	return(X);
 }

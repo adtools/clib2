@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vsprintf.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_vsprintf.c,v 1.5 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,8 @@ vsprintf(char *s,const char *format,va_list arg)
 		buffer,sizeof(buffer),
 		-1,
 		-1,
-		IOBF_IN_USE | IOBF_WRITE | IOBF_BUFFER_MODE_NONE | IOBF_INTERNAL);
+		IOBF_IN_USE | IOBF_WRITE | IOBF_BUFFER_MODE_NONE | IOBF_INTERNAL,
+		NULL);
 
 	string_iob.iob_String = (STRPTR)s;
 

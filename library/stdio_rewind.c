@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rewind.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_rewind.c,v 1.3 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,11 @@ rewind(FILE *stream)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	flockfile(stream);
+
 	clearerr(stream);
 
 	fseek(stream,0,SEEK_SET);
+
+	funlockfile(stream);
 }

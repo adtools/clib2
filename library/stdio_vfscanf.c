@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.9 2005-02-21 10:22:01 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.10 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -87,6 +87,11 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 	ENTER();
 
 	assert( stream != NULL && format != NULL );
+
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -1571,6 +1576,8 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 	result = num_assignments;
 
  out:
+
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result); 

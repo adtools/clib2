@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fputs.c,v 1.4 2005-02-21 10:21:49 obarthel Exp $
+ * $Id: stdio_fputs.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,6 +58,9 @@ fputs(const char *s, FILE *stream)
 
 	assert( s != NULL && stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(s == NULL || stream == NULL)
@@ -68,8 +71,7 @@ fputs(const char *s, FILE *stream)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__check_abort_enabled)
-		__check_abort();
+	flockfile(stream);
 
 	assert( __is_valid_iob(file) );
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
@@ -104,6 +106,8 @@ fputs(const char *s, FILE *stream)
 			result = EOF;
 		}
 	}
+
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result);

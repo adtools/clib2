@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_rand.c,v 1.3 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_rand.c,v 1.4 2005-02-27 18:09:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,34 +37,16 @@
 
 /****************************************************************************/
 
-/* Parameters of a pseudo-random-number generator from Knuth's
- * "The Art of Computer Programming, Volume 2: Seminumerical
- *  Algorithms" (3rd edition), pp. 185-186.
- */
-#define MM 2147483647	/* a Mersenne prime */
-#define AA 48271		/* this does well in the spectral test */
-#define QQ 44488		/* (long)(MM/AA) */
-#define RR 3399			/* MM % AA; it is important that RR < QQ */
-
-/****************************************************************************/
-
-/* NOTE: for Knuth's algorithm below the seed must not be zero. */
-unsigned __random_seed = 1;
+unsigned int __random_seed = 1;
 
 /****************************************************************************/
 
 int
 rand(void)
 {
-	int X;
+	int result;
 
-	X = (int)__random_seed;
+	result = rand_r(&__random_seed);
 
-	X = AA * (X % QQ) - RR * (long)(X / QQ);
-	if(X < 0)
-		X += MM;
-
-	__random_seed = (unsigned)X;
-
-	return(X);
+	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.15 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.16 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -262,6 +262,8 @@ struct iob
 
 	UBYTE				iob_SingleByte;			/* Fall-back buffer for 'unbuffered'
 												   files */
+
+	struct SignalSemaphore * iob_Lock;			/* For thread locking */
 };
 
 /****************************************************************************/

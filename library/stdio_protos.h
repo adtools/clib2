@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.7 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.8 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -103,7 +103,7 @@ extern int __find_vacant_fd_entry(void);
 /****************************************************************************/
 
 /* stdio_initializeiob.c */
-extern void __initialize_iob(struct iob * iob,file_action_iob_t action_function,STRPTR custom_buffer,STRPTR buffer,int buffer_size,int file_descriptor,int slot_number,ULONG flags);
+extern void __initialize_iob(struct iob * iob,file_action_iob_t action_function,STRPTR custom_buffer,STRPTR buffer,int buffer_size,int file_descriptor,int slot_number,ULONG flags,struct SignalSemaphore * lock);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fsetpos.c,v 1.4 2005-02-21 10:21:49 obarthel Exp $
+ * $Id: stdio_fsetpos.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,11 @@ fsetpos(FILE *stream, fpos_t *pos)
 
 	assert( stream != NULL && pos != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL || pos == NULL)
@@ -67,9 +72,6 @@ fsetpos(FILE *stream, fpos_t *pos)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__check_abort_enabled)
-		__check_abort();
-
 	if(fseek(stream,(long int)(*pos),SEEK_SET) != 0)
 	{
 		SHOWMSG("fseek failed");
@@ -79,6 +81,8 @@ fsetpos(FILE *stream, fpos_t *pos)
 	result = 0;
 
  out:
+
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializeiob.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_initializeiob.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,14 +39,15 @@
 
 void
 __initialize_iob(
-	struct iob *		iob,
-	file_action_iob_t	action_function,
-	STRPTR				custom_buffer,
-	STRPTR				buffer,
-	int					buffer_size,
-	int					file_descriptor,
-	int					slot_number,
-	ULONG				flags)
+	struct iob *				iob,
+	file_action_iob_t			action_function,
+	STRPTR						custom_buffer,
+	STRPTR						buffer,
+	int							buffer_size,
+	int							file_descriptor,
+	int							slot_number,
+	ULONG						flags,
+	struct SignalSemaphore *	lock)
 {
 	assert( iob != NULL && action_function != NULL );
 
@@ -59,4 +60,5 @@ __initialize_iob(
 	iob->iob_SlotNumber		= slot_number;
 	iob->iob_Flags			= flags;
 	iob->iob_Action			= action_function;
+	iob->iob_Lock			= lock;
 }

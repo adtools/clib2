@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fprintf.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_fprintf.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,6 +56,11 @@ fprintf(FILE *stream,const char *format,...)
 
 	assert( stream != NULL && format != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
+	flockfile(stream);
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL || format == NULL)
@@ -66,14 +71,13 @@ fprintf(FILE *stream,const char *format,...)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__check_abort_enabled)
-		__check_abort();
-
 	va_start(arg,format);
 	result = vfprintf(stream,format,arg);
 	va_end(arg);
 
  out:
+
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result);

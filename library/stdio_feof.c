@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_feof.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_feof.c,v 1.4 2005-02-27 18:09:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,6 +59,9 @@ feof(FILE *stream)
 
 	assert( stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -74,13 +77,14 @@ feof(FILE *stream)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__check_abort_enabled)
-		__check_abort();
-
 	assert( __is_valid_iob(file) );
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
 
+	flockfile(stream);
+
 	result = FLAG_IS_SET(file->iob_Flags,IOBF_EOF_REACHED);
+
+	funlockfile(stream);
 
  out:
 

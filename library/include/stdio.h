@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.5 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: stdio.h,v 1.6 2005-02-27 18:09:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -200,6 +200,21 @@ extern int putchar(int c);
 
 /****************************************************************************/
 
+/* The following four functions are not part of ISO 'C' (1994). */
+
+/****************************************************************************/
+
+extern int getc_unlocked(FILE *stream);
+extern int getchar_unlocked(void);
+extern int putc_unlocked(int c,FILE *stream);
+extern int putchar_unlocked(int c);
+
+/****************************************************************************/
+
+/* ISO 'C' (1994) functions continue below. */
+
+/****************************************************************************/
+
 extern char *fgets(char *s,int n,FILE *stream);
 extern char *gets(char *s);
 
@@ -252,9 +267,17 @@ extern char *tmpnam(char *buf);
 /*
  * A special buffer flush routine which returns the last character written
  * in case of success and EOF in case of failure. This is used by the
- * putc() macro defined below.
+ * putc_unlocked() macro defined below.
  */
 extern int __flush(FILE *stream);
+
+/****************************************************************************/
+
+/*
+ * A special function which returns the input character. This is used by
+ * the getc() macro defined below.
+ */
+extern int __unlockfile(FILE *stream,int c);
 
 /****************************************************************************/
 
@@ -262,12 +285,14 @@ extern int __flush(FILE *stream);
  * fgetc() implemented as a "simple" macro; note that fgetc() does much more than
  * can be conveniently expressed as a macro!
  */
-#define getc(f) \
+#define __getc_unlocked(f) \
 	(((((FILE *)(f))->flags & (__FILE_IN_USE|__FILE_READABLE|__FILE_EOF)) == (__FILE_IN_USE|__FILE_READABLE) && \
 	 (((FILE *)(f))->flags & __FILE_BUFFER_MASK) != _IONBF && \
 	 ((FILE *)(f))->position < ((FILE *)(f))->num_read_bytes) ? \
 	    ((FILE *)(f))->buffer[((FILE *)(f))->position++] : \
 	    fgetc(f))
+
+#define getc_unlocked(f)
 
 /****************************************************************************/
 
@@ -275,7 +300,7 @@ extern int __flush(FILE *stream);
  * fputc() implemented as a "simple" macro; note that fputc() does much more than
  * can be conveniently expressed as a macro!
  */
-#define putc(c,f) \
+#define __putc_unlocked(c,f) \
 	(((((FILE *)(f))->flags & (__FILE_IN_USE|__FILE_WRITABLE)) == (__FILE_IN_USE|__FILE_WRITABLE) && \
 	 (((FILE *)(f))->flags & __FILE_BUFFER_MASK) != _IONBF && \
 	 (((FILE *)(f))->num_write_bytes < ((FILE *)(f))->size)) ? \
@@ -285,6 +310,20 @@ extern int __flush(FILE *stream);
 	   __flush(f) : \
 	   (((FILE *)(f))->buffer[((FILE *)(f))->num_write_bytes-1]))) : \
 	   fputc((c),(f)))
+
+#define putc_unlocked(c,f) __putc((c),(f))
+
+/****************************************************************************/
+
+#define getchar_unlocked()	__getc_unlocked(stdin)
+#define putchar_unlocked(c)	__putc_unlocked((c),stdout)
+
+/****************************************************************************/
+
+#define getc(f)		(flockfile(f), __unlockfile((f),__getc_unlocked(f)))
+#define putc(c,f)	(flockfile(f), __unlockfile((f),__putc_unlocked((c),(f))))
+#define getchar()	getc(stdin)
+#define putchar(c)	putc((c),stdout)
 
 /****************************************************************************/
 
@@ -296,8 +335,6 @@ extern int __flush(FILE *stream);
 
 /****************************************************************************/
 
-#define getchar()		getc(stdin)
-#define putchar(c)		putc((c),stdout)
 #define clearerr(file)	((void)((file)->flags &= ~(__FILE_EOF|__FILE_ERROR)))
 #define feof(file)		(((file)->flags & __FILE_EOF) != 0)
 #define ferror(file)	(((file)->flags & __FILE_ERROR) != 0)
@@ -323,6 +360,12 @@ extern int snprintf(char *s,size_t size,const char *format,...);
 extern int vsnprintf(char *s,size_t size,const char *format,va_list arg);
 extern int pclose(FILE *stream);
 extern FILE * popen(const char *command, const char *type);
+
+/****************************************************************************/
+
+extern void flockfile(FILE * file);
+extern void funlockfile(FILE * file);
+extern int ftrylockfile(FILE * file);
 
 /****************************************************************************/
 
