@@ -1,5 +1,5 @@
 /*
- * $Id: stat_lstat.c,v 1.7 2005-03-02 14:47:10 obarthel Exp $
+ * $Id: stat_lstat.c,v 1.8 2005-03-02 18:49:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -137,6 +137,10 @@ lstat_lock(const char *name,const int mode,int *link_length)
 				name = new_name;
 			}
 
+			/* Remember that we found a link. */
+			if((*link_length) < (int)name_size)
+				(*link_length) = name_size;
+
 			/* Now ask the file system to resolve the entire path. */
 			result = ReadLink(dvp->dvp_Port,dvp->dvp_Lock,(STRPTR)name,(STRPTR)name,name_size);
 			if(result < 0)
@@ -194,7 +198,7 @@ lstat(const char * path_name, struct stat * st)
 	int result = -1;
 	LONG status;
 	BPTR file_lock = ZERO;
-	int link_length = 0;
+	int link_length = -1;
 
 	ENTER();
 
@@ -229,18 +233,13 @@ lstat(const char * path_name, struct stat * st)
 			   We make up some pseudo data for it. */
 			if(path_name_nti.is_root)
 			{
-				struct DateStamp ds;
 				time_t mtime;
 
 				SHOWMSG("setting up the root directory info");
 
 				memset(st,0,sizeof(*st));
 
-				PROFILE_OFF();
-				DateStamp(&ds);
-				PROFILE_ON();
-
-				mtime = __convert_datestamp_to_time(&ds);
+				time(&mtime);
 
 				st->st_mode		= S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 				st->st_mtime	= mtime;
@@ -263,7 +262,7 @@ lstat(const char * path_name, struct stat * st)
 	file_lock = lstat_lock(path_name,SHARED_LOCK,&link_length);
 	PROFILE_ON();
 
-	if(file_lock == ZERO)
+	if(file_lock == ZERO && link_length < 0)
 	{
 		SHOWMSG("that didn't work");
 
