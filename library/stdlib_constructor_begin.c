@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor_begin.c,v 1.7 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: stdlib_constructor_begin.c,v 1.8 2005-03-20 11:57:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,11 +68,17 @@ _init(void)
 	/* The address is NULL if no constructor functions are to be used. */
 	if(p != NULL)
 	{
+		int num_constructors;
 		int i;
 
-		for(i = 0 ; __ctors[i] != NULL ; i++)
+		num_constructors = 0;
+
+		while(__ctors[num_constructors] != NULL)
+			num_constructors++;
+
+		for(i = 0 ; i < num_constructors ; i++)
 		{
-			if((*__ctors[i])() != 0)
+			if((*__ctors[num_constructors - (i+1)])() != 0)
 				exit(RETURN_FAIL);
 		}
 	}
@@ -90,14 +96,21 @@ _fini(void)
 	{
 		static int i;
 
-		while(__dtors[i] != NULL)
+		int num_destructors;
+
+		num_destructors = 0;
+
+		while(__dtors[num_destructors] != NULL)
+			num_destructors++;
+
+		while(i < num_destructors)
 		{
 			/* Increment this before jumping in, so that the next
 			   invocation will always pick up the destructor following
 			   the one we will invoke rigt now. */
 			i++;
 
-			(*__dtors[i-1])();
+			(*__dtors[num_destructors - i])();
 		}
 	}
 }
