@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.6 2004-12-26 13:14:47 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.7 2004-12-27 09:15:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -108,7 +108,11 @@
    This should be determined dynamically rather than preset here. For the
    68040/68060 the cache line size is 16 bytes, for the PowerPC G4 it's
    32 bytes and 128 bytes (gross!) for the PowerPC G5. */
+#if defined(__PPC__)
 #define CACHE_LINE_SIZE 32UL
+#else
+#define CACHE_LINE_SIZE 16UL
+#endif /* __PPC__ */
 
 /****************************************************************************/
 
@@ -262,6 +266,8 @@ struct iob
 #define FDF_CACHE_POSITION	(1UL<<9)	/* Cache the file position. */
 #define FDF_ASYNC_IO		(1UL<<10)	/* File was switched into asynchronous I/O
 										   mode (sockets only). */
+#define FDF_IS_INTERACTIVE	(1UL<<11)	/* File is attached to a console window or
+										   something like it. */
 
 /****************************************************************************/
 

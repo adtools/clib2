@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.4 2004-12-26 13:14:47 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.5 2004-12-27 09:15:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -180,6 +180,19 @@ __stdio_init(void)
 		if(buffer == NULL)
 			goto out;
 
+		/* Check if this stream is attached to a console window. */
+		if(default_file != ZERO)
+		{
+			struct FileHandle * fh = BADDR(default_file);
+
+			PROFILE_OFF();
+
+			if(fh->fh_Type != NULL && IsInteractive(default_file))
+				SET_FLAG(fd_flags,FDF_IS_INTERACTIVE);
+
+			PROFILE_ON();
+		}
+
 		/* Align the buffer start address to a cache line boundary. */
 		aligned_buffer = (char *)((ULONG)(buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
 
@@ -241,11 +254,19 @@ __stdio_init(void)
 
 	PROFILE_OFF();
 
-	/* Check if the standard error output refers to a console or must
+	/* Figure out if the standard error stream is bound to a console. */
+	if(__fd[STDERR_FILENO]->fd_DefaultFile != ZERO)
+	{
+		struct FileHandle * fh = BADDR(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile));
+
+		if(fh->fh_Type != NULL && IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
+			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
+	}
+
+	/* Check if the standard/error output refers to a console or must
 	   be considered unusable for console output. */
-	if(__fd[STDERR_FILENO]->fd_DefaultFile == ZERO ||
-	   ((struct FileHandle *)BADDR(__fd[STDERR_FILENO]->fd_DefaultFile))->fh_Type == NULL ||
-	   NOT IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
+	if(FLAG_IS_CLEAR(__fd[STDOUT_FILENO]->fd_Flags,FDF_IS_INTERACTIVE) ||
+	   FLAG_IS_CLEAR(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE))
 	{
 		/* The standard I/O streams are no longer attached to a console. */
 		__no_standard_io = TRUE;

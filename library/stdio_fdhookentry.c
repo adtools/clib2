@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.3 2004-12-26 13:14:47 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.4 2004-12-27 09:15:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -1823,7 +1823,7 @@ __fd_hook_entry(
 
 			PROFILE_OFF();
 
-			if(fd->fd_DefaultFile != ZERO && ((struct FileHandle *)BADDR(fd->fd_DefaultFile))->fh_Type != NULL && IsInteractive(fd->fd_DefaultFile))
+			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
 			{
 				LONG mode;
 
@@ -2167,21 +2167,6 @@ __fd_hook_entry(
 			__duplicate_fd(message->duplicate_fd,fd);
 
 			result = 0;
-			break;
-
-		case file_hook_action_is_interactive:
-
-			SHOWMSG("file_hook_action_is_interactive");
-
-			PROFILE_OFF();
-
-			if(fd->fd_DefaultFile != ZERO && ((struct FileHandle *)BADDR(fd->fd_DefaultFile))->fh_Type != NULL && IsInteractive(fd->fd_DefaultFile))
-				result = 1;
-			else
-				result = 0;
-
-			PROFILE_ON();
-
 			break;
 
 		default:

@@ -32,6 +32,14 @@
   for the 68040/68060 but not for the PowerPC, which uses 32 or 128
   bytes per cache line.
 
+- fwrite() now flushes the entire "buffer" for unbuffered files. The
+  exception are "interactive" files such as console windows. For these
+  line buffered output is used.
+
+- Whether or not a file is bound to an interactive device, such as a
+  console window, is now checked and remembered after a file descriptor
+  has been associated with it.
+
 
 c.lib 1.184 (28.11.2004)
 

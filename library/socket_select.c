@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.1.1.1 2004-07-26 16:31:19 obarthel Exp $
+ * $Id: socket_select.c,v 1.2 2004-12-27 09:15:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -304,16 +304,8 @@ map_descriptor_sets(
 			}
 			else
 			{
-				LONG is_interactive;
-
-				/* We only watch files bound to
-				 * console streams.
-				 */
-				PROFILE_OFF();
-				is_interactive = IsInteractive(fd->fd_DefaultFile);
-				PROFILE_ON();
-
-				if(NOT is_interactive)
+				/* We only watch files bound to console streams. */
+				if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_INTERACTIVE))
 				{
 					SHOWMSG("this is a file");
 					continue;

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_assertion_failure.c,v 1.2 2004-12-26 10:28:56 obarthel Exp $
+ * $Id: stdlib_assertion_failure.c,v 1.3 2004-12-27 09:15:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -80,17 +80,11 @@ __assertion_failure(
 				if(fd != NULL &&
 				   FLAG_IS_SET(fd->fd_Flags,FDF_IN_USE) &&
 				   FLAG_IS_SET(fd->fd_Flags,FDF_WRITE) &&
-				   FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET))
+				   FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
 				{
-					BPTR file_handle;
+					assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET) );
 
-					file_handle = fd->fd_DefaultFile;
-					if(file_handle != ZERO &&
-					   ((struct FileHandle *)BADDR(file_handle))->fh_Type != NULL &&
-					   IsInteractive(file_handle))
-					{
-						use_stderr = TRUE;
-					}
+					use_stderr = TRUE;
 				}
 			}
 		}

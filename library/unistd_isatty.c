@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_isatty.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: unistd_isatty.c,v 1.3 2004-12-27 09:15:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,16 +44,12 @@
 int
 isatty(int file_descriptor)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
 	int result = -1;
 	struct fd * fd;
 
 	ENTER();
 
 	SHOWVALUE(file_descriptor);
-
-	assert( UtilityBase != NULL );
 
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
@@ -69,16 +65,10 @@ isatty(int file_descriptor)
 		goto out;
 	}
 
-	SHOWMSG("calling the hook");
-
-	message.action = file_hook_action_is_interactive;
-
-	assert( fd->fd_Hook != NULL );
-
-	CallHookPkt(fd->fd_Hook,fd,&message);
-
-	result	= message.result;
-	errno	= message.error;
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+		result = 1;
+	else
+		result = 0;
 
  out:
 

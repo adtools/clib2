@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.3 2004-12-27 09:15:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,7 +67,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 	struct FileHandle * file_handle;
 	BPTR handle = ZERO;
 	BOOL create_new_file = FALSE;
-	LONG is_interactive;
+	LONG is_interactive = FALSE;
 	int fd_slot_number;
 	struct fd * fd;
 	int access_mode;
@@ -342,13 +342,19 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 	__initialize_fd(fd,(HOOKFUNC)__fd_hook_entry,handle,0);
 
+	/* Figure out if this stream is attached to a console. */
 	PROFILE_OFF();
-	is_interactive = IsInteractive(handle);
+
+	if(file_handle->fh_Type != NULL)
+		is_interactive = IsInteractive(handle);
+
 	PROFILE_ON();
 
-	if(FLAG_IS_SET(open_flag,O_NONBLOCK))
+	if(is_interactive)
 	{
-		if(is_interactive)
+		SET_FLAG(fd->fd_Flags,FDF_IS_INTERACTIVE);
+
+		if(FLAG_IS_SET(open_flag,O_NONBLOCK))
 		{
 			SHOWMSG("enabling non-blocking mode");
 
@@ -356,12 +362,12 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 				SET_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 		}
 	}
-
-	if(NOT is_interactive)
+	else
 	{
 		size_t len;
 
 		len = 0;
+
 		for(i = 0 ; i < (int)strlen(path_name) ; i++)
 		{
 			if(path_name[i] == ':')
