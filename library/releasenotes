@@ -1,6 +1,6 @@
-c.lib 1.177 (29.9.2004)
+c.lib 1.178 (7.10.2004)
 
-- Added usleep(), strtoll() and strtoull().
-
-- Setting a minimum stack size via the '__stack_size' variable
-  works again.
+- The OS4 version had floating point math support code enabled in all
+  libraries and not just "libm.a". Trying to link with, for example,
+  "libc.a" would bring up a number of unsatisfied symbol references
+  which could be fixed only by linking against "libm.a", too.
