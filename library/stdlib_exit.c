@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_exit.c,v 1.3 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_exit.c,v 1.4 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,10 +52,18 @@ _exit(int return_code)
 
 /****************************************************************************/
 
+/* The C99 version of _exit(). */
+void
+_Exit(int return_code)
+{
+	_exit(return_code);
+}
+
+/****************************************************************************/
+
 void
 exit(int return_code)
 {
-	/* ZZZ what about inifinite recursion in __exit_trap_trigger()? */
 	__exit_trap_trigger();
 
 	_exit(return_code);

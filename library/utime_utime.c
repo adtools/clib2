@@ -1,5 +1,5 @@
 /*
- * $Id: utime_utime.c,v 1.8 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: utime_utime.c,v 1.9 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,20 +40,6 @@
 #ifndef _UTIME_HEADERS_H
 #include "utime_headers.h"
 #endif /* _UTIME_HEADERS_H */
-
-#ifndef _LOCALE_HEADERS_H
-#include "locale_headers.h"
-#endif /* _LOCALE_HEADERS_H */
-
-#ifndef _TIME_HEADERS_H
-#include "time_headers.h"
-#endif /* _TIME_HEADERS_H */
-
-/****************************************************************************/
-
-#ifndef _STDLIB_PROFILE_H
-#include "stdlib_profile.h"
-#endif /* _STDLIB_PROFILE_H */
 
 /****************************************************************************/
 

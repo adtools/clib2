@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf.c,v 1.10 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_vasprintf.c,v 1.11 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,17 +41,15 @@
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
 
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
+
 /****************************************************************************/
 
 #ifndef _STDLIB_MEMORY_H
 #include "stdlib_memory.h"
 #endif /* _STDLIB_MEMORY_H */
-
-/****************************************************************************/
-
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 

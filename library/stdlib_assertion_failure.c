@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_assertion_failure.c,v 1.8 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdlib_assertion_failure.c,v 1.9 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,16 +31,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_HEADERS_H
-#include "stdlib_headers.h"
-#endif /* _STDLIB_HEADERS_H */
-
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
-
-/****************************************************************************/
-
 #ifndef PROTO_EXEC_H
 #include <proto/exec.h>
 #endif /* PROTO_EXEC_H */
@@ -55,6 +45,16 @@
 #ifndef PROTO_DOS_H
 #include <proto/dos.h>
 #endif /* PROTO_DOS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
+
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 

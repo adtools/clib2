@@ -1,5 +1,5 @@
 /*
- * $Id: utime_headers.h,v 1.3 2005-03-19 10:15:56 obarthel Exp $
+ * $Id: stdlib_profile_monitoring.c,v 1.1 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,29 +31,64 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _UTIME_HEADERS_H
-#define _UTIME_HEADERS_H
+#if defined(__SASC)
 
 /****************************************************************************/
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
-
-#ifndef _LOCALE_HEADERS_H
-#include "locale_headers.h"
-#endif /* _LOCALE_HEADERS_H */
-
-#ifndef _TIME_HEADERS_H
-#include "time_headers.h"
-#endif /* _TIME_HEADERS_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#ifndef _STDLIB_PROFILE_H
-#include "stdlib_profile.h"
-#endif /* _STDLIB_PROFILE_H */
+static BOOL show_profile_names = FALSE;
+static int nest_level;
 
 /****************************************************************************/
 
-#endif /* _UTIME_HEADERS_H */
+void ASM
+_PROLOG(REG(a0,char * id))
+{
+	nest_level++;
+
+	if(id != NULL && __program_name != NULL)
+	{
+		int i;
+
+		kprintf("[%s]",__program_name);
+
+		for(i = 0 ; i < nest_level ; i++)
+			kputc(' ');
+
+		kprintf("%s\n",id);
+	}
+}
+
+/****************************************************************************/
+
+void ASM
+_EPILOG(REG(a0,char * id))
+{
+	if(nest_level > 0)
+		nest_level--;
+}
+
+/****************************************************************************/
+
+void
+__show_profile_names(void)
+{
+	show_profile_names = TRUE;
+}
+
+/****************************************************************************/
+
+void
+__hide_profile_names(void)
+{
+	show_profile_names = FALSE;
+}
+
+/****************************************************************************/
+
+#endif /* __SASC */

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf_hook_entry.c,v 1.5 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: stdio_vasprintf_hook_entry.c,v 1.6 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,11 +41,15 @@
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
 
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

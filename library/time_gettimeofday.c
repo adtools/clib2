@@ -1,5 +1,5 @@
 /*
- * $Id: time_gettimeofday.c,v 1.8 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: time_gettimeofday.c,v 1.9 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,6 +31,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef PROTO_TIMER_H
+#include <proto/timer.h>
+#endif /* PROTO_TIMER_H */
+
+/****************************************************************************/
+
+#include <sys/time.h>
+
+/****************************************************************************/
+
 #ifndef _TIME_HEADERS_H
 #include "time_headers.h"
 #endif /* _TIME_HEADERS_H */
@@ -42,16 +52,6 @@
 #ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
-
-/****************************************************************************/
-
-#include <sys/time.h>
-
-/****************************************************************************/
-
-#ifndef PROTO_TIMER_H
-#include <proto/timer.h>
-#endif /* PROTO_TIMER_H */
 
 /****************************************************************************/
 

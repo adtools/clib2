@@ -1,5 +1,5 @@
 /*
- * $Id: string_strdup.c,v 1.7 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: string_strdup.c,v 1.8 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,8 +40,6 @@
 #ifndef _STRING_HEADERS_H
 #include "string_headers.h"
 #endif /* _STRING_HEADERS_H */
-
-/****************************************************************************/
 
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"

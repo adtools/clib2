@@ -1,5 +1,5 @@
 /*
- * $Id: utime_headers.h,v 1.3 2005-03-19 10:15:56 obarthel Exp $
+ * $Id: stdlib_profile_monitoring.h,v 1.1 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,29 +31,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _UTIME_HEADERS_H
-#define _UTIME_HEADERS_H
+#ifndef _STDLIB_PROFILE_MONITORING_H
+#define _STDLIB_PROFILE_MONITORING_H
 
 /****************************************************************************/
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
-
-#ifndef _LOCALE_HEADERS_H
-#include "locale_headers.h"
-#endif /* _LOCALE_HEADERS_H */
-
-#ifndef _TIME_HEADERS_H
-#include "time_headers.h"
-#endif /* _TIME_HEADERS_H */
+/* The SAS/C profiling hooks can be used to track call chains. Neat
+   trick, but not always necessary. Don't enable this unless you know
+   what you're doing... */
 
 /****************************************************************************/
 
-#ifndef _STDLIB_PROFILE_H
-#include "stdlib_profile.h"
-#endif /* _STDLIB_PROFILE_H */
+/*#define USE_PROFILE_MONITORING*/
 
 /****************************************************************************/
 
-#endif /* _UTIME_HEADERS_H */
+#if defined(__SASC) && defined(USE_PROFILE_MONITORING)
+
+/****************************************************************************/
+
+extern void __show_profile_names(void);
+extern void __hide_profile_names(void);
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
+#define __show_profile_names() ((void)0)
+#define __hide_profile_names() ((void)0)
+
+/****************************************************************************/
+
+#endif /* __SASC && USE_PROFILE_MONITORING */
+
+/****************************************************************************/
+
+#endif /* _STDLIB_PROFILE_MONITORING_H */

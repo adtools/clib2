@@ -101,6 +101,13 @@
 - Dropped unused stub code which is now redundant because of
   the constructor/destructor mechanism.
 
+- Moved the call chain printing out of stdlib_main.c and into
+  separate files.
+
+- Removed some more redundant data from stdlib_main.c.
+
+- Added the first real C99 function: _Exit().
+
 
 c.lib 1.189 (5.3.2005)
 

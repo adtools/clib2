@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.17 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.18 2005-03-19 10:15:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,14 @@
 
 /****************************************************************************/
 
+#include <setjmp.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+
+/****************************************************************************/
+
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
@@ -51,16 +59,9 @@
 
 /****************************************************************************/
 
-#include <setjmp.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-
-/****************************************************************************/
-
-typedef int  (*init_func_ptr)(void);
-typedef void (*exit_func_ptr)(void);
+#ifndef _STDLIB_PROFILE_MONITORING_H
+#include "stdlib_profile_monitoring.h"
+#endif /* _STDLIB_PROFILE_MONITORING_H */
 
 /****************************************************************************/
 
@@ -70,49 +71,6 @@ extern int main(int arg_c,char ** arg_v);
 
 /* This will be set to TRUE in case a stack overflow was detected. */
 BOOL __stack_overflow;
-
-/****************************************************************************/
-
-/* The SAS/C profiling hooks can be used to track call chains. Neat
-   trick, but not always necessary. Don't enable this unless you know
-   what you're doing... */
-#if defined(__USE_SAS_PROFILING_FOR_MONITORING)
-
-/****************************************************************************/
-
-static BOOL show_profile_names = FALSE;
-static int nest_level;
-
-void ASM
-_PROLOG(REG(a0,char * id))
-{
-	nest_level++;
-
-	if(id != NULL && __program_name != NULL)
-	{
-		int i;
-
-		kprintf("[%s]",__program_name);
-
-		for(i = 0 ; i < nest_level ; i++)
-			kputc(' ');
-
-		kprintf("%s\n",id);
-	}
-}
-
-/****************************************************************************/
-
-void ASM
-_EPILOG(REG(a0,char * id))
-{
-	if(nest_level > 0)
-		nest_level--;
-}
-
-/****************************************************************************/
-
-#endif /* __USE_SAS_PROFILING_FOR_MONITORING */
 
 /****************************************************************************/
 
@@ -134,11 +92,7 @@ call_main(void)
 
 	/* If the SAS/C profiling code is set up for printing function
 	   call chains, switch it on now. */
-	#if defined(__USE_SAS_PROFILING_FOR_MONITORING)
-	{
-		show_profile_names = TRUE;
-	}
-	#endif /* __USE_SAS_PROFILING_FOR_MONITORING */
+	__show_profile_names();
 
 	/* After all these preparations, get this show on the road... */
 	exit(main((int)__argc,(char **)__argv));
@@ -146,11 +100,7 @@ call_main(void)
  out:
 
 	/* Switch off function name printing, if it was enabled. */
-	#if defined(__USE_SAS_PROFILING_FOR_MONITORING)
-	{
-		show_profile_names = FALSE;
-	}
-	#endif /* __USE_SAS_PROFILING_FOR_MONITORING */
+	__hide_profile_names();
 
 	/* If we end up here with the __stack_overflow variable
 	   set then the stack overflow handler dropped into
