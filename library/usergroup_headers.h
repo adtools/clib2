@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_headers.h,v 1.5 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_headers.h,v 1.6 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,6 +39,18 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_PROFILE_H
+#include "stdlib_profile.h"
+#endif /* _STDLIB_PROFILE_H */
 
 /****************************************************************************/
 

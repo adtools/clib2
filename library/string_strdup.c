@@ -1,5 +1,5 @@
 /*
- * $Id: string_strdup.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: string_strdup.c,v 1.7 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,6 +46,12 @@
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

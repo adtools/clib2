@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.5 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.6 2005-03-18 12:38:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,15 +31,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 
@@ -62,7 +68,7 @@ static struct MinList alloca_memory_list;
 
 /****************************************************************************/
 
-CLIB_DESTRUCTOR(__alloca_exit)
+CLIB_DESTRUCTOR(alloca_exit)
 {
 	ENTER();
 

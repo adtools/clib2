@@ -1,5 +1,5 @@
 /*
- * $Id: debug_headers.h,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: debug_headers.h,v 1.3 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,14 +36,15 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
+#endif /* EXEC_LIBRARIES_H */
 
 /****************************************************************************/
 
 #if defined(__SASC)
 
 #include <clib/exec_protos.h>
-/*#include <pragmas/exec_sysbase_pragmas.h>*/
 #include <pragmas/exec_pragmas.h>
 
 LONG RawMayGetChar(VOID);
@@ -57,7 +58,11 @@ VOID RawPutChar(UBYTE c);
 /****************************************************************************/
 
 #if defined(__amigaos4__)
+
+#ifndef EXEC_EMULATION_H
 #include <exec/emulation.h>
+#endif /* EXEC_EMULATION_H */
+
 #endif /* __amigaos4__ */
 
 /****************************************************************************/
@@ -106,11 +111,13 @@ VOID RawPutChar(UBYTE c);
 
 /****************************************************************************/
 
-#include "debug.h"
-
-/****************************************************************************/
-
+#ifndef _MACROS_H
 #include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
+#include "debug.h"
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 

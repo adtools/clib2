@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chdir_exit.c,v 1.4 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: unistd_chdir_exit.c,v 1.5 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,12 @@
 #ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 

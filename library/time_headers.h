@@ -1,5 +1,5 @@
 /*
- * $Id: time_headers.h,v 1.9 2005-01-30 09:37:59 obarthel Exp $
+ * $Id: time_headers.h,v 1.10 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,26 +36,49 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
+#endif /* EXEC_LIBRARIES_H */
+
+#ifndef EXEC_DEVICES_H
 #include <exec/devices.h>
+#endif /* EXEC_DEVICES_H */
+
+#ifndef EXEC_MEMORY_H
 #include <exec/memory.h>
+#endif /* EXEC_MEMORY_H */
 
+#ifndef DOS_DOSEXTENS_H
 #include <dos/dosextens.h>
+#endif /* DOS_DOSEXTENS_H */
 
+#ifndef DEVICES_TIMER_H
 #include <devices/timer.h>
+#endif /* DEVICES_TIMER_H */
 
+#ifndef LIBRARIES_LOCALE_H
 #include <libraries/locale.h>
+#endif /* LIBRARIES_LOCALE_H */
 
+#ifndef UTILITY_DATE_H
 #include <utility/date.h>
+#endif /* UTILITY_DATE_H */
 
 /****************************************************************************/
 
+#ifndef CLIB_ALIB_PROTOS_H
 #include <clib/alib_protos.h>
+#endif /* CLIB_ALIB_PROTOS_H */
 
 /****************************************************************************/
 
+#ifndef PROTO_EXEC_H
 #include <proto/exec.h>
+#endif /* PROTO_EXEC_H */
+
+#ifndef PROTO_DOS_H
 #include <proto/dos.h>
+#endif /* PROTO_DOS_H */
 
 /****************************************************************************/
 
@@ -73,14 +96,25 @@
 
 /****************************************************************************/
 
-#include "macros.h"
-#include "debug.h"
-
-/****************************************************************************/
-
 #ifndef _MATH_FP_SUPPORT_H
 #include "math_fp_support.h"
 #endif /* _MATH_FP_SUPPORT_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_PROFILE_H
+#include "stdlib_profile.h"
+#endif /* _STDLIB_PROFILE_H */
+
+/****************************************************************************/
+
+#ifndef _MACROS_H
+#include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
+#include "debug.h"
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: signal_headers.h,v 1.6 2005-01-09 10:10:41 obarthel Exp $
+ * $Id: signal_headers.h,v 1.7 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,14 +36,23 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
+#endif /* EXEC_LIBRARIES_H */
 
+#ifndef DOS_DOSEXTENS_H
 #include <dos/dosextens.h>
+#endif /* DOS_DOSEXTENS_H */
 
 /****************************************************************************/
 
+#ifndef PROTO_EXEC_H
 #include <proto/exec.h>
+#endif /* PROTO_EXEC_H */
+
+#ifndef PROTO_DOS_H
 #include <proto/dos.h>
+#endif /* PROTO_DOS_H */
 
 /****************************************************************************/
 
@@ -55,8 +64,13 @@
 
 /****************************************************************************/
 
+#ifndef _MACROS_H
 #include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
 #include "debug.h"
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.5 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.6 2005-03-18 12:38:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,9 +34,17 @@
 /* We don't want to pull in <clib/alib_protos.h> */
 #define CLIB_ALIB_PROTOS_H
 
+/****************************************************************************/
+
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 

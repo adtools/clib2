@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_dosbase.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_dosbase.c,v 1.3 2005-03-18 12:38:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -32,7 +32,10 @@
  */
 
 #define __NOLIBBASE__
+
+#ifndef PROTO_DOS_H
 #include <proto/dos.h>
+#endif /* PROTO_DOS_H */
 
 /****************************************************************************/
 

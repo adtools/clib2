@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_math.c,v 1.3 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_math.c,v 1.4 2005-03-18 12:38:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,10 +34,6 @@
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
-
-/****************************************************************************/
-
-#include "macros.h"
 
 /****************************************************************************/
 

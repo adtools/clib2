@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.43 2005-03-12 14:10:09 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.44 2005-03-18 12:38:20 obarthel Exp $
 #
 # :ts=8
 #
@@ -326,7 +326,6 @@ C_LIB = \
 	stdlib_set_process_window.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
-	stdlib_socket.o \
 	stdlib_srand.o \
 	stdlib_stackargbytes.o \
 	stdlib_stackcheck.o \
@@ -925,19 +924,19 @@ $(LIBC_OBJS)/stdlib_stacksize.o : stdlib_stacksize.c stdlib_gcc_help.h
 
 $(LIBC_OBJS)/stdlib_shell_escape.o : stdlib_shell_escape.c stdlib_gcc_help.h
 
-$(LIBC_OBJS)/stdlib_alloca.o : stdlib_alloca.c stdlib_mem_debug.h
+$(LIBC_OBJS)/stdlib_alloca.o : stdlib_alloca.c stdlib_memory.h
 
-$(LIBC_OBJS)/stdlib_calloc.o : stdlib_calloc.c stdlib_mem_debug.h
+$(LIBC_OBJS)/stdlib_calloc.o : stdlib_calloc.c stdlib_memory.h
 
-$(LIBC_OBJS)/stdlib_free.o : stdlib_free.c stdlib_mem_debug.h
+$(LIBC_OBJS)/stdlib_free.o : stdlib_free.c stdlib_memory.h
 
-$(LIBC_OBJS)/stdlib_init_exit.o : stdlib_init_exit.c stdlib_mem_debug.h
+$(LIBC_OBJS)/stdlib_init_exit.o : stdlib_init_exit.c stdlib_memory.h
 
-$(LIBC_OBJS)/stdlib_malloc.o : stdlib_malloc.c stdlib_mem_debug.h
+$(LIBC_OBJS)/stdlib_malloc.o : stdlib_malloc.c stdlib_memory.h
 
-$(LIBC_OBJS)/stdlib_realloc.o : stdlib_realloc.c stdlib_mem_debug.h
+$(LIBC_OBJS)/stdlib_realloc.o : stdlib_realloc.c stdlib_memory.h
 
-$(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_mem_debug.h
+$(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_memory.h
 
 ##############################################################################
 

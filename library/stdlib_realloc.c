@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_realloc.c,v 1.5 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: stdlib_realloc.c,v 1.6 2005-03-18 12:38:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,15 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

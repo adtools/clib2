@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.33 2005-03-11 18:27:26 obarthel Exp $
+# $Id: smakefile,v 1.34 2005-03-18 12:38:22 obarthel Exp $
 #
 # :ts=8
 #
@@ -645,61 +645,61 @@ stdlib_setjmp.o : stdlib_setjmp.asm
 
 stdlib_swapstack.o : stdlib_swapstack.asm
 
-stdio_fdhookentry.o : stdio_fdhookentry.c stdlib_mem_debug.h
+stdio_fdhookentry.o : stdio_fdhookentry.c stdlib_memory.h
 
-stdio_openiob.o : stdio_openiob.c stdlib_mem_debug.h
+stdio_openiob.o : stdio_openiob.c stdlib_memory.h
 
-stdlib_alloca.o : stdlib_alloca.c stdlib_mem_debug.h
+stdlib_alloca.o : stdlib_alloca.c stdlib_memory.h
 
-stdlib_calloc.o : stdlib_calloc.c stdlib_mem_debug.h
+stdlib_calloc.o : stdlib_calloc.c stdlib_memory.h
 
-stdlib_free.o : stdlib_free.c stdlib_mem_debug.h
+stdlib_free.o : stdlib_free.c stdlib_memory.h
 
-stdlib_init_exit.o : stdlib_init_exit.c stdlib_mem_debug.h
+stdlib_init_exit.o : stdlib_init_exit.c stdlib_memory.h
 
-stdlib_malloc.o : stdlib_malloc.c stdlib_mem_debug.h
+stdlib_malloc.o : stdlib_malloc.c stdlib_memory.h
 
-stdlib_realloc.o : stdlib_realloc.c stdlib_mem_debug.h
+stdlib_realloc.o : stdlib_realloc.c stdlib_memory.h
 
-stdlib_red_black.o : stdlib_red_black.c stdlib_mem_debug.h
+stdlib_red_black.o : stdlib_red_black.c stdlib_memory.h
 
-dirent_closedir.o : dirent_closedir.c stdlib_mem_debug.h
+dirent_closedir.o : dirent_closedir.c stdlib_memory.h
 
-dirent_opendir.o : dirent_opendir.c stdlib_mem_debug.h
+dirent_opendir.o : dirent_opendir.c stdlib_memory.h
 
-fcntl_open.o : fcntl_open.c stdlib_mem_debug.h
+fcntl_open.o : fcntl_open.c stdlib_memory.h
 
-socket_select.o : socket_select.c stdlib_mem_debug.h
+socket_select.o : socket_select.c stdlib_memory.h
 
-stdio_fclose.o : stdio_fclose.c stdlib_mem_debug.h
+stdio_fclose.o : stdio_fclose.c stdlib_memory.h
 
-stdio_growfdtable.o : stdio_growfdtable.c stdlib_mem_debug.h
+stdio_growfdtable.o : stdio_growfdtable.c stdlib_memory.h
 
-stdio_growiobtable.o : stdio_growiobtable.c stdlib_mem_debug.h
+stdio_growiobtable.o : stdio_growiobtable.c stdlib_memory.h
 
-stdio_init_exit.o : stdio_init_exit.c stdlib_mem_debug.h
+stdio_init_exit.o : stdio_init_exit.c stdlib_memory.h
 
-stdio_popen.o : stdio_popen.c stdlib_mem_debug.h
+stdio_popen.o : stdio_popen.c stdlib_memory.h
 
-stdio_setvbuf.o : stdio_setvbuf.c stdlib_mem_debug.h
+stdio_setvbuf.o : stdio_setvbuf.c stdlib_memory.h
 
-stdio_tmpfile.o : stdio_tmpfile.c stdlib_mem_debug.h
+stdio_tmpfile.o : stdio_tmpfile.c stdlib_memory.h
 
-stdlib_atexit.o : stdlib_atexit.c stdlib_mem_debug.h
+stdlib_atexit.o : stdlib_atexit.c stdlib_memory.h
 
-stdlib_setenv.o : stdlib_setenv.c stdlib_mem_debug.h
+stdlib_setenv.o : stdlib_setenv.c stdlib_memory.h
 
-stdlib_arg.o : stdlib_arg.c stdlib_mem_debug.h
+stdlib_arg.o : stdlib_arg.c stdlib_memory.h
 
-stdlib_system.o : stdlib_system.c stdlib_mem_debug.h
+stdlib_system.o : stdlib_system.c stdlib_memory.h
 
-stdlib_unsetenv.o : stdlib_unsetenv.c stdlib_mem_debug.h
+stdlib_unsetenv.o : stdlib_unsetenv.c stdlib_memory.h
 
-unistd_getcwd.o : unistd_getcwd.c stdlib_mem_debug.h
+unistd_getcwd.o : unistd_getcwd.c stdlib_memory.h
 
-unistd_unlink.o : unistd_unlink.c stdlib_mem_debug.h
+unistd_unlink.o : unistd_unlink.c stdlib_memory.h
 
-unistd_wildcard_expand.o : unistd_wildcard_expand.c stdlib_mem_debug.h
+unistd_wildcard_expand.o : unistd_wildcard_expand.c stdlib_memory.h
 
 stdlib_main.o : stdlib_main.c
 	@echo "Compiling $<"

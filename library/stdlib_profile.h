@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_mem_debug.h,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_profile.h,v 1.1 2005-03-18 12:38:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,60 +31,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#define _STDLIB_MEM_DEBUG_H
+#ifndef _STDLIB_PROFILE_H
+#define _STDLIB_PROFILE_H
 
 /****************************************************************************/
 
-/*
- * Uncomment this to build a library which has the memory debugging features
- * enabled.
- */
-/*#define __MEM_DEBUG */
+/* Magic macros for code profiling, SAS/C style. Normally, you would find
+   these in <sprof.h>, which is SAS/C-specific. */
 
 /****************************************************************************/
 
-/*
- * Uncomment this to see reports of where and how much memory is allocated
- * or released.
- */
-/*#define __MEM_DEBUG_LOG*/
+#ifdef __SASC
 
 /****************************************************************************/
 
-/*
- * Uncomment this to speed up memory data maintenance operations when
- * the memory debugging mode is enabled.
- */
-/*#define __USE_MEM_TREES*/
+extern void ASM _PROLOG(REG(a0,char *));
+extern void ASM _EPILOG(REG(a0,char *));
+
+#if _PROFILE
+#define PROFILE_OFF()	_PROLOG(0L)
+#define PROFILE_ON()	_EPILOG(0L)
+#else
+#define PROFILE_OFF()	((void)0)
+#define PROFILE_ON()	((void)0)
+#endif /* _PROFILE */
 
 /****************************************************************************/
 
-/*
- * Memory debugging parameters; note that the head/tail size must be
- * multiples of four, or you will break code that depends upon malloc()
- * and friends to return long word aligned data structures! Better
- * still, there are assert()s in the library which will blow your code
- * out of the water if the data returned by malloc() and realloc() is
- * not long word aligned...
- */
-
-#define MALLOC_HEAD_SIZE 512	/* How many bytes to allocate in front of
-								   each memory chunk */
-#define MALLOC_TAIL_SIZE 512	/* How many bytes to allocate behind each
-								   memory chunk */
+#else
 
 /****************************************************************************/
 
-#define MALLOC_NEW_FILL  0xA3	/* The byte value to fill newly created
-								   memory allocations with */
-#define MALLOC_FREE_FILL 0xA5	/* The byte value to fill freed memory
-								   allocations with */
-#define MALLOC_HEAD_FILL 0xA7	/* The byte value to fill the memory in
-								   front of each allocation with */
-#define MALLOC_TAIL_FILL 0xA9	/* The byte value to fill the memory behind
-								   each allocation with */
+#define PROFILE_OFF()	((void)0)
+#define PROFILE_ON()	((void)0)
 
 /****************************************************************************/
 
-#endif /* _STDLIB_MEM_DEBUG_H */
+#endif /* __SASC */
+
+/****************************************************************************/
+
+#endif /* _STDLIB_PROFILE_H */

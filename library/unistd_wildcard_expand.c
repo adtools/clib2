@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.10 2005-03-03 09:32:09 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.11 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,23 +31,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
+
+/****************************************************************************/
+
+#ifndef CLIB_ALIB_PROTOS_H
 #include <clib/alib_protos.h>
+#endif /* CLIB_ALIB_PROTOS_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_red_black.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_red_black.c,v 1.4 2005-03-18 12:38:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,15 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

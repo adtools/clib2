@@ -1,5 +1,5 @@
 /*
- * $Id: ftw_headers.h,v 1.1 2005-03-02 12:57:53 obarthel Exp $
+ * $Id: ftw_headers.h,v 1.2 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,11 +36,30 @@
 
 /****************************************************************************/
 
-#include <sys/stat.h>
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
+#include <unistd.h>
+#include <dirent.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <ftw.h>
+#include <errno.h>
+#include <dos.h>
+
+/****************************************************************************/
+
+#ifndef _MACROS_H
 #include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
+#include "debug.h"
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 

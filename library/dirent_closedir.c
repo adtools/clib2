@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.11 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.12 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,15 +31,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _DIRENT_HEADERS_H
 #include "dirent_headers.h"
 #endif /* _DIRENT_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 

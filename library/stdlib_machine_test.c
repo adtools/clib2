@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_machine_test.c,v 1.4 2005-03-07 16:56:36 obarthel Exp $
+ * $Id: stdlib_machine_test.c,v 1.5 2005-03-18 12:38:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,7 +37,9 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_EXECBASE_H
 #include <exec/execbase.h>
+#endif /* EXEC_EXECBASE_H */
 
 /****************************************************************************/
 

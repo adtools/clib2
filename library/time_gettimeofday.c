@@ -1,5 +1,5 @@
 /*
- * $Id: time_gettimeofday.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: time_gettimeofday.c,v 1.8 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,7 +49,9 @@
 
 /****************************************************************************/
 
+#ifndef PROTO_TIMER_H
 #include <proto/timer.h>
+#endif /* PROTO_TIMER_H */
 
 /****************************************************************************/
 

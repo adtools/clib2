@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_init_exit.c,v 1.10 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: unistd_init_exit.c,v 1.11 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,7 +37,9 @@
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 

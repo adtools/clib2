@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_dotimer.c,v 1.3 2005-03-06 09:00:16 obarthel Exp $
+ * $Id: amiga_dotimer.c,v 1.4 2005-03-18 12:38:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,12 @@
 
 #include <proto/exec.h>
 #include <clib/alib_protos.h>
+
+/****************************************************************************/
+
+#ifndef _STDLIB_PROFILE_H
+#include "stdlib_profile.h"
+#endif /* _STDLIB_PROFILE_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_detach.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_detach.c,v 1.3 2005-03-18 12:38:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,7 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef EXEC_TYPES_H
 #include <exec/types.h>
+#endif /* EXEC_TYPES_H */
 
 /****************************************************************************/
 

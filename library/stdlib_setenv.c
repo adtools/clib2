@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setenv.c,v 1.7 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: stdlib_setenv.c,v 1.8 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,15 +37,21 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.7 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: socket_select.c,v 1.8 2005-03-18 12:38:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -35,15 +35,15 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _SOCKET_HEADERS_H
 #include "socket_headers.h"
 #endif /* _SOCKET_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

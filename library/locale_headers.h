@@ -1,5 +1,5 @@
 /*
- * $Id: locale_headers.h,v 1.6 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: locale_headers.h,v 1.7 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,13 +36,19 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
+#endif /* EXEC_LIBRARIES_H */
 
+#ifndef LIBRARIES_LOCALE_H
 #include <libraries/locale.h>
+#endif /* LIBRARIES_LOCALE_H */
 
 /****************************************************************************/
 
+#ifndef PROTO_EXEC_H
 #include <proto/exec.h>
+#endif /* PROTO_EXEC_H */
 
 /****************************************************************************/
 
@@ -59,8 +65,19 @@
 
 /****************************************************************************/
 
+#ifndef _STDLIB_PROFILE_H
+#include "stdlib_profile.h"
+#endif /* _STDLIB_PROFILE_H */
+
+/****************************************************************************/
+
+#ifndef _MACROS_H
 #include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
 #include "debug.h"
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 

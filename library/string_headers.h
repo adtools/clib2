@@ -1,5 +1,5 @@
 /*
- * $Id: string_headers.h,v 1.4 2005-03-15 11:18:32 obarthel Exp $
+ * $Id: string_headers.h,v 1.5 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,8 +52,13 @@
 
 /****************************************************************************/
 
+#ifndef _MACROS_H
 #include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
 #include "debug.h"
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 

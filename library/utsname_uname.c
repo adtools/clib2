@@ -1,5 +1,5 @@
 /*
- * $Id: utsname_uname.c,v 1.2 2005-03-02 14:47:10 obarthel Exp $
+ * $Id: utsname_uname.c,v 1.3 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,10 +48,6 @@
 #ifndef	_STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
-
-#ifndef	_DEBUG_H
-#include "debug.h"
-#endif /* _DEBUG_H */
 
 /****************************************************************************/
 

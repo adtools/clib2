@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_tmpfile.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_tmpfile.c,v 1.4 2005-03-18 12:38:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,15 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

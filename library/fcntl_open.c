@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.14 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.15 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,15 +37,15 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _FCNTL_HEADERS_H
 #include "fcntl_headers.h"
 #endif /* _FCNTL_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

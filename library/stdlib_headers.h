@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.15 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.16 2005-03-18 12:38:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,8 +36,9 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
-#include <exec/memory.h>
+#endif /* EXEC_LIBRARIES_H */
 
 /****************************************************************************/
 
@@ -49,25 +50,46 @@
 /****************************************************************************/
 
 #if (INCLUDE_VERSION >= 50)
+#ifndef DOS_ANCHORPATH_H
 #include <dos/anchorpath.h>
+#endif /* DOS_ANCHORPATH_H */
 #endif /* (INCLUDE_VERSION >= 50) */
 
+/****************************************************************************/
+
+#ifndef DOS_DOSEXTENS_H
 #include <dos/dosextens.h>
+#endif /* DOS_DOSEXTENS_H */
+
+#ifndef DOS_DOSTAGS_H
 #include <dos/dostags.h>
+#endif /* DOS_DOSTAGS_H */
+
+#ifndef DOS_DOSASL_H
 #include <dos/dosasl.h>
+#endif /* DOS_DOSASL_H */
 
 /****************************************************************************/
 
+#ifndef WORKBENCH_STARTUP_H
 #include <workbench/startup.h>
+#endif /* WORKBENCH_STARTUP_H */
 
 /****************************************************************************/
 
+#ifndef CLIB_ALIB_PROTOS_H
 #include <clib/alib_protos.h>
+#endif /* CLIB_ALIB_PROTOS_H */
 
 /****************************************************************************/
 
+#ifndef PROTO_EXEC_H
 #include <proto/exec.h>
+#endif /* PROTO_EXEC_H */
+
+#ifndef PROTO_DOS_H
 #include <proto/dos.h>
+#endif /* PROTO_DOS_H */
 
 /****************************************************************************/
 
@@ -96,118 +118,29 @@
 
 /****************************************************************************/
 
+#ifndef _STDLIB_PROFILE_H
+#include "stdlib_profile.h"
+#endif /* _STDLIB_PROFILE_H */
+
+/****************************************************************************/
+
 #if defined(FLOATING_POINT_SUPPORT)
 #include <math.h>
 #endif /* FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
 
+#ifndef _MACROS_H
 #include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
 #include "debug.h"
-
-/****************************************************************************/
-
-/* We shuffle things around a bit for the debug code. This works by joining
-   related code which shares the same name. The debug code symbols also have
-   to be completely separate from the "regular" code. */
-#if defined(__MEM_DEBUG)
-
-#define __static
-
-#define __alloca_cleanup __alloca_cleanup_debug
-#define __alloca_exit __alloca_exit_debug
-
-#define __find_memory_node __find_memory_node_debug
-#define __free_memory_node __free_memory_node_debug
-#define __force_free __force_free_debug
-
-#define __get_allocation_size __get_allocation_size_debug
-#define __allocate_memory __allocate_memory_debug
-
-#define __memory_pool __memory_pool_debug
-#define __memory_list __memory_list_debug
-
-#define __vasprintf_hook_entry __vasprintf_hook_entry_debug
-
-extern void * __alloca(size_t size,const char * file,int line);
-extern void * __calloc(size_t num_elements,size_t element_size,const char * file,int line);
-extern void __free(void * ptr,const char * file,int line);
-extern void * __malloc(size_t size,const char * file,int line);
-extern void * __realloc(void *ptr,size_t size,const char * file,int line);
-extern char * __strdup(const char *s,const char * file,int line);
-extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int line);
-
-#else
-
-#define __static STATIC
-
-#define __free(mem,file,line) free(mem)
-#define __malloc(size,file,line) malloc(size)
-
-#endif /* __MEM_DEBUG */
-
-/****************************************************************************/
-
-struct MemoryNode
-{
-	struct MinNode		mn_MinNode;
-	size_t				mn_Size;
-
-	UBYTE				mn_NeverFree;
-
-#ifdef __MEM_DEBUG
-	UBYTE				mn_AlreadyFree;
-	UBYTE				mn_Pad0[2];
-
-	void *				mn_Allocation;
-	size_t				mn_AllocationSize;
-
-	char *				mn_FreeFile;
-	int					mn_FreeLine;
-
-	char *				mn_File;
-	int					mn_Line;
-
-#ifdef __USE_MEM_TREES
-	struct MemoryNode *	mn_Left;
-	struct MemoryNode *	mn_Right;
-	struct MemoryNode *	mn_Parent;
-	UBYTE				mn_IsRed;
-	UBYTE				mn_Pad1[3];
-#endif /* __USE_MEM_TREES */
-
-#else
-	UBYTE				mn_Pad0[3];
-#endif /* __MEM_DEBUG */
-};
-
-#ifdef __USE_MEM_TREES
-
-struct MemoryTree
-{
-	struct MemoryNode *	mt_Root;
-	struct MemoryNode	mt_RootNode;
-	struct MemoryNode	mt_NullNode;
-};
-
-#endif /* __USE_MEM_TREES */
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 
 extern unsigned int NOCOMMON __random_seed;
-
-/****************************************************************************/
-
-extern struct MemoryTree NOCOMMON	__memory_tree;
-extern struct MinList NOCOMMON		__memory_list;
-extern APTR NOCOMMON				__memory_pool;
-
-/****************************************************************************/
-
-extern unsigned long NOCOMMON __maximum_memory_allocated;
-extern unsigned long NOCOMMON __current_memory_allocated;
-extern unsigned long NOCOMMON __maximum_num_memory_chunks_allocated;
-extern unsigned long NOCOMMON __current_num_memory_chunks_allocated;
 
 /****************************************************************************/
 
@@ -220,9 +153,9 @@ extern unsigned int NOCOMMON (* __get_default_stack_size)(void);
 
 /****************************************************************************/
 
-extern unsigned int NOCOMMON __stack_size;
-extern UBYTE * NOCOMMON __stk_limit;
-extern UBYTE * NOCOMMON __base;
+extern unsigned int NOCOMMON	__stack_size;
+extern UBYTE * NOCOMMON			__stk_limit;
+extern UBYTE * NOCOMMON			__base;
 
 /****************************************************************************/
 
@@ -248,33 +181,6 @@ extern UBYTE NOCOMMON __shell_escape_character;
 
 extern char ** NOCOMMON	__argv;
 extern int NOCOMMON		__argc;
-
-/****************************************************************************/
-
-extern int NOCOMMON __default_pool_size;
-extern int NOCOMMON __default_puddle_size;
-
-/****************************************************************************/
-
-#if defined(__THREAD_SAFE)
-
-/****************************************************************************/
-
-extern void __memory_lock(void);
-extern void __memory_unlock(void);
-
-/****************************************************************************/
-
-#else
-
-/****************************************************************************/
-
-#define __memory_lock()		((void)0)
-#define __memory_unlock()	((void)0)
-
-/****************************************************************************/
-
-#endif /* __THREAD_SAFE */
 
 /****************************************************************************/
 

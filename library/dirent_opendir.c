@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_opendir.c,v 1.8 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: dirent_opendir.c,v 1.9 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,15 +37,15 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _DIRENT_HEADERS_H
 #include "dirent_headers.h"
 #endif /* _DIRENT_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.13 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.14 2005-03-18 12:38:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,15 +37,21 @@
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 
+#ifndef EXEC_EXECBASE_H
 #include <exec/execbase.h>
+#endif /* EXEC_EXECBASE_H */
 
 /****************************************************************************/
 
+#ifndef PROTO_EXEC_H
 #include <proto/exec.h>
+#endif /* PROTO_EXEC_H */
 
 /****************************************************************************/
 

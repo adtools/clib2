@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.18 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.19 2005-03-18 12:38:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,9 @@
 
 /****************************************************************************/
 
-#include "stdlib_protos.h"
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 

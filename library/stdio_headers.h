@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.20 2005-03-12 09:43:48 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.21 2005-03-18 12:38:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,28 +36,57 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
+#endif /* EXEC_LIBRARIES_H */
+
+#ifndef EXEC_MEMORY_H
 #include <exec/memory.h>
+#endif /* EXEC_MEMORY_H */
 
+#ifndef DEVICES_TIMER_H
 #include <devices/timer.h>
+#endif /* DEVICES_TIMER_H */
 
+#ifndef DOS_DOSEXTENS_H
 #include <dos/dosextens.h>
+#endif /* DOS_DOSEXTENS_H */
+
+#ifndef DOS_DOSTAGS_H
 #include <dos/dostags.h>
+#endif /* DOS_DOSTAGS_H */
+
+#ifndef DOS_DOSASL_H
 #include <dos/dosasl.h>
+#endif /* DOS_DOSASL_H */
+
+#ifndef DOS_RECORD_H
 #include <dos/record.h>
+#endif /* DOS_RECORD_H */
 
+#ifndef LIBRARIES_LOCALE_H
 #include <libraries/locale.h>
+#endif /* LIBRARIES_LOCALE_H */
 
+#ifndef UTILITY_HOOKS_H
 #include <utility/hooks.h>
+#endif /* UTILITY_HOOKS_H */
 
 /****************************************************************************/
 
+#ifndef CLIB_ALIB_PROTOS_H
 #include <clib/alib_protos.h>
+#endif /* CLIB_ALIB_PROTOS_H */
 
 /****************************************************************************/
 
+#ifndef PROTO_EXEC_H
 #include <proto/exec.h>
+#endif /* PROTO_EXEC_H */
+
+#ifndef PROTO_DOS_H
 #include <proto/dos.h>
+#endif /* PROTO_DOS_H */
 
 /****************************************************************************/
 
@@ -81,6 +110,12 @@
 
 /****************************************************************************/
 
+#if defined(FLOATING_POINT_SUPPORT)
+#include <math.h>
+#endif /* FLOATING_POINT_SUPPORT */
+
+/****************************************************************************/
+
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
@@ -93,21 +128,25 @@
 
 /****************************************************************************/
 
-#if defined(FLOATING_POINT_SUPPORT)
-#include <math.h>
-#endif /* FLOATING_POINT_SUPPORT */
+#ifndef _STDLIB_PROFILE_H
+#include "stdlib_profile.h"
+#endif /* _STDLIB_PROFILE_H */
 
 /****************************************************************************/
 
+#ifndef _MACROS_H
 #include "macros.h"
+#endif /* _MACROS_H */
+
+#ifndef _DEBUG_H
 #include "debug.h"
+#endif /* _DEBUG_H */
 
 /****************************************************************************/
 
 /* Forward declarations for below... */
 struct fd;
 struct iob;
-struct file_action_message;
 
 /****************************************************************************/
 

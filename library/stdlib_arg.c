@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.5 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.6 2005-03-18 12:38:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -35,12 +35,6 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_MEM_DEBUG_H
-#include "stdlib_mem_debug.h"
-#endif /* _STDLIB_MEM_DEBUG_H */
-
-/****************************************************************************/
-
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
@@ -51,15 +45,23 @@
 
 /****************************************************************************/
 
+#ifndef _STDLIB_MEMORY_H
+#include "stdlib_memory.h"
+#endif /* _STDLIB_MEMORY_H */
+
+/****************************************************************************/
+
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
+
+/****************************************************************************/
+
 #include <setjmp.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-
-/****************************************************************************/
-
-#include "macros.h"
 
 /****************************************************************************/
 

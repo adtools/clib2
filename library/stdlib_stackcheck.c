@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackcheck.c,v 1.7 2005-03-12 14:10:09 obarthel Exp $
+ * $Id: stdlib_stackcheck.c,v 1.8 2005-03-18 12:38:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,7 +37,9 @@
 
 /****************************************************************************/
 
-#include "macros.h"
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
 
 /****************************************************************************/
 
