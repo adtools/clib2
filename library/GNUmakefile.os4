@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.9 2004-09-29 14:17:44 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.10 2004-10-02 15:56:12 obarthel Exp $
 #
 # :ts=8
 #
@@ -105,7 +105,7 @@ WARNINGS = \
 
 INCLUDES = -Iinclude -I. -I$(SDK_INCLUDE)
 OPTIONS = -DNDEBUG -DUSE_64_BIT_INTS -fno-builtin -D__USE_INLINE__ -Wa,-mregnames
-OPTIMIZE = -O3 -fomit-frame-pointer -funroll-loops
+OPTIMIZE = -O -fomit-frame-pointer -funroll-loops
 #DEBUG = -g
 
 CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
@@ -708,7 +708,7 @@ clean:
 
 realclean:
 	$(MAKE) clean
-	-$(DELETE) lib small_data large_data
+	-$(DELETE) lib small_data large_data large_data_softfloat
 
 ##############################################################################
 

@@ -31,6 +31,9 @@ c.lib 1.177 (29.9.2004)
 - The socket exit code now calls the common stdio function which
   flushes and shuts down all buffered and unbuffered files.
 
+- Fixed the stack swapping function which, for reasons unknown, ceased
+  to work...
+
 - The start time used by clock() is now initialized by a constructor
   function.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_swapstack.c,v 1.1.1.1 2004-07-26 16:32:11 obarthel Exp $
+ * $Id: stdlib_swapstack.c,v 1.2 2004-10-02 15:56:13 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,51 +94,19 @@ ___swap_stack_and_call:                                                   \n\
 
 /****************************************************************************/
 
-__asm("																		\n\
-																			\n\
-	.text																	\n\
-	.align 2																\n\
-																			\n\
-	.set MainInterface, 632													\n\
-	.set IExec_StackSwap, 272												\n\
-																			\n\
-	.globl	SysBase															\n\
-	.globl	__swap_stack_and_call											\n\
-																			\n\
-__swap_stack_and_call:														\n\
-	stwu	r1, -32(r1)					# Make a stack frame				\n\
-	mflr	r0																\n\
-	stw		r0, 36(r1)														\n\
-	stmw	r29, 8(r1)					# Get us three GPRs					\n\
-										# r29 will store IExec				\n\
-	mr		r4, r31						# Backup ptr to function to call	\n\
-	mr		r3, r30						# Backup ptr to StackSwapStruct		\n\
-																			\n\
-	lis		r3, SysBase@ha				# Retrieve sysbase pointer			\n\
-	lwz		r3, SysBase@l(r3)												\n\
-	lwz		r29, MainInterface(r3)		# Get IExec							\n\
-																			\n\
-	addi	r3, r29, IExec_StackSwap	# StackSwap entry					\n\
-	mr		r4, r30						# StackSwap struct in r4			\n\
-	mtlr	r3																\n\
-	blrl								# IExec->StackSwap(r4)				\n\
-																			\n\
-	mtlr	r31							# Call payload						\n\
-	blrl																	\n\
-																			\n\
-	addi	r3, r29, IExec_StackSwap	# Revert to old stack				\n\
-	mr		r4, r30															\n\
-	mtlr	r3																\n\
-	blrl																	\n\
-																			\n\
-	lmw		r29, 8(r1)					# Restore registers					\n\
-	lwz		r0, 36(r1)														\n\
-	mtlr	r0																\n\
-	addi	r1, r1, 32					# Clean up stack					\n\
-																			\n\
-	blr																		\n\
-																			\n\
-");
+/* Swap the current stack configuration out, call a function provided,
+   swap the stack configuration back and return. */
+int
+__swap_stack_and_call(struct StackSwapStruct * stk,APTR function)
+{
+	register int result;
+
+	StackSwap(stk);
+	result = ((int (*)(void))function)();
+	StackSwap(stk);
+
+	return(result);
+}
 
 /****************************************************************************/
 

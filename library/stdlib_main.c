@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.4 2004-09-29 19:57:58 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.5 2004-10-02 15:56:13 obarthel Exp $
  *
  * :ts=4
  *
@@ -415,37 +415,36 @@ _main(void)
 		{
 			struct StackSwapStruct * stk;
 			unsigned int stack_size;
-			ULONG lower,upper;
+			APTR new_stack;
 
-			/* Make the stack size a multiple of 16 bytes. */
-			stack_size = (__stack_size + 15UL) & ~15UL;
+			/* Make the stack size a multiple of 32 bytes. */
+			stack_size = 32 + ((__stack_size + 31UL) & ~31UL);
 
-			/* We allocate a little more memory so that we can align
-			   the stack to a 128 bit boundary. The extra 20 bytes are
-			   to mimic the Task stack setup in dos.library/CreateProc. */
-			stk = AllocVec(sizeof(*stk) + 15 + 20 + stack_size,MEMF_PUBLIC|MEMF_ANY);
+			/* Allocate the stack swapping data structure
+			   and the stack space separately. */
+			stk = AllocVec(sizeof(*stk),MEMF_PUBLIC|MEMF_ANY);
 			if(stk == NULL)
 				goto out;
 
-			/* Align the lower stack bound to a 128 bit boundary, then
-			   fix up the upper bound, which is guaranteed to be on
-			   a 128 bit boundary, too, on account of the stack size
-			   having being rounded to that boundary. */
-			lower = (((ULONG)(stk+1)) + 15UL) & ~15UL;
-			upper = lower + stack_size;
+			new_stack = AllocMem(stack_size,MEMF_PUBLIC|MEMF_ANY);
+			if(new_stack == NULL)
+			{
+				FreeVec(stk);
+				goto out;
+			}
 
 			/* Fill in the lower and upper bounds, then take care of
-			   the stack pointer itself. This layout mimics the process
-			   creation code in dos.library. */
-			stk->stk_Lower		= (APTR)lower;
-			stk->stk_Upper		= upper - 4;
-			stk->stk_Pointer	= (APTR)(upper - 20);
+			   the stack pointer itself. */
+			stk->stk_Lower		= new_stack;
+			stk->stk_Upper		= (ULONG)(new_stack) + stack_size;
+			stk->stk_Pointer	= (APTR)(stk->stk_Upper - 32);
 
 			/* If necessary, set up for stack size usage measurement. */
 			__stack_usage_init(stk);
 
 			return_code = __swap_stack_and_call(stk,(APTR)call_main);
 
+			FreeMem(new_stack, stack_size);
 			FreeVec(stk);
 		}
 		else
