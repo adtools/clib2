@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.11 2004-10-07 09:20:44 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.12 2004-10-07 11:03:46 tfrieden Exp $
 #
 # :ts=8
 #
@@ -65,7 +65,7 @@ $(LIBUNIX_OBJS)/%.o : %.c
 
 $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
-	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) -DPPC_FLOATING_POINT_SUPPORT $<
+	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) $(FLOAT_TYPE) $<
 
 $(LIBSTACK_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):stack]"
@@ -87,14 +87,17 @@ $(LIBAMIGA_OBJS)/%.o : %.c
 
 ifeq (small_data,$(TYPE))
 CODE_TYPE := -msdata=sysv -DSMALL_DATA
+FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
 endif
 
 ifeq (large_data,$(TYPE))
 CODE_TYPE := -msdata=data
+FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
 endif
 
 ifeq (large_data_softfloat, $(TYPE))
 CODE_TYPE := -msdata=data -msoft-float
+FLOAT_TYPE :=
 endif
 
 ##############################################################################
