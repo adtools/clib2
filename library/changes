@@ -1,3 +1,9 @@
+- The default console output window opened when a program is launched
+  from Workbench would open and stay open. This was not intended to
+  happen and is a side-effect of the new stdio initialization code which
+  checks if the stdio streams are in non-blocking mode. Fixed.
+
+
 c.lib 1.186 (14.1.2005)
 
 - Redirecting stderr to a file no longer has the effect of showing error

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.13 2005-01-14 09:07:17 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.14 2005-01-15 08:17:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -195,23 +195,28 @@ __stdio_init(void)
 
 			if(IsInteractive(default_file))
 			{
-				struct FileHandle * fh;
-
 				SET_FLAG(fd_flags,FDF_IS_INTERACTIVE);
 
 				/* Try to figure out if the console is in single
-				   character mode. */
-				fh = BADDR(default_file);
-				if(fh->fh_Type != NULL)
+				   character mode. We don't do that if we opened the
+				   output console window since this will prevent it
+				   from closing, or end up making it visible. */
+				if(__WBenchMsg == NULL)
 				{
-					D_S(struct InfoData,id);
+					struct FileHandle * fh;
 
-					if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
+					fh = BADDR(default_file);
+					if(fh->fh_Type != NULL)
 					{
-						if(id->id_DiskType == ID_RAWCON)
+						D_S(struct InfoData,id);
+
+						if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
 						{
-							SET_FLAG(fd_flags,FDF_NON_BLOCKING);
-							SET_FLAG(fd_flags,FDF_DEFAULT_NON_BLOCKING);
+							if(id->id_DiskType == ID_RAWCON)
+							{
+								SET_FLAG(fd_flags,FDF_NON_BLOCKING);
+								SET_FLAG(fd_flags,FDF_DEFAULT_NON_BLOCKING);
+							}
 						}
 					}
 				}
@@ -282,21 +287,28 @@ __stdio_init(void)
 	{
 		if(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
 		{
-			struct FileHandle * fh;
-
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
 
-			fh = BADDR(__fd[STDERR_FILENO]->fd_DefaultFile);
-			if(fh->fh_Type != NULL)
+			/* Careful: the console handler may open an AUTO console window
+			            which so far was hidden when the ACTION_DISK_INFO
+			            packet is sent. We don't want that to happen if we
+			            can avoid it. */
+			if(__WBenchMsg == NULL)
 			{
-				D_S(struct InfoData,id);
+				struct FileHandle * fh;
 
-				if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
+				fh = BADDR(__fd[STDERR_FILENO]->fd_DefaultFile);
+				if(fh->fh_Type != NULL)
 				{
-					if(id->id_DiskType == ID_RAWCON)
+					D_S(struct InfoData,id);
+
+					if(DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
 					{
-						SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NON_BLOCKING);
-						SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_DEFAULT_NON_BLOCKING);
+						if(id->id_DiskType == ID_RAWCON)
+						{
+							SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NON_BLOCKING);
+							SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_DEFAULT_NON_BLOCKING);
+						}
 					}
 				}
 			}
