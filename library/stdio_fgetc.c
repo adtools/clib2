@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgetc.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_fgetc.c,v 1.4 2005-02-21 10:21:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,7 +81,7 @@ int
 __fgetc_check(FILE * stream)
 {
 	struct iob * file = (struct iob *)stream;
-	int result = EOF;
+	int result = -1;
 
 	assert( stream != NULL );
 
@@ -148,7 +148,7 @@ fgetc(FILE *stream)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__fgetc_check(stream) != OK)
+	if(__fgetc_check(stream) < 0)
 		goto out;
 
 	result = __getc(stream);

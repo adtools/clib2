@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_setvbuf.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_setvbuf.c,v 1.5 2005-02-21 10:22:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -105,9 +105,10 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	{
 		SHOWMSG("this file is not even in use");
 
+		SET_FLAG(file->iob_Flags,IOBF_ERROR);
+
 		__set_errno(EBADF);
 
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
 	}
 
@@ -183,7 +184,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 
 	new_buffer = NULL;
 
-	result = OK;
+	result = 0;
 
  out:
 

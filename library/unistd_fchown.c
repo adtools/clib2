@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fchown.c,v 1.5 2005-02-18 18:53:17 obarthel Exp $
+ * $Id: unistd_fchown.c,v 1.6 2005-02-21 10:22:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -159,7 +159,7 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 		goto out;
 	}
 
-	result = OK;
+	result = 0;
 
  out:
 

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_ioctl.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_ioctl.c,v 1.6 2005-02-21 10:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -85,7 +85,7 @@ ioctl(int sockfd,unsigned long request, ... /* char *arg */)
 	result = __IoctlSocket((LONG)fd->fd_DefaultFile,request,param);
 	PROFILE_ON();
 
-	if(result == OK)
+	if(result == 0)
 	{
 		int * option = (int *)param;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.1 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.2 2005-02-21 10:22:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -1173,7 +1173,7 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 		}
 	}
 
-	result = OK;
+	result = 0;
 
  out:
 
@@ -1186,7 +1186,7 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 	UnLock(parent_dir);
 	PROFILE_ON();
 
-	if(result != OK && error != OK)
+	if(result != 0 && error != OK)
 	{
 		SetIoErr(error);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_flushiobwritebuffer.c,v 1.5 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: stdio_flushiobwritebuffer.c,v 1.6 2005-02-21 10:21:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,6 +84,7 @@ __flush_iob_write_buffer(struct iob * file)
 			SET_FLAG(file->iob_Flags,IOBF_ERROR);
 
 			__set_errno(fam.fam_Error);
+
 			goto out;
 		}
 

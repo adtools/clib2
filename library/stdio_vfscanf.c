@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.8 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.9 2005-02-21 10:22:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,7 +98,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__fgetc_check(stream) != OK)
+	if(__fgetc_check(stream) < 0)
 		goto out;
 
 	/* Just so we can detect errors and tell them apart from

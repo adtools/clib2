@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ungetc.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_ungetc.c,v 1.4 2005-02-21 10:22:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,9 +74,10 @@ ungetc(int c,FILE *stream)
 	{
 		SHOWMSG("this file is not even in use");
 
+		SET_FLAG(file->iob_Flags,IOBF_ERROR);
+
 		__set_errno(EBADF);
 
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
 	}
 
@@ -85,9 +86,10 @@ ungetc(int c,FILE *stream)
 	{
 		SHOWMSG("can't even read from this file");
 
+		SET_FLAG(file->iob_Flags,IOBF_ERROR);
+
 		__set_errno(EACCES);
 
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
 	}
 
@@ -96,9 +98,10 @@ ungetc(int c,FILE *stream)
 	{
 		SHOWMSG("cannot push back an EOF");
 
+		SET_FLAG(file->iob_Flags,IOBF_ERROR);
+
 		__set_errno(EINVAL);
 
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
 	}
 
@@ -121,9 +124,10 @@ ungetc(int c,FILE *stream)
 	{
 		SHOWMSG("no room to push back");
 
+		SET_FLAG(file->iob_Flags,IOBF_ERROR);
+
 		__set_errno(ENOBUFS);
 
-		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
 	}
 

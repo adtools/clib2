@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: mount_fstatfs.c,v 1.6 2005-02-21 10:21:42 obarthel Exp $
  *
  * :ts=4
  *
@@ -121,7 +121,7 @@ fstatfs(int file_descriptor, struct statfs *buf)
 
 	__convert_info_to_statfs(id,buf);
 
-	result = OK;
+	result = 0;
 
  out:
 

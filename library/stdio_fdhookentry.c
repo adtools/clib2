@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.13 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.14 2005-02-21 10:21:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -440,7 +440,7 @@ __fd_hook_entry(
 							break;
 						}
 
-						if(__grow_file_size(fd,new_position - fib->fib_Size) != OK)
+						if(__grow_file_size(fd,new_position - fib->fib_Size) < 0)
 						{
 							fam->fam_Error = __translate_io_error_to_errno(IoErr());
 							break;

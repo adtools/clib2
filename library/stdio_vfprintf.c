@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.10 2005-02-21 10:22:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -172,7 +172,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 	assert( FLAG_IS_SET(iob->iob_Flags,IOBF_IN_USE) );
 	assert( iob->iob_BufferSize > 0 );
 
-	if(__fputc_check(stream) != OK)
+	if(__fputc_check(stream) < 0)
 		goto out;
 
 	while((c = (*format++)) != '\0')

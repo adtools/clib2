@@ -1,5 +1,5 @@
 /*
- * $Id: sas_profile.c,v 1.1.1.1 2004-07-26 16:31:04 obarthel Exp $
+ * $Id: sas_profile.c,v 1.2 2005-02-21 10:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -133,7 +133,7 @@ send_profiler_message(ULONG clock_value,char * id,ULONG flags)
 	PutMsg(profiler_port,(struct Message *)spm);
 	WaitPort(reply_port);
 
-	result = OK;
+	result = 0;
 
  out:
 

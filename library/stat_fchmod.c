@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fchmod.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: stat_fchmod.c,v 1.6 2005-02-21 10:21:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -155,7 +155,7 @@ fchmod(int file_descriptor, mode_t mode)
 		goto out;
 	}
 
-	result = OK;
+	result = 0;
 
  out:
 

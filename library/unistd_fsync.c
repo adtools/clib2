@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fsync.c,v 1.2 2005-02-18 18:53:17 obarthel Exp $
+ * $Id: unistd_fsync.c,v 1.3 2005-02-21 10:22:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,7 +78,7 @@ fsync(int file_descriptor)
 
 	__sync_fd(fd,1); /* flush everything */
 
-	result = OK;
+	result = 0;
 
  out:
 

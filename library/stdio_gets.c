@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_gets.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_gets.c,v 1.4 2005-02-21 10:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,7 +75,7 @@ gets(char *s)
 	/* Take care of the checks and data structure changes that
 	 * need to be handled only once for this stream.
 	 */
-	if(__fgetc_check(stdin) != OK)
+	if(__fgetc_check(stdin) < 0)
 	{
 		result = NULL;
 		goto out;

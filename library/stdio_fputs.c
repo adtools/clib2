@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fputs.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_fputs.c,v 1.4 2005-02-21 10:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -79,7 +79,7 @@ fputs(const char *s, FILE *stream)
 	if(buffer_mode == IOBF_BUFFER_MODE_NONE)
 		buffer_mode = IOBF_BUFFER_MODE_LINE;
 
-	if(__fputc_check(stream) != OK)
+	if(__fputc_check(stream) < 0)
 		goto out;
 
 	while((c = (*s++)) != '\0')
@@ -88,7 +88,7 @@ fputs(const char *s, FILE *stream)
 			goto out;
 	}
 
-	result = OK;
+	result = 0;
 
  out:
 
@@ -96,7 +96,7 @@ fputs(const char *s, FILE *stream)
 	   may have buffered data around, queued to be printed right now.
 	   This is intended to improve performance as it takes more effort
 	   to write a single character to a file than to write a bunch. */
-	if(result == OK && (file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
+	if(result == 0 && (file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
 	{
 		if(__iob_write_buffer_is_valid(file) && __flush_iob_write_buffer(file) < 0)
 		{

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.5 2005-02-16 14:48:17 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.6 2005-02-21 10:22:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -105,7 +105,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 
 	/* Prepend an absolute path to the name, if such a path was previously set
 	   as the current directory. */
-	if(__translate_relative_path_name((const char **)&name,nti->substitute,sizeof(nti->substitute)) != OK)
+	if(__translate_relative_path_name((const char **)&name,nti->substitute,sizeof(nti->substitute)) < 0)
 	{
 		SHOWMSG("relative path name could not be worked into the pattern");
 		goto out;

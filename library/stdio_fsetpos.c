@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fsetpos.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_fsetpos.c,v 1.4 2005-02-21 10:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,7 +76,7 @@ fsetpos(FILE *stream, fpos_t *pos)
 		goto out;
 	}
 
-	result = OK;
+	result = 0;
 
  out:
 

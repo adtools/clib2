@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgets.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_fgets.c,v 1.4 2005-02-21 10:21:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ fgets(char *s,int n,FILE *stream)
 	/* Take care of the checks and data structure changes that
 	 * need to be handled only once for this stream.
 	 */
-	if(__fgetc_check(stream) != OK)
+	if(__fgetc_check(stream) < 0)
 	{
 		result = NULL;
 		goto out;
