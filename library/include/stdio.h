@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.2 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: stdio.h,v 1.3 2004-08-25 15:27:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ extern "C" {
  * correspond to a real limitation for this 'C' runtime library and is
  * included solely for ISO 'C' (1994) compliance.
  */
-#define FOPEN_MAX 8
+#define FOPEN_MAX 64
 
 /****************************************************************************/
 

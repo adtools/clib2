@@ -1,15 +1,7 @@
-c.lib 1.172 (21.8.2004)
+c.lib 1.173 (25.8.2004)
 
-- Changed the values which the acos(), asin(), atan2(), fmod()
-  and sqrt() functions return when they find that their parameters
-  are invalid.
-
-- The atan2() function failed to perform a correct parameter check.
-
-
-c.lib 1.171 (16.8.2004)
-
-- Added hypot()
-
-- vfprintf/vfscanf now support the %lld/%llu (64 bit integer) format
-  by default
+- You can now retrieve the low level file handle or socket descriptor
+  that is associated with a file descriptor, as used by this runtime
+  library. The new function is called "__get_default_file()", and the
+  function prototype and documentation can be found in the <dos.h>
+  header file.

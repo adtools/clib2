@@ -1,5 +1,5 @@
 /*
- * $Id: assert.h,v 1.2 2004-08-25 15:27:28 obarthel Exp $
+ * $Id: fcntl_get_default_file.c,v 1.1 2004-08-25 15:27:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,52 +31,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _ASSERT_H
-#define _ASSERT_H
+#ifndef _FCNTL_HEADERS_H
+#include "fcntl_headers.h"
+#endif /* _FCNTL_HEADERS_H */
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
-#ifndef assert
+int
+__get_default_file(int file_descriptor,long * file_ptr)
+{
+	struct fd * fd;
+	int result = -1;
 
-/****************************************************************************/
+	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
+	assert( __fd[file_descriptor] != NULL );
+	assert( FLAG_IS_SET(__fd[file_descriptor]->fd_Flags,FDF_IN_USE) );
+	assert( file_ptr != NULL );
 
-#ifndef NDEBUG
+	fd = __get_file_descriptor(file_descriptor);
+	if(fd == NULL)
+	{
+		errno = EBADF;
+		goto out;
+	}
 
-/****************************************************************************/
+	(*file_ptr) = (long)fd->fd_DefaultFile;
 
-extern void __assertion_failure(const char *file_name,int line_number,const char * expression);
+	result = 0;
 
-/****************************************************************************/
+ out:
 
-#define assert(expression) \
-	((void)((expression) ? 0 : (__assertion_failure(__FILE__,__LINE__,#expression),0)))
-
-#else
-
-/****************************************************************************/
-
-#define assert(expression) ((void)0)
-
-/****************************************************************************/
-
-#endif /* NDEBUG */
-
-/****************************************************************************/
-
-#endif /* assert */
-
-/****************************************************************************/
-
-#ifdef __cplusplus
+	return(result);
 }
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#endif /* _ASSERT_H */

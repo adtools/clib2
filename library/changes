@@ -1,3 +1,13 @@
+c.lib 1.173 (25.8.2004)
+
+- The <assert.h> header file was missing the C++ 'extern "C" { .. }'
+  declarations.
+
+- Added a new function __get_default_file() which allows direct access
+  to the low level file handle/socket descriptor associated with a
+  file descriptor.
+
+
 c.lib 1.172 (21.8.2004)
 
 - acos() now returns 0 for a domain error.

@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.2 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: dos.h,v 1.3 2004-08-25 15:27:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -109,6 +109,18 @@ extern void geta4(void);
  */
 extern unsigned long __get_a4(void);
 extern void __set_a4(unsigned long value);
+
+/****************************************************************************/
+
+/*
+ * Obtain the low level 'file' handle or socket ID bound to a file
+ * descriptor. This function returns 0 for success and non-zero
+ * otherwise (if, for example, the file descriptor value you
+ * provided is not valid; errno will be set to the appropriate
+ * error code, too). Put a pointer to the file handle variable you
+ * want to be filled in into the second parameter to this function.
+ */
+extern int __get_default_file(int file_descriptor,long * file_ptr);
 
 /****************************************************************************/
 

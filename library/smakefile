@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.6 2004-08-16 09:33:12 obarthel Exp $
+# $Id: smakefile,v 1.7 2004-08-25 15:27:27 obarthel Exp $
 #
 # :ts=8
 #
@@ -163,7 +163,8 @@ FCNTL_OBJ = \
 	fcntl_lseek.o \
 	fcntl_open.o \
 	fcntl_read.o \
-	fcntl_write.o
+	fcntl_write.o \
+	fcntl_get_default_file.o
 
 LIBGEN_OBJ = \
 	libgen_basename.o \
