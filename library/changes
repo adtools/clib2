@@ -1,3 +1,8 @@
+- The directory scanning functions opendir/closedir did not get the global
+  directory data tracking data structure initialized which later led to
+  Enforcer hits and maybe trashed memory. Fixed.
+
+
 c.lib 1.180 (23.10.2004)
 
 - The printf() family now produces no output at all for %e, %f and %g if the

@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_headers.h,v 1.1.1.1 2004-07-26 16:30:30 obarthel Exp $
+ * $Id: dirent_headers.h,v 1.2 2004-10-24 20:03:42 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,6 +42,12 @@
 
 /****************************************************************************/
 
+#ifndef _MACROS_H
+#include "macros.h"
+#endif /* _MACROS_H */
+
+/****************************************************************************/
+
 struct DirectoryHandle
 {
 	struct MinNode			dh_MinNode;
@@ -56,7 +62,7 @@ struct DirectoryHandle
 
 /****************************************************************************/
 
-extern struct MinList __directory_list;
+extern struct MinList NOCOMMON __directory_list;
 
 /****************************************************************************/
 

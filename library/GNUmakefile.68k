@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.11 2004-10-07 09:20:44 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.12 2004-10-24 20:03:36 obarthel Exp $
 #
 # :ts=8
 #
@@ -9,7 +9,7 @@
 CC = gcc
 AR = ar -q
 RANLIB = ranlib
-COPY = copy clone
+COPY = copy clone buf=0
 DELETE = delete all quiet
 MAKEDIR = makedir
 MAKE = make -f GNUmakefile.68k
@@ -108,7 +108,7 @@ INCLUDES = -Iinclude -I. -Inetinclude
 #OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O
 #OPTIMIZE = -O2 -fomit-frame-pointer
-#DEBUG = -g2
+ DEBUG = -g2
 
 CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
 
@@ -688,7 +688,6 @@ LIBS_68K := $(LIBC_OBJS)/libc.a $(LIBSTACK_OBJS)/libstack.a $(LIBUNIX_OBJS)/libu
             $(LIBNET_OBJS)/libnet.a $(LIBDEBUG_OBJS)/libdebug.a $(LIBAMIGA_OBJS)/libamiga.a \
             $(LIBM_OBJS)/libm.a
  LIBS_020 := $(LIBM881_OBJS)/libm881.a $(LIBS_68K)
-#LIBS_020 := $(LIBS_68K)
 
 ##############################################################################
 
@@ -714,8 +713,8 @@ all: \
 	lib/mainnb.o \
 	lib/mainb.o \
 	lib/mainb32.o \
-	lib/libm.a \
 	lib/libm020/libm.a \
+	lib/libm.a \
 	lib/libb/libm.a \
 	lib/libb/libm020/libm.a \
 	lib/libb32/libm020/libm.a
