@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.10 2005-03-11 18:27:26 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.11 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -257,7 +257,8 @@ CLIB_CONSTRUCTOR(locale_init)
 
  out:
 
-	RETURN(success);
+	SHOWVALUE(success);
+	LEAVE();
 
 	if(success)
 		CONSTRUCTOR_SUCCEED();

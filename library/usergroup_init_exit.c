@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_init_exit.c,v 1.8 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: usergroup_init_exit.c,v 1.9 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -138,7 +138,8 @@ CLIB_CONSTRUCTOR(usergroup_init)
 
 	PROFILE_ON();
 
-	RETURN(success);
+	SHOWVALUE(success);
+	LEAVE();
 
 	if(success)
 		CONSTRUCTOR_SUCCEED();

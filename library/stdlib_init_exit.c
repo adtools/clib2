@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_init_exit.c,v 1.9 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: stdlib_init_exit.c,v 1.10 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,6 +53,8 @@ char * __program_name;
 
 STDLIB_DESTRUCTOR(stdlib_exit)
 {
+	ENTER();
+
 	__memory_exit();
 
 	if(free_program_name && __program_name != NULL)
@@ -60,6 +62,8 @@ STDLIB_DESTRUCTOR(stdlib_exit)
 		FreeVec(__program_name);
 		__program_name = NULL;
 	}
+
+	LEAVE();
 }
 
 /****************************************************************************/
@@ -67,6 +71,8 @@ STDLIB_DESTRUCTOR(stdlib_exit)
 STDLIB_CONSTRUCTOR(stdlib_init)
 {
 	BOOL success = FALSE;
+
+	ENTER();
 
 	if(__machine_test() < 0)
 		goto out;
@@ -96,6 +102,9 @@ STDLIB_CONSTRUCTOR(stdlib_init)
 	success = TRUE;
 
  out:
+
+	SHOWVALUE(success);
+	LEAVE();
 
 	if(success)
 		CONSTRUCTOR_SUCCEED();

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.42 2005-03-11 18:27:26 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.43 2005-03-12 14:10:09 obarthel Exp $
 #
 # :ts=8
 #
@@ -110,12 +110,13 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -Inetinclude
- OPTIONS = -DNDEBUG -fno-builtin -fno-common
-#OPTIONS = -D__MEM_DEBUG -fno-builtin
-#OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
+#OPTIONS = -fno-builtin -fno-common -DDEBUG
+ OPTIONS = -fno-builtin -fno-common -DNDEBUG
+#OPTIONS = -fno-builtin -fno-common -D__MEM_DEBUG
+#OPTIONS = -fno-builtin -fno-common -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG
  OPTIMIZE = -O -fomit-frame-pointer -fstrength-reduce -finline-functions
 #OPTIMIZE = -O2 -fomit-frame-pointer
-#DEBUG = -g2
+#DEBUG = -g
 
 CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(CODE_TYPE) $(INCLUDES)
 
@@ -1122,15 +1123,19 @@ mainnb.o : stdlib_main.c
 ##############################################################################
 
 CONSTRUCTOR_FILES = \
-	amiga_rexxvars.c  \
+	amiga_rexxvars.c \
 	dirent_closedir.c \
 	locale_init_exit.c \
 	math_init_exit.c \
+	sas_profile.c \
 	socket_init_exit.c \
 	stdio_file_init.c \
 	stdio_init_exit.c \
 	stdlib_alloca.c \
+	stdlib_arg.c \
+	stdlib_init_exit.c \
 	stdlib_setenv.c \
+	stdlib_stackcheck.c \
 	stdlib_stackextension.c \
 	time_clock.c \
 	unistd_chdir_exit.c \

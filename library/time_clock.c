@@ -1,5 +1,5 @@
 /*
- * $Id: time_clock.c,v 1.4 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: time_clock.c,v 1.5 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,10 +43,12 @@ static struct DateStamp start_time;
 
 CLIB_CONSTRUCTOR(clock_init)
 {
+	ENTER();
+
 	/* Remember when this program was started. */
 	DateStamp(&start_time);
 
-	RETURN(OK);
+	LEAVE();
 
 	CONSTRUCTOR_SUCCEED();
 }

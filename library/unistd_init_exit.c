@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_init_exit.c,v 1.9 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: unistd_init_exit.c,v 1.10 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@ CLIB_CONSTRUCTOR(unistd_init)
 
 	NewList((struct List *)&__unlink_list);
 
-	RETURN(OK);
+	LEAVE();
 
 	CONSTRUCTOR_SUCCEED();
 }

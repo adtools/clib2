@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.12 2005-03-11 18:27:26 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.13 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,36 +71,46 @@ double __huge_val;
 
 /****************************************************************************/
 
+#if defined(IEEE_FLOATING_POINT_SUPPORT)
+
+/****************************************************************************/
+
 MATH_DESTRUCTOR(math_exit)
 {
-	#if defined(IEEE_FLOATING_POINT_SUPPORT)
+	ENTER();
+
+	if(MathIeeeSingBasBase != NULL)
 	{
-		if(MathIeeeSingBasBase != NULL)
-		{
-			CloseLibrary(MathIeeeSingBasBase);
-			MathIeeeSingBasBase = NULL;
-		}
-
-		if(MathIeeeDoubBasBase != NULL)
-		{
-			CloseLibrary(MathIeeeDoubBasBase);
-			MathIeeeDoubBasBase = NULL;
-		}
-
-		if(MathIeeeDoubTransBase != NULL)
-		{
-			CloseLibrary(MathIeeeDoubTransBase);
-			MathIeeeDoubTransBase = NULL;
-		}
+		CloseLibrary(MathIeeeSingBasBase);
+		MathIeeeSingBasBase = NULL;
 	}
-	#endif /* IEEE_FLOATING_POINT_SUPPORT */
+
+	if(MathIeeeDoubBasBase != NULL)
+	{
+		CloseLibrary(MathIeeeDoubBasBase);
+		MathIeeeDoubBasBase = NULL;
+	}
+
+	if(MathIeeeDoubTransBase != NULL)
+	{
+		CloseLibrary(MathIeeeDoubTransBase);
+		MathIeeeDoubTransBase = NULL;
+	}
+
+	LEAVE();
 }
+
+/****************************************************************************/
+
+#endif /* IEEE_FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
 
 MATH_CONSTRUCTOR(math_init)
 {
 	BOOL success = FALSE;
+
+	ENTER();
 
 	#if defined(IEEE_FLOATING_POINT_SUPPORT)
 	{
@@ -168,6 +178,9 @@ MATH_CONSTRUCTOR(math_init)
 	success = TRUE;
 
  out:
+
+	SHOWVALUE(success);
+	LEAVE();
 
 	if(success)
 		CONSTRUCTOR_SUCCEED();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackcheck.c,v 1.6 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: stdlib_stackcheck.c,v 1.7 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -120,6 +120,8 @@ STK_CONSTRUCTOR(stk_init)
 	struct Task * this_task = FindTask(NULL);
 	ULONG lower = (ULONG)this_task->tc_SPLower;
 
+	ENTER();
+
 	#if defined(__GNUC__)
 	{
 		__stk_limit = (UBYTE *)(lower + __stk_safezone + __stk_argbytes);
@@ -131,6 +133,8 @@ STK_CONSTRUCTOR(stk_init)
 		__base = (UBYTE *)(lower + __stk_safezone + __stk_argbytes);
 	}
 	#endif /* __SASC */
+
+	LEAVE();
 
 	CONSTRUCTOR_SUCCEED();
 }

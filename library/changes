@@ -86,6 +86,10 @@
   streams. This is intended to support the upcoming shared
   library feature.
 
+- Turns out that the 68k GCC port does not sort constructor and
+  destructor functions in any way at all. I reimplemented the
+  entire library constructor/destructor functionality to use the
+  same approach as libnix.
 
 
 c.lib 1.189 (5.3.2005)

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_timer.c,v 1.5 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: unistd_timer.c,v 1.6 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -102,7 +102,8 @@ CLIB_CONSTRUCTOR(timer_init)
 
  out:
 
-	RETURN(success);
+	SHOWVALUE(success);
+	LEAVE();
 
 	if(success)
 		CONSTRUCTOR_SUCCEED();

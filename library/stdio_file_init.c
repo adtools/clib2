@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.4 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.5 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -207,6 +207,8 @@ FILE_CONSTRUCTOR(stdio_file_init)
 	char * aligned_buffer;
 	int i;
 
+	ENTER();
+
 	/* If we were invoked from Workbench, set up the standard I/O streams. */
 	if(__WBenchMsg != NULL)
 	{
@@ -358,6 +360,9 @@ FILE_CONSTRUCTOR(stdio_file_init)
 	success = TRUE;
 
  out:
+
+	SHOWVALUE(success);
+	LEAVE();
 
 	if(success)
 		CONSTRUCTOR_SUCCEED();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.28 2005-03-11 18:27:27 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.29 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,9 +101,13 @@ __close_all_files(void)
 
 STDIO_DESTRUCTOR(stdio_exit)
 {
+	ENTER();
+
 	__close_all_files();
 
 	__stdio_lock_exit();
+
+	LEAVE();
 }
 
 /****************************************************************************/
@@ -128,6 +132,9 @@ STDIO_CONSTRUCTOR(stdio_init)
 	success = TRUE;
 
  out:
+
+	SHOWVALUE(success);
+	LEAVE();
 
 	if(success)
 		CONSTRUCTOR_SUCCEED();

@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.4 2005-03-11 18:27:26 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.5 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -79,6 +79,8 @@ CLIB_CONSTRUCTOR(rexxvars_init)
 		}
 	}
 	#endif /* __amigaos4__ */
+
+	LEAVE();
 
 	CONSTRUCTOR_SUCCEED();
 }

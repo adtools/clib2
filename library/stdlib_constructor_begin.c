@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor_begin.c,v 1.6 2005-03-11 16:04:50 obarthel Exp $
+ * $Id: stdlib_constructor_begin.c,v 1.7 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -112,15 +112,142 @@ _fini(void)
 
 /****************************************************************************/
 
+/* The GCC 68k port does not sort constructor/destructor functions. We
+   have to sort them here all on our own before they can be used. */
+
+/****************************************************************************/
+
 typedef void (*func_ptr)(void);
 
 /****************************************************************************/
 
-void
-_init(void)
+struct private_function
 {
-	extern func_ptr __CTOR_LIST__[];
+	func_ptr	function;
+	int			priority;
+};
 
+/****************************************************************************/
+
+extern func_ptr __INIT_LIST__[];
+extern func_ptr __EXIT_LIST__[];
+
+/****************************************************************************/
+
+extern func_ptr __CTOR_LIST__[];
+extern func_ptr __DTOR_LIST__[];
+
+/****************************************************************************/
+
+/* Sort the private function table in ascending order by priority. This is
+   a simple bubblesort algorithm which assumes that there will be at least
+   two entries in the table worth sorting. */
+static void
+sort_private_functions(struct private_function * base, size_t count)
+{
+	struct private_function * a;
+	struct private_function * b;
+	size_t i,j;
+
+	i = count - 2;
+
+	do
+	{
+		a = base;
+
+		for(j = 0 ; j <= i ; j++)
+		{
+			b = a + 1;
+
+			if(a->priority > b->priority)
+			{
+				struct private_function t;
+
+				t		= (*a);
+				(*a)	= (*b);
+				(*b)	= t;
+			}
+
+			a = b;
+		}
+	}
+	while(i-- > 0);
+}
+
+/****************************************************************************/
+
+/* Sort all the init and exit functions (private library constructors), then
+   invoke the init functions in ascending order. */
+static void
+call_init_functions(void)
+{
+	LONG num_init_functions = (LONG)(__INIT_LIST__[0]) / 2;
+	LONG num_exit_functions = (LONG)(__EXIT_LIST__[0]) / 2;
+
+	ENTER();
+
+	SHOWVALUE(num_init_functions);
+
+	if(num_init_functions > 1)
+		sort_private_functions((struct private_function *)&__INIT_LIST__[1],num_init_functions);
+
+	SHOWVALUE(num_exit_functions);
+
+	if(num_exit_functions > 1)
+		sort_private_functions((struct private_function *)&__EXIT_LIST__[1],num_exit_functions);
+
+	if(num_init_functions > 0)
+	{
+		struct private_function * t = (struct private_function *)&__INIT_LIST__[1];
+		LONG i;
+
+		for(i = 0 ; i < num_init_functions ; i++)
+		{
+			D(("calling init function #%ld, 0x%08lx",i,t[i].function));
+
+			(*t[i].function)();
+		}
+	}
+
+	LEAVE();
+}
+
+/****************************************************************************/
+
+/* Call all exit functions in descending order; this assumes that the function
+   table was prepared by call_init_functions() above. */
+static void
+call_exit_functions(void)
+{
+	LONG num_exit_functions = (LONG)(__EXIT_LIST__[0]) / 2;
+
+	ENTER();
+
+	if(num_exit_functions > 0)
+	{
+		STATIC LONG j = 0;
+
+		struct private_function * t = (struct private_function *)&__EXIT_LIST__[1];
+		LONG i;
+
+		for( ; j < num_exit_functions ; j++)
+		{
+			i = num_exit_functions - (j+1);
+
+			D(("calling exit function #%ld, 0x%08lx",i,t[i].function));
+
+			(*t[i].function)();
+		}
+	}
+
+	LEAVE();
+}
+
+/****************************************************************************/
+
+static void
+call_constructors(void)
+{
 	ULONG num_ctors = (ULONG)__CTOR_LIST__[0];
 	ULONG i;
 
@@ -136,18 +263,14 @@ _init(void)
 		__CTOR_LIST__[num_ctors - i]();
 	}
 
-	SHOWMSG("all done.");
-
 	LEAVE();
 }
 
 /****************************************************************************/
 
-void
-_fini(void)
+static void
+call_destructors(void)
 {
-	extern func_ptr __DTOR_LIST__[];
-
 	ULONG num_dtors = (ULONG)__DTOR_LIST__[0];
 	static ULONG i;
 
@@ -164,6 +287,32 @@ _fini(void)
 	}
 
 	SHOWMSG("all done.");
+
+	LEAVE();
+}
+
+/****************************************************************************/
+
+void
+_init(void)
+{
+	ENTER();
+
+	call_init_functions();
+	call_constructors();
+
+	LEAVE();
+}
+
+/****************************************************************************/
+
+void
+_fini(void)
+{
+	ENTER();
+
+	call_destructors();
+	call_exit_functions();
 
 	LEAVE();
 }

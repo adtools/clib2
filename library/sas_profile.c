@@ -1,5 +1,5 @@
 /*
- * $Id: sas_profile.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: sas_profile.c,v 1.4 2005-03-12 14:10:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -306,7 +306,12 @@ __profile_exit(void)
 
 PROFILE_CONSTRUCTOR(profile_init)
 {
+	ENTER();
+
 	__profile_init();
+
+	SHOWVALUE(success);
+	LEAVE();
 
 	CONSTRUCTOR_SUCCEED();
 }
@@ -315,5 +320,9 @@ PROFILE_CONSTRUCTOR(profile_init)
 
 PROFILE_DESTRUCTOR(profile_exit)
 {
+	ENTER();
+
 	__profile_exit();
+
+	LEAVE();
 }
