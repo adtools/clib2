@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.3 2004-08-12 12:31:29 obarthel Exp $
+ * $Id: math_logb.c,v 1.1 2004-08-12 12:31:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,74 +29,108 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
-#ifndef _MATH_H
-#define _MATH_H
+#ifndef _MATH_HEADERS_H
+#include "math_headers.h"
+#endif /* _MATH_HEADERS_H */
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#if defined(FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
-#ifndef _STDLIB_H
-#include <stdlib.h>
-#endif /* _STDLIB_H */
+#if defined(IEEE_FLOATING_POINT_SUPPORT) || defined(M68881_FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
-extern double __huge_val;
+INLINE static const double
+__logb(double x)
+{
+	double result;
 
-/****************************************************************************/
+	result = log(x) / log(FLT_RADIX);
 
-#define	HUGE_VAL ((const double)__huge_val)
-
-/****************************************************************************/
-
-extern double acos(double x);
-extern double asin(double x);
-extern double atan(double x);
-extern double atan2(double y,double x);
-extern double ceil(double x);
-extern double cos(double x);
-extern double cosh(double x);
-extern double exp(double x);
-extern double fabs(double x);
-extern double floor(double x);
-extern double fmod(double x,double y);
-extern double frexp(double x,int *nptr);
-extern double ldexp(double x,int n);
-extern double log(double x);
-extern double log10(double x);
-extern double modf(double x,double *nptr);
-extern double pow(double x,double y);
-extern double sin(double x);
-extern double sinh(double x);
-extern double sqrt(double x);
-extern double tan(double x);
-extern double tanh(double x);
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-extern double rint(double x);
-extern float rintf(float x);
-extern int isinf(double x);
-extern int isnan(double x);
-extern double logb(double x);
-
-/****************************************************************************/
-
-#ifdef __cplusplus
+	return(result);
 }
-#endif /* __cplusplus */
+
+#endif /* IEEE_FLOATING_POINT_SUPPORT || M68881_FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
 
-#endif /* _MATH_H */
+#if defined(PPC_FLOATING_POINT_SUPPORT)
+
+INLINE static const double
+__logb(double x)
+{
+	unsigned int lx,ix;
+
+	EXTRACT_WORDS(ix,lx,x);
+
+	ix &= 0x7fffffff;	/* high |x| */
+	if((ix|lx)==0)
+		return -1.0/fabs(x);
+
+	if(ix>=0x7ff00000)
+		return x*x;
+
+	if((ix>>=20)==0)	/* IEEE 754 logb */
+		return -1022.0;
+	else
+		return (double) (ix-1023);
+}
+
+#endif /* PPC_FLOATING_POINT_SUPPORT */
+
+/****************************************************************************/
+
+double
+logb(double x)
+{
+	double result;
+
+	int sign;
+
+	if(x == 0.0)
+	{
+		result = -HUGE_VAL;
+		goto out;
+	}
+
+	if(isnan(x))
+	{
+		result = x;
+		goto out;
+	}
+
+	sign = isinf(x);
+	if(sign != 0)
+	{
+		if(sign < 0)
+			result = (-x);
+		else
+			result = x;
+
+		goto out;
+	}
+
+	result = __logb(x);
+
+ out:
+
+	return(result);
+}
+
+/****************************************************************************/
+
+#endif /* FLOATING_POINT_SUPPORT */

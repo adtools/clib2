@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.1.1.1 2004-07-26 16:30:45 obarthel Exp $
+ * $Id: math_headers.h,v 1.2 2004-08-12 12:31:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,6 +38,7 @@
 
 #include <limits.h>
 #include <errno.h>
+#include <float.h>
 #include <math.h>
 
 /****************************************************************************/

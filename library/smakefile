@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.4 2004-08-07 09:15:32 obarthel Exp $
+# $Id: smakefile,v 1.5 2004-08-12 12:31:27 obarthel Exp $
 #
 # :ts=8
 #
@@ -195,6 +195,7 @@ MATH_OBJ = \
 	math_ldexp.o \
 	math_log.o \
 	math_log10.o \
+	math_logb.o \
 	math_modf.o \
 	math_pow.o \
 	math_rint.o \
