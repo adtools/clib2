@@ -1,0 +1,64 @@
+*asm:
+ %{m68000:-mc68010} %{mc68000:-mc68010} %{m68020:-mc68020} %{mc68020:-mc68020} %{m68030:-mc68030} %{m68040:-mc68040} %{m68060:-mc68060} %{m68020-40:-mc68020} %{m68020-60:-mc68020} %{!mc68000:%{!m68000:%{!mc68020:%{!m68020:%{!m68030:%{!m68040:%{!m68060:%{!m68020-40:%{!m68020-60:-mc68010}}}}}}}}} %{msmall-code:-sc}
+
+*asm_final:
+
+
+*cpp:
+%{m68881:-D__HAVE_68881__} %{!ansi:%{m68020:-Dmc68020} %{mc68020:-Dmc68020} %{m68020-40:-Dmc68020} %{m68020-60:-Dmc68020} %{m68030:-Dmc68030} %{m68040:-Dmc68040} %{m68060:-Dmc68060}} %{m68020:-D__mc68020__ -D__mc68020} %{mc68020:-D__mc68020__ -D__mc68020} %{m68020-40:-D__mc68020__ -D__mc68020} %{m68020-60:-D__mc68020__ -D__mc68020} %{m68030:-D__mc68030__ -D__mc68030} %{m68040:-D__mc68040__ -D__mc68040} %{m68060:-D__mc68060__ -D__mc68060} 
+
+*cc1:
+%{resident:-fbaserel} %{resident32:-fbaserel32} %{msmall-code:-fno-function-cse} 
+
+*cc1plus:
+
+
+*endfile:
+
+
+*link:
+%{fbaserel:%{!resident:-m amiga_bss -fl libb}} %{resident:-m amiga_bss -amiga-datadata-reloc -fl libb} %{fbaserel32:%{!resident32:-m amiga_bss -fl libb32}} %{resident32:-m amiga_bss -amiga-datadata-reloc -fl libb32} %{g:-amiga-debug-hunk} %{m68020:-fl libm020} %{mc68020:-fl libm020} %{m68030:-fl libm020} %{m68040:-fl libm020} %{m68060:-fl libm020} %{m68020-40:-fl libm020} %{m68020-60:-fl libm020} %{m68881:-fl libm881} 
+
+*lib:
+%{mstackextend:-lstack} -lc -lamiga -ldebug -lgcc -lc
+
+*libgcc:
+
+
+*startfile:
+%{resident32:nr32crt0.o%s mainb32.o%s}%{!resident32:%{fbaserel32:nb32crt0.o%s mainb32.o%s}%{!fbaserel32:%{resident:nrcrt0.o%s mainb.o%s}%{!resident:%{fbaserel:nbcrt0.o%s mainb.o%s}%{!fbaserel:ncrt0.o%s mainnb.o%s}}}}
+
+*switches_need_spaces:
+
+
+*signed_char:
+%{funsigned-char:-D__CHAR_UNSIGNED__}
+
+*predefines:
+-Dmc68000 -Damiga -Damigaos -DMCH_AMIGA -DAMIGA -D__chip=__attribute__((__chip__)) -D__saveds=__attribute__((__saveds__)) -D__interrupt=__attribute__((__interrupt__)) -D__stackext=__attribute__((__stackext__)) -D__regargs=__attribute__((__regparm__)) -D__stdargs=__attribute__((__stkparm__)) -D__aligned=__attribute__((__aligned__(4))) -Asystem(amigaos) -Acpu(m68k) -Amachine(m68k)
+
+*cross_compile:
+0
+
+*version:
+2.95.3
+
+*multilib:
+. ;
+
+*multilib_defaults:
+
+
+*multilib_extra:
+
+
+*multilib_matches:
+
+
+*linker:
+collect2
+
+*link_command:
+%{!fsyntax-only: %{!c:%{!M:%{!MM:%{!E:%{!S:%(linker) %l %X %{o*} %{A} %{d} %{e*} %{m} %{N} %{n} %{r} %{s} %{t} %{u*} %{x} %{z} %{Z} %{!A:%{!nostdlib:%{!nostartfiles:%S}}} %{static:} %{L*} %D %o %{!nostdlib:%{!nodefaultlibs:%G %L %G}} %{!A:%{!nostdlib:%{!nostartfiles:%E}}} %{T*}
+ }}}}}}
+

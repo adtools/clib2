@@ -1,0 +1,50 @@
+You can use the 68k build of clib2 with the existing Amiga 68k ports of the
+GNU 'C' compiler. In order to do so, you need to modify the "specs" file which
+controls how the compiler(s) and the linker interact, and where the linker
+will look for the program startup code and library files. Also, you will need
+to copy the header files, startup code and library files to the locations
+where the 'C' compiler and linker expects them.
+
+Please read the following description before you follow the instructions. The
+changes suggested may have unexpected side-effects!
+
+I have provided a working "specs" file with this documentation file. To switch
+over an existing Amiga 68k port of GCC to use clib2, you would proceed as
+follows:
+
+   - Locate the directory within which GCC is installed. For example, this
+     could be within a directory to which the name "ADE:", "GG:" or "GCC:"
+     is assigned. For the sake of simplicity, the following notes assume
+     that the assignment name is "GCC:"
+
+   - Make backup copies of the following directories and files:
+
+        GCC:lib/gcc-lib/amigaos/2.95.3/specs
+
+           (NOTE: Check the directory called "GCC:lib/gcc-lib/amigaos"
+                  first; the "2.95.3" quoted above refers to the version,
+                  revision and patch number of the GCC installed and your
+                  version number may differ!)
+
+        GCC:include
+        GCC:lib
+
+   - Now you can proceed to install clib2; just copy the "include" and "lib"
+     directories over, like this:
+
+        Copy include GCC:include all quiet
+        Copy lib GCC:lib all quiet
+
+   - Finally, replace the "specs" file with the one provided:
+
+        Copy specs GCC:lib/gcc-lib/amigaos/2.95.3/specs
+
+           (NOTE: Check the directory called "GCC:lib/gcc-lib/amigaos"
+                  first; the "2.95.3" quoted above refers to the version,
+                  revision and patch number of the GCC installed and your
+                  version number may differ!)
+
+Once you have completed these steps you should be able to build programs using
+the 68k build of clib2 and you currently installed GCC. Note that these
+changes may have the effect of rendering your C++ compiler unusable, so make
+sure that you've made backup copies of all files and directories first!
