@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.3 2004-10-22 10:57:53 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.4 2004-10-26 16:25:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -1577,8 +1577,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 		}
 	}
 
-	if(num_conversions > 0)
-		result = num_assignments;
+	result = num_assignments;
 
  out:
 

@@ -1,3 +1,9 @@
+c.lib 1.181 (26.10.2004)
+
+- The scanf() family now always returns the number of assignments made
+  unless an error occured or an EOF was hit during conversion before the
+  first assignment could be made.
+
 - strtok() did not terminate properly if the last token in the string
   did not end with a separator character but with a '\0' byte. Fixed.
 

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.12 2004-10-24 20:03:36 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.13 2004-10-26 16:25:03 obarthel Exp $
 #
 # :ts=8
 #
@@ -108,7 +108,7 @@ INCLUDES = -Iinclude -I. -Inetinclude
 #OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O
 #OPTIMIZE = -O2 -fomit-frame-pointer
- DEBUG = -g2
+#DEBUG = -g2
 
 CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
 
