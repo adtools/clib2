@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.8 2005-02-28 13:42:54 obarthel Exp $
+ * $Id: stdio.h,v 1.9 2005-03-06 09:04:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -327,7 +327,7 @@ extern char *tmpnam(char *buf);
 /*
  * A special buffer flush routine which returns the last character written
  * in case of success and EOF in case of failure. This is used by the
- * putc_unlocked() macro defined above.
+ * __putc_unlocked() macro defined above.
  */
 extern int __flush(FILE *stream);
 
@@ -335,7 +335,7 @@ extern int __flush(FILE *stream);
 
 /*
  * A special function which returns the input character. This is used by
- * the getc() macro defined above.
+ * the __getc_unlocked() macro defined above.
  */
 extern int __unlockfile(FILE *stream,int c);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.8 2005-02-25 10:14:22 obarthel Exp $
+ * $Id: dos.h,v 1.9 2005-03-06 09:04:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -293,8 +293,8 @@ extern BOOL __open_locale;
  *
  * __locale_exit() releases the default locale and closes locale.library.
  */
-extern void __locale_exit(void);
 extern int __locale_init(void);
+extern void __locale_exit(void);
 
 /****************************************************************************/
 
