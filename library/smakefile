@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.2 2004-07-28 15:50:45 obarthel Exp $
+# $Id: smakefile,v 1.3 2004-08-06 11:53:49 obarthel Exp $
 #
 # :ts=8
 #
@@ -13,6 +13,14 @@
 .asm.o:
 	@echo "Assembling $<"
 	@asm $(AFLAGS) $<
+
+##############################################################################
+
+# You might want to change this to the directory where your operating system
+# header files are stored. On my system, that's "V:include", but you might
+# get lucky with "sc:include" instead, which is the default for SAS/C.
+INCLUDE_DIR = V:include
+#INCLUDE_DIR = sc:include
 
 ##############################################################################
 
@@ -33,7 +41,15 @@ SUPPORT		= define=UNIX_PATH_SEMANTICS define=SOCKET_SUPPORT define=USERGROUP_SUP
 ##############################################################################
 
 CFLAGS = \
-	idlen=64 idir=include idir=netinclude commentnest \
+	resopt \
+	nover \
+	memorysize=huge \
+	idir=netinclude \
+	idlen=64 \
+	commentnest \
+	nostackcheck \
+	stringmerge \
+	errorrexx \
 	$(PROFILE) $(OPTIMIZE) $(CODE) $(DATA) $(CPU) $(MATH) \
 	$(SUPPORT) $(DEBUG)
 
@@ -519,16 +535,16 @@ UTIME_OBJ = \
 
 ##############################################################################
 
-all: setup c.lib startup.o test fgets_test iotest sscanf_test printf_test stack_size_test translate_test cleanup
+all: setup c.lib startup.o cleanup
 
 clean:
-	-delete \#?.o \#?.lib \#?.map test fgets_test iotest sscanf_test printf_test stack_size_test translate_test
+	-delete \#?.o \#?.lib \#?.map
 
 ##############################################################################
 
 setup:
 	@echo "Setting up include: assignment"
-	@assign include: include V:include
+	@assign include: include $(INCLUDE_DIR)
 
 cleanup:
 	@echo "Cleaning up include: assignment"
@@ -557,43 +573,6 @@ version:
 
 cvs-tag:
 	cvs -q tag V1_`type c.lib_rev.rev`
-
-##############################################################################
-
-test: test.o startup.o c.lib
-	@echo "Linking $@"
-	@slink startup.o test.o to $@ lib c.lib addsym \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
-
-fgets_test: fgets_test.o startup.o c.lib
-	@echo "Linking $@"
-	@slink startup.o fgets_test.o to $@ lib c.lib addsym \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
-
-iotest: iotest.o startup.o c.lib
-	@echo "Linking $@"
-	@slink startup.o iotest.o to $@ lib c.lib addsym \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
-
-sscanf_test: sscanf_test.o startup.o c.lib
-	@echo "Linking $@"
-	@slink startup.o sscanf_test.o to $@ lib c.lib addsym \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
-
-printf_test: printf_test.o startup.o c.lib
-	@echo "Linking $@"
-	@slink startup.o printf_test.o to $@ lib c.lib addsym \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
-
-stack_size_test: stack_size_test.o startup.o c.lib
-	@echo "Linking $@"
-	@slink startup.o stack_size_test.o to $@ lib c.lib addsym \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
-
-translate_test: translate_test.o startup.o c.lib
-	@echo "Linking $@"
-	@slink startup.o translate_test.o to $@ lib c.lib addsym \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 ##############################################################################
 
