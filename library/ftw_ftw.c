@@ -1,5 +1,5 @@
 /*
- * $Id: ftw_ftw.c,v 1.1 2005-03-02 12:57:53 obarthel Exp $
+ * $Id: ftw_ftw.c,v 1.2 2005-03-03 10:59:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,9 +47,11 @@
 
 #include <dirent.h>
 #include <string.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <ftw.h>
 #include <errno.h>
+#include <dos.h>
 
 /****************************************************************************/
 
