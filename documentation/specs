@@ -17,7 +17,7 @@
 
 
 *link:
-%{fbaserel:%{!resident:-m amiga_bss -fl libb}} %{resident:-m amiga_bss -amiga-datadata-reloc -fl libb} %{fbaserel32:%{!resident32:-m amiga_bss -fl libb32}} %{resident32:-m amiga_bss -amiga-datadata-reloc -fl libb32} %{g:-amiga-debug-hunk} %{m68020:-fl libm020} %{mc68020:-fl libm020} %{m68030:-fl libm020} %{m68040:-fl libm020} %{m68060:-fl libm020} %{m68020-40:-fl libm020} %{m68020-60:-fl libm020} %{m68881:-fl libm881} 
+%{fbaserel:%{!resident:-m amiga_bss -fl libb}} %{resident:-m amiga_bss -amiga-datadata-reloc -fl libb} %{fbaserel32:%{!resident32:-m amiga_bss -fl libb32}} %{resident32:-m amiga_bss -amiga-datadata-reloc -fl libb32} %{g:-amiga-debug-hunk} %{m68020:-fl libm020} %{mc68020:-fl libm020} %{m68030:-fl libm020} %{m68040:-fl libm020} %{m68060:-fl libm020} %{m68020-40:-fl libm020} %{m68020-60:-fl libm020}
 
 *lib:
 %{mstackextend:-lstack} -lc -lamiga -ldebug -lgcc -lc
@@ -26,7 +26,7 @@
 
 
 *startfile:
-%{resident32:nr32crt0.o%s mainb32.o%s}%{!resident32:%{fbaserel32:nb32crt0.o%s mainb32.o%s}%{!fbaserel32:%{resident:nrcrt0.o%s mainb.o%s}%{!resident:%{fbaserel:nbcrt0.o%s mainb.o%s}%{!fbaserel:ncrt0.o%s mainnb.o%s}}}}
+%{resident32:nr32crt0.o%s}%{!resident32:%{fbaserel32:nb32crt0.o%s}%{!fbaserel32:%{resident:nrcrt0.o%s}%{!resident:%{fbaserel:nbcrt0.o%s}%{!fbaserel:ncrt0.o%s}}}}
 
 *switches_need_spaces:
 

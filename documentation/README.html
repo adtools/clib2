@@ -71,21 +71,6 @@ other than the one that opened it. Also yet unsolved is the issue of reading
 error codes from the <tt>errno</tt> variable which currently always contains the
 error code left by the last caller.</p>
 
-<p>Take care: thread-safety does not imply that you can have multiple callers
-access and close the same file. There is no resource tracking to that degree
-yet. All that the thread-safety tries to afford you is not to get into big trouble
-if simultaneous and overlapping accesses to files, memory allocation and other
-resources are taking place.</p>
-
-<p> Also take care with file I/O involving the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt>
-streams; read/write operations on these streams will be mapped to the <tt>Input()</tt>/</tt>Output()</tt>/<tt>ErrorOutput()</tt>
-file handles of the process performing these operations. Since only this small set of
-operations is mapped, functions such as <tt>fcntl()</tt> or <tt>select()</tt> will not
-work on the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt> streams and the corresponding
-file descriptors <tt>STDIN_FILENO</tt>/<tt>STDOUT_FILENO</tt>/<tt>STDERR_FILENO</tt>.
-It is therefore strongly recommended to use the thread-safe library only for applications
-which can cope with the limitations described above.</p>
-
 
 <h2>3. What does it not do?</h2>
 
@@ -156,6 +141,37 @@ library and the programs.</p>
 <p>Different build makefiles are supplied for use with GCC. There is
 <tt>GNUmakefile.68k</tt> for the 68k platform and <tt>GNUmakefile.os4</tt> for the AmigaOS4
 PowerPC version.</p>
+
+<h3>5.1 Floating point math and functions (<tt>scanf()</tt>, <tt>printf()</tt>, etc.) </h3>
+
+<p>The plain <tt>libc.a</tt>, which your software would be linked against by default, does not contain
+any floating point support code. This means, for example, that <tt>printf("%f",...)</tt> will not produce
+the desired output and that <tt>scanf("%f",...)</tt> may not read any data at all. If your
+program needs functions such as these or <tt>atod()</tt> then you must link against <tt>libm.a</tt> or
+the equivalent.</p>
+
+<p>To link the floating point support code with your software, use the <tt>-lm</tt> compiler option. Careful!
+The order in which you specify the libraries to link against is important here. Thus, <tt>gcc -o test test.c -lm -lc</tt>
+would correctly link the program <tt>test</tt> against the proper floating point math library, but
+<tt>gcc -o test test.c -lc -lm</tt> would not.</p>
+
+<h3>5.2 The thread-safe library</h3>
+
+<p>Thread-safety does not imply that you can have multiple callers
+access and close the same file. There is no resource tracking to that degree
+yet. All that the thread-safety tries to afford you is not to get into big trouble
+if simultaneous and overlapping accesses to files, memory allocation and other
+resources are taking place.</p>
+
+<p> Also take care with file I/O involving the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt>
+streams; read/write operations on these streams will be mapped to the <tt>Input()</tt>/</tt>Output()</tt>/<tt>ErrorOutput()</tt>
+file handles of the process performing these operations. Since only this small set of
+operations is mapped, functions such as <tt>fcntl()</tt> or <tt>select()</tt> will not
+work on the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt> streams and the corresponding
+file descriptors <tt>STDIN_FILENO</tt>/<tt>STDOUT_FILENO</tt>/<tt>STDERR_FILENO</tt>.
+It is therefore strongly recommended to use the thread-safe library only for applications
+which can cope with the limitations described above.</p>
+
 
 
 <h2>6. Conventions and design issues</h2>
