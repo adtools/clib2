@@ -1,3 +1,5 @@
+c.lib 1.186 (14.1.2005)
+
 - Redirecting stderr to a file no longer has the effect of showing error
   messages and assertion failure notifications as requesters. The exception
   is in redirecting stderr to NIL: which will prompt the requester use.
@@ -54,6 +56,9 @@
 - close() did not reset the non-blocking file property, as it should
   have. This only worked for files which were closed anyway, but not
   for the stdio streams. Fixed.
+
+- Added a missing definition to stdio_init_exit.c which is part of
+  the OS4 header files, but not of the older header file distributions.
 
 
 

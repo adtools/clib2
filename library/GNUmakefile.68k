@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.19 2004-12-26 10:28:56 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.20 2005-01-14 09:07:16 obarthel Exp $
 #
 # :ts=8
 #
@@ -99,8 +99,10 @@ endif
 ##############################################################################
 
 WARNINGS = \
-	-Wall -W -Wshadow -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
-	-Wundef -Wbad-function-cast -Wmissing-declarations -Wconversion
+	-Wall -W -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
+	-Wundef -Wbad-function-cast -Wmissing-declarations
+
+#	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -Inetinclude
  OPTIONS = -DNDEBUG -fno-builtin
