@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor_begin.c,v 1.5 2005-03-10 09:55:03 obarthel Exp $
+ * $Id: stdlib_constructor_begin.c,v 1.6 2005-03-11 16:04:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,7 +38,6 @@
 /****************************************************************************/
 
 #include <stdlib.h>
-#include <setjmp.h>
 
 /****************************************************************************/
 
@@ -52,9 +51,8 @@ extern void	(* __far __dtors[])(void);
 /****************************************************************************/
 
 /* With SAS/C this function is placed in front of the first constructor
- * table entry. It will invoke all following constructors and
- * finally all the destructors. We don't use this approach here.
- */
+   table entry. It will invoke all following constructors and
+   finally all the destructors. We don't use this approach here. */
 void
 __construct(void)
 {
@@ -92,18 +90,11 @@ _fini(void)
 	{
 		static int i;
 
-		/* If one of the destructors drops into
-		 * exit(), processing will continue with
-		 * the next following destructor.
-		 */
-		(void)setjmp(__exit_jmp_buf);
-
 		while(__dtors[i] != NULL)
 		{
 			/* Increment this before jumping in, so that the next
-			 * invocation will always pick up the destructor following
-			 * the one we will invoke rigt now.
-			 */
+			   invocation will always pick up the destructor following
+			   the one we will invoke rigt now. */
 			i++;
 
 			(*__dtors[i-1])();
@@ -129,6 +120,7 @@ void
 _init(void)
 {
 	extern func_ptr __CTOR_LIST__[];
+
 	ULONG num_ctors = (ULONG)__CTOR_LIST__[0];
 	ULONG i;
 
@@ -155,19 +147,13 @@ void
 _fini(void)
 {
 	extern func_ptr __DTOR_LIST__[];
-	extern jmp_buf __exit_jmp_buf;
+
 	ULONG num_dtors = (ULONG)__DTOR_LIST__[0];
 	static ULONG i;
 
 	ENTER();
 
 	D(("there are %ld destructors to be called",num_dtors));
-
-	/* If one of the destructors drops into
-	 * exit(), processing will continue with
-	 * the next following destructor.
-	 */
-	(void)setjmp(__exit_jmp_buf);
 
 	/* Call all destructors in forward order */
 	while(i++ < num_dtors)

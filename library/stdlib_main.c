@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.15 2005-03-11 13:23:18 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.16 2005-03-11 16:04:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -183,6 +183,11 @@ call_main(void)
 	#endif /* NDEBUG */
 
 	SHOWMSG("invoking the destructors");
+
+	/* If one of the destructors drops into exit(), either directly
+	   or through a failed assert() call, processing will resume with
+	   the next following destructor. */
+	(void)setjmp(__exit_jmp_buf);
 
 	/* Go through the destructor list */
 	_fini();

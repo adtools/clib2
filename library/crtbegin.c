@@ -1,5 +1,5 @@
 /* 
- * $Id: crtbegin.c,v 1.8 2005-03-10 13:30:11 obarthel Exp $
+ * $Id: crtbegin.c,v 1.9 2005-03-11 16:04:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -11,11 +11,6 @@
 /****************************************************************************/
 
 #include <exec/types.h>
-
-/****************************************************************************/
-
-#include <stdlib.h>
-#include <setjmp.h>
 
 /****************************************************************************/
 
@@ -48,15 +43,8 @@ _init(void)
 void
 _fini(void)
 {
-	extern jmp_buf __exit_jmp_buf;
-
 	int num_dtors,i;
 	static int j;
-
-	/* If one of the destructors drops into
-	   exit(), processing will continue with
-	   the next following destructor. */
-	(void)setjmp(__exit_jmp_buf);
 
 	for(i = 1, num_dtors = 0 ; __DTOR_LIST__[i] != NULL ; i++)
 		num_dtors++;

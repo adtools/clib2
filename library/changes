@@ -66,6 +66,10 @@
   constructor/destructor functions for initialization and cleanup
   purposes.
 
+- The destructor function invocation code no longer calls
+  setjmp(). This is now done within stdlib_main.c prior to
+  calling the destructor function invocation code.
+
 
 c.lib 1.189 (5.3.2005)
 
