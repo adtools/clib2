@@ -1,6 +1,11 @@
 - The name of the public record locking semaphore has to be preallocated
   for OS4 if the AllocSysObject() function is used to create it.
 
+- Moved the signal block mask and the signal function table out of
+  signal_data.c and into signal_raise.c where they are actually used.
+  This makes it possible to override the default definition of the
+  __check_abort_enabled variable in your own programs.
+
 
 c.lib 1.190 (25.3.2005)
 

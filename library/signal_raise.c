@@ -1,5 +1,5 @@
 /*
- * $Id: signal_raise.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: signal_raise.c,v 1.5 2005-03-26 11:01:13 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,22 @@
 #ifndef _SIGNAL_HEADERS_H
 #include "signal_headers.h"
 #endif /* _SIGNAL_HEADERS_H */
+
+/****************************************************************************/
+
+signal_handler_t __signal_handler_table[NUM_SIGNALS] =
+{
+	SIG_DFL,
+	SIG_DFL,
+	SIG_DFL,
+	SIG_DFL,
+	SIG_DFL,
+	SIG_DFL
+};
+
+/****************************************************************************/
+
+int __signals_blocked;
 
 /****************************************************************************/
 
