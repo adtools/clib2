@@ -1,3 +1,15 @@
+- mktemp() was broken in libunix.a with Unix path semantics enabled.
+  This was because the name template was translated and translated
+  back again, overwriting the translation buffer. This, funny enough,
+  broke Samba's printing feature. Fixed by translating the name only
+  before each test for "uniqueness" is made. The new code also handles
+  empty "" templates gracefully, which was a problem with both the
+  "standard" and the Unix path semantics flavour.
+
+  Why is it that I find bugs like this always after having just
+  released another library update?
+
+
 c.lib 1.182 (8.11.2004)
 
 - Changed the error abort condition for the %s conversion of the
