@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.9 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: macros.h,v 1.10 2005-03-09 21:07:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -163,12 +163,31 @@
 #endif /* __SASC */
 
 #ifdef __GNUC__
-#define CLIB_CONSTRUCTOR(name)		STATIC VOID __attribute__((constructor)) name##_ctor(void)
-#define CLIB_DESTRUCTOR(name)		STATIC VOID __attribute__((destructor)) name##_dtor(void)
-#define PROFILE_CONSTRUCTOR(name)	STATIC VOID __attribute__((constructor)) name##_ctor(void)
-#define PROFILE_DESTRUCTOR(name)	STATIC VOID __attribute__((destructor)) name##_dtor(void)
-#define CONSTRUCTOR_SUCCEED()		return
-#define CONSTRUCTOR_FAIL()			exit(RETURN_FAIL)	/* ZZZ not a nice thing to do; fix the constructor invocation code! */
+#define CLIB_CONSTRUCTOR(name) \
+	STATIC VOID __attribute__((used)) name##_ctor(void); \
+	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors.00500"))) = name##_ctor; \
+	STATIC VOID name##_ctor(void)
+	
+#define CLIB_DESTRUCTOR(name) \
+	STATIC VOID __attribute__((used)) name##_dtor(void); \
+	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors.00500"))) = name##_dtor; \
+	STATIC VOID name##_dtor(void)
+
+#define PROFILE_CONSTRUCTOR(name) \
+	STATIC VOID __attribute__((used)) name##_ctor(void); \
+	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors.00150"))) = name##_ctor; \
+	STATIC VOID name##_ctor(void)
+
+#define PROFILE_DESTRUCTOR(name) \
+	STATIC VOID __attribute__((used)) name##_dtor(void); \
+	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors.00150"))) = name##_dtor; \
+	STATIC VOID name##_ctor(void)
+	
+#define CONSTRUCTOR_SUCCEED() \
+	return
+
+#define CONSTRUCTOR_FAIL() \
+	exit(RETURN_FAIL)	/* ZZZ not a nice thing to do; fix the constructor invocation code! */
 #endif /* __GNUC__ */
 
 /****************************************************************************/

@@ -40,6 +40,12 @@
 - Moved a few __delete_semaphore() calls into conditional compilation
   sections where they should have been in the first place.
 
+- Thanks to Joerg Strohmayer, the GCC library build now manages to
+  invoke the library's constructor/destructor functions in a
+  very particular order. That way, you can use constructor/destructor
+  functions in your own code and not have them clash with the library's
+  own functions.
+
 
 c.lib 1.189 (5.3.2005)
 

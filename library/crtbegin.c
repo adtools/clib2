@@ -1,5 +1,5 @@
 /* 
- * $Id: crtbegin.c,v 1.4 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: crtbegin.c,v 1.5 2005-03-09 21:07:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -25,22 +25,24 @@
  * with a NULL pointer entry and is put at the end of the sections. This way, the init
  * code can find the global constructor/destructor pointers
  */
-static void (*__CTOR_LIST__[1]) (void) __attribute__((section(".ctors"))) = { (void *)-1 };
-static void (*__DTOR_LIST__[1]) (void) __attribute__((section(".dtors"))) = { (void *)-1 };
+static void (*__CTOR_LIST__[1]) (void) __attribute__(( used, section(".ctors"), aligned(sizeof(void (*)(void))) ));
+static void (*__DTOR_LIST__[1]) (void) __attribute__(( used, section(".dtors"), aligned(sizeof(void (*)(void))) ));
 
 /****************************************************************************/
 
 STATIC VOID
 _do_ctors(void)
 {
-	void (**pFuncPtr)(void);
+	int num_ctors;
+	int i;
 
-	/* Skip the first entry in the list (it's -1 anyway) */
-	pFuncPtr = __CTOR_LIST__ + 1;
+	num_ctors = 0;
 
-	/* Call all constructors in forward order */
-	while (*pFuncPtr != NULL)
-		(**pFuncPtr++)();
+	for(i = 1 ; __CTOR_LIST__[i] != NULL ; i++)
+		num_ctors++;
+
+	for(i = 0 ; i < num_ctors ; i++)
+		__CTOR_LIST__[num_ctors - i]();
 }
 
 /****************************************************************************/
@@ -48,25 +50,16 @@ _do_ctors(void)
 STATIC VOID
 _do_dtors(void)
 {
-	ULONG i = (ULONG)__DTOR_LIST__[0];
-	void (**pFuncPtr)(void);
+	int num_dtors;
+	int i;
 
-	if (i == ~0UL)
-	{
-		/* Find the end of the destructors list */
-		i = 1;
+	num_dtors = 0;
 
-		while (__DTOR_LIST__[i] != NULL)
-			i++;
+	for(i = 1 ; __DTOR_LIST__[i] != NULL ; i++)
+		num_dtors++;
 
-		/* We're at the NULL entry now. Go back by one */
-		i--;
-	}
-
-	/* Call all destructors in reverse order */
-	pFuncPtr = __DTOR_LIST__ + i;
-	while (i-- > 0)
-		(**pFuncPtr--)();
+	for(i = 0 ; i < num_dtors ; i++)
+		__DTOR_LIST__[i+1]();
 }
 
 /****************************************************************************/
