@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.6 2004-08-16 09:33:11 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.7 2004-08-23 13:47:32 obarthel Exp $
 #
 # :ts=8
 #
@@ -103,9 +103,9 @@ WARNINGS = \
 	-Wundef -Wbad-function-cast -Wmissing-declarations -Wconversion
 
 INCLUDES = -Iinclude -I. -Inetinclude
- OPTIONS = -DUSE_64_BIT_INTS -DNDEBUG -fno-builtin -DNO_INLINE_STDARG
-#OPTIONS = -DUSE_64_BIT_INTS -D__MEM_DEBUG -fno-builtin
-#OPTIONS = -DUSE_64_BIT_INTS -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
+ OPTIONS = -DNDEBUG -fno-builtin -DNO_INLINE_STDARG
+#OPTIONS = -D__MEM_DEBUG -fno-builtin
+#OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g2
