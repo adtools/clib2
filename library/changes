@@ -1,6 +1,6 @@
 - Rewrote the __translate_unix_to_amiga_path_name() function to
   translate patterns such as "foo/bar/../../baz" properly, and to
-  use strlen() less.
+  use strlen() a lot less.
 
 - Major, major changes! Moved most of the monolithic code out of
   the file descriptor hook and into the respective functions,
@@ -10,6 +10,20 @@
   link with the updated library.
 
   NOTE: these changes require that the entire library is rebuilt!
+
+- The buffered and unbuffered file hook code is now invoked through
+  function pointers alone. The utility.library/CallHookPkt mechanism
+  is no longer required.
+
+- Moved the entire lseek() code relevant for files into the hook
+  function.
+
+- Simplified the close() function which now just calls into the
+  hook code to perform whatever is necessary. The hook code is
+  responsible for cleaning up after aliases, etc. This change in
+  turn made it possible to greatly simplify the hook code for
+  buffered files which now bypasses close/read/write/lseek and
+  directly invokes the hook code for unbuffered files.
 
 
 c.lib 1.188 (7.2.2005)

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_openiob.c,v 1.6 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_openiob.c,v 1.7 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -171,7 +171,7 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 	if(FLAG_IS_SET(open_mode,O_WRONLY) || FLAG_IS_SET(open_mode,O_RDWR))
 		SET_FLAG(file_flags,IOBF_WRITE);
 
-	__initialize_iob(file,(HOOKFUNC)__iob_hook_entry,
+	__initialize_iob(file,__iob_hook_entry,
 		buffer,
 		aligned_buffer,BUFSIZ,
 		file_descriptor,

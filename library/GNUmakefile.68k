@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.27 2005-02-18 18:53:16 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.28 2005-02-20 13:19:40 obarthel Exp $
 #
 # :ts=8
 #
@@ -228,6 +228,7 @@ C_LIB = \
 	stdio_putchar.o \
 	stdio_puts.o \
 	stdio_remove.o \
+	stdio_remove_fd_alias.o \
 	stdio_rename.o \
 	stdio_rewind.o \
 	stdio_scanf.o \

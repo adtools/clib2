@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.6 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.7 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,7 +57,7 @@
 #ifndef _STDIO_HEADERS_H
 
 /* Forward declarations */
-struct file_hook_message;
+struct file_action_message;
 struct iob;
 struct fd;
 
@@ -82,17 +82,17 @@ extern struct fd * __get_file_descriptor(int file_descriptor);
 /****************************************************************************/
 
 /* stdio_iobhookentry.c */
-extern void __iob_hook_entry(struct Hook * hook,struct iob * iob,struct file_hook_message * message);
+extern int __iob_hook_entry(struct iob * iob,struct file_action_message * fam);
 
 /****************************************************************************/
 
 /* stdio_fdhookentry.c */
-extern void __fd_hook_entry(struct Hook * hook,struct fd * fd,struct file_hook_message * message);
+extern int __fd_hook_entry(struct fd * fd,struct file_action_message * fam);
 
 /****************************************************************************/
 
 /* stdio_initializefd.c */
-extern void __initialize_fd(struct fd * fd,HOOKFUNC hook_function,BPTR default_file,ULONG flags);
+extern void __initialize_fd(struct fd * fd,file_action_fd_t action_function,BPTR default_file,ULONG flags);
 
 /****************************************************************************/
 
@@ -103,7 +103,7 @@ extern int __find_vacant_fd_entry(void);
 /****************************************************************************/
 
 /* stdio_initializeiob.c */
-extern void __initialize_iob(struct iob * iob,HOOKFUNC hook_function,STRPTR custom_buffer,STRPTR buffer,int buffer_size,int file_descriptor,int slot_number,ULONG flags);
+extern void __initialize_iob(struct iob * iob,file_action_iob_t action_function,STRPTR custom_buffer,STRPTR buffer,int buffer_size,int file_descriptor,int slot_number,ULONG flags);
 
 /****************************************************************************/
 
@@ -148,21 +148,6 @@ extern int __vfscanf(FILE *stream, const char *format, va_list arg);
 
 /****************************************************************************/
 
-/* fcntl_write.c */
-extern ssize_t __write(int file_descriptor, const void * buffer, size_t num_bytes, int * error_ptr);
-
-/****************************************************************************/
-
-/* fcntl_lseek.c */
-extern off_t __lseek(int file_descriptor, off_t offset, int mode, int * error_ptr);
-
-/****************************************************************************/
-
-/* fcntl_close.c */
-extern int __close(int file_descriptor,int * error_ptr);
-
-/****************************************************************************/
-
 /* stdio_fgetc.c */
 extern int __fgetc_check(FILE * stream);
 extern int __fgetc(FILE *stream);
@@ -176,27 +161,22 @@ extern int __fputc(int c,FILE *stream,int buffer_mode);
 /****************************************************************************/
 
 /* stdio_sscanf_hook_entry.c */
-extern void __sscanf_hook_entry(struct Hook *UNUSED	unused_hook,struct iob *string,struct file_hook_message *message);
+extern int __sscanf_hook_entry(struct iob *string,struct file_action_message *fam);
 
 /****************************************************************************/
 
 /* stdio_vasprintf_hook_entry.c */
-extern void __vasprintf_hook_entry(struct Hook *UNUSED	unused_hook,struct iob *string,struct file_hook_message *message);
+extern int __vasprintf_hook_entry(struct iob *string,struct file_action_message *fam);
 
 /****************************************************************************/
 
 /* stdio_vsprintf_hook_entry.c */
-extern void __vsprintf_hook_entry(struct Hook *UNUSED unused_hook,struct iob *string,struct file_hook_message *message);
+extern int __vsprintf_hook_entry(struct iob *string,struct file_action_message *fam);
 
 /****************************************************************************/
 
 /* stdio_vsnprintf_hook_entry.c */
-extern void __vsnprintf_hook_entry(struct Hook *UNUSED unused_hook,struct iob *string,struct file_hook_message *message);
-
-/****************************************************************************/
-
-/* fcntl_read.c */
-extern ssize_t __read(int file_descriptor, void * buffer, size_t num_bytes, int * error_ptr);
+extern int __vsnprintf_hook_entry(struct iob *string,struct file_action_message *fam);
 
 /****************************************************************************/
 
@@ -227,6 +207,11 @@ extern void __sync_fd(struct fd * fd,int mode);
 
 /* stdio_record_locking.c */
 extern int __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr);
+
+/****************************************************************************/
+
+/* stdio_remove_fd_alias.c */
+extern void __remove_fd_alias(struct fd * fd);
 
 /****************************************************************************/
 

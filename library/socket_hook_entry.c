@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.7 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.8 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,102 +45,127 @@
 
 /****************************************************************************/
 
-void
+int
 __socket_hook_entry(
-	struct Hook * UNUSED		unused_hook,
-	struct fd *					fd,
-	struct file_hook_message *	message)
+	struct fd *						fd,
+	struct file_action_message *	fam)
 {
 	struct FileInfoBlock * fib;
 	int error = OK;
-	int param;
 	int result;
+	int param;
 
-	assert( message != NULL && fd != NULL );
+	assert( fam != NULL && fd != NULL );
 
-	switch(message->action)
+	switch(fam->fam_Action)
 	{
-		case file_hook_action_read:
+		case file_action_read:
 
-			SHOWMSG("file_hook_action_read");
+			SHOWMSG("file_action_read");
 
-			assert( message->data != NULL );
-			assert( message->size > 0 );
+			assert( fam->fam_Data != NULL );
+			assert( fam->fam_Size > 0 );
 
-			SHOWVALUE(message->data);
-			SHOWVALUE(message->size);
+			SHOWPOINTER(fam->fam_Data);
+			SHOWVALUE(fam->fam_Size);
 
 			PROFILE_OFF();
 
-			result	= __recv((LONG)fd->fd_DefaultFile,message->data,message->size,0);
-			error	= __get_errno();
+			result = __recv((LONG)fd->fd_DefaultFile,fam->fam_Data,fam->fam_Size,0);
+			if(result < 0)
+				error = __get_errno();
 
 			PROFILE_ON();
 
 			break;
 
-		case file_hook_action_write:
+		case file_action_write:
 
-			SHOWMSG("file_hook_action_write");
+			SHOWMSG("file_action_write");
 
-			assert( message->data != NULL );
-			assert( message->size > 0 );
+			assert( fam->fam_Data != NULL );
+			assert( fam->fam_Size > 0 );
 
-			SHOWVALUE(message->data);
-			SHOWVALUE(message->size);
+			SHOWPOINTER(fam->fam_Data);
+			SHOWVALUE(fam->fam_Size);
 
 			PROFILE_OFF();
 
-			result	= __send((LONG)fd->fd_DefaultFile,message->data,message->size,0);
-			error	= __get_errno();
+			result = __send((LONG)fd->fd_DefaultFile,fam->fam_Data,fam->fam_Size,0);
+			if(result < 0)
+				error = __get_errno();
 
 			PROFILE_ON();
 
 			break;
 
-		case file_hook_action_close:
+		case file_action_close:
 
-			SHOWMSG("file_hook_action_close");
+			SHOWMSG("file_action_close");
 
-			PROFILE_OFF();
+			/* If this is an alias, just remove it. */
+			if(__fd_is_aliased(fd))
+			{
+				__remove_fd_alias(fd);
+			}
+			else
+			{
+				/* Are we permitted to close this file? */
+				if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_NO_CLOSE))
+				{
+					PROFILE_OFF();
 
-			__CloseSocket((LONG)fd->fd_DefaultFile);
+					__CloseSocket((LONG)fd->fd_DefaultFile);
 
-			PROFILE_ON();
+					PROFILE_ON();
+				}
+			}
 
-			fd->fd_DefaultFile = -1; /* paranoia! */
+			/* And that's the last for this file descriptor. */
+			memset(fd,0,sizeof(*fd));
 
 			result = 0;
 
 			break;
 
-		case file_hook_action_set_blocking:
+		case file_action_seek:
 
-			SHOWMSG("file_hook_action_set_blocking");
+			SHOWMSG("file_action_seek");
 
-			param = (int)(message->arg == 0);
-
-			result	= __IoctlSocket(fd->fd_DefaultFile,FIONBIO,&param);
-			error	= __get_errno();
+			result	= -1;
+			error	= ESPIPE;
 
 			break;
 
-		case file_hook_action_set_async:
+		case file_action_set_blocking:
 
-			SHOWMSG("file_hook_action_set_async");
+			SHOWMSG("file_action_set_blocking");
 
-			param = (int)(message->arg != 0);
+			param = (int)(fam->fam_Arg == 0);
 
-			result	= __IoctlSocket(fd->fd_DefaultFile,FIOASYNC,&param);
-			error	= __get_errno();
+			result = __IoctlSocket(fd->fd_DefaultFile,FIONBIO,&param);
+			if(result < 0)
+				error = __get_errno();
 
 			break;
 
-		case file_hook_action_examine:
+		case file_action_set_async:
 
-			SHOWMSG("file_hook_action_examine");
+			SHOWMSG("file_action_set_async");
 
-			fib = message->file_info;
+			param = (int)(fam->fam_Arg != 0);
+
+			result = __IoctlSocket(fd->fd_DefaultFile,FIOASYNC,&param);
+			if(result < 0)
+				error = __get_errno();
+
+			break;
+
+		case file_action_examine:
+
+			SHOWMSG("file_action_examine");
+
+			fib = fam->fam_FileInfo;
 
 			memset(fib,0,sizeof(*fib));
 
@@ -156,7 +181,7 @@ __socket_hook_entry(
 
 		default:
 
-			SHOWVALUE(message->action);
+			SHOWVALUE(fam->fam_Action);
 
 			result	= -1;
 			error	= EBADF;
@@ -164,10 +189,10 @@ __socket_hook_entry(
 			break;
 	}
 
-	SHOWVALUE(result);
+	fam->fam_Error = error;
 
-	message->result	= result;
-	message->error	= error;
+	RETURN(result);
+	return(result);
 }
 
 /****************************************************************************/

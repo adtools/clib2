@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ftell.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_ftell.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,13 +46,11 @@
 long int
 ftell(FILE *stream)
 {
-	DECLARE_UTILITYBASE();
 	struct iob * file = (struct iob *)stream;
-	struct file_hook_message message;
+	struct file_action_message fam;
 	long result = -1;
 
 	assert( stream != NULL );
-	assert( UtilityBase != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -83,24 +81,20 @@ ftell(FILE *stream)
 
 	SHOWMSG("calling the hook");
 
-	SHOWPOINTER(&message);
+	SHOWPOINTER(&fam);
 
-	message.action		= file_hook_action_seek;
-	message.position	= 0;
-	message.mode		= SEEK_CUR;
-	message.result		= 0;
+	fam.fam_Action		= file_action_seek;
+	fam.fam_Position	= 0;
+	fam.fam_Mode		= SEEK_CUR;
 
-	SHOWVALUE(message.position);
-	SHOWVALUE(message.mode);
+	SHOWVALUE(fam.fam_Position);
+	SHOWVALUE(fam.fam_Mode);
 
-	assert( file->iob_Hook != NULL );
+	assert( file->iob_Action != NULL );
 
-	CallHookPkt(file->iob_Hook,file,&message);
-
-	result = message.result;
-	if(result < 0)
+	if((*file->iob_Action)(file,&fam) < 0)
 	{
-		__set_errno(message.error);
+		__set_errno(fam.fam_Error);
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 

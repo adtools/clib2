@@ -1,5 +1,5 @@
 /*
- * $Id: socket_headers.h,v 1.6 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_headers.h,v 1.7 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ extern int NOCOMMON h_errno;
 /****************************************************************************/
 
 extern struct fd * __get_file_descriptor_socket(int socket_descriptor);
-extern void __socket_hook_entry(struct Hook * hook,struct fd * fd,struct file_hook_message * message);
+extern int __socket_hook_entry(struct fd * fd,struct file_action_message * fam);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.13 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.14 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -104,6 +104,13 @@
 
 /****************************************************************************/
 
+/* Forward declarations for below... */
+struct fd;
+struct iob;
+struct file_action_message;
+
+/****************************************************************************/
+
 /* CPU cache line size; used for alignment purposes with some data structures.
    This should be determined dynamically rather than preset here. For the
    68040/68060 the cache line size is 16 bytes, for the PowerPC G4 it's
@@ -118,6 +125,47 @@
 
 /* The directory entry type a socket is identified with (in a FileInfoBlock). */
 #define ST_SOCKET (31082002)
+
+/****************************************************************************/
+
+/* Operations that can be performed by the file action function. */
+enum file_action_t
+{
+	file_action_read,
+	file_action_write,
+	file_action_seek,
+	file_action_close,
+	file_action_set_blocking,
+	file_action_set_async,
+	file_action_examine
+};
+
+/****************************************************************************/
+
+/* A message sent to a file action function. */
+struct file_action_message
+{
+	enum file_action_t		fam_Action;		/* What to do */
+	char *					fam_Data;		/* Where to read/write the data */
+	long					fam_Size;		/* How much data to write */
+
+	long					fam_Position;	/* The seek position */
+	long					fam_Mode;		/* The seek mode */
+
+	int						fam_Arg;		/* Whether or not this file should
+											   be set non-blocking or use
+											   asynchronous I/O */
+
+	struct FileInfoBlock *	fam_FileInfo;
+	struct MsgPort *		fam_FileSystem;
+
+	int						fam_Error;		/* Error code, if any... */
+};
+
+/****************************************************************************/
+
+/* The file action function for buffered files. */
+typedef int (*file_action_iob_t)(struct iob * iob,struct file_action_message * fam);
 
 /****************************************************************************/
 
@@ -162,60 +210,58 @@
    things will take a turn for the worse! */
 struct iob
 {
-	ULONG			iob_Flags;				/* Properties and options
-											   associated with this file */
+	ULONG				iob_Flags;				/* Properties and options
+												   associated with this file */
 
-	UBYTE *			iob_Buffer;				/* Points to the file buffer */
-	LONG			iob_BufferSize;			/* Size of the buffer in bytes */
-	LONG			iob_BufferPosition;		/* Current read position
-											   in the buffer (grows when any
-											   data is read from the buffer) */
-	LONG			iob_BufferReadBytes;	/* Number of bytes available for
-											   reading (shrinks when any data
-											   is read from the buffer) */
-	LONG			iob_BufferWriteBytes;	/* Number of bytes written to the
-											   buffer which still need to be
-											   flushed to disk (grows when any
-											   data is written to the buffer) */
+	UBYTE *				iob_Buffer;				/* Points to the file buffer */
+	LONG				iob_BufferSize;			/* Size of the buffer in bytes */
+	LONG				iob_BufferPosition;		/* Current read position
+												   in the buffer (grows when any
+												   data is read from the buffer) */
+	LONG				iob_BufferReadBytes;	/* Number of bytes available for
+												   reading (shrinks when any data
+												   is read from the buffer) */
+	LONG				iob_BufferWriteBytes;	/* Number of bytes written to the
+												   buffer which still need to be
+												   flushed to disk (grows when any
+												   data is written to the buffer) */
 
 	/************************************************************************/
 	/* Public portion ends here                                             */
 	/************************************************************************/
 
-	struct Hook *	iob_Hook;				/* The hook to invoke for file
-											   operations, such as read,
-											   write and seek. */
+	file_action_iob_t	iob_Action;				/* The function to invoke for file
+												   operations, such as read,
+												   write and seek. */
 
-	int				iob_SlotNumber;			/* Points back to the iob table
-											   entry number. */
+	int					iob_SlotNumber;			/* Points back to the iob table
+												   entry number. */
 
-	int				iob_Descriptor;			/* Associated file descriptor */
+	int					iob_Descriptor;			/* Associated file descriptor */
 
-	STRPTR			iob_String;				/* Alternative source of data;
-											   a pointer to a string */
-	LONG			iob_StringSize;			/* Number of bytes that may be
-											   stored in the string */
-	LONG			iob_StringPosition;		/* Current read/write position
-											   in the string */
-	LONG			iob_StringLength;		/* Number of characters stored
-											   in the string */
+	STRPTR				iob_String;				/* Alternative source of data;
+												   a pointer to a string */
+	LONG				iob_StringSize;			/* Number of bytes that may be
+												   stored in the string */
+	LONG				iob_StringPosition;		/* Current read/write position
+												   in the string */
+	LONG				iob_StringLength;		/* Number of characters stored
+												   in the string */
 
-	char *			iob_File;				/* For access tracking with the
-											   memory allocator. */
-	int				iob_Line;
+	char *				iob_File;				/* For access tracking with the
+												   memory allocator. */
+	int					iob_Line;
 
-	struct Hook		iob_DefaultHook;		/* Static hook */
+	APTR				iob_CustomBuffer;		/* A custom buffer allocated
+												   by setvbuf() */
 
-	APTR			iob_CustomBuffer;		/* A custom buffer allocated
-											   by setvbuf() */
+	char *				iob_TempFileName;		/* If this is a temporary
+												   file, this is its name */
+	BPTR				iob_TempFileLock;		/* The directory in which this
+												   temporary file is stored */
 
-	char *			iob_TempFileName;		/* If this is a temporary
-											   file, this is its name */
-	BPTR			iob_TempFileLock;		/* The directory in which this
-											   temporary file is stored */
-
-	UBYTE			iob_SingleByte;			/* Fall-back buffer for 'unbuffered'
-											   files */
+	UBYTE				iob_SingleByte;			/* Fall-back buffer for 'unbuffered'
+												   files */
 };
 
 /****************************************************************************/
@@ -271,29 +317,28 @@ struct iob
 
 /****************************************************************************/
 
-/* Forward declaration... */
-struct fd;
+/* The file action function for unbuffered files. */
+typedef int (*file_action_fd_t)(struct fd * fd,struct file_action_message * fam);
 
 /****************************************************************************/
 
+/* Function to be called before a file descriptor is "closed". */
 typedef void (*fd_cleanup_t)(struct fd * fd);
 
 /****************************************************************************/
 
 struct fd
 {
-	struct Hook *	fd_Hook;			/* Hook to invoke to perform actions */
-	ULONG			fd_Flags;			/* File properties */
-	struct fd *		fd_Original;		/* NULL if this is not a dup()ed file
-										   descriptor; points to original
-										   descriptor if non-NULL */
-	struct fd *		fd_NextLink;		/* Points to next duplicate of this
-										   file descriptor; NULL for none */
-	struct Hook		fd_DefaultHook;		/* Static hook */
-	BPTR			fd_DefaultFile;		/* A dos.library file handle */
-	LONG			fd_Position;		/* Cached file position (seek offset). */
-
-	fd_cleanup_t	fd_Cleanup;			/* Cleanup function, if any. */
+	file_action_fd_t	fd_Action;			/* Function to invoke to perform actions */
+	ULONG				fd_Flags;			/* File properties */
+	struct fd *			fd_Original;		/* NULL if this is not a dup()ed file
+											   descriptor; points to original
+											   descriptor if non-NULL */
+	struct fd *			fd_NextLink;		/* Points to next duplicate of this
+											   file descriptor; NULL for none */
+	BPTR				fd_DefaultFile;		/* A dos.library file handle */
+	LONG				fd_Position;		/* Cached file position (seek offset). */
+	fd_cleanup_t		fd_Cleanup;			/* Cleanup function, if any. */
 };
 
 /****************************************************************************/
@@ -313,44 +358,6 @@ struct UnlinkNode
 struct bcpl_name
 {
 	unsigned char name[256];
-};
-
-/****************************************************************************/
-
-/* Actions that can be performed by the file handle hook. */
-enum file_hook_action_t
-{
-	file_hook_action_read,
-	file_hook_action_write,
-	file_hook_action_seek,
-	file_hook_action_close,
-	file_hook_action_set_blocking,
-	file_hook_action_set_async,
-	file_hook_action_examine
-};
-
-/****************************************************************************/
-
-/* A message sent to a file handle hook. */
-struct file_hook_message
-{
-	enum file_hook_action_t	action;		/* What to do */
-	char *					data;		/* Where to read/write the data */
-	long					size;		/* How much data to write */
-
-	long					position;	/* The seek position */
-	long					mode;		/* The seek mode */
-
-	int						arg;		/* Whether or not this file should
-										   be set non-blocking or use
-										   asynchronous I/O */
-
-	struct FileInfoBlock *	file_info;
-	struct MsgPort *		file_system;
-
-	int						error;		/* Error code, if any... */
-
-	long					result;		/* Whatever this produced */
 };
 
 /****************************************************************************/
@@ -411,6 +418,11 @@ extern BOOL NOCOMMON __no_standard_io;
 
 #define __iob_read_buffer_is_valid(file) \
 	(((struct iob *)file)->iob_BufferReadBytes > 0)
+
+/****************************************************************************/
+
+#define __fd_is_aliased(fd) \
+	((fd)->fd_Original != NULL || (fd)->fd_NextLink != NULL)
 
 /****************************************************************************/
 

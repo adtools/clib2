@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_sscanf.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,7 +73,7 @@ sscanf(const char *s,const char *format, ...)
 	if(__check_abort_enabled)
 		__check_abort();
 
-	__initialize_iob(&string_iob,(HOOKFUNC)__sscanf_hook_entry,
+	__initialize_iob(&string_iob,__sscanf_hook_entry,
 		NULL,
 		local_buffer,sizeof(local_buffer),
 		-1,

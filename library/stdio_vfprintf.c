@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.8 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -732,8 +732,8 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 							if(precision < 1)
 								precision = 1;
 
-							SHOWVALUE(local_exponent);
-							SHOWVALUE(local_precision);
+							SHOWVALUE(exponent);
+							SHOWVALUE(precision);
 
 							/* If the exponent is < -4 or greater than or equal to
 							 * the precision, we switch to 'e' or 'f' format,

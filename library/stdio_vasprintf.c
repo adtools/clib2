@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf.c,v 1.6 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_vasprintf.c,v 1.7 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -88,7 +88,7 @@ __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg)
 
 	(*ret) = NULL;
 
-	__initialize_iob(&string_iob,(HOOKFUNC)__vasprintf_hook_entry,
+	__initialize_iob(&string_iob,__vasprintf_hook_entry,
 		NULL,
 		local_buffer,sizeof(local_buffer),
 		-1,

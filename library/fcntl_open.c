@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.8 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -328,7 +328,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 	fd = __fd[fd_slot_number];
 
-	__initialize_fd(fd,(HOOKFUNC)__fd_hook_entry,handle,0);
+	__initialize_fd(fd,__fd_hook_entry,handle,0);
 
 	/* Figure out if this stream is attached to a console. */
 	PROFILE_OFF();
@@ -343,7 +343,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 		{
 			SHOWMSG("enabling non-blocking mode");
 
-			if(SetMode(handle,1)) /* single character mode */
+			if(SetMode(handle,DOSTRUE)) /* single character mode */
 				SET_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 		}
 	}

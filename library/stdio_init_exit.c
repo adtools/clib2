@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.16 2005-02-04 08:49:10 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.17 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -201,9 +201,9 @@ __stdio_init(void)
 		/* Align the buffer start address to a cache line boundary. */
 		aligned_buffer = (char *)((ULONG)(buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
 
-		__initialize_fd(__fd[i],(HOOKFUNC)__fd_hook_entry,default_file,fd_flags);
+		__initialize_fd(__fd[i],__fd_hook_entry,default_file,fd_flags);
 
-		__initialize_iob(__iob[i],(HOOKFUNC)__iob_hook_entry,
+		__initialize_iob(__iob[i],__iob_hook_entry,
 			buffer,
 			aligned_buffer,BUFSIZ,
 			i,

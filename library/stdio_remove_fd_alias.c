@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_remove_fd_alias.c,v 1.1 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,51 +31,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _FCNTL_HEADERS_H
-#include "fcntl_headers.h"
-#endif /* _FCNTL_HEADERS_H */
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-int
-close(int file_descriptor)
+void
+__remove_fd_alias(struct fd * fd)
 {
-	struct file_action_message fam;
-	struct fd * fd;
-	int result = -1;
+	assert( fd != NULL );
 
-	ENTER();
-
-	SHOWVALUE(file_descriptor);
-
-	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
-	assert( __fd[file_descriptor] != NULL );
-	assert( FLAG_IS_SET(__fd[file_descriptor]->fd_Flags,FDF_IN_USE) );
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	fd = __get_file_descriptor(file_descriptor);
-	if(fd == NULL)
+	if(fd->fd_Original != NULL) /* this is an alias */
 	{
-		__set_errno(EBADF);
-		goto out;
+		struct fd * list_fd;
+
+		assert( fd->fd_Original != fd );
+		assert( fd->fd_Original->fd_Original == NULL );
+
+		/* Remove this alias from the list. */
+		for(list_fd = fd->fd_Original ;
+		    list_fd != NULL ;
+		    list_fd = list_fd->fd_NextLink)
+		{
+			if(list_fd->fd_NextLink == fd)
+			{
+				list_fd->fd_NextLink = fd->fd_NextLink;
+				break;
+			}
+		}
 	}
+	else if (fd->fd_NextLink != NULL) /* this one has aliases attached; it is the 'original' resource */
+	{
+		struct fd * first_alias;
+		struct fd * list_fd;
 
-	fam.fam_Action = file_action_close;
+		/* The first link now becomes the original resource */
+		first_alias = fd->fd_NextLink;
+		first_alias->fd_Original = NULL;
 
-	assert( fd->fd_Action != NULL );
-
-	result = (*fd->fd_Action)(fd,&fam);
-	if(result < 0)
-		__set_errno(fam.fam_Error);
-
- out:
-
-	RETURN(result);
-	return(result);
+		/* The resources are migrated to the first link. */
+		for(list_fd = first_alias->fd_NextLink ;
+		    list_fd != NULL ;
+		    list_fd = list_fd->fd_NextLink)
+		{
+			list_fd->fd_Original = first_alias;
+		}
+	}
 }

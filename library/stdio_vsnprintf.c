@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vsnprintf.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_vsnprintf.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,7 +78,7 @@ vsnprintf(char *buffer,size_t size,const char *format,va_list arg)
 	if(__check_abort_enabled)
 		__check_abort();
 
-	__initialize_iob(&string_iob,(HOOKFUNC)__vsnprintf_hook_entry,
+	__initialize_iob(&string_iob,__vsnprintf_hook_entry,
 		NULL,
 		local_buffer,sizeof(local_buffer),
 		-1,

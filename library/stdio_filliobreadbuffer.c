@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_filliobreadbuffer.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_filliobreadbuffer.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,8 +40,8 @@
 int
 __fill_iob_read_buffer(struct iob * file)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
+	struct file_action_message fam;
+	int num_bytes_read;
 	int result = -1;
 
 	ENTER();
@@ -52,7 +52,6 @@ __fill_iob_read_buffer(struct iob * file)
 	assert( file != NULL && (file->iob_BufferReadBytes == 0 || file->iob_BufferPosition == file->iob_BufferReadBytes) && file->iob_BufferWriteBytes == 0 );
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_READ) );
 	assert( file->iob_BufferSize > 0 );
-	assert( UtilityBase != NULL );
 
 	if(__check_abort_enabled)
 		__check_abort();
@@ -81,26 +80,24 @@ __fill_iob_read_buffer(struct iob * file)
 	SHOWPOINTER(file->iob_Buffer);
 	SHOWVALUE(file->iob_BufferSize);
 
-	message.action	= file_hook_action_read;
-	message.data	= file->iob_Buffer;
-	message.size	= file->iob_BufferSize;
-	message.result	= 0;
+	fam.fam_Action	= file_action_read;
+	fam.fam_Data	= file->iob_Buffer;
+	fam.fam_Size	= file->iob_BufferSize;
 
-	assert( file->iob_Hook != NULL );
+	assert( file->iob_Action != NULL );
 
-	CallHookPkt(file->iob_Hook,file,&message);
-
-	if(message.result < 0)
+	num_bytes_read = (*file->iob_Action)(file,&fam);
+	if(num_bytes_read < 0)
 	{
-		__set_errno(message.error);
+		__set_errno(fam.fam_Error);
 
-		D(("got error %ld",message.error));
+		D(("got error %ld",fam.fam_Error));
 
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 		goto out;
 	}
 
-	file->iob_BufferReadBytes	= message.result;
+	file->iob_BufferReadBytes	= num_bytes_read;
 	file->iob_BufferPosition	= 0;
 
 	SHOWVALUE(file->iob_BufferReadBytes);

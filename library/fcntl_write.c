@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_write.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: fcntl_write.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,9 +48,8 @@
 /****************************************************************************/
 
 ssize_t
-__write(int file_descriptor, const void * buffer, size_t num_bytes, int * error_ptr)
+write(int file_descriptor, const void * buffer, size_t num_bytes)
 {
-	DECLARE_UTILITYBASE();
 	struct fd * fd;
 	off_t result = -1;
 
@@ -60,10 +59,8 @@ __write(int file_descriptor, const void * buffer, size_t num_bytes, int * error_
 	SHOWPOINTER(buffer);
 	SHOWVALUE(num_bytes);
 
-	assert( error_ptr != NULL );
 	assert( buffer != NULL );
 	assert( (int)num_bytes >= 0 );
-	assert( UtilityBase != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -71,7 +68,7 @@ __write(int file_descriptor, const void * buffer, size_t num_bytes, int * error_
 		{
 			SHOWMSG("invalid buffer address");
 
-			(*error_ptr) = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}
@@ -87,7 +84,7 @@ __write(int file_descriptor, const void * buffer, size_t num_bytes, int * error_
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		(*error_ptr) = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -95,53 +92,32 @@ __write(int file_descriptor, const void * buffer, size_t num_bytes, int * error_
 	{
 		SHOWMSG("file descriptor is not write-enabled");
 
-		(*error_ptr) = EBADF;
+		__set_errno(EBADF);
 		goto out;
 	}
 
 	if(num_bytes > 0)
 	{
-		struct file_hook_message message;
+		struct file_action_message fam;
 
 		SHOWMSG("calling the hook");
 
-		message.action	= file_hook_action_write;
-		message.data	= (void *)buffer;
-		message.size	= num_bytes;
+		fam.fam_Action	= file_action_write;
+		fam.fam_Data	= (void *)buffer;
+		fam.fam_Size	= num_bytes;
 
-		assert( fd->fd_Hook != NULL );
+		assert( fd->fd_Action != NULL );
 
-		CallHookPkt(fd->fd_Hook,fd,&message);
-
-		(*error_ptr) = message.error;
-
-		result = message.result;
+		result = (*fd->fd_Action)(fd,&fam);
+		if(result < 0)
+			__set_errno(fam.fam_Error);
 	}
 	else
 	{
-		(*error_ptr) = 0;
-
 		result = 0;
 	}
 
  out:
-
-	RETURN(result);
-	return(result);
-}
-
-/****************************************************************************/
-
-ssize_t
-write(int file_descriptor, const void * buffer, size_t num_bytes)
-{
-	ssize_t result;
-	int error;
-
-	ENTER();
-
-	result = __write(file_descriptor,buffer,num_bytes,&error);
-	__set_errno(error);
 
 	RETURN(result);
 	return(result);

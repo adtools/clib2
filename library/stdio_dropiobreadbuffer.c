@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_dropiobreadbuffer.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stdio_dropiobreadbuffer.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,6 @@
 int
 __drop_iob_read_buffer(struct iob * file)
 {
-	DECLARE_UTILITYBASE();
 	int result = 0;
 
 	ENTER();
@@ -53,7 +52,6 @@ __drop_iob_read_buffer(struct iob * file)
 	SHOWPOINTER(file);
 
 	assert( file != NULL );
-	assert( UtilityBase != NULL );
 
 	if(__check_abort_enabled)
 		__check_abort();
@@ -75,20 +73,17 @@ __drop_iob_read_buffer(struct iob * file)
 
 			if(num_unread_bytes > 0)
 			{
-				struct file_hook_message message;
+				struct file_action_message fam;
 
-				SHOWMSG("calling the hook");
+				SHOWMSG("calling the action function");
 
-				message.action		= file_hook_action_seek;
-				message.position	= -num_unread_bytes;
-				message.mode		= SEEK_CUR;
-				message.result		= 0;
+				fam.fam_Action		= file_action_seek;
+				fam.fam_Position	= -num_unread_bytes;
+				fam.fam_Mode		= SEEK_CUR;
 
-				assert( file->iob_Hook != NULL );
+				assert( file->iob_Action != NULL );
 
-				CallHookPkt(file->iob_Hook,file,&message);
-
-				if(message.result < 0)
+				if((*file->iob_Action)(file,&fam) < 0)
 				{
 					SHOWMSG("that didn't work");
 
@@ -96,7 +91,7 @@ __drop_iob_read_buffer(struct iob * file)
 
 					result = -1;
 
-					__set_errno(message.error);
+					__set_errno(fam.fam_Error);
 
 					goto out;
 				}

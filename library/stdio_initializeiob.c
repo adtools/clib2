@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializeiob.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_initializeiob.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,16 +39,16 @@
 
 void
 __initialize_iob(
-	struct iob *	iob,
-	HOOKFUNC		hook_function,
-	STRPTR			custom_buffer,
-	STRPTR			buffer,
-	int				buffer_size,
-	int				file_descriptor,
-	int				slot_number,
-	ULONG			flags)
+	struct iob *		iob,
+	file_action_iob_t	action_function,
+	STRPTR				custom_buffer,
+	STRPTR				buffer,
+	int					buffer_size,
+	int					file_descriptor,
+	int					slot_number,
+	ULONG				flags)
 {
-	assert( iob != NULL && hook_function != NULL );
+	assert( iob != NULL && action_function != NULL );
 
 	memset(iob,0,sizeof(*iob));
 
@@ -58,16 +58,5 @@ __initialize_iob(
 	iob->iob_Descriptor		= file_descriptor;
 	iob->iob_SlotNumber		= slot_number;
 	iob->iob_Flags			= flags;
-	iob->iob_Hook			= &iob->iob_DefaultHook;
-
-	#if defined(__amigaos4__)
-	{
-		iob->iob_Hook->h_Entry		= (HOOKFUNC)hook_function;
-	}
-	#else
-	{
-		iob->iob_Hook->h_Entry		= (HOOKFUNC)HookEntry;
-		iob->iob_Hook->h_SubEntry	= (HOOKFUNC)hook_function;
-	}
-	#endif /* __amigaos4__ */
+	iob->iob_Action			= action_function;
 }

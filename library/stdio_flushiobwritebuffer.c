@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_flushiobwritebuffer.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_flushiobwritebuffer.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,26 +42,9 @@
 
 /****************************************************************************/
 
-/*
-int
-__iob_write_buffer_is_full(struct iob * file)
-{
-	int result;
-
-	assert( file != NULL );
-
-	result = (file->iob_BufferSize > 0 && (ULONG)file->iob_BufferWriteBytes == file->iob_BufferSize);
-
-	return(result);
-}
-*/
-
-/****************************************************************************/
-
 int
 __flush_iob_write_buffer(struct iob * file)
 {
-	DECLARE_UTILITYBASE();
 	int result = 0;
 
 	ENTER();
@@ -69,7 +52,6 @@ __flush_iob_write_buffer(struct iob * file)
 	SHOWPOINTER(file);
 
 	assert( file != NULL );
-	assert( UtilityBase != NULL );
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
 	assert( file->iob_BufferSize > 0 );
 
@@ -78,7 +60,7 @@ __flush_iob_write_buffer(struct iob * file)
 
 	if(FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) && file->iob_BufferWriteBytes > 0)
 	{
-		struct file_hook_message message;
+		struct file_action_message fam;
 
 		assert( FLAG_IS_SET(file->iob_Flags,IOBF_WRITE) );
 		assert( file->iob_BufferSize > 0 );
@@ -87,22 +69,19 @@ __flush_iob_write_buffer(struct iob * file)
 
 		SHOWMSG("calling the hook");
 
-		message.action	= file_hook_action_write;
-		message.data	= file->iob_Buffer;
-		message.size	= file->iob_BufferWriteBytes;
-		message.result	= 0;
+		fam.fam_Action	= file_action_write;
+		fam.fam_Data	= file->iob_Buffer;
+		fam.fam_Size	= file->iob_BufferWriteBytes;
 
-		assert( file->iob_Hook != NULL );
+		assert( file->iob_Action != NULL );
 
-		CallHookPkt(file->iob_Hook,file,&message);
-
-		if(message.result != file->iob_BufferWriteBytes)
+		if((*file->iob_Action)(file,&fam) != file->iob_BufferWriteBytes)
 		{
 			SHOWMSG("that didn't work");
 
 			SET_FLAG(file->iob_Flags,IOBF_ERROR);
 
-			__set_errno(message.error);
+			__set_errno(fam.fam_Error);
 
 			result = -1;
 			goto out;

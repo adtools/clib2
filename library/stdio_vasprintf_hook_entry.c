@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf_hook_entry.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_vasprintf_hook_entry.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,34 +49,33 @@
 
 /****************************************************************************/
 
-void
+int
 __vasprintf_hook_entry(
-	struct Hook *				UNUSED	unused_hook,
-	struct iob *						string_iob,
-	struct file_hook_message *			message)
+	struct iob *					string_iob,
+	struct file_action_message *	fam)
 {
 	int result = -1;
 	int error = OK;
 	int num_bytes_left;
 	int num_bytes;
 
-	assert( message != NULL && string_iob != NULL );
-	assert( message->action == file_hook_action_write );
+	assert( fam != NULL && string_iob != NULL );
+	assert( fam->fam_Action == file_action_write );
 
-	if(message->action != file_hook_action_write)
+	if(fam->fam_Action != file_action_write)
 	{
 		error = EBADF;
 		goto out;
 	}
 
-	if(string_iob->iob_StringPosition + message->size > string_iob->iob_StringSize)
+	if(string_iob->iob_StringPosition + fam->fam_Size > string_iob->iob_StringSize)
 	{
 		const int granularity = 64;
 
 		size_t new_size;
 		char * buffer;
 
-		new_size = string_iob->iob_StringPosition + message->size + granularity;
+		new_size = string_iob->iob_StringPosition + fam->fam_Size + granularity;
 
 		buffer = __malloc(new_size,string_iob->iob_File,string_iob->iob_Line);
 		if(buffer == NULL)
@@ -100,20 +99,21 @@ __vasprintf_hook_entry(
 
 	num_bytes_left = string_iob->iob_StringSize - string_iob->iob_StringPosition;
 
-	num_bytes = message->size;
+	num_bytes = fam->fam_Size;
 	if(num_bytes > num_bytes_left)
 		num_bytes = num_bytes_left;
 
 	assert( num_bytes >= 0 );
-	assert( message->data != NULL );
+	assert( fam->fam_Data != NULL );
 
-	memmove(&string_iob->iob_String[string_iob->iob_StringPosition],message->data,(size_t)num_bytes);
+	memmove(&string_iob->iob_String[string_iob->iob_StringPosition],fam->fam_Data,(size_t)num_bytes);
 	string_iob->iob_StringPosition += num_bytes;
 
 	result = num_bytes;
 
  out:
 
-	message->result	= result;
-	message->error	= error;
+	fam->fam_Error = error;
+
+	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fseek.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_fseek.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,6 @@
 int
 fseek(FILE *stream, long int offset, int wherefrom)
 {
-	DECLARE_UTILITYBASE();
 	struct iob * file = (struct iob *)stream;
 	int result = -1;
 
@@ -57,7 +56,6 @@ fseek(FILE *stream, long int offset, int wherefrom)
 	SHOWVALUE(wherefrom);
 
 	assert(stream != NULL);
-	assert( UtilityBase != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -140,7 +138,7 @@ fseek(FILE *stream, long int offset, int wherefrom)
 
 		if(NOT buffer_position_adjusted)
 		{
-			struct file_hook_message message;
+			struct file_action_message fam;
 
 			/* Oh dear, no luck. So we have to get rid of the
 			 * current buffer contents and start with a clean
@@ -162,23 +160,20 @@ fseek(FILE *stream, long int offset, int wherefrom)
 
 			SHOWMSG("calling the hook");
 
-			SHOWPOINTER(&message);
+			SHOWPOINTER(&fam);
 
-			message.action		= file_hook_action_seek;
-			message.position	= offset;
-			message.mode		= wherefrom;
-			message.result		= 0;
+			fam.fam_Action		= file_action_seek;
+			fam.fam_Position	= offset;
+			fam.fam_Mode		= wherefrom;
 
-			SHOWVALUE(message.position);
-			SHOWVALUE(message.mode);
+			SHOWVALUE(fam.fam_Position);
+			SHOWVALUE(fam.fam_Mode);
 
-			assert( file->iob_Hook != NULL );
+			assert( file->iob_Action != NULL );
 
-			CallHookPkt(file->iob_Hook,file,&message);
-
-			if(message.result < 0)
+			if((*file->iob_Action)(file,&fam) < 0)
 			{
-				__set_errno(message.error);
+				__set_errno(fam.fam_Error);
 
 				SET_FLAG(file->iob_Flags,IOBF_ERROR);
 				goto out;

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.8 2005-02-20 09:03:02 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,7 @@
 int
 fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
+	struct file_action_message fam;
 	struct flock * l;
 	int vacant_slot;
 	int result = -1;
@@ -60,8 +59,6 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 
 	SHOWVALUE(file_descriptor);
 	SHOWVALUE(cmd);
-
-	assert( UtilityBase != NULL );
 
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
@@ -160,16 +157,14 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			if((FLAG_IS_SET(flags,O_NONBLOCK) && FLAG_IS_CLEAR(fd->fd_Flags,FDF_NON_BLOCKING)) ||
 			   (FLAG_IS_CLEAR(flags,O_NONBLOCK) && FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING)))
 			{
-				message.action	= file_hook_action_set_blocking;
-				message.arg		= FLAG_IS_CLEAR(flags,O_NONBLOCK);
+				fam.fam_Action	= file_action_set_blocking;
+				fam.fam_Arg		= FLAG_IS_CLEAR(flags,O_NONBLOCK);
 
-				assert( fd->fd_Hook != NULL );
+				assert( fd->fd_Action != NULL );
 
-				CallHookPkt(fd->fd_Hook,fd,&message);
-
-				if(message.result < 0)
+				if((*fd->fd_Action)(fd,&fam) < 0)
 				{
-					__set_errno(message.error);
+					__set_errno(fam.fam_Error);
 
 					goto out;
 				}
@@ -183,16 +178,14 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			if((FLAG_IS_SET(flags,O_ASYNC) && FLAG_IS_CLEAR(fd->fd_Flags,FDF_ASYNC_IO)) ||
 			   (FLAG_IS_CLEAR(flags,O_ASYNC) && FLAG_IS_SET(fd->fd_Flags,FDF_ASYNC_IO)))
 			{
-				message.action	= file_hook_action_set_async;
-				message.arg		= FLAG_IS_SET(flags,O_ASYNC);
+				fam.fam_Action	= file_action_set_async;
+				fam.fam_Arg		= FLAG_IS_SET(flags,O_ASYNC);
 
-				assert( fd->fd_Hook != NULL );
+				assert( fd->fd_Action != NULL );
 
-				CallHookPkt(fd->fd_Hook,fd,&message);
-
-				if(message.result < 0)
+				if((*fd->fd_Action)(fd,&fam) < 0)
 				{
-					__set_errno(message.error);
+					__set_errno(fam.fam_Error);
 
 					goto out;
 				}

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.4 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_accept.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,7 +111,7 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 
 	new_fd = __fd[new_fd_slot_number];
 
-	__initialize_fd(new_fd,(HOOKFUNC)__socket_hook_entry,(BPTR)new_socket_fd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE);
+	__initialize_fd(new_fd,__socket_hook_entry,(BPTR)new_socket_fd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE);
 
 	result = new_fd_slot_number;
 

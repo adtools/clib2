@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf_hook_entry.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_sscanf_hook_entry.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,21 +43,19 @@
 
 /****************************************************************************/
 
-void
+int
 __sscanf_hook_entry(
-	struct Hook *				UNUSED	unused_hook,
-	struct iob *						string_iob,
-	struct file_hook_message *			message)
+	struct iob *					string_iob,
+	struct file_action_message *	fam)
 {
 	int result = -1;
-	int error = OK;
 	int num_bytes;
 
-	assert( message != NULL && string_iob != NULL );
+	assert( fam != NULL && string_iob != NULL );
 
-	if(message->action != file_hook_action_read)
+	if(fam->fam_Action != file_action_read)
 	{
-		error = EBADF;
+		fam->fam_Error = EBADF;
 		goto out;
 	}
 
@@ -70,14 +68,14 @@ __sscanf_hook_entry(
 
 		num_bytes_left = string_iob->iob_StringLength - string_iob->iob_StringPosition;
 
-		num_bytes = message->size;
+		num_bytes = fam->fam_Size;
 		if(num_bytes > num_bytes_left)
 			num_bytes = num_bytes_left;
 
-		assert( message->data != NULL );
+		assert( fam->fam_Data != NULL );
 		assert( num_bytes >= 0 );
 
-		memmove(message->data,&string_iob->iob_String[string_iob->iob_StringPosition],(size_t)num_bytes);
+		memmove(fam->fam_Data,&string_iob->iob_String[string_iob->iob_StringPosition],(size_t)num_bytes);
 		string_iob->iob_StringPosition += num_bytes;
 	}
 	else
@@ -89,6 +87,6 @@ __sscanf_hook_entry(
 
  out:
 
-	message->result	= result;
-	message->error	= error;
+
+	return(result);
 }

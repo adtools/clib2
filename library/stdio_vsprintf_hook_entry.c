@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vsprintf_hook_entry.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_vsprintf_hook_entry.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,35 +43,32 @@
 
 /****************************************************************************/
 
-void
+int
 __vsprintf_hook_entry(
-	struct Hook *				UNUSED	unused_hook,
-	struct iob *						string_iob,
-	struct file_hook_message *			message)
+	struct iob *					string_iob,
+	struct file_action_message *	fam)
 {
 	int result = -1;
-	int error = OK;
 
-	assert( message != NULL && string_iob != NULL );
+	assert( fam != NULL && string_iob != NULL );
 
-	if(message->action != file_hook_action_write)
+	if(fam->fam_Action != file_action_write)
 	{
-		error = EBADF;
+		fam->fam_Error = EBADF;
 		goto out;
 	}
 
-	assert( message->size >= 0 );
+	assert( fam->fam_Size >= 0 );
 
-	assert( message->data != NULL );
+	assert( fam->fam_Data != NULL );
 	assert( string_iob->iob_StringPosition >= 0 );
 
-	memmove(&string_iob->iob_String[string_iob->iob_StringPosition],message->data,(size_t)message->size);
-	string_iob->iob_StringPosition += message->size;
+	memmove(&string_iob->iob_String[string_iob->iob_StringPosition],fam->fam_Data,(size_t)fam->fam_Size);
+	string_iob->iob_StringPosition += fam->fam_Size;
 
-	result = message->size;
+	result = fam->fam_Size;
 
  out:
 
-	message->result	= result;
-	message->error	= error;
+	return(result);
 }

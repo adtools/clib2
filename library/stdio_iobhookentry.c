@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_iobhookentry.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_iobhookentry.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,86 +37,51 @@
 
 /****************************************************************************/
 
-void
+int
 __iob_hook_entry(
-	struct Hook *				UNUSED	unused_hook,
-	struct iob *						file_iob,
-	struct file_hook_message *			message)
+	struct iob *					file_iob,
+	struct file_action_message *	fam)
 {
+	struct fd * fd;
 	int result;
-	int error;
 
-	assert( message != NULL && file_iob != NULL );
+	assert( fam != NULL && file_iob != NULL );
 
-	switch(message->action)
+	switch(fam->fam_Action)
 	{
-		case file_hook_action_read:
+		case file_action_read:
+		case file_action_write:
+		case file_action_seek:
+		case file_action_close:
 
-			SHOWMSG("file_hook_action_read");
+			assert( file_iob->iob_Descriptor >= 0 && file_iob->iob_Descriptor < __num_fd );
+			assert( __fd[file_iob->iob_Descriptor] != NULL );
+			assert( FLAG_IS_SET(__fd[file_iob->iob_Descriptor]->fd_Flags,FDF_IN_USE) );
 
-			SHOWVALUE(file_iob->iob_Descriptor);
-			SHOWPOINTER(message->data);
-			SHOWVALUE(message->size);
+			fd = __get_file_descriptor(file_iob->iob_Descriptor);
+			if(fd == NULL)
+			{
+				fam->fam_Error = EBADF;
+				break;
+			}
 
-			assert( message->data != NULL );
-			assert( message->size > 0 );
-			assert( FLAG_IS_SET(file_iob->iob_Flags,IOBF_IN_USE) );
+			assert( fd->fd_Action != NULL );
 
-			result = __read(file_iob->iob_Descriptor,message->data,(size_t)message->size,&error);
-			break;
+			result = (*fd->fd_Action)(fd,fam);
 
-		case file_hook_action_write:
-
-			SHOWMSG("file_hook_action_write");
-
-			SHOWVALUE(file_iob->iob_Descriptor);
-			SHOWPOINTER(message->data);
-			SHOWVALUE(message->size);
-
-			assert( message->data != NULL );
-			assert( message->size > 0 );
-			assert( FLAG_IS_SET(file_iob->iob_Flags,IOBF_IN_USE) );
-
-			result = __write(file_iob->iob_Descriptor,message->data,(size_t)message->size,&error);
-
-			break;
-
-		case file_hook_action_seek:
-
-			SHOWMSG("file_hook_action_seek");
-
-			SHOWVALUE(file_iob->iob_Descriptor);
-			SHOWVALUE(message->position);
-			SHOWVALUE(message->mode);
-
-			assert( FLAG_IS_SET(file_iob->iob_Flags,IOBF_IN_USE) );
-
-			result = __lseek(file_iob->iob_Descriptor,message->position,message->mode,&error);
-			break;
-
-		case file_hook_action_close:
-
-			SHOWMSG("file_hook_action_close");
-
-			SHOWVALUE(file_iob->iob_Descriptor);
-
-			assert( FLAG_IS_SET(file_iob->iob_Flags,IOBF_IN_USE) );
-
-			result = __close(file_iob->iob_Descriptor,&error);
 			break;
 
 		default:
 
-			SHOWVALUE(message->action);
+			SHOWVALUE(fam->fam_Action);
 
-			result	= -1;
-			error	= EBADF;
+			fam->fam_Error = EBADF;
+
+			result = -1;
 
 			break;
 	}
 
-	SHOWVALUE(result);
-
-	message->result	= result;
-	message->error	= error;
+	RETURN(result);
+	return(result);
 }

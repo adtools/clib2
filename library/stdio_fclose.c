@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fclose.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stdio_fclose.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,9 +52,8 @@
 int
 fclose(FILE *stream)
 {
-	DECLARE_UTILITYBASE();
 	struct iob * file = (struct iob *)stream;
-	struct file_hook_message message;
+	struct file_action_message fam;
 	int result = OK;
 
 	ENTER();
@@ -62,7 +61,6 @@ fclose(FILE *stream)
 	SHOWPOINTER(stream);
 
 	assert( stream != NULL );
-	assert( UtilityBase != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -100,20 +98,17 @@ fclose(FILE *stream)
 		result = EOF;
 
 	/* Make sure that the stream is closed. */
-	SHOWMSG("calling the hook");
+	SHOWMSG("calling the action function");
 
-	message.action = file_hook_action_close;
-	message.result = OK;
+	fam.fam_Action = file_action_close;
 
-	assert( file->iob_Hook != NULL );
+	assert( file->iob_Action != NULL );
 
-	CallHookPkt(file->iob_Hook,file,&message);
-
-	if(result != EOF)
+	if((*file->iob_Action)(file,&fam) < 0 && result != EOF)
 	{
-		result = message.result;
+		result = EOF;
 
-		__set_errno(message.error);
+		__set_errno(fam.fam_Error);
 	}
 
 	/* Now that the file is closed and we are in fact

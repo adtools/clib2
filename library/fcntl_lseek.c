@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_lseek.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: fcntl_lseek.c,v 1.6 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,15 +42,11 @@
 /****************************************************************************/
 
 off_t
-__lseek(int file_descriptor, off_t offset, int mode, int * error_ptr)
+lseek(int file_descriptor, off_t offset, int mode)
 {
-	D_S(struct FileInfoBlock,fib);
+	struct file_action_message fam;
 	off_t result = -1;
 	struct fd * fd;
-	BOOL fib_is_valid = FALSE;
-	LONG current_position;
-	LONG new_position;
-	LONG new_mode;
 
 	ENTER();
 
@@ -58,7 +54,6 @@ __lseek(int file_descriptor, off_t offset, int mode, int * error_ptr)
 	SHOWVALUE(offset);
 	SHOWVALUE(mode);
 
-	assert( error_ptr != NULL );
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
 	assert( FLAG_IS_SET(__fd[file_descriptor]->fd_Flags,FDF_IN_USE) );
@@ -69,15 +64,7 @@ __lseek(int file_descriptor, off_t offset, int mode, int * error_ptr)
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		(*error_ptr) = EBADF;
-		goto out;
-	}
-
-	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
-	{
-		SHOWMSG("can't seek on a socket");
-
-		(*error_ptr) = ESPIPE;
+		__set_errno(EBADF);
 		goto out;
 	}
 
@@ -85,128 +72,24 @@ __lseek(int file_descriptor, off_t offset, int mode, int * error_ptr)
 	{
 		SHOWMSG("seek mode is invalid");
 
-		(*error_ptr) = EINVAL;
+		__set_errno(EINVAL);
 		goto out;
 	}
 
-	if(mode == SEEK_CUR)
-		new_mode = OFFSET_CURRENT;
-	else if (mode == SEEK_SET)
-		new_mode = OFFSET_BEGINNING;
-	else
-		new_mode = OFFSET_END;
+	fam.fam_Action		= file_action_seek;
+	fam.fam_Position	= offset;
+	fam.fam_Mode		= mode;
 
-	D(("seek&extended to offset %ld, mode %ld; current position = %ld",offset,new_mode,Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT)));
+	assert( fd->fd_Action != NULL );
 
-	if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
+	result = (*fd->fd_Action)(fd,&fam);
+	if(result < 0)
 	{
-		current_position = fd->fd_Position;
+		__set_errno(fam.fam_Error);
+		goto out;
 	}
-	else
-	{
-		PROFILE_OFF();
-		current_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
-		PROFILE_ON();
-
-		if(current_position < 0)
-		{
-			(*error_ptr) = EBADF;
-			goto out;
-		}
-	}
-
-	new_position = current_position;
-
-	switch(new_mode)
-	{
-		case OFFSET_CURRENT:
-
-			new_position += offset;
-			break;
-
-		case OFFSET_BEGINNING:
-
-			new_position = offset;
-			break;
-
-		case OFFSET_END:
-
-			if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
-			{
-				new_position = fib->fib_Size + offset;
-
-				fib_is_valid = TRUE;
-			}
-
-			break;
-	}
-
-	if(new_position != current_position)
-	{
-		LONG position;
-
-		PROFILE_OFF();
-		position = Seek(fd->fd_DefaultFile,offset,new_mode);
-		PROFILE_ON();
-
-		if(position < 0)
-		{
-			D(("seek failed, mode=%ld (%ld), offset=%ld, ioerr=%ld",new_mode,message->mode,offset,IoErr()));
-
-			(*error_ptr) = __translate_io_error_to_errno(IoErr());
-
-			#if defined(UNIX_PATH_SEMANTICS)
-			{
-				if(NOT fib_is_valid && CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
-				{
-					(*error_ptr) = __translate_io_error_to_errno(IoErr());
-					goto out;
-				}
-
-				if(new_position <= fib->fib_Size)
-				{
-					(*error_ptr) = __translate_io_error_to_errno(IoErr());
-					goto out;
-				}
-
-				if(__grow_file_size(fd,new_position - fib->fib_Size) != OK)
-				{
-					(*error_ptr) = __translate_io_error_to_errno(IoErr());
-					goto out;
-				}
-			}
-			#else
-			{
-				(*error_ptr) = __translate_io_error_to_errno(IoErr());
-				goto out;
-			}
-			#endif /* UNIX_PATH_SEMANTICS */
-		}
-	}
-
-	if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-		fd->fd_Position = new_position;
-
-	result = new_position;
 
  out:
-
-	RETURN(result);
-	return(result);
-}
-
-/****************************************************************************/
-
-off_t
-lseek(int file_descriptor, off_t offset, int mode)
-{
-	off_t result;
-	int error;
-
-	ENTER();
-
-	result = __lseek(file_descriptor,offset,mode,&error);
-	__set_errno(error);
 
 	RETURN(result);
 	return(result);

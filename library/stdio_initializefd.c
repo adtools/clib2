@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_initializefd.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,27 +39,16 @@
 
 void
 __initialize_fd(
-	struct fd *	fd,
-	HOOKFUNC	hook_function,
-	BPTR		default_file,
-	ULONG		flags)
+	struct fd *			fd,
+	file_action_fd_t	action_function,
+	BPTR				default_file,
+	ULONG				flags)
 {
-	assert( fd != NULL && hook_function != NULL );
+	assert( fd != NULL && action_function != NULL );
 
 	memset(fd,0,sizeof(*fd));
 
 	fd->fd_DefaultFile	= default_file;
 	fd->fd_Flags		= flags;
-	fd->fd_Hook			= &fd->fd_DefaultHook;
-
-	#if defined(__amigaos4__)
-	{
-		fd->fd_Hook->h_Entry	= (HOOKFUNC)hook_function;
-	}
-	#else
-	{
-		fd->fd_Hook->h_Entry	= (HOOKFUNC)HookEntry;
-		fd->fd_Hook->h_SubEntry	= (HOOKFUNC)hook_function;
-	}
-	#endif /* __amigaos4__ */
+	fd->fd_Action		= action_function;
 }

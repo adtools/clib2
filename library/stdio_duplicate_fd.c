@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_duplicate_fd.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_duplicate_fd.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,25 +40,10 @@
 void
 __duplicate_fd(struct fd * duplicate_fd,struct fd * original_fd)
 {
-	HOOKFUNC hook_function;
-
 	assert( duplicate_fd != NULL && original_fd != NULL );
 
-	/* Obtain the hook function associated with the file; note that
-	   this is different depending upon which operating system
-	   release is being used (compare "stdio_initializefd.c"). */
-	#if defined(__amigaos4__)
-	{
-		hook_function = original_fd->fd_Hook->h_Entry;
-	}
-	#else
-	{
-		hook_function = original_fd->fd_Hook->h_SubEntry;
-	}
-	#endif /* __amigaos4__ */
-
 	/* Initialize the duplicate to match the original. */
-	__initialize_fd(duplicate_fd,hook_function,original_fd->fd_DefaultFile,original_fd->fd_Flags);
+	__initialize_fd(duplicate_fd,original_fd->fd_Action,original_fd->fd_DefaultFile,original_fd->fd_Flags);
 
 	/* Figure out where the linked list of file descriptors associated
 	   with this one starts. */

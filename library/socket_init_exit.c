@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.8 2005-01-09 10:10:41 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -277,7 +277,7 @@ __socket_init(void)
 					}
 				}
 
-				__initialize_fd(fd,(HOOKFUNC)__socket_hook_entry,(BPTR)sockfd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE);
+				__initialize_fd(fd,__socket_hook_entry,(BPTR)sockfd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE);
 			}
 
 			/* This program now runs as an internet superserver client (daemon). */

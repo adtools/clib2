@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vsnprintf_hook_entry.c,v 1.4 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_vsnprintf_hook_entry.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,47 +43,47 @@
 
 /****************************************************************************/
 
-void
+int
 __vsnprintf_hook_entry(
-	struct Hook *				UNUSED	unused_hook,
-	struct iob *						string_iob,
-	struct file_hook_message *			message)
+	struct iob *					string_iob,
+	struct file_action_message *	fam)
 {
 	int result = -1;
 	int error = OK;
 
-	assert( message != NULL && string_iob != NULL );
+	assert( fam != NULL && string_iob != NULL );
 
-	if(message->action != file_hook_action_write)
+	if(fam->fam_Action != file_action_write)
 	{
 		error = EBADF;
 		goto out;
 	}
 
-	if(message->size > 0 && string_iob->iob_StringSize > 0 && string_iob->iob_StringPosition < string_iob->iob_StringSize)
+	if(fam->fam_Size > 0 && string_iob->iob_StringSize > 0 && string_iob->iob_StringPosition < string_iob->iob_StringSize)
 	{
 		int num_bytes_left;
 		int num_bytes;
 
 		num_bytes_left = string_iob->iob_StringSize - string_iob->iob_StringPosition;
 
-		num_bytes = message->size;
+		num_bytes = fam->fam_Size;
 		if(num_bytes > num_bytes_left)
 			num_bytes = num_bytes_left;
 
 		assert( num_bytes >= 0 );
 
-		assert( message->data != NULL );
+		assert( fam->fam_Data != NULL );
 		assert( string_iob->iob_String != NULL );
 
-		memmove(&string_iob->iob_String[string_iob->iob_StringPosition],message->data,(size_t)num_bytes);
+		memmove(&string_iob->iob_String[string_iob->iob_StringPosition],fam->fam_Data,(size_t)num_bytes);
 		string_iob->iob_StringPosition += num_bytes;
 	}
 
-	result = message->size;
+	result = fam->fam_Size;
 
  out:
 
-	message->result	= result;
-	message->error	= error;
+	fam->fam_Error = error;
+
+	return(result);
 }

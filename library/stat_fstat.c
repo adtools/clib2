@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fstat.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stat_fstat.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,8 +50,7 @@
 int
 fstat(int file_descriptor, struct stat * buffer)
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
+	struct file_action_message fam;
 	D_S(struct FileInfoBlock,fib);
 	int result = -1;
 	struct fd * fd;
@@ -62,7 +61,6 @@ fstat(int file_descriptor, struct stat * buffer)
 	SHOWPOINTER(buffer);
 
 	assert( buffer != NULL );
-	assert( UtilityBase != NULL );
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -92,22 +90,19 @@ fstat(int file_descriptor, struct stat * buffer)
 
 	SHOWMSG("calling the hook");
 
-	message.action		= file_hook_action_examine;
-	message.file_info	= fib;
-	message.file_system	= NULL;
+	fam.fam_Action		= file_action_examine;
+	fam.fam_FileInfo	= fib;
+	fam.fam_FileSystem	= NULL;
 
-	assert( fd->fd_Hook != NULL );
+	assert( fd->fd_Action != NULL );
 
-	CallHookPkt(fd->fd_Hook,fd,&message);
-
-	result = message.result;
-	if(result != 0)
+	if((*fd->fd_Action)(fd,&fam) < 0)
 	{
-		__set_errno(message.error);
+		__set_errno(fam.fam_Error);
 		goto out;
 	}
 
-	__convert_file_info_to_stat(message.file_system,fib,buffer);
+	__convert_file_info_to_stat(fam.fam_FileSystem,fib,buffer);
 
  out:
 
