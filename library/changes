@@ -25,6 +25,10 @@
   all IsInterative() tests. I verified that IsInteractive() will always
   return FALSE for NIL: type file handles.
 
+- Dropped the special flag variable used by the abort() function that
+  tracks whether or not console output is possible. We now use the
+  global "__no_standard_io" instead.
+
 
 c.lib 1.185 (2.1.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: signal_headers.h,v 1.5 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: signal_headers.h,v 1.6 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,10 +73,6 @@ extern signal_handler_t	NOCOMMON __signal_handler_table[NUM_SIGNALS];
 /****************************************************************************/
 
 extern int NOCOMMON __signals_blocked;
-
-/****************************************************************************/
-
-extern BOOL NOCOMMON __termination_message_disabled;
 
 /****************************************************************************/
 

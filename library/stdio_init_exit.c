@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.8 2005-01-09 09:54:33 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.9 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -171,7 +171,7 @@ __stdio_init(void)
 
 				iob_flags		= IOBF_IN_USE | IOBF_WRITE | IOBF_NO_NUL | IOBF_BUFFER_MODE_NONE;
 				fd_flags		= FDF_IN_USE | FDF_WRITE;
-				default_file	= ZERO;
+				default_file	= ZERO; /* NOTE: this is really initialized later; see below... */
 				break;
 		}
 

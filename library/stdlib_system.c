@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_system.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_system.c,v 1.3 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ system(const char * command)
 	}
 	else
 	{
-		STATIC const struct TagItem system_tags[2] =
+		static const struct TagItem system_tags[2] =
 		{
 			{ SYS_UserShell,	TRUE },
 			{ TAG_END,			0 }

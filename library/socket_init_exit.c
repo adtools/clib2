@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.7 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.8 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -244,14 +244,12 @@ __socket_init(void)
 
 			SHOWVALUE(daemon_socket);
 
-			/* Whatever happens, the following likely won't end up
-			 * in the console...
-			 */
-			__termination_message_disabled = TRUE;
-
 			/* Shut down the three standard I/O streams. */
 			for(i = STDIN_FILENO ; i <= STDERR_FILENO ; i++)
 				close(i);
+
+			/* The standard I/O streams are no longer attached to a console. */
+			__no_standard_io = TRUE;
 
 			/* Put the socket into the three standard I/O streams. */
 			for(i = STDIN_FILENO ; i <= STDERR_FILENO ; i++)
@@ -284,9 +282,6 @@ __socket_init(void)
 
 			/* This program now runs as an internet superserver client (daemon). */
 			__is_daemon = TRUE;
-
-			/* The standard I/O streams are no longer attached to a console. */
-			__no_standard_io = TRUE;
 		}
 	}
 

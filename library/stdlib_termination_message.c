@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_termination_message.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: stdlib_termination_message.c,v 1.4 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ __print_termination_message(const char * termination_message)
 	{
 		termination_message_printed = TRUE;
 
-		if(NOT __termination_message_disabled && NOT __no_standard_io)
+		if(NOT __no_standard_io)
 		{
 			fputs((termination_message != NULL) ? termination_message : "Abnormal program termination",stderr);
 

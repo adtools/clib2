@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setenv.c,v 1.4 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_setenv.c,v 1.5 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,7 +61,7 @@ struct LocalVariable
 
 /****************************************************************************/
 
-STATIC struct LocalVariable * __lv_root;
+static struct LocalVariable * __lv_root;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.7 2005-01-09 09:40:32 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.8 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -156,19 +156,17 @@ __show_error(const char * message)
 		{
 			/* Try to print the error message on the default error output stream. */
 			output = ErrorOutput();
-			if(output == ZERO)
-				output = Output();
 		}
 		#else
 		{
 			struct Process * this_process = (struct Process *)FindTask(NULL);
 
-			if(this_process->pr_CES != ZERO)
-				output = this_process->pr_CES;
-			else
-				output = Output();
+			output = this_process->pr_CES;
 		}
 		#endif /* __amigaos4__ */
+
+		if(output == ZERO)
+			output = Output();
 
 		if(output != ZERO)
 		{

@@ -1,5 +1,5 @@
 /*
- * $Id: signal_data.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: signal_data.c,v 1.4 2005-01-09 10:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,3 @@ int __signals_blocked;
 /****************************************************************************/
 
 BOOL __check_abort_enabled = TRUE;
-
-/****************************************************************************/
-
-BOOL __termination_message_disabled;
