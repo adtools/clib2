@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_openiob.c,v 1.10 2005-02-28 10:07:31 obarthel Exp $
+ * $Id: stdio_openiob.c,v 1.11 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -169,11 +169,9 @@ __open_iob(const char *filename, const char *mode, int file_descriptor, int slot
 	{
 		/* Allocate memory for an arbitration mechanism, then
 		   initialize it. */
-		lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
+		lock = __create_semaphore();
 		if(lock == NULL)
 			goto out;
-
-		InitSemaphore(lock);
 	}
 	#else
 	{

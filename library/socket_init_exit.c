@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.10 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.11 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -257,11 +257,9 @@ __socket_init(void)
 			{
 				#if defined(__THREAD_SAFE)
 				{
-					lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
+					lock = __create_semaphore();
 					if(lock == NULL)
 						goto out;
-
-					InitSemaphore(lock);
 				}
 				#else
 				{
@@ -287,7 +285,7 @@ __socket_init(void)
 					{
 						SHOWMSG("could not duplicate daemon socket");
 
-						FreeVec(lock);
+						__delete_semaphore(lock);
 
 						__show_error("Network server streams could not be initialized.");
 						goto out;

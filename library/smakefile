@@ -1,5 +1,5 @@
-_#
-# $Id: smakefile,v 1.27 2005-03-02 12:57:53 obarthel Exp $
+#
+# $Id: smakefile,v 1.28 2005-03-03 14:20:55 obarthel Exp $
 #
 # :ts=8
 #
@@ -36,7 +36,7 @@ INCLUDE_DIR = V:include
  CPU		= cpu=060
 MATH		= define=IEEE_FLOATING_POINT_SUPPORT math=IEEE
 SUPPORT		= define=UNIX_PATH_SEMANTICS define=SOCKET_SUPPORT define=USERGROUP_SUPPORT \
-		  define=__C_MACROS__
+		  define=__C_MACROS__ define=__THREAD_SAFE
 
 ##############################################################################
 
@@ -395,6 +395,7 @@ STDLIB_OBJ = \
 	stdlib_dosbase.o \
 	stdlib_get_errno.o \
 	stdlib_set_errno.o \
+	stdlib_semaphore.o \
 	stdlib_sysbase.o \
 	stdlib_termination_message.o \
 	stdlib_threshold.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.10 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.11 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -125,7 +125,7 @@ __socket_hook_entry(
 			__fd_unlock(fd);
 
 			/* Free the lock semaphore now. */
-			FreeVec(fd->fd_Lock);
+			__delete_semaphore(fd->fd_Lock);
 
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));

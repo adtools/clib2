@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.9 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.10 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -358,7 +358,7 @@ __memory_exit(void)
 
 	#if defined(__THREAD_SAFE)
 	{
-		FreeVec(memory_semaphore);
+		__delete_semaphore(memory_semaphore);
 		memory_semaphore = NULL;
 	}
 	#endif /* __THREAD_SAFE */
@@ -377,11 +377,9 @@ __memory_init(void)
 
 	#if defined(__THREAD_SAFE)
 	{
-		memory_semaphore = AllocVec(sizeof(*memory_semaphore),MEMF_ANY|MEMF_PUBLIC);
+		memory_semaphore = __create_semaphore();
 		if(memory_semaphore == NULL)
 			goto out;
-
-		InitSemaphore(memory_semaphore);
 	}
 	#endif /* __THREAD_SAFE */
 

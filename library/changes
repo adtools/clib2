@@ -91,6 +91,11 @@
 - The shell command parameter parser now considers the non-breaking
   space character (ISO code 160) to be a blank space character, too.
 
+- Moved the signal semaphore allocation/initialization/deallocation
+  into a dedicated module. This also has the advantage that it's
+  harder to break code by accidentally forgetting to call
+  InitSemaphore() after having allocated the memory for it.
+
 
 c.lib 1.188 (7.2.2005)
 

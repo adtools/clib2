@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.12 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.13 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -331,14 +331,12 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 	#if defined(__THREAD_SAFE)
 	{
-		fd_lock = AllocVec(sizeof(*fd_lock),MEMF_ANY|MEMF_PUBLIC);
+		fd_lock = __create_semaphore();
 		if(fd_lock == NULL)
 		{
 			__set_errno(ENOMEM);
 			goto out;
 		}
-
-		InitSemaphore(fd_lock);
 	}
 	#else
 	{

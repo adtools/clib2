@@ -1,5 +1,5 @@
 /*
- * $Id: socket_socket.c,v 1.6 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: stdlib_semaphore.c,v 1.1 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,88 +31,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(SOCKET_SUPPORT)
+#include "stdlib_headers.h"
 
 /****************************************************************************/
 
-#ifndef _SOCKET_HEADERS_H
-#include "socket_headers.h"
-#endif /* _SOCKET_HEADERS_H */
-
-/****************************************************************************/
-
-int
-socket(int domain,int type,int protocol)
+struct SignalSemaphore *
+__create_semaphore(void)
 {
-	struct SignalSemaphore * lock = NULL;
-	int result = -1;
-	struct fd * fd;
-	int fd_slot_number;
-	LONG socket_fd;
+	struct SignalSemaphore * semaphore;
 
-	ENTER();
-
-	SHOWVALUE(domain);
-	SHOWVALUE(type);
-	SHOWVALUE(protocol);
-
-	__stdio_lock();
-
-	fd_slot_number = __find_vacant_fd_entry();
-	if(fd_slot_number < 0)
+	#if defined(__amigaos4__)
 	{
-		if(__grow_fd_table() < 0)
-		{
-			SHOWMSG("couldn't find a vacant fd slot and no memory to create one");
-			goto out;
-		}
-
-		fd_slot_number = __find_vacant_fd_entry();
-		assert( fd_slot_number >= 0 );
+		semaphore = AllocSysObject(ASOT_SEMAPHORE,NULL);
 	}
-
-	#if defined(__THREAD_SAFE)
+	#else
 	{
-		lock = __create_semaphore();
-		if(lock == NULL)
-		{
-			__set_errno(ENOMEM);
-			goto out;
-		}
+		semaphore = AllocVec(sizeof(*semaphore),MEMF_ANY|MEMF_PUBLIC);
+		if(semaphore != NULL)
+			InitSemaphore(semaphore);
 	}
-	#endif /* __THREAD_SAFE */
+	#endif /* __amigaos4 */
 
-	PROFILE_OFF();
-	socket_fd = __socket(domain,type,protocol);
-	PROFILE_ON();
-
-	if(socket_fd < 0)
-	{
-		SHOWMSG("could not create socket");
-		goto out;
-	}
-
-	fd = __fd[fd_slot_number];
-
-	__initialize_fd(fd,__socket_hook_entry,(BPTR)socket_fd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE,lock);
-
-	lock = NULL;
-
-	result = fd_slot_number;
-
- out:
-
-	__stdio_unlock();
-
-	__delete_semaphore(lock);
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	RETURN(result);
-	return(result);
+	return(semaphore);
 }
 
 /****************************************************************************/
 
-#endif /* SOCKET_SUPPORT */
+void
+__delete_semaphore(struct SignalSemaphore * semaphore)
+{
+	if(semaphore != NULL)
+	{
+		#if defined(__amigaos4__)
+		{
+			FreeSysObject(ASOT_SEMAPHORE,semaphore);
+		}
+		#else
+		{
+			assert( semaphore->ss_Owner == NULL );
+
+			#if defined(DEBUG)
+			{
+				/* Just in case somebody tries to reuse this data
+				   structure; this should produce an alert if
+				   attempted. */
+				memset(semaphore,0,sizeof(*semaphore));
+			}
+			#endif /* DEBUG */
+
+			FreeVec(semaphore);
+		}
+		#endif /* __amigaos4 */
+	}
+}

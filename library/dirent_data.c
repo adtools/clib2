@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_data.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: dirent_data.c,v 1.8 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -82,11 +82,9 @@ CLIB_CONSTRUCTOR(__dirent_init)
 
 	#if defined(__THREAD_SAFE)
 	{
-		dirent_lock = AllocVec(sizeof(*dirent_lock),MEMF_ANY|MEMF_PUBLIC);
+		dirent_lock = __create_semaphore();
 		if(dirent_lock == NULL)
 			goto out;
-
-		InitSemaphore(dirent_lock);
 	}
 	#endif /* __THREAD_SAFE */
 
@@ -116,7 +114,7 @@ CLIB_DESTRUCTOR(__dirent_exit)
 
 	#if defined(__THREAD_SAFE)
 	{
-		FreeVec(dirent_lock);
+		__delete_semaphore(dirent_lock);
 		dirent_lock = NULL;
 	}
 	#endif /* __THREAD_SAFE */

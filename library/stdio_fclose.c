@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fclose.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: stdio_fclose.c,v 1.8 2005-03-03 14:20:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,8 +61,6 @@ fclose(FILE *stream)
 	SHOWPOINTER(stream);
 
 	assert( stream != NULL );
-
-	assert( file->iob_Lock == NULL || file->iob_Lock->ss_Owner == NULL );
 
 	if(__check_abort_enabled)
 		__check_abort();
@@ -142,7 +140,7 @@ fclose(FILE *stream)
 		free(file->iob_CustomBuffer);
 
 	/* Free the lock semaphore now. */
-	FreeVec(file->iob_Lock);
+	__delete_semaphore(file->iob_Lock);
 
 	memset(file,0,sizeof(*file));
 
