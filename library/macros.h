@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.10 2005-03-09 21:07:25 obarthel Exp $
+ * $Id: macros.h,v 1.11 2005-03-10 07:47:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -136,7 +136,7 @@
 #define WEAK __attribute__((weak))
 #else
 #define WEAK /* WEAK */
-#endif
+#endif /* __GNUC__ */
 #endif /* WEAK */
 
 /****************************************************************************/
@@ -148,39 +148,42 @@
 #else
 #define UNUSED /* UNUSED */
 #define NOCOMMON /* NOCOMMON */
-#endif
+#endif /* __GNUC__ */
 #endif /* UNUSED */
 
 /****************************************************************************/
 
 #ifdef __SASC
+
 #define CLIB_CONSTRUCTOR(name)		int __stdargs _STI_500_##name(void)
 #define CLIB_DESTRUCTOR(name)		void __stdargs _STD_500_##name(void)
 #define PROFILE_CONSTRUCTOR(name)	int __stdargs _STI_150_##name(void)
 #define PROFILE_DESTRUCTOR(name)	void __stdargs _STD_150_##name(void)
 #define CONSTRUCTOR_SUCCEED()		return(0)
 #define CONSTRUCTOR_FAIL()			return(1)
+
 #endif /* __SASC */
 
 #ifdef __GNUC__
+
 #define CLIB_CONSTRUCTOR(name) \
 	STATIC VOID __attribute__((used)) name##_ctor(void); \
-	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors.00500"))) = name##_ctor; \
+	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors._00500"))) = name##_ctor; \
 	STATIC VOID name##_ctor(void)
 	
 #define CLIB_DESTRUCTOR(name) \
 	STATIC VOID __attribute__((used)) name##_dtor(void); \
-	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors.00500"))) = name##_dtor; \
+	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors._00500"))) = name##_dtor; \
 	STATIC VOID name##_dtor(void)
 
 #define PROFILE_CONSTRUCTOR(name) \
 	STATIC VOID __attribute__((used)) name##_ctor(void); \
-	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors.00150"))) = name##_ctor; \
+	STATIC VOID (*__name##_ctor)(void) __attribute__((used,section(".ctors._00150"))) = name##_ctor; \
 	STATIC VOID name##_ctor(void)
 
 #define PROFILE_DESTRUCTOR(name) \
 	STATIC VOID __attribute__((used)) name##_dtor(void); \
-	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors.00150"))) = name##_dtor; \
+	STATIC VOID (*__name##_dtor)(void) __attribute__((used,section(".dtors._00150"))) = name##_dtor; \
 	STATIC VOID name##_ctor(void)
 	
 #define CONSTRUCTOR_SUCCEED() \
@@ -188,6 +191,7 @@
 
 #define CONSTRUCTOR_FAIL() \
 	exit(RETURN_FAIL)	/* ZZZ not a nice thing to do; fix the constructor invocation code! */
+
 #endif /* __GNUC__ */
 
 /****************************************************************************/
