@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.5 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.6 2005-01-09 15:58:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -275,8 +275,16 @@ __memory_init(void)
 
 	NewList((struct List *)&__memory_list);
 
-	if(((struct Library *)SysBase)->lib_Version >= 39)
+	#if defined(__amigaos4__)
+	{
 		__memory_pool = CreatePool(MEMF_ANY,(ULONG)__default_pool_size,(ULONG)__default_puddle_size);
+	}
+	#else
+	{
+		if(((struct Library *)SysBase)->lib_Version >= 39)
+			__memory_pool = CreatePool(MEMF_ANY,(ULONG)__default_pool_size,(ULONG)__default_puddle_size);
+	}
+	#endif /* __amigaos4__ */
 
 	LEAVE();
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.5 2005-01-09 09:54:33 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.6 2005-01-09 15:58:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,6 +53,69 @@
 
 /****************************************************************************/
 
+/* This is used in place of ExamineFH() in order to work around a bug in
+   dos.library V40 and below: a "NIL:" file handle will crash the
+   ExamineFH() function. */
+static LONG
+safe_examine_file_handle(BPTR file_handle,struct FileInfoBlock *fib)
+{
+	LONG result = DOSFALSE;
+
+	assert( fib != NULL );
+
+	#ifndef __amigaos4__
+	{
+		struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
+
+		if(fh == NULL || fh->fh_Type == NULL)
+		{
+			SetIoErr(ERROR_OBJECT_WRONG_TYPE);
+			goto out;
+		}
+	}
+	#endif /* __amigaos4__ */
+
+	PROFILE_OFF();
+	result = ExamineFH(file_handle,fib);
+	PROFILE_ON();
+
+ out:
+
+	return(result);
+}
+
+/* Same thing as above, but for ChangeMode(), which suffers from
+   the same problem. */
+static LONG
+safe_change_mode(LONG type,BPTR file_handle,LONG mode)
+{
+	LONG result = DOSFALSE;
+
+	#ifndef __amigaos4__
+	{
+		struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
+
+		assert( type == CHANGE_FH );
+
+		if(fh == NULL || fh->fh_Type == NULL)
+		{
+			SetIoErr(ERROR_OBJECT_WRONG_TYPE);
+			goto out;
+		}
+	}
+	#endif /* __amigaos4__ */
+
+	PROFILE_OFF();
+	result = ChangeMode(type,file_handle,mode);
+	PROFILE_ON();
+
+ out:
+
+	return(result);
+}
+
+/****************************************************************************/
+
 int
 open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 {
@@ -64,7 +127,6 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 	LONG is_file_system = FALSE;
 	LONG open_mode;
 	BPTR lock = ZERO;
-	struct FileHandle * file_handle;
 	BPTR handle = ZERO;
 	BOOL create_new_file = FALSE;
 	LONG is_interactive;
@@ -294,47 +356,33 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 		goto out;
 	}
 
-	file_handle = BADDR(handle);
-
-	/* NOTE: workaround for a bug in dos.library V40 and below which will
-	 *       crash the caller if the file handle refers to "NIL:".
-	 */
-	if(file_handle->fh_Type != NULL)
+	if(safe_examine_file_handle(handle,fib) != DOSFALSE)
 	{
-		LONG status;
+		BOOL operation_permitted = TRUE;
 
-		PROFILE_OFF();
-		status = ExamineFH(handle,fib);
-		PROFILE_ON();
-
-		if(status != DOSFALSE)
+		/* Check if the file is readable. */
+		if(FLAG_IS_SET(fib->fib_Protection,FIBF_READ))
 		{
-			BOOL operation_permitted = TRUE;
-
-			/* Check if the file is readable. */
-			if(FLAG_IS_SET(fib->fib_Protection,FIBF_READ))
+			if(access_mode == O_RDONLY ||
+			   access_mode == O_RDWR)
 			{
-				if(access_mode == O_RDONLY ||
-				   access_mode == O_RDWR)
-				{
-					operation_permitted = FALSE;
-				}
+				operation_permitted = FALSE;
 			}
+		}
 
-			/* Check if the file can be written to. */
-			if(FLAG_IS_SET(fib->fib_Protection,FIBF_WRITE))
-			{
-				if(access_mode == O_WRONLY)
-					operation_permitted = FALSE;
-			}
+		/* Check if the file can be written to. */
+		if(FLAG_IS_SET(fib->fib_Protection,FIBF_WRITE))
+		{
+			if(access_mode == O_WRONLY)
+				operation_permitted = FALSE;
+		}
 
-			if(NOT operation_permitted)
-			{
-				SHOWMSG("this object must not be opened");
+		if(NOT operation_permitted)
+		{
+			SHOWMSG("this object must not be opened");
 
-				errno = EACCES;
-				goto out;
-			}
+			errno = EACCES;
+			goto out;
 		}
 	}
 
@@ -365,7 +413,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 		len = 0;
 
-		for(i = 0 ; i < (int)strlen(path_name) ; i++)
+		for(i = 0 ; path_name[i] != '\0' ; i++)
 		{
 			if(path_name[i] == ':')
 			{
@@ -400,21 +448,11 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 		if(is_file_system)
 		{
-			/* NOTE: workaround for a bug in dos.library V40 and below which will
-			 *       crash the caller if the file handle refers to "NIL:".
-			 */
-			if(file_handle->fh_Type != NULL)
-			{
-				/* We opened the file in exclusive access mode. Switch it back
-				   into shared access mode so that its contents can be read
-				   while it's still open. */
-				if(open_mode == MODE_NEWFILE)
-				{
-					PROFILE_OFF();
-					ChangeMode(CHANGE_FH,handle,SHARED_LOCK);
-					PROFILE_ON();
-				}
-			}
+			/* We opened the file in exclusive access mode. Switch it back
+			   into shared access mode so that its contents can be read
+			   while it's still open. */
+			if(open_mode == MODE_NEWFILE)
+				safe_change_mode(CHANGE_FH,handle,SHARED_LOCK);
 
 			/* We should be able to seek in this file. */
 			SET_FLAG(fd->fd_Flags,FDF_CACHE_POSITION);

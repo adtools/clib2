@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.10 2005-01-09 10:43:40 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.11 2005-01-09 15:58:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -242,13 +242,9 @@ __stdio_init(void)
 
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
 		}
-		else if (__fd[STDOUT_FILENO]->fd_DefaultFile != ZERO)
+		else
 		{
-			struct FileHandle * fh = (struct FileHandle *)BADDR(__fd[STDOUT_FILENO]->fd_DefaultFile);
-
-			/* Careful, this could be "NIL:". */
-			if(fh->fh_Type != NULL)
-				__fd[STDERR_FILENO]->fd_DefaultFile = Open("CONSOLE:",MODE_NEWFILE);
+			__fd[STDERR_FILENO]->fd_DefaultFile = Open("CONSOLE:",MODE_NEWFILE);
 		}
 	}
 

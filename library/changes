@@ -31,6 +31,15 @@
 
 - Made the <ctype.h> macros more robust.
 
+- Removed the "NIL:" file handle tests preceding the Open("CONSOLE:",..)
+  calls. As of Kickstart 2.x and beyond these are no longer a source of
+  trouble.
+
+- The V37/V40 compatibility code is no longer built for the AmigaOS4
+  version of the library.
+
+- Switched over the last use of DeviceProc() to GetDeviceProc(), etc.
+
 
 c.lib 1.185 (2.1.2005)
 

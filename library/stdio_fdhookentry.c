@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.5 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.6 2005-01-09 15:58:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,16 +59,21 @@
 static LONG
 safe_examine_file_handle(BPTR file_handle,struct FileInfoBlock *fib)
 {
-	struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
 	LONG result = DOSFALSE;
 
 	assert( fib != NULL );
 
-	if(fh == NULL || fh->fh_Type == NULL)
+	#ifndef __amigaos4__
 	{
-		SetIoErr(ERROR_OBJECT_WRONG_TYPE);
-		goto out;
+		struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
+
+		if(fh == NULL || fh->fh_Type == NULL)
+		{
+			SetIoErr(ERROR_OBJECT_WRONG_TYPE);
+			goto out;
+		}
 	}
+	#endif /* __amigaos4__ */
 
 	PROFILE_OFF();
 	result = ExamineFH(file_handle,fib);
@@ -85,14 +90,19 @@ safe_examine_file_handle(BPTR file_handle,struct FileInfoBlock *fib)
 static BPTR
 safe_parent_of_file_handle(BPTR file_handle)
 {
-	struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
 	BPTR result = ZERO;
 
-	if(fh == NULL || fh->fh_Type == NULL)
+	#ifndef __amigaos4__
 	{
-		SetIoErr(ERROR_OBJECT_WRONG_TYPE);
-		goto out;
+		struct FileHandle * fh = (struct FileHandle *)BADDR(file_handle);
+
+		if(fh == NULL || fh->fh_Type == NULL)
+		{
+			SetIoErr(ERROR_OBJECT_WRONG_TYPE);
+			goto out;
+		}
 	}
+	#endif /* __amigaos4__ */
 
 	PROFILE_OFF();
 	result = ParentOfFH(file_handle);
@@ -244,19 +254,27 @@ obtain_file_lock_semaphore(BOOL shared)
 
 		if(shared)
 		{
-			if(((struct Library *)SysBase)->lib_Version >= 39)
+			#if defined(__amigaos4__)
 			{
 				ObtainSemaphoreShared((struct SignalSemaphore *)FileLockSemaphore);
 			}
-			else
+			#else
 			{
-				/* Workaround for shared semaphore nesting problem. */
-				if(CANNOT AttemptSemaphoreShared((struct SignalSemaphore *)FileLockSemaphore))
+				if(((struct Library *)SysBase)->lib_Version >= 39)
 				{
-					if(CANNOT AttemptSemaphore((struct SignalSemaphore *)FileLockSemaphore))
-						ObtainSemaphoreShared((struct SignalSemaphore *)FileLockSemaphore);
+					ObtainSemaphoreShared((struct SignalSemaphore *)FileLockSemaphore);
+				}
+				else
+				{
+					/* Workaround for shared semaphore nesting problem. */
+					if(CANNOT AttemptSemaphoreShared((struct SignalSemaphore *)FileLockSemaphore))
+					{
+						if(CANNOT AttemptSemaphore((struct SignalSemaphore *)FileLockSemaphore))
+							ObtainSemaphoreShared((struct SignalSemaphore *)FileLockSemaphore);
+					}
 				}
 			}
+			#endif /* __amigaos4__ */
 		}
 		else
 		{
@@ -1885,10 +1903,8 @@ __fd_hook_entry(
 
 						old_current_dir = CurrentDir(parent_dir);
 
-						if(((struct Library *)DOSBase)->lib_Version >= 39)
+						#if defined(__amigaos4__)
 						{
-							SHOWMSG("changing owner");
-
 							if(SetOwner(fib->fib_FileName,(LONG)((((ULONG)message->owner) << 16) | message->group)))
 							{
 								result = 0;
@@ -1900,36 +1916,55 @@ __fd_hook_entry(
 								__translate_io_error_to_errno(IoErr(),&error);
 							}
 						}
-						else
+						#else
 						{
-							D_S(struct bcpl_name,new_name);
-							struct DevProc * dvp;
-							unsigned int len;
-
-							SHOWMSG("have to do this manually...");
-
-							len = strlen(fib->fib_FileName);
-
-							assert( len < sizeof(new_name->name) );
-
-							dvp = GetDeviceProc(fib->fib_FileName,NULL);
-							if(dvp != NULL)
+							if(((struct Library *)DOSBase)->lib_Version >= 39)
 							{
-								new_name->name[0] = len;
-								memmove(&new_name->name[1],fib->fib_FileName,len);
+								SHOWMSG("changing owner");
 
-								if(DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)message->owner) << 16) | message->group),0,0))
+								if(SetOwner(fib->fib_FileName,(LONG)((((ULONG)message->owner) << 16) | message->group)))
+								{
 									result = 0;
+								}
 								else
-									__translate_io_error_to_errno(IoErr(),&error);
+								{
+									SHOWMSG("that didn't work");
 
-								FreeDeviceProc(dvp);
+									__translate_io_error_to_errno(IoErr(),&error);
+								}
 							}
 							else
 							{
-								__translate_io_error_to_errno(IoErr(),&error);
+								D_S(struct bcpl_name,new_name);
+								struct DevProc * dvp;
+								unsigned int len;
+
+								SHOWMSG("have to do this manually...");
+
+								len = strlen(fib->fib_FileName);
+
+								assert( len < sizeof(new_name->name) );
+
+								dvp = GetDeviceProc(fib->fib_FileName,NULL);
+								if(dvp != NULL)
+								{
+									new_name->name[0] = len;
+									memmove(&new_name->name[1],fib->fib_FileName,len);
+
+									if(DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)message->owner) << 16) | message->group),0,0))
+										result = 0;
+									else
+										__translate_io_error_to_errno(IoErr(),&error);
+
+									FreeDeviceProc(dvp);
+								}
+								else
+								{
+									__translate_io_error_to_errno(IoErr(),&error);
+								}
 							}
 						}
+						#endif /* __amigaos4__ */
 
 						CurrentDir(old_current_dir);
 

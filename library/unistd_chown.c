@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chown.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_chown.c,v 1.4 2005-01-09 15:58:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,57 +106,59 @@ chown(const char * path_name, uid_t owner, gid_t group)
 
 	D(("changing owner of '%s'",path_name));
 
-	if(((struct Library *)DOSBase)->lib_Version >= 39)
+	#if defined(__amigaos4__)
 	{
 		PROFILE_OFF();
 		status = SetOwner((STRPTR)path_name,(LONG)((((ULONG)owner) << 16) | group));
 		PROFILE_ON();
-
-		if(status == DOSFALSE)
-		{
-			__translate_io_error_to_errno(IoErr(),&errno);
-			goto out;
-		}
-
-		result = 0;
 	}
-	else
+	#else
 	{
-		D_S(struct bcpl_name,new_name);
-		size_t len;
-
-		len = strlen(path_name);
-		if(len >= sizeof(new_name->name))
+		if(((struct Library *)DOSBase)->lib_Version >= 39)
 		{
-			errno = ENAMETOOLONG;
-			goto out;
+			PROFILE_OFF();
+			status = SetOwner((STRPTR)path_name,(LONG)((((ULONG)owner) << 16) | group));
+			PROFILE_ON();
 		}
-
-		PROFILE_OFF();
-		dvp = GetDeviceProc((STRPTR)path_name,NULL);
-		PROFILE_ON();
-
-		if(dvp == NULL)
+		else
 		{
-			__translate_io_error_to_errno(IoErr(),&errno);
-			goto out;
+			D_S(struct bcpl_name,new_name);
+			size_t len;
+
+			len = strlen(path_name);
+			if(len >= sizeof(new_name->name))
+			{
+				errno = ENAMETOOLONG;
+				goto out;
+			}
+
+			PROFILE_OFF();
+			dvp = GetDeviceProc((STRPTR)path_name,NULL);
+			PROFILE_ON();
+
+			if(dvp == NULL)
+			{
+				__translate_io_error_to_errno(IoErr(),&errno);
+				goto out;
+			}
+
+			new_name->name[0] = len;
+			memmove(&new_name->name[1],path_name,len);
+
+			PROFILE_OFF();
+			status = DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0,0);
+			PROFILE_ON();
 		}
-
-		new_name->name[0] = len;
-		memmove(&new_name->name[1],path_name,len);
-
-		PROFILE_OFF();
-		status = DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0,0);
-		PROFILE_ON();
-
-		if(status == DOSFALSE)
-		{
-			__translate_io_error_to_errno(IoErr(),&errno);
-			goto out;
-		}
-
-		result = 0;
 	}
+	#endif /* __amigaos4__ */
+
+	if(status == DOSFALSE)
+	{
+		__translate_io_error_to_errno(IoErr(),&errno);
+		goto out;
+	}
+
+	result = 0;
 
  out:
 
