@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.21 2005-01-24 10:25:46 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.22 2005-01-26 18:41:38 obarthel Exp $
 #
 # :ts=8
 #
@@ -376,6 +376,7 @@ C_LIB = \
 	time_numbertostring.o \
 	time_strftime.o \
 	time_time.o \
+	time_weekday.o \
 	unistd_access.o \
 	unistd_chdir.o \
 	unistd_chdir_exit.o \

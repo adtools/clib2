@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime_r.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_asctime_r.c,v 1.4 2005-01-26 18:41:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,21 +101,13 @@ __asctime_r(const struct tm *tm,char * buffer,size_t buffer_size)
 	/* Fill in the week day if it's not in proper range. */
 	if(tm->tm_wday < 0 || tm->tm_wday > 6)
 	{
-		struct tm other_tm;
-		time_t seconds;
+		/* We use a peculiar algorithm rather than falling back onto
+		   mktime() here in order to avoid trouble with skewed results
+		   owing to time zone influence. */
+		copy_tm = (*tm);
+		copy_tm.tm_wday = __calculate_weekday(tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
 
-		other_tm = (*tm);
-
-		seconds = mktime(&other_tm);
-		if(seconds != (time_t)-1)
-		{
-			__convert_time(seconds,0,&other_tm);
-
-			copy_tm = (*tm);
-			copy_tm.tm_wday = other_tm.tm_wday;
-
-			tm = &copy_tm;
-		}
+		tm = &copy_tm;
 	}
 
 	if(0 <= tm->tm_wday && tm->tm_wday <= 6)

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.16 2005-01-24 10:25:46 obarthel Exp $
+# $Id: smakefile,v 1.17 2005-01-26 18:41:39 obarthel Exp $
 #
 # :ts=8
 #
@@ -484,7 +484,8 @@ TIME_OBJ = \
 	time_mktime.o \
 	time_numbertostring.o \
 	time_strftime.o \
-	time_time.o
+	time_time.o \
+	time_weekday.o
 
 UNISTD_OBJ = \
 	unistd_access.o \

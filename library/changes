@@ -14,6 +14,10 @@
   UTC. This didn't really work up until now since the time value returned
   was given as local time.
 
+- Plugged in a different algorithm for calculating the day of the week in
+  strftime() and asctime_r(). This one isn't sensitive to the effects of
+  adding/subtracting the local time zone.
+
 
 c.lib 1.186 (14.1.2005)
 
