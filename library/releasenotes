@@ -1,11 +1,6 @@
-c.lib 1.175 (10.9.2004)
+c.lib 1.177 (29.9.2004)
 
-- The timeval definition in <sys/time.h> can now be used without
-  having to include <exec/types.h> and <devices/timer.h>. Just
-  define the __USE_CLIB2_TIMEVAL preprocessor symbol. However,
-  this is intended only for code which for certain reasons cannot
-  include these header files. Don't use this approach if your
-  code may include <devices/timer.h> at some point.
+- Added usleep(), strtoll() and strtoull().
 
-- The sprintf() function family did not properly terminate the
-  output string if the format string itself was empty. Fixed.
+- Setting a minimum stack size via the '__stack_size' variable
+  works again.
