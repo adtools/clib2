@@ -1,3 +1,10 @@
+c.lib 1.179 (22.10.2004)
+
+- The scanf() family no longer assumes that a leading '0' indicates that the
+  following digits form an octal number if the conversion type has been
+  specified as already '%x' already.
+
+
 c.lib 1.178 (7.10.2004)
 
 - The OS4 version had floating point math support code enabled in all

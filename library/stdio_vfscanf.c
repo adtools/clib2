@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.2 2004-08-08 10:55:57 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.3 2004-10-22 10:57:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -1016,6 +1016,10 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 				}
 			}
 
+			/* Chose a base according to the conversion to be
+			   expected. For the 'x' and 'i' we examine the
+			   incoming data rather than commit ourselves to
+			   a peculiar data format now. */
 			if(conversion_type == 'd' || conversion_type == 'u')
 				base = 10;
 			else if (conversion_type == 'o')
@@ -1060,7 +1064,11 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 							 * '0x' prefix or just a zero.
 							 */
 							c = __getc(stream);
-							if (c == 'x' || c == 'X')
+
+							/* This takes care of the '0x' prefix for hexadecimal
+							   numbers ('%x') and also picks the right type of
+							   data for the '%i' type. */
+							if ((c == 'x' || c == 'X') && (conversion_type == 'x' || conversion_type == 'i'))
 							{
 								/* It's the hex prefix. */
 								base = 16;
@@ -1075,7 +1083,7 @@ __vfscanf(FILE *stream, const char *format, va_list arg)
 								if(maximum_field_width > 0)
 									maximum_field_width--;
 							}
-							else if (isdigit(c))
+							else if (isdigit(c) && (conversion_type == 'i')) /* This could be the octal prefix for the '%i' format. */
 							{
 								/* The preceding '0' was part of the
 								   octal prefix. So we don't really know
