@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.8 2005-03-09 10:48:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,6 +44,93 @@
 /****************************************************************************/
 
 /* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+/* Directories being scanned whose locks need to be freed when shutting down. */
+struct MinList NOCOMMON __directory_list;
+
+/****************************************************************************/
+
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
+static struct SignalSemaphore * dirent_lock;
+
+/****************************************************************************/
+
+void
+__dirent_lock(void)
+{
+	if(dirent_lock != NULL)
+		ObtainSemaphore(dirent_lock);
+}
+
+/****************************************************************************/
+
+void
+__dirent_unlock(void)
+{
+	if(dirent_lock != NULL)
+		ReleaseSemaphore(dirent_lock);
+}
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */
+
+/****************************************************************************/
+
+CLIB_CONSTRUCTOR(__dirent_init)
+{
+	BOOL success = FALSE;
+
+	ENTER();
+
+	NewList((struct List *)&__directory_list);
+
+	#if defined(__THREAD_SAFE)
+	{
+		dirent_lock = __create_semaphore();
+		if(dirent_lock == NULL)
+			goto out;
+	}
+	#endif /* __THREAD_SAFE */
+
+	success = TRUE;
+
+ out:
+
+	RETURN(success);
+
+	if(success)
+		CONSTRUCTOR_SUCCEED();
+	else
+		CONSTRUCTOR_FAIL();
+}
+
+/****************************************************************************/
+
+CLIB_DESTRUCTOR(__dirent_exit)
+{
+	ENTER();
+
+	if(__directory_list.mlh_Head != NULL)
+	{
+		while(NOT IsListEmpty((struct List *)&__directory_list))
+			closedir((DIR *)__directory_list.mlh_Head);
+	}
+
+	#if defined(__THREAD_SAFE)
+	{
+		__delete_semaphore(dirent_lock);
+		dirent_lock = NULL;
+	}
+	#endif /* __THREAD_SAFE */
+
+	LEAVE();
+}
 
 /****************************************************************************/
 

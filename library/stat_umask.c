@@ -1,5 +1,5 @@
 /*
- * $Id: stat_umask.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stat_umask.c,v 1.4 2005-03-09 10:48:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,10 @@
 
 /****************************************************************************/
 
+mode_t __current_umask = S_IWGRP | S_IWOTH;
+
+/****************************************************************************/
+
 mode_t
 umask(mode_t new_mask)
 {
@@ -66,7 +70,9 @@ umask(mode_t new_mask)
 	result = __getumask();
 	PROFILE_ON();
 
-	__umask(new_mask & (S_IRWXU | S_IRWXG | S_IRWXO));
+	__current_umask = new_mask & (S_IRWXU | S_IRWXG | S_IRWXO);
+
+	__umask(__current_umask);
 
 	RETURN(result);
 	return(result);

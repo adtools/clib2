@@ -33,6 +33,10 @@
 - Moved the CPU/FPU type tests into the respective linker
   libraries.
 
+- Moved the data declarations out of math_data.c, stat_data.c,
+  socket_data.c, dirent_data.c and stdio_data.c and into the
+  code that initializes them.
+
 
 c.lib 1.189 (5.3.2005)
 

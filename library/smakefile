@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.29 2005-03-07 11:16:43 obarthel Exp $
+# $Id: smakefile,v 1.30 2005-03-09 10:48:59 obarthel Exp $
 #
 # :ts=8
 #
@@ -149,7 +149,6 @@ DEBUG_OBJ = \
 
 DIRENT_OBJ = \
 	dirent_closedir.o \
-	dirent_data.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
 	dirent_rewinddir.o
@@ -186,7 +185,6 @@ MATH_OBJ = \
 	math_ceil.o \
 	math_cos.o \
 	math_cosh.o \
-	math_data.o \
 	math_exp.o \
 	math_fabs.o \
 	math_floor.o \
@@ -233,7 +231,6 @@ SOCKET_OBJ = \
 	socket_accept.o \
 	socket_bind.o \
 	socket_connect.o \
-	socket_data.o \
 	socket_gethostbyaddr.o \
 	socket_gethostbyname.o \
 	socket_gethostid.o \
@@ -275,7 +272,6 @@ SOCKET_OBJ = \
 STAT_OBJ = \
 	stat_chmod.o \
 	stat_convertfileinfo.o \
-	stat_data.o \
 	stat_fchmod.o \
 	stat_fstat.o \
 	stat_lstat.o \
@@ -287,7 +283,6 @@ STAT_OBJ = \
 STDIO_OBJ = \
 	stdio_asprintf.o \
 	stdio_clearerr.o \
-	stdio_data.o \
 	stdio_dropiobreadbuffer.o \
 	stdio_duplicate_fd.o \
 	stdio_examine_fh.o \

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.37 2005-03-07 16:56:35 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.38 2005-03-09 10:48:58 obarthel Exp $
 #
 # :ts=8
 #
@@ -139,7 +139,6 @@ C_LIB = \
 	ctype_tolower.o \
 	ctype_toupper.o \
 	dirent_closedir.o \
-	dirent_data.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
 	dirent_rewinddir.o \
@@ -177,7 +176,6 @@ C_LIB = \
 	signal_sigsetmask.o \
 	stat_chmod.o \
 	stat_convertfileinfo.o \
-	stat_data.o \
 	stat_fchmod.o \
 	stat_fstat.o \
 	stat_lstat.o \
@@ -187,7 +185,6 @@ C_LIB = \
 	stat_umask.o \
 	stdio_asprintf.o \
 	stdio_clearerr.o \
-	stdio_data.o \
 	stdio_dropiobreadbuffer.o \
 	stdio_duplicate_fd.o \
 	stdio_examine_fh.o \
@@ -444,7 +441,6 @@ C_LIB = \
 UNIX_LIB = \
 	unix.lib_rev.o \
 	dirent_closedir.o \
-	dirent_data.o \
 	dirent_rewinddir.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
@@ -504,7 +500,6 @@ MATH_LIB = \
 	math_ceil.o \
 	math_cos.o \
 	math_cosh.o \
-	math_data.o \
 	math_exp.o \
 	math_fabs.o \
 	math_floor.o \
@@ -599,7 +594,6 @@ NET_LIB = \
 	socket_accept.o \
 	socket_bind.o \
 	socket_connect.o \
-	socket_data.o \
 	socket_gethostbyaddr.o \
 	socket_gethostbyname.o \
 	socket_gethostid.o \

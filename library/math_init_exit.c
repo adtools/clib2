@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.9 2005-03-07 16:56:36 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.10 2005-03-09 10:48:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,6 +54,20 @@
 /****************************************************************************/
 
 #if defined(FLOATING_POINT_SUPPORT)
+
+/****************************************************************************/
+
+#if defined(IEEE_FLOATING_POINT_SUPPORT)
+
+struct Library * MathIeeeSingBasBase;
+struct Library * MathIeeeDoubBasBase;
+struct Library * MathIeeeDoubTransBase;
+
+#endif /* IEEE_FLOATING_POINT_SUPPORT */
+
+/****************************************************************************/
+
+double __huge_val;
 
 /****************************************************************************/
 

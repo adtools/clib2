@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_growfdtable.c,v 1.4 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: stdio_growfdtable.c,v 1.5 2005-03-09 10:48:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,6 +40,12 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+/* The file descriptor table. */
+struct fd **	__fd;
+int				__num_fd;
 
 /****************************************************************************/
 
