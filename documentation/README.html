@@ -57,11 +57,13 @@ when it starts up. This is controlled via the <tt>__stack_size</tt> variable (se
 <p>I added some <tt>amiga.lib</tt> and <tt>debug.lib</tt> functionality to the library, but don't
 count on it to be complete.</p>
 
+<h3>2.1 Thread-safety</h3>
+
 <p>The library code is supposed to be thread-safe if built with the <tt>__THREAD_SAFE</tt>
 preprocesssor symbold defined. Note that 'thread-safe' does <em>not</em> mean
 'reentrant'. Multiple callers for certain library functions are permitted, but
 not for all of them. For example, <tt>mkdtemp()</tt> is not thread-safe, and neither is
-<tt>rand()</tt> or <tt>localtime()</tt>. But as per POSIX 1003.1c-1995 there are thread-safe
+<tt>rand()</tt> or <tt>localtime()</tt>. But as per <b>POSIX 1003.1c-1995</b> there are thread-safe
 variants of <tt>rand()</tt> and <tt>localtime()</tt> called <tt>rand_r()</tt>, <tt>localtime_r()</tt>, and others.
 The use of the socket I/O functions is still problematic because the
 underlying <tt>bsdsocket.library</tt> API is not supposed to be used by any process
@@ -71,9 +73,18 @@ error code left by the last caller.</p>
 
 <p>Take care: thread-safety does not imply that you can have multiple callers
 access and close the same file. There is no resource tracking to that degree
-yet. All the thread-safety tries to afford you is not to get into big trouble
+yet. All that the thread-safety tries to afford you is not to get into big trouble
 if simultaneous and overlapping accesses to files, memory allocation and other
 resources are taking place.</p>
+
+<p> Also take care with file I/O involving the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt>
+streams; read/write operations on these streams will be mapped to the <tt>Input()</tt>/</tt>Output()</tt>/<tt>ErrorOutput()</tt>
+file handles of the process performing these operations. Since only this small set of
+operations is mapped, functions such as <tt>fcntl()</tt> or <tt>select()</tt> will not
+work on the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt> streams and the corresponding
+file descriptors <tt>STDIN_FILENO</tt>/<tt>STDOUT_FILENO</tt>/<tt>STDERR_FILENO</tt>.
+It is therefore strongly recommended to use the thread-safe library only for applications
+which can cope with the limitations described above.</p>
 
 
 <h2>3. What does it not do?</h2>
