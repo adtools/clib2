@@ -1,5 +1,5 @@
 /*
- * $Id: signal.h,v 1.1.1.1 2004-07-26 16:32:53 obarthel Exp $
+ * $Id: signal.h,v 1.2 2004-07-28 14:14:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,6 +69,10 @@ extern int raise(int sig);
 #ifndef _SYS_TYPES_H
 #include <sys/types.h>
 #endif /* _SYS_TYPES_H */
+
+/****************************************************************************/
+
+typedef void (*sig_t)(int);
 
 /****************************************************************************/
 
