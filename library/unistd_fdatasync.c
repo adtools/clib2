@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fdatasync.c,v 1.3 2005-02-21 10:22:02 obarthel Exp $
+ * $Id: unistd_fdatasync.c,v 1.4 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,6 +74,12 @@ fdatasync(int file_descriptor)
 	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
 		__set_errno(EINVAL);
+		goto out;
+	}
+
+	if(fd->fd_DefaultFile == ZERO)
+	{
+		__set_errno(EBADF);
 		goto out;
 	}
 

@@ -6,6 +6,22 @@
   code can spend less time in Forbid() state and, heaven forbid,
   refrain from allocating memory while in that state.
 
+- Split the general stdio initialization/cleanup code from the
+  initialization of the stdin/stdout/stderr streams.
+
+- Moved the Workbench console stream initialization into the
+  initialization code for the stdin/stdout/stderr streams and
+  out of the program parameter setup.
+
+- The current program name is now set up in the stdlib
+  initialization function.
+
+- Simplified the machine test code; moved the FPU check into
+  the math initialization code.
+
+- Added more safety checks to verify that file descriptor
+  file handles are valid.
+
 
 c.lib 1.189 (5.3.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_startup.c,v 1.8 2005-03-03 09:32:09 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.1 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,12 +41,13 @@
 
 /****************************************************************************/
 
+#ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
+
+#ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
-
-/****************************************************************************/
-
-#include <exec/execbase.h>
+#endif /* _UNISTD_HEADERS_H */
 
 /****************************************************************************/
 
@@ -59,25 +60,6 @@
 /****************************************************************************/
 
 #include "macros.h"
-
-/****************************************************************************/
-
-static struct MsgPort *	old_console_task;
-static BOOL				restore_console_task;
-
-/****************************************************************************/
-
-static BOOL restore_streams;
-
-/****************************************************************************/
-
-static BPTR old_output;
-static BPTR old_input;
-
-/****************************************************************************/
-
-static BPTR output;
-static BPTR input;
 
 /****************************************************************************/
 
@@ -129,34 +111,18 @@ is_final_quote_character(const unsigned char * str)
 /****************************************************************************/
 
 int
-__startup_init(void)
+__arg_init(void)
 {
-	int result = -1;
+	int result = ERROR;
 
 	/* Shell startup? */
 	if(__WBenchMsg == NULL)
 	{
 		size_t			number_of_arguments;
-		unsigned char *	command_name;
-		size_t			command_name_len;
 		unsigned char *	arg_str;
 		size_t			arg_len;
 		unsigned char *	command_line;
 		unsigned char *	str;
-
-		/* Make a copy of the current command name string. */
-		command_name_len = (size_t)((UBYTE *)BADDR(Cli()->cli_CommandName))[0];
-
-		__free_program_name = TRUE;
-
-		command_name = AllocVec((ULONG)(command_name_len + 1),MEMF_ANY);
-		if(command_name == NULL)
-			goto out;
-
-		if(CANNOT GetProgramName(command_name,command_name_len + 1))
-			goto out;
-
-		__program_name = (char *)command_name;
 
 		/* Get the shell parameter string and find out
 		   how long it is, stripping a trailing line
@@ -242,7 +208,7 @@ __startup_init(void)
 			goto out;
 
 		/* The first parameter is the program name. */
-		__argv[0] = command_name;
+		__argv[0] = __program_name;
 
 		str = command_line;
 
@@ -341,130 +307,20 @@ __startup_init(void)
 		assert( str <= &command_line[arg_len] );
 
 		__argv[__argc] = NULL;
+
+		/* If necessary, expand wildcard patterns found in the command
+		   line string into file and directory names. */
+		if(__wildcard_expand_init() < 0)
+			goto out;
 	}
 	else
 	{
-		PROFILE_OFF();
-
-		__program_name = (char *)__WBenchMsg->sm_ArgList[0].wa_Name;
-
-		__original_current_directory = CurrentDir(__WBenchMsg->sm_ArgList[0].wa_Lock);
-		__current_directory_changed = TRUE;
-
-		if (__stdio_window_specification != NULL)
-		{
-			input = Open(__stdio_window_specification,MODE_NEWFILE);	
-		}
-		else if (__WBenchMsg->sm_ToolWindow != NULL)
-		{
-			input = Open(__WBenchMsg->sm_ToolWindow,MODE_NEWFILE);	
-		}
-		else
-		{
-			static const char console_prefix[] = "CON:20/20/600/150/";
-			static const char console_suffix[] = " Output/AUTO/CLOSE/WAIT";
-			STRPTR window_specifier;
-			STRPTR tool_name;
-			size_t len;
-
-			tool_name = FilePart(__WBenchMsg->sm_ArgList[0].wa_Name);
-
-			len = strlen(console_prefix) + strlen(tool_name) + strlen(console_suffix);
-
-			window_specifier = malloc(len+1);
-			if(window_specifier == NULL)
-				goto out;
-
-			strcpy(window_specifier,console_prefix);
-			strcat(window_specifier,tool_name);
-			strcat(window_specifier,console_suffix);
-
-			input = Open(window_specifier,MODE_NEWFILE);
-
-			free(window_specifier);
-		}
-
-		if(input == ZERO)
-			input = Open("NIL:",MODE_NEWFILE);
-
-		if(input != ZERO)
-		{
-			struct FileHandle * fh = BADDR(input);
-
-			old_console_task = SetConsoleTask(fh->fh_Type);
-
-			output = Open("CONSOLE:",MODE_NEWFILE);
-			if(output != ZERO)
-				restore_console_task = TRUE;
-			else
-				SetConsoleTask((struct MsgPort *)old_console_task);
-		}
-
-		if(output == ZERO)
-			output = Open("NIL:",MODE_NEWFILE);
-
-		if(input == ZERO || output == ZERO)
-			goto out;
-
-		old_input	= SelectInput(input);
-		old_output	= SelectOutput(output);
-
-		restore_streams = TRUE;
-
 		__argv = (char **)__WBenchMsg;
-
-		PROFILE_ON();
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 
 	return(result);
-}
-
-/****************************************************************************/
-
-CLIB_DESTRUCTOR(__startup_exit)
-{
-	ENTER();
-
-	PROFILE_OFF();
-
-	/* Now clean up after the streams set up for the Workbench
-	   startup... */
-	if(restore_console_task)
-	{
-		SetConsoleTask((struct MsgPort *)old_console_task);
-		old_console_task = NULL;
-
-		restore_console_task = FALSE;
-	}
-
-	if(restore_streams)
-	{
-		SelectInput(old_input);
-		old_input = ZERO;
-
-		SelectOutput(old_output);
-		old_output = ZERO;
-
-		restore_streams = FALSE;
-	}
-
-	if(input != ZERO)
-	{
-		Close(input);
-		input = ZERO;
-	}
-
-	if(output != ZERO)
-	{
-		Close(output);
-		output = ZERO;
-	}
-
-	PROFILE_ON();
-
-	LEAVE();
 }

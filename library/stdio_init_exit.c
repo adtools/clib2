@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.23 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.24 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,16 +44,6 @@
 #ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
-
-/****************************************************************************/
-
-#include "stdlib_protos.h"
-
-/****************************************************************************/
-
-#ifndef ID_RAWCON
-#define ID_RAWCON 0x52415700L /* "RAW\0" */
-#endif /* ID_RAWCON */
 
 /****************************************************************************/
 
@@ -115,16 +105,9 @@ CLIB_DESTRUCTOR(__stdio_exit)
 int
 __stdio_init(void)
 {
-	const int num_standard_files = (STDERR_FILENO-STDIN_FILENO+1);
+	const int num_standard_files = (STDERR_FILENO - STDIN_FILENO + 1);
 
-	struct SignalSemaphore * stdio_lock;
-	struct SignalSemaphore * fd_lock;
-	BPTR default_file;
-	ULONG fd_flags,iob_flags;
 	int result = ERROR;
-	char * buffer;
-	char * aligned_buffer;
-	int i;
 
 	ENTER();
 
@@ -136,143 +119,6 @@ __stdio_init(void)
 
 	if(__grow_fd_table(num_standard_files) < 0)
 		goto out;
-
-	/* Now initialize the standard I/O streams (input, output, error). */
-	for(i = STDIN_FILENO ; i <= STDERR_FILENO ; i++)
-	{
-		PROFILE_OFF();
-
-		switch(i)
-		{
-			case STDIN_FILENO:
-
-				iob_flags		= IOBF_IN_USE | IOBF_READ | IOBF_NO_NUL | IOBF_BUFFER_MODE_LINE;
-				fd_flags		= FDF_IN_USE | FDF_READ | FDF_NO_CLOSE;
-				default_file	= Input();
-				break;
-
-			case STDOUT_FILENO:
-
-				iob_flags		= IOBF_IN_USE | IOBF_WRITE | IOBF_NO_NUL | IOBF_BUFFER_MODE_LINE;
-				fd_flags		= FDF_IN_USE | FDF_WRITE | FDF_NO_CLOSE;
-				default_file	= Output();
-				break;
-
-			case STDERR_FILENO:
-			default:
-
-				iob_flags		= IOBF_IN_USE | IOBF_WRITE | IOBF_NO_NUL | IOBF_BUFFER_MODE_NONE;
-				fd_flags		= FDF_IN_USE | FDF_WRITE;
-				default_file	= ZERO; /* NOTE: this is really initialized later; see below... */
-				break;
-		}
-
-		PROFILE_ON();
-
-		/* Allocate a little more memory than necessary. */
-		buffer = malloc(BUFSIZ + (CACHE_LINE_SIZE-1));
-		if(buffer == NULL)
-			goto out;
-
-		#if defined(__THREAD_SAFE)
-		{
-			/* Allocate memory for an arbitration mechanism, then
-			   initialize it. */
-			stdio_lock	= __create_semaphore();
-			fd_lock		= __create_semaphore();
-
-			if(stdio_lock == NULL || fd_lock == NULL)
-			{
-				__delete_semaphore(stdio_lock);
-				__delete_semaphore(fd_lock);
-
-				goto out;
-			}
-		}
-		#else
-		{
-			stdio_lock	= NULL;
-			fd_lock		= NULL;
-		}
-		#endif /* __THREAD_SAFE */
-
-		/* Check if this stream is attached to a console window. */
-		if(default_file != ZERO)
-		{
-			PROFILE_OFF();
-
-			if(IsInteractive(default_file))
-				SET_FLAG(fd_flags,FDF_IS_INTERACTIVE);
-
-			PROFILE_ON();
-		}
-
-		/* Align the buffer start address to a cache line boundary. */
-		aligned_buffer = (char *)((ULONG)(buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
-
-		__initialize_fd(__fd[i],__fd_hook_entry,default_file,fd_flags,fd_lock);
-
-		__initialize_iob(__iob[i],__iob_hook_entry,
-			buffer,
-			aligned_buffer,BUFSIZ,
-			i,
-			i,
-			iob_flags,
-			stdio_lock);
-	}
-
-	/* If the program was launched from Workbench, we continue by
-	   duplicating the default output stream for use as the
-	   standard error stream. */
-	if(__WBenchMsg != NULL)
-	{
-		PROFILE_OFF();
-		__fd[STDERR_FILENO]->fd_DefaultFile = Output();
-		PROFILE_ON();
-
-		SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
-	}
-	else
-	{
-		BPTR ces;
-
-		/* Figure out what the default error output stream is. */
-		#if defined(__amigaos4__)
-		{
-			ces = ErrorOutput();
-		}
-		#else
-		{
-			struct Process * this_process = (struct Process *)FindTask(NULL);
-
-			ces = this_process->pr_CES;
-		}
-		#endif /* __amigaos4__ */
-
-		/* Is the standard error stream configured? If so, use it.
-		   Otherwise, try to duplicate the standard output stream. */
-		if(ces != ZERO)
-		{
-			__fd[STDERR_FILENO]->fd_DefaultFile = ces;
-
-			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
-		}
-		else
-		{
-			__fd[STDERR_FILENO]->fd_DefaultFile = Open("CONSOLE:",MODE_NEWFILE);
-		}
-	}
-
-	PROFILE_OFF();
-
-	/* Figure out if the standard error stream is bound to a console. */
-	if(__fd[STDERR_FILENO]->fd_DefaultFile != ZERO)
-	{
-		if(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
-			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
-	}
-
-	PROFILE_ON();
 
 	result = OK;
 

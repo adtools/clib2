@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_machine_test.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_machine_test.c,v 1.3 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,38 +48,14 @@ __machine_test(void)
 
 	#if defined(M68020)
 	{
-		const struct ExecBase * UNUSED ex = (const struct ExecBase *)SysBase;
-
-		#if defined(M68881_FLOATING_POINT_SUPPORT)
-		{
-			if(FLAG_IS_CLEAR(ex->AttnFlags,AFF_68881) || FLAG_IS_CLEAR(ex->AttnFlags,AFF_68020))
-			{
-				__show_error("This program requires a floating point processor and an MC68020 CPU, or better.");
-
-				goto out;
-			}
-		}
-		#endif /* M68881_FLOATING_POINT_SUPPORT */
-	
-		if(FLAG_IS_CLEAR(ex->AttnFlags,AFF_68020))
+		if(FLAG_IS_CLEAR(((struct ExecBase *)SysBase)->AttnFlags,AFF_68020))
 		{
 			__show_error("This program requires an MC68020 CPU, or better.");
 
 			goto out;
 		}
 	}
-	#elif defined(M68881_FLOATING_POINT_SUPPORT)
-	{
-		const struct ExecBase * UNUSED ex = (const struct ExecBase *)SysBase;
-
-		if(FLAG_IS_CLEAR(ex->AttnFlags,AFF_68881))
-		{
-			__show_error("This program requires a floating point processor.");
-
-			goto out;
-		}
-	}
-	#endif /* M68881_FLOATING_POINT_SUPPORT */
+	#endif /* M68020 */
 
 	result = OK;
 

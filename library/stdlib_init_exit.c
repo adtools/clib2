@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_init_exit.c,v 1.5 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdlib_init_exit.c,v 1.6 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,6 +43,14 @@
 
 /****************************************************************************/
 
+static BOOL free_program_name;
+
+/****************************************************************************/
+
+char * __program_name;
+
+/****************************************************************************/
+
 void
 __stdlib_exit(void)
 {
@@ -50,7 +58,7 @@ __stdlib_exit(void)
 
 	__memory_exit();
 
-	if(__free_program_name && __program_name != NULL)
+	if(free_program_name && __program_name != NULL)
 	{
 		FreeVec(__program_name);
 		__program_name = NULL;
@@ -64,11 +72,35 @@ __stdlib_exit(void)
 int
 __stdlib_init(void)
 {
-	int result;
+	int result = ERROR;
 
 	ENTER();
 
-	result = __memory_init();
+	if(__WBenchMsg == NULL)
+	{
+		const size_t program_name_size = 256;
+
+		/* Make a copy of the current command name string. */
+		__program_name = AllocVec((ULONG)program_name_size,MEMF_ANY);
+		if(__program_name == NULL)
+			goto out;
+
+		free_program_name = TRUE;
+
+		if(CANNOT GetProgramName(__program_name,program_name_size))
+			goto out;
+	}
+	else
+	{
+		__program_name = (char *)__WBenchMsg->sm_ArgList[0].wa_Name;
+	}
+
+	if(__memory_init() < 0)
+		goto out;
+
+	result = OK;
+
+ out:
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.11 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.12 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -132,8 +132,8 @@ void _fini(void);
 
 /****************************************************************************/
 
-/* stdlib_startup.c */
-extern int	__startup_init(void);
+/* stdlib_arg.c */
+extern int __arg_init(void);
 
 /****************************************************************************/
 

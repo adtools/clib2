@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.28 2005-03-03 14:20:55 obarthel Exp $
+# $Id: smakefile,v 1.29 2005-03-07 11:16:43 obarthel Exp $
 #
 # :ts=8
 #
@@ -329,6 +329,7 @@ STDIO_OBJ = \
 	stdio_grow_file.o \
 	stdio_initializefd.o \
 	stdio_initializeiob.o \
+	stdio_file_init.o \
 	stdio_init_exit.o \
 	stdio_iobhookentry.o \
 	stdio_lock.o \
@@ -439,7 +440,7 @@ STDLIB_OBJ = \
 	stdlib_stacksafezone.o \
 	stdlib_stacksize.o \
 	stdlib_stack_usage.o \
-	stdlib_startup.o \
+	stdlib_arg.o \
 	stdlib_strtod.o \
 	stdlib_strtol.o \
 	stdlib_strtoul.o \
@@ -701,7 +702,7 @@ stdlib_atexit.o : stdlib_atexit.c stdlib_mem_debug.h
 
 stdlib_setenv.o : stdlib_setenv.c stdlib_mem_debug.h
 
-stdlib_startup.o : stdlib_startup.c stdlib_mem_debug.h
+stdlib_arg.o : stdlib_arg.c stdlib_mem_debug.h
 
 stdlib_system.o : stdlib_system.c stdlib_mem_debug.h
 

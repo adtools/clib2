@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.8 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: mount_fstatfs.c,v 1.9 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,6 +94,12 @@ fstatfs(int file_descriptor, struct statfs *buf)
 	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
 		__set_errno(EINVAL);
+		goto out;
+	}
+
+	if(fd->fd_DefaultFile == ZERO)
+	{
+		__set_errno(EBADF);
 		goto out;
 	}
 

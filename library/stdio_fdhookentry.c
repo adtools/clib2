@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.16 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.17 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,6 +59,7 @@ __fd_hook_entry(
 {
 	D_S(struct FileInfoBlock,fib);
 	BOOL fib_is_valid = FALSE;
+	struct FileHandle * fh;
 	off_t current_position;
 	off_t new_position;
 	int new_mode;
@@ -72,19 +73,19 @@ __fd_hook_entry(
 
 	__fd_lock(fd);
 
+	if(fd->fd_DefaultFile == ZERO)
+	{
+		SHOWMSG("file is closed");
+
+		fam->fam_Error = EBADF;
+		goto out;
+	}
+
 	switch(fam->fam_Action)
 	{
 		case file_action_read:
 
 			SHOWMSG("file_action_read");
-
-			if(fd->fd_DefaultFile == ZERO)
-			{
-				SHOWMSG("file is closed");
-
-				fam->fam_Error = EBADF;
-				break;
-			}
 
 			assert( fam->fam_Data != NULL );
 			assert( fam->fam_Size > 0 );
@@ -102,7 +103,7 @@ __fd_hook_entry(
 				D(("read failed ioerr=%ld",IoErr()));
 
 				fam->fam_Error = __translate_io_error_to_errno(IoErr());
-				break;
+				goto out;
 			}
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
@@ -113,14 +114,6 @@ __fd_hook_entry(
 		case file_action_write:
 
 			SHOWMSG("file_action_write");
-
-			if(fd->fd_DefaultFile == ZERO)
-			{
-				SHOWMSG("file is closed");
-
-				fam->fam_Error = EBADF;
-				break;
-			}
 
 			assert( fam->fam_Data != NULL );
 			assert( fam->fam_Size > 0 );
@@ -153,7 +146,7 @@ __fd_hook_entry(
 				D(("write failed ioerr=%ld",IoErr()));
 
 				fam->fam_Error = __translate_io_error_to_errno(IoErr());
-				break;
+				goto out;
 			}
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
@@ -172,15 +165,6 @@ __fd_hook_entry(
 			}
 			else
 			{
-				/* Is this file open in the first place? */
-				if(fd->fd_DefaultFile == ZERO)
-				{
-					SHOWMSG("file is closed");
-
-					fam->fam_Error = EBADF;
-					break;
-				}
-
 				/* The following is almost guaranteed not to fail. */
 				result = 0;
 
@@ -389,7 +373,7 @@ __fd_hook_entry(
 				if(current_position < 0)
 				{
 					fam->fam_Error = EBADF;
-					break;
+					goto out;
 				}
 			}
 
@@ -438,24 +422,24 @@ __fd_hook_entry(
 						if(NOT fib_is_valid && CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
 						{
 							fam->fam_Error = __translate_io_error_to_errno(IoErr());
-							break;
+							goto out;
 						}
 
 						if(new_position <= fib->fib_Size)
 						{
 							fam->fam_Error = __translate_io_error_to_errno(IoErr());
-							break;
+							goto out;
 						}
 
 						if(__grow_file_size(fd,new_position - fib->fib_Size) < 0)
 						{
 							fam->fam_Error = __translate_io_error_to_errno(IoErr());
-							break;
+							goto out;
 						}
 					}
 					#else
 					{
-						break;
+						goto out;
 					}
 					#endif /* UNIX_PATH_SEMANTICS */
 				}
@@ -488,7 +472,7 @@ __fd_hook_entry(
 				if(CANNOT SetMode(fd->fd_DefaultFile,mode))
 				{
 					fam->fam_Error = __translate_io_error_to_errno(IoErr());
-					break;
+					goto out;
 				}
 
 				result = 0;
@@ -508,30 +492,19 @@ __fd_hook_entry(
 
 			SHOWMSG("file_action_examine");
 
-			if(fd->fd_DefaultFile != ZERO)
+			if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fam->fam_FileInfo))
 			{
-				struct FileHandle * fh;
+				SHOWMSG("couldn't examine the file");
 
-				if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fam->fam_FileInfo))
-				{
-					SHOWMSG("couldn't examine the file");
-
-					fam->fam_Error = __translate_io_error_to_errno(IoErr());
-					break;
-				}
-
-				fh = BADDR(fd->fd_DefaultFile);
-
-				fam->fam_FileSystem = fh->fh_Type;
-
-				result = 0;
+				fam->fam_Error = __translate_io_error_to_errno(IoErr());
+				goto out;
 			}
-			else
-			{
-				SHOWMSG("file is already closed");
 
-				fam->fam_Error = EBADF;
-			}
+			fh = BADDR(fd->fd_DefaultFile);
+
+			fam->fam_FileSystem = fh->fh_Type;
+
+			result = 0;
 
 			break;
 
@@ -542,6 +515,8 @@ __fd_hook_entry(
 			fam->fam_Error = EBADF;
 			break;
 	}
+
+ out:
 
 	__fd_unlock(fd);
 

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.35 2005-03-05 17:55:26 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.36 2005-03-07 11:16:43 obarthel Exp $
 #
 # :ts=8
 #
@@ -229,6 +229,7 @@ C_LIB = \
 	stdio_initializefd.o \
 	stdio_initializeiob.o \
 	stdio_init_exit.o \
+	stdio_file_init.o \
 	stdio_iobhookentry.o \
 	stdio_lock.o \
 	stdio_locksemaphorename.o \
@@ -336,7 +337,7 @@ C_LIB = \
 	stdlib_stacksafezone.o \
 	stdlib_stacksize.o \
 	stdlib_stack_usage.o \
-	stdlib_startup.o \
+	stdlib_arg.o \
 	stdlib_stdio_window_spec.o \
 	stdlib_strtol.o \
 	stdlib_strtoll.o \
@@ -462,6 +463,7 @@ UNIX_LIB = \
 	stdio_fdhookentry.o \
 	stdio_fflush.o \
 	stdio_fopen.o \
+	stdio_file_init.o \
 	stdio_init_exit.o \
 	stdio_locksemaphorename.o \
 	stdio_openiob.o \

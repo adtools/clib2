@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.7 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.8 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,6 +38,10 @@
 /****************************************************************************/
 
 #include "stdlib_protos.h"
+
+/****************************************************************************/
+
+#include <exec/execbase.h>
 
 /****************************************************************************/
 
@@ -88,6 +92,17 @@ int
 __math_init(void)
 {
 	int result = ERROR;
+
+	#if defined(M68881_FLOATING_POINT_SUPPORT)
+	{
+		if(FLAG_IS_CLEAR(((struct ExecBase *)SysBase)->AttnFlags,AFF_68881))
+		{
+			__show_error("This program requires a floating point processor.");
+
+			goto out;
+		}
+	}
+	#endif /* M68881_FLOATING_POINT_SUPPORT */
 
 	#if defined(IEEE_FLOATING_POINT_SUPPORT)
 	{

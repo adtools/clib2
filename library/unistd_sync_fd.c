@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_sync_fd.c,v 1.2 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: unistd_sync_fd.c,v 1.3 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,20 +54,17 @@ __sync_fd(struct fd * fd,int mode)
 
 	__fd_lock(fd);
 
-	if(fd->fd_DefaultFile != ZERO)
+	/* The mode tells us what to flush. 0 means "flush just the data", and
+	   everything else means "flush everything. */
+	Flush(fd->fd_DefaultFile);
+
+	if(mode != 0)
 	{
-		/* The mode tells us what to flush. 0 means "flush just the data", and
-		   everything else means "flush everything. */
-		Flush(fd->fd_DefaultFile);
+		struct FileHandle * fh = BADDR(fd->fd_DefaultFile);
 
-		if(mode != 0)
-		{
-			struct FileHandle * fh = BADDR(fd->fd_DefaultFile);
-
-			/* Verify that this file is not bound to "NIL:". */
-			if(fh->fh_Type != NULL)
-				DoPkt(fh->fh_Type,ACTION_FLUSH,	0,0,0,0,0);
-		}
+		/* Verify that this file is not bound to "NIL:". */
+		if(fh->fh_Type != NULL)
+			DoPkt(fh->fh_Type,ACTION_FLUSH,	0,0,0,0,0);
 	}
 
 	__fd_unlock(fd);

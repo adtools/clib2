@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.11 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.12 2005-03-07 11:16:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -117,12 +117,12 @@ call_main(void)
 	{
 		__stdlib_init,
 		__stk_init,
-		__startup_init,
 		__stdio_init,
+		__stdio_file_init,
 		__machine_test,
 		__math_init,
 		__socket_init,
-		__wildcard_expand_init,
+		__arg_init,
 
 		NULL
 	};
