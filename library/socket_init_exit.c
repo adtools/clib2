@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.3 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.4 2004-09-29 17:03:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,16 +111,7 @@ CLIB_DESTRUCTOR(__socket_exit)
 	 *          does not happen, the stdio cleanup function will
 	 *          crash (with bells on).
 	 */
-	if(__fd != NULL && __num_fd > 0)
-	{
-		int i;
-
-		for(i = 0 ; i < __num_fd ; i++)
-		{
-			if(FLAG_IS_SET(__fd[i]->fd_Flags,FDF_IS_SOCKET) && FLAG_IS_SET(__fd[i]->fd_Flags,FDF_IN_USE))
-				close(i);
-		}
-	}
+	__close_all_files();
 
 	#if defined(__amigaos4__)
 	{

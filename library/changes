@@ -28,6 +28,9 @@ c.lib 1.177 (29.9.2004)
 - Added strtoll() and strtoull(), with further changes to <limits.h>
   and <stdlib.h>.
 
+- The socket exit code now calls the common stdio function which
+  flushes and shuts down all buffered and unbuffered files.
+
 
 c.lib 1.175 (10.9.2004)
 
