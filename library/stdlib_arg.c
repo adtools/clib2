@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.1 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.2 2005-03-07 14:04:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,13 +73,13 @@ is_space(unsigned char c)
 {
 	BOOL result;
 
-	result = (BOOL)(c == '\t' ||	/* tab */
-	                c == '\r' ||	/* carriage return */
-	                c == '\n' ||	/* line feed */
-	                c == '\v' ||	/* vertical tab */
-	                c == '\f' ||	/* form feed */
-	                c == ' '  ||	/* blank space */
-	                c == '\240');	/* non-breaking space */
+	result = (BOOL)(c == '\t' 					||	/* horizontal tab */
+	                c == '\r' 					||	/* carriage return */
+	                c == '\n' 					||	/* line feed */
+	                c == '\v' 					||	/* vertical tab */
+	                c == '\f' 					||	/* form feed */
+	                c == ' '  					||	/* blank space */
+	                c == (unsigned char)'\240');	/* non-breaking space */
 
 	return(result);
 }
@@ -129,12 +129,12 @@ __arg_init(void)
 		   feed and blank spaces if necessary. */
 		arg_str = GetArgStr();
 
-		while((*arg_str) == ' ' || (*arg_str) == '\t')
+		while(is_space(*arg_str))
 			arg_str++;
 
 		arg_len = strlen(arg_str);
 
-		while(arg_len > 0 && (arg_str[arg_len - 1] == '\n' || arg_str[arg_len - 1] == ' ' || arg_str[arg_len - 1] == '\t'))
+		while(arg_len > 0 && is_space(arg_str[arg_len - 1]))
 			arg_len--;
 
 		/* Make a copy of the shell parameter string. */
@@ -315,6 +315,9 @@ __arg_init(void)
 	}
 	else
 	{
+		/* Return a pointer to the startup message in place of the
+		   the argument vector. The argument counter (what will come
+		   out as 'argc' for the main() function) will remain 0. */
 		__argv = (char **)__WBenchMsg;
 	}
 

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.35 2005-03-07 11:16:42 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.36 2005-03-07 14:04:08 obarthel Exp $
 #
 # :ts=8
 #
@@ -77,23 +77,28 @@ $(LIBAMIGA_OBJS)/%.o : %.c
 ##############################################################################
 
 ifeq (small_data_020,$(TYPE))
-CODE_TYPE := -fbaserel -DSMALL_DATA -m68020-60 -DM68020
+CODE_TYPE	:= -m68020-60 -fbaserel
+CODE_FLAGS	:= -DSMALL_DATA -DM68020
 endif
 
 ifeq (small_data,$(TYPE))
-CODE_TYPE := -fbaserel -DSMALL_DATA -m68000
+CODE_TYPE	:= -m68000 -fbaserel
+CODE_FLAGS	:= -DSMALL_DATA
 endif
 
 ifeq (small_data32,$(TYPE))
-CODE_TYPE := -fbaserel32 -DSMALL_DATA32 -m68020-60 -DM68020
+CODE_TYPE	:= -m68020-60 -fbaserel32
+CODE_FLAGS	:= -DSMALL_DATA32 -DM68020
 endif
 
 ifeq (large_data_020,$(TYPE))
-CODE_TYPE := -m68020-60 -DM68020
+CODE_TYPE	:= -m68020-60
+CODE_FLAGS	:= -DM68020
 endif
 
 ifeq (large_data,$(TYPE))
-CODE_TYPE := -m68000
+CODE_TYPE	:= -m68000
+CODE_FLAGS	:=
 endif
 
 ##############################################################################
@@ -112,7 +117,7 @@ INCLUDES = -Iinclude -I. -Inetinclude
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g2
 
-CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
+CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(CODE_TYPE) $(INCLUDES)
 
 ##############################################################################
 
@@ -539,7 +544,6 @@ MATH_LIB = \
 	stdio_vsnprintf.o \
 	stdio_vsprintf.o \
 	stdlib_atof.o \
-	stdlib_machine_test.o \
 	stdlib_strtod.o \
 	time_difftime.o
 
@@ -752,7 +756,7 @@ LIBS_020 := $(LIBM881_OBJS)/libm881.a $(LIBS_68K)
 ##############################################################################
 
 # The 881 math library won't build in plain 68k mode
-ifneq (,$(findstring 68020,$(CODE_TYPE)))
+ifneq (,$(findstring 68020,$(CODE_FLAGS)))
 LIBS := $(LIBS_020)
 else
 LIBS := $(LIBS_68K)
@@ -943,6 +947,20 @@ $(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_mem_debug.h
 
 ##############################################################################
 
+$(LIBC_OBJS)/stdlib_machine_test.o : stdlib_machine_test.c
+	@echo "Compiling $< [$(TYPE):c]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_machine_test.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(INCLUDES) $<
+
+$(LIBC_OBJS)/stdlib_showerror.o : stdlib_showerror.c
+	@echo "Compiling $< [$(TYPE):c]"
+	@$(CC) -o $(LIBC_OBJS)/stdlib_showerror.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(INCLUDES) $<
+
+$(LIBM881_OBJS)/math_init_exit.o : math_init_exit.c
+	@echo "Compiling $< [$(TYPE):m881]"
+	@$(CC) -o $(LIBM881_OBJS)/math_init_exit.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_FLAGS) $(INCLUDES) -DM68881_FLOATING_POINT_SUPPORT $<
+
+##############################################################################
+
 $(LIBC_OBJS)/stdlib_alloca_debug.o : stdlib_alloca.c
 	@echo "Compiling $< [$(TYPE):c debug]"
 	@$(CC) -o $(LIBC_OBJS)/stdlib_alloca_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_alloca.c
@@ -1070,25 +1088,33 @@ $(LIBAMIGA_OBJS)/libamiga.a : $(LIBAMIGA_OBJS) $(foreach file,$(AMIGA_LIB),$(LIB
 ##############################################################################
 
 nrcrt0.o : nrcrt0.S
-	$(CC) -traditional -o $@ -c nrcrt0.S
+	@echo "Assembling $< [resident]"
+	@$(CC) -traditional -o $@ -c nrcrt0.S
 
 nr32crt0.o : nrcrt0.S
-	$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c nrcrt0.S
+	@echo "Assembling $< [resident32]"
+	@$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c nrcrt0.S
 
 nbcrt0.o : ncrt0.S
-	$(CC) -traditional -DSMALL_DATA -o $@ -c ncrt0.S
+	@echo "Assembling $< [small_data]"
+	@$(CC) -traditional -DSMALL_DATA -o $@ -c ncrt0.S
 
 nb32crt0.o : ncrt0.S
-	$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c ncrt0.S
+	@echo "Assembling $< [small_data32]"
+	@$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c ncrt0.S
 
 ncrt0.o : ncrt0.S
-	$(CC) -traditional -o $@ -c ncrt0.S
+	@echo "Assembling $< [large_data]"
+	@$(CC) -traditional -o $@ -c ncrt0.S
 
 mainb32.o : stdlib_main.c
-	$(CC) -o mainb32.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -fbaserel32 -DSMALL_DATA32 -m68020-60 -DM68020 stdlib_main.c
+	@echo "Compiling $< [small_data32]"
+	@$(CC) -o mainb32.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -fbaserel32 -DSMALL_DATA32 -m68020-60 -DM68020 stdlib_main.c
 
 mainb.o : stdlib_main.c
-	$(CC) -o mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -fbaserel -DSMALL_DATA -m68000 stdlib_main.c
+	@echo "Compiling $< [small_data]"
+	@$(CC) -o mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -fbaserel -DSMALL_DATA -m68000 stdlib_main.c
 
 mainnb.o : stdlib_main.c
-	$(CC) -o mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -m68000 stdlib_main.c
+	@echo "Compiling $< [large_data]"
+	@$(CC) -o mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -m68000 stdlib_main.c

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.12 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.13 2005-03-07 14:04:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -307,6 +307,7 @@ _main(void)
 	struct WBStartup * startup_message;
 	struct Process * this_process;
 	APTR old_window_pointer = NULL;
+	BOOL old_window_pointer_valid = FALSE;
 	int return_code = RETURN_FAIL;
 	ULONG current_stack_size;
 	int os_version;
@@ -387,6 +388,8 @@ _main(void)
 
 		__set_process_window(old_window_pointer);
 	}
+
+	old_window_pointer_valid = TRUE;
 
 	/* If a callback was provided which can fill us in on which
 	   minimum stack size should be used, invoke it now and
@@ -557,7 +560,7 @@ _main(void)
 
  out:
 
-	if(DOSBase != NULL)
+	if(old_window_pointer_valid)
 		__set_process_window(old_window_pointer);
 
 	if(child_process == NULL)
