@@ -1,5 +1,5 @@
 /* 
- * $Id: crtbegin.c,v 1.7 2005-03-10 13:28:05 obarthel Exp $
+ * $Id: crtbegin.c,v 1.8 2005-03-10 13:30:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -33,16 +33,14 @@ static void (*__DTOR_LIST__[1]) (void) __attribute__(( used, section(".dtors"), 
 void
 _init(void)
 {
-	int num_ctors;
-	int i;
+	int num_ctors,i;
+	int j;
 
-	num_ctors = 0;
-
-	for(i = 1 ; __CTOR_LIST__[i] != NULL ; i++)
+	for(i = 1, num_ctors = 0 ; __CTOR_LIST__[i] != NULL ; i++)
 		num_ctors++;
 
-	for(i = 0 ; i < num_ctors ; i++)
-		__CTOR_LIST__[num_ctors - i]();
+	for(j = 0 ; j < num_ctors ; j++)
+		__CTOR_LIST__[num_ctors - j]();
 }
 
 /****************************************************************************/
@@ -52,19 +50,19 @@ _fini(void)
 {
 	extern jmp_buf __exit_jmp_buf;
 
-	int num_dtors,j;
-	static int i;
+	int num_dtors,i;
+	static int j;
 
 	/* If one of the destructors drops into
 	   exit(), processing will continue with
 	   the next following destructor. */
 	(void)setjmp(__exit_jmp_buf);
 
-	for(j = 0, num_dtors = 0 ; __DTOR_LIST__[j] != NULL ; j++)
+	for(i = 1, num_dtors = 0 ; __DTOR_LIST__[i] != NULL ; i++)
 		num_dtors++;
 
-	while(i++ < num_dtors)
-		__DTOR_LIST__[i]();
+	while(j++ < num_dtors)
+		__DTOR_LIST__[j]();
 }
 
 /****************************************************************************/
