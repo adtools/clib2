@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vsnprintf_hook_entry.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: stdio_vsnprintf_hook_entry.c,v 1.3 2004-08-07 10:24:04 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,10 +40,6 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 

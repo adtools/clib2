@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_data.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: dirent_data.c,v 1.3 2004-08-07 10:24:04 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,10 +34,6 @@
 #ifndef _DIRENT_HEADERS_H
 #include "dirent_headers.h"
 #endif /* _DIRENT_HEADERS_H */
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
