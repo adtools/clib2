@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.2 2004-12-13 11:11:57 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.3 2004-12-24 10:52:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,33 +76,53 @@ __show_error(const char * message)
 	struct DOSIFace *		IDOS		= NULL;
 	#endif /* __amigaos4__ */
 
-	struct Library * IntuitionBase	= NULL;
-	struct Library * DOSBase		= NULL;
+	struct Library * IntuitionBase;
+	struct Library * DOSBase;
 
 	PROFILE_OFF();
 
-	if(__detach || __WBenchMsg != NULL || __no_standard_io)
+	DOSBase			= OpenLibrary("dos.library",0);
+	IntuitionBase	= OpenLibrary("intuition.library",0);
+
+	if(DOSBase == NULL || IntuitionBase == NULL)
+		goto out;
+
+	#if defined(__amigaos4__)
 	{
-		IntuitionBase = OpenLibrary("intuition.library",0);
-		if(IntuitionBase == NULL)
+		IDOS = (struct DOSIFace *)GetInterface((struct Library *)DOSBase, "main", 1, 0);
+		if (IDOS == NULL)
 			goto out;
 
-		#if defined(__amigaos4__)
-		{
-			IIntuition = (struct IntuitionIFace *)GetInterface((struct Library *)IntuitionBase, "main", 1, 0);
-			if (IIntuition == NULL)
-				goto out;
-		}
-		#endif /* __amigaos4__ */
+		IIntuition = (struct IntuitionIFace *)GetInterface((struct Library *)IntuitionBase, "main", 1, 0);
+		if (IIntuition == NULL)
+			goto out;
+	}
+	#endif /* __amigaos4__ */
 
+	if(__detach || __no_standard_io || __WBenchMsg != NULL)
+	{
 		if(IntuitionBase->lib_Version >= 37)
 		{
+			UBYTE program_name[256];
 			struct EasyStruct es;
+			STRPTR title_string;
+
+			if(__WBenchMsg != NULL)
+			{
+				title_string = (STRPTR)FilePart(__WBenchMsg->sm_ArgList[0].wa_Name);
+			}
+			else
+			{
+				if(GetProgramName(program_name,sizeof(program_name)))
+					title_string = FilePart((STRPTR)program_name);
+				else
+					title_string = (STRPTR)"Error";
+			}
 
 			memset(&es,0,sizeof(es));
 
 			es.es_StructSize	= sizeof(es);
-			es.es_Title			= (STRPTR)__WBenchMsg->sm_ArgList[0].wa_Name;
+			es.es_Title			= title_string;
 			es.es_TextFormat	= (STRPTR)message;
 			es.es_GadgetFormat	= (STRPTR)"Sorry";
 
@@ -114,8 +134,8 @@ __show_error(const char * message)
 			#if NOT defined(__amigaos4__)
 			{
 				static struct TextAttr default_font	= { (STRPTR)"topaz.font",8,FS_NORMAL,FPF_ROMFONT|FPF_DESIGNED };
-				static struct IntuiText sorry_text	= {0,1,JAM1,6,3,(struct IText *)NULL,(STRPTR)"Sorry",NULL};
-				static struct IntuiText body_text	= {0,1,JAM1,5,3,(struct IText *)NULL,(STRPTR)NULL,NULL};
+				static struct IntuiText sorry_text	= {0,1,JAM1,6,3,(struct TextAttr *)NULL,(STRPTR)"Sorry",(struct IntuiText *)NULL};
+				static struct IntuiText body_text	= {0,1,JAM1,5,3,(struct TextAttr *)NULL,(STRPTR)NULL,(struct IntuiText *)NULL};
 
 				sorry_text.ITextFont	= &default_font;
 				body_text.ITextFont		= &default_font;
@@ -130,18 +150,6 @@ __show_error(const char * message)
 	else
 	{
 		BPTR output;
-
-		DOSBase = OpenLibrary("dos.library",0);
-		if(DOSBase == NULL)
-			goto out;
-
-		#if defined(__amigaos4__)
-		{
-			IDOS = (struct DOSIFace *)GetInterface((struct Library *)DOSBase, "main", 1, 0);
-			if (IDOS == NULL)
-				goto out;
-		}
-		#endif /* __amigaos4__ */
 
 		output = Output();
 
