@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.3 2004-07-28 15:50:45 obarthel Exp $
+ * $Id: unistd.h,v 1.4 2004-08-07 09:15:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,7 +36,7 @@
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' standard. */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_isnotanumber.c,v 1.2 2004-07-29 08:14:49 obarthel Exp $
+ * $Id: math_rintf.c,v 1.1 2004-08-07 09:15:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,83 +29,38 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+#ifndef _MATH_HEADERS_H
+#include "math_headers.h"
+#endif /* _MATH_HEADERS_H */
 
 /****************************************************************************/
 
-#if defined (FLOATING_POINT_SUPPORT)
+/* The following is not part of the ISO 'C' (1994) (1994) standard. */
 
 /****************************************************************************/
 
-union ieee_long_double
-{
-	long double		value;
-	unsigned long	raw[3];
-};
-
-union ieee_double
-{
-	double			value;
-	unsigned long	raw[2];
-};
-
-union ieee_single
-{
-	float			value;
-	unsigned long	raw[1];
-};
+#if defined(FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
-int
-__is_not_a_number(long double number)
+float
+rintf(float x)
 {
-	int result;
-
-	ENTER();
-
-	/* This assumes that a) 'number' is stored in big endian format
-	 * and b) it is stored in IEEE 754 format.
-	 */
-	if(sizeof(number) == 4) /* single precision */
-	{
-		union ieee_single x;
-
-		x.value = number;
-
-		/* Exponent = 255 and fraction != 0.0 */
-		result = ((x.raw[0] & 0x7F800000) == 0x7F800000 && (x.raw[0] & 0x007FFFFF) != 0);
-	}
-	else if (sizeof(number) == 8) /* double precision */
-	{
-		union ieee_double x;
-
-		x.value = number;
-
-		/* Exponent = 2047 and fraction != 0.0 */
-		result = (((x.raw[0] & 0x7FF00000) == 0x7FF00000) && ((x.raw[0] & 0x000FFFFF) != 0 || (x.raw[1] != 0)));
-	}
-	else if (sizeof(number) == 12) /* extended precision */
-	{
-		union ieee_long_double x;
-
-		x.value = number;
-
-		/* Exponent = 32767 and fraction != 0.0 */
-		result = (((x.raw[0] & 0x7FFF0000) == 0x7FFF0000) && ((x.raw[1] & 0x7FFFFFFF) != 0 || x.raw[2] != 0));
-	}
-	else
-	{
-		/* Can't happen */
-		result = 0;
-	}
-
-	RETURN(result);
-	return(result);
+	return (float) floor ( x + 0.5f );
 }
 
+/****************************************************************************/
+
 #endif /* FLOATING_POINT_SUPPORT */
+

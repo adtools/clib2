@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.1.1.1 2004-07-26 16:31:35 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.2 2004-08-07 09:15:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,7 +72,6 @@
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' standard. */
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>

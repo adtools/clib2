@@ -1,5 +1,5 @@
 /*
- * $Id: signal.h,v 1.2 2004-07-28 14:14:38 obarthel Exp $
+ * $Id: signal.h,v 1.3 2004-08-07 09:15:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ extern int raise(int sig);
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' standard. */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 

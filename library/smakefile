@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.3 2004-08-06 11:53:49 obarthel Exp $
+# $Id: smakefile,v 1.4 2004-08-07 09:15:32 obarthel Exp $
 #
 # :ts=8
 #
@@ -190,11 +190,15 @@ MATH_OBJ = \
 	math_fmod.o \
 	math_frexp.o \
 	math_init_exit.o \
+	math_isinf.o \
+	math_isnan.o \
 	math_ldexp.o \
 	math_log.o \
 	math_log10.o \
 	math_modf.o \
 	math_pow.o \
+	math_rint.o \
+	math_rintf.o \
 	math_sin.o \
 	math_sinh.o \
 	math_sqrt.o \
@@ -314,8 +318,6 @@ STDIO_OBJ = \
 	stdio_initializeiob.o \
 	stdio_init_exit.o \
 	stdio_iobhookentry.o \
-	stdio_isinfinity.o \
-	stdio_isnotanumber.o \
 	stdio_locksemaphorename.o \
 	stdio_nostdio.o \
 	stdio_openiob.o \

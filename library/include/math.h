@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.1.1.1 2004-07-26 16:32:53 obarthel Exp $
+ * $Id: math.h,v 1.2 2004-08-07 09:15:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,6 +78,17 @@ extern double sinh(double x);
 extern double sqrt(double x);
 extern double tan(double x);
 extern double tanh(double x);
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+extern double rint(double x);
+extern float rintf(float x);
+extern int isinf(double x);
+extern int isnan(double x);
 
 /****************************************************************************/
 

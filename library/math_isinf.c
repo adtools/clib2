@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_isinfinity.c,v 1.2 2004-07-29 08:14:49 obarthel Exp $
+ * $Id: math_isinf.c,v 1.1 2004-08-07 09:15:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,10 @@
 
 /****************************************************************************/
 
+/* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
 union ieee_long_double
 {
 	long double		value;
@@ -62,23 +66,23 @@ union ieee_single
 /****************************************************************************/
 
 int
-__is_infinity(long double number)
+isinf(double number)
 {
+	int is_infinity;
 	int result;
 
 	ENTER();
 
 	/* This assumes that a) 'number' is stored in big endian format
-	 * and b) it is stored in IEEE 754 format.
-	 */
-	if(sizeof(number) == 4) /* single precision */
+	   and b) it is stored in IEEE 754 format. */
+	if (sizeof(number) == 4) /* single precision */
 	{
 		union ieee_single x;
 
 		x.value = number;
 
 		/* Exponent = 255 and fraction = 0.0 */
-		result = ((x.raw[0] & 0x7FFFFFFF) == 0x7F800000);
+		is_infinity = ((x.raw[0] & 0x7FFFFFFF) == 0x7F800000);
 	}
 	else if (sizeof(number) == 8) /* double precision */
 	{
@@ -87,7 +91,7 @@ __is_infinity(long double number)
 		x.value = number;
 
 		/* Exponent = 2047 and fraction = 0.0 */
-		result = (((x.raw[0] & 0x7FFFFFFF) == 0x7FF00000) && (x.raw[1] == 0));
+		is_infinity = (((x.raw[0] & 0x7FFFFFFF) == 0x7FF00000) && (x.raw[1] == 0));
 	}
 	else if (sizeof(number) == 12) /* extended precision */
 	{
@@ -96,16 +100,30 @@ __is_infinity(long double number)
 		x.value = number;
 
 		/* Exponent = 32767 and fraction = 0.0 */
-		result = (((x.raw[0] & 0x7FFF0000) == 0x7FFF0000) && (x.raw[1] & 0x7FFFFFFF) == 0 && (x.raw[2] == 0));
+		is_infinity = (((x.raw[0] & 0x7FFF0000) == 0x7FFF0000) && (x.raw[1] & 0x7FFFFFFF) == 0 && (x.raw[2] == 0));
 	}
 	else
 	{
 		/* Can't happen */
+		is_infinity = 0;
+	}
+
+	if(is_infinity)
+	{
+		if(number < 0)
+			result = -1;
+		else
+			result = 1;
+	}
+	else
+	{
 		result = 0;
 	}
 
 	RETURN(result);
 	return(result);
 }
+
+/****************************************************************************/
 
 #endif /* FLOATING_POINT_SUPPORT */

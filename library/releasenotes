@@ -1,3 +1,13 @@
+- Ditched __is_infinity() and __is_not_a_number(), brought them back
+  as isinf() and isnan().
+
+- Updated code and header files to state exactly which ISO 'C' version
+  is meant by the "The following is not part of the ISO 'C' standard."
+  warning.
+
+- Integrated rint() and rintf().
+
+
 c.lib 1.167 (29.7.2004)
 
 - Modified __is_infinity() and __is_not_a_number() to use more portable

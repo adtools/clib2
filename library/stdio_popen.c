@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_popen.c,v 1.1.1.1 2004-07-26 16:31:38 obarthel Exp $
+ * $Id: stdio_popen.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,7 +49,7 @@
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' standard. */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 

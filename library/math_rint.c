@@ -1,5 +1,5 @@
 /*
- * $Id: math_rint.c,v 1.1 2004-08-06 12:56:43 hfrieden Exp $
+ * $Id: math_rint.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,12 +44,13 @@
 #include "math_headers.h"
 #endif /* _MATH_HEADERS_H */
 
-#if defined(FLOATING_POINT_SUPPORT)
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) (1994) standard. */
 
 /****************************************************************************/
 
-extern double rint(double);
-extern float rintf(float);
+#if defined(FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
@@ -59,10 +60,7 @@ rint(double x)
 	return floor ( x+0.5 );
 }
 
-float
-rintf(float x)
-{
-	return (float) floor ( x + 0.5f );
-}
+/****************************************************************************/
 
-#endif
+#endif /* FLOATING_POINT_SUPPORT */
+

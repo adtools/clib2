@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: math_isnan.c,v 1.1 2004-08-07 09:15:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,15 +31,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_NULL_POINTER_CHECK_H
-#include "stdlib_null_pointer_check.h"
-#endif /* _STDLIB_NULL_POINTER_CHECK_H */
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-#ifndef _MOUNT_HEADERS_H
-#include "mount_headers.h"
-#endif /* _MOUNT_HEADERS_H */
+#if defined (FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
@@ -47,69 +45,72 @@
 
 /****************************************************************************/
 
-int
-fstatfs(int file_descriptor, struct statfs *buf)
+union ieee_long_double
 {
-	DECLARE_UTILITYBASE();
-	struct file_hook_message message;
-	D_S(struct InfoData,id);
-	int result = -1;
-	struct fd * fd;
+	long double		value;
+	unsigned long	raw[3];
+};
+
+union ieee_double
+{
+	double			value;
+	unsigned long	raw[2];
+};
+
+union ieee_single
+{
+	float			value;
+	unsigned long	raw[1];
+};
+
+/****************************************************************************/
+
+int
+isnan(double number)
+{
+	int result;
 
 	ENTER();
 
-	SHOWVALUE(file_descriptor);
-	SHOWPOINTER(buf);
-
-	assert( buf != NULL );
-	assert( UtilityBase != NULL );
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
+	/* This assumes that a) 'number' is stored in big endian format
+	   and b) it is stored in IEEE 754 format. */
+	if (sizeof(number) == 4) /* single precision */
 	{
-		if(buf == NULL)
-		{
-			SHOWMSG("invalid buffer parameter");
+		union ieee_single x;
 
-			errno = EFAULT;
-			goto out;
-		}
+		x.value = number;
+
+		/* Exponent = 255 and fraction != 0.0 */
+		result = ((x.raw[0] & 0x7F800000) == 0x7F800000 && (x.raw[0] & 0x007FFFFF) != 0);
 	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
-	assert( __fd[file_descriptor] != NULL );
-	assert( FLAG_IS_SET(__fd[file_descriptor]->fd_Flags,FDF_IN_USE) );
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	fd = __get_file_descriptor(file_descriptor);
-	if(fd == NULL)
+	else if (sizeof(number) == 8) /* double precision */
 	{
-		errno = EBADF;
-		goto out;
+		union ieee_double x;
+
+		x.value = number;
+
+		/* Exponent = 2047 and fraction != 0.0 */
+		result = (((x.raw[0] & 0x7FF00000) == 0x7FF00000) && ((x.raw[0] & 0x000FFFFF) != 0 || (x.raw[1] != 0)));
 	}
-
-	SHOWMSG("calling the hook");
-
-	message.action		= file_hook_action_info;
-	message.info_data	= id;
-
-	assert( fd->fd_Hook != NULL );
-
-	CallHookPkt(fd->fd_Hook,fd,&message);
-
-	result = message.result;
-	if(result != 0)
+	else if (sizeof(number) == 12) /* extended precision */
 	{
-		errno = message.error;
-		goto out;
+		union ieee_long_double x;
+
+		x.value = number;
+
+		/* Exponent = 32767 and fraction != 0.0 */
+		result = (((x.raw[0] & 0x7FFF0000) == 0x7FFF0000) && ((x.raw[1] & 0x7FFFFFFF) != 0 || x.raw[2] != 0));
 	}
-
-	__convert_info_to_statfs(id,buf);
-
- out:
+	else
+	{
+		/* Can't happen */
+		result = 0;
+	}
 
 	RETURN(result);
 	return(result);
 }
+
+/****************************************************************************/
+
+#endif /* FLOATING_POINT_SUPPORT */
