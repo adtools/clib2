@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.6 2005-02-21 16:09:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,6 @@ int
 closedir(DIR * directory_pointer)
 {
 	struct DirectoryHandle * dh;
-	struct Node * node;
 	int result = -1;
 
 	ENTER();
@@ -96,6 +95,8 @@ closedir(DIR * directory_pointer)
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
+		struct Node * node;
+
 		while((node = RemHead((struct List *)&dh->dh_VolumeList)) != NULL)
 			free(node);
 	}

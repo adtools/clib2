@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_iobhookentry.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_iobhookentry.c,v 1.4 2005-02-21 16:09:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,6 +62,9 @@ __iob_hook_entry(
 			if(fd == NULL)
 			{
 				fam->fam_Error = EBADF;
+
+				result = -1;
+
 				break;
 			}
 

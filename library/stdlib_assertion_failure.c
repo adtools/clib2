@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_assertion_failure.c,v 1.6 2005-01-09 09:40:32 obarthel Exp $
+ * $Id: stdlib_assertion_failure.c,v 1.7 2005-02-21 16:09:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -93,10 +93,11 @@ __assertion_failure(
 
 				es.es_StructSize	= sizeof(es);
 				es.es_Title			= (STRPTR)__program_name;
-				es.es_TextFormat	= (STRPTR)"Assertion of expression\n'%s'\nfailed in file '%s', line %ld";
+				es.es_TextFormat	= (STRPTR)"Assertion of expression\n\"%s\"\nfailed in file \"%s\", line %ld.";
 				es.es_GadgetFormat	= (STRPTR)"Sorry";
 
-				EasyRequest(NULL,&es,NULL,expression,file_name,line_number);
+				EasyRequest(NULL,&es,NULL,
+					expression,file_name,line_number);
 
 				#if defined(__amigaos4__)
 				{
@@ -113,7 +114,7 @@ __assertion_failure(
 				fprintf(stderr,"[%s] ",__program_name);
 
 			fprintf(stderr,
-				"%s:%d: failed assertion '%s'\n",
+				"%s:%d: failed assertion \"%s\".\n",
 					file_name,
 					line_number,
 					expression);

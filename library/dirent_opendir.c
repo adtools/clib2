@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_opendir.c,v 1.5 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: dirent_opendir.c,v 1.6 2005-02-21 16:09:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,7 +89,6 @@ opendir(const char * path_name)
 	#endif /* UNIX_PATH_SEMANTICS */
 	struct DirectoryHandle * dh = NULL;
 	DIR * result = NULL;
-	struct Node * node;
 
 	ENTER();
 
@@ -123,6 +122,8 @@ opendir(const char * path_name)
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
+		struct Node * node;
+
 		NewList((struct List *)&dh->dh_VolumeList);
 
 		if(__unix_path_semantics)
@@ -256,6 +257,8 @@ opendir(const char * path_name)
 
 		#if defined(UNIX_PATH_SEMANTICS)
 		{
+			struct Node * node;
+
 			while((node = RemHead((struct List *)&dh->dh_VolumeList)) != NULL)
 				free(node);
 		}
