@@ -28,6 +28,10 @@
   and address resolution errors trash the 'errno' variable instead
   and leaving 'h_errno' always set to 0. Fixed.
 
+- For sockets, ioctl() and fcntl() now interact on the FIONBIO/FIOASYNC
+  requests (ioctl) and the O_NOBLOCK/O_ASYNC flags (fcntl).
+
+
 
 c.lib 1.183 (13.11.2004)
 

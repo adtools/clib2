@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl.h,v 1.2 2004-08-07 09:15:33 obarthel Exp $
+ * $Id: fcntl.h,v 1.3 2004-11-27 12:43:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,6 +67,7 @@ extern "C" {
 #define O_NONBLOCK	(1<<6)
 #define O_SYNC		(0)
 #define O_NOCTTY	(0)
+#define O_ASYNC		(1<<7)
 
 /****************************************************************************/
 

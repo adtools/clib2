@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.1.1.1 2004-07-26 16:31:14 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.2 2004-11-27 12:43:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,10 @@
 
 /****************************************************************************/
 
+#include <sys/ioctl.h>
+
+/****************************************************************************/
+
 void
 __socket_hook_entry(
 	struct Hook * UNUSED		unused_hook,
@@ -49,6 +53,7 @@ __socket_hook_entry(
 {
 	struct FileInfoBlock * fib;
 	int error = OK;
+	int param;
 	int result;
 
 	assert( message != NULL && fd != NULL );
@@ -126,6 +131,28 @@ __socket_hook_entry(
 
 			result	= -1;
 			error	= ESPIPE;
+
+			break;
+
+		case file_hook_action_set_blocking:
+
+			SHOWMSG("file_hook_action_set_blocking");
+
+			param = (int)(message->block == 0);
+
+			result	= __IoctlSocket(fd->fd_DefaultFile,FIONBIO,&param);
+			error	= errno;
+
+			break;
+
+		case file_hook_action_set_async:
+
+			SHOWMSG("file_hook_action_set_async");
+
+			param = (int)(message->block != 0);
+
+			result	= __IoctlSocket(fd->fd_DefaultFile,FIOASYNC,&param);
+			error	= errno;
 
 			break;
 
