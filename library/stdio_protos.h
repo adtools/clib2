@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.11 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.12 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -114,12 +114,12 @@ extern int __find_vacant_iob_entry(void);
 /****************************************************************************/
 
 /* stdio_growfdtable.c */
-extern int __grow_fd_table(void);
+extern int __grow_fd_table(int max_fd);
 
 /****************************************************************************/
 
 /* stdio_growiobtable.c */
-extern int __grow_iob_table(void);
+extern int __grow_iob_table(int max_fd);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_growiobtable.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_growiobtable.c,v 1.4 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,53 +44,63 @@
 /****************************************************************************/
 
 int
-__grow_iob_table(void)
+__grow_iob_table(int max_iob)
 {
 	const int granularity = 10;
-	struct iob ** new_iob;
 	int new_num_iob;
 	int result = -1;
-	int i;
 
-	new_num_iob = __num_iob + granularity;
+	if(max_iob == 0)
+		new_num_iob = __num_iob + granularity;
+	else
+		new_num_iob = max_iob;
 
-	new_iob = malloc(sizeof(*new_iob) * new_num_iob);
-	if(new_iob == NULL)
+	if(new_num_iob > __num_iob)
 	{
-		SHOWMSG("not enough memory for file table");
+		struct iob ** new_iob;
+		int i;
 
-		__set_errno(ENOMEM);
-		goto out;
-	}
-
-	for(i = __num_iob ; i < new_num_iob ; i++)
-	{
-		new_iob[i] = malloc(sizeof(*new_iob[i]));
-		if(new_iob[i] == NULL)
+		new_iob = malloc(sizeof(*new_iob) * new_num_iob);
+		if(new_iob == NULL)
 		{
-			int j;
-
-			SHOWMSG("not enough memory for file table entry");
-
-			for(j = __num_iob ; j < i ; j++)
-				free(new_iob[j]);
-
-			free(new_iob);
+			SHOWMSG("not enough memory for file table");
 
 			__set_errno(ENOMEM);
 			goto out;
 		}
 
-		memset(new_iob[i],0,sizeof(*new_iob[i]));
+		for(i = __num_iob ; i < new_num_iob ; i++)
+		{
+			new_iob[i] = malloc(sizeof(*new_iob[i]));
+			if(new_iob[i] == NULL)
+			{
+				int j;
+
+				SHOWMSG("not enough memory for file table entry");
+
+				for(j = __num_iob ; j < i ; j++)
+					free(new_iob[j]);
+
+				free(new_iob);
+
+				__set_errno(ENOMEM);
+				goto out;
+			}
+
+			memset(new_iob[i],0,sizeof(*new_iob[i]));
+		}
+
+		if(__iob != NULL)
+		{
+			for(i = 0 ; i < __num_iob ; i++)
+				new_iob[i] = __iob[i];
+
+			free(__iob);
+		}
+
+		__iob		= new_iob;
+		__num_iob	= new_num_iob;
 	}
-
-	for(i = 0 ; i < __num_iob ; i++)
-		new_iob[i] = __iob[i];
-
-	free(__iob);
-
-	__iob		= new_iob;
-	__num_iob	= new_num_iob;
 
 	result = 0;
 

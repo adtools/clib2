@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fopen.c,v 1.5 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_fopen.c,v 1.6 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,7 +76,7 @@ fopen(const char *filename, const char *mode)
 	slot_number = __find_vacant_iob_entry();
 	if(slot_number < 0)
 	{
-		if(__grow_iob_table() < 0)
+		if(__grow_iob_table(0) < 0)
 		{
 			SHOWMSG("couldn't find a free file table, and no memory for a new one");
 			goto out;

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_socket.c,v 1.6 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: socket_socket.c,v 1.7 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,7 +61,7 @@ socket(int domain,int type,int protocol)
 	fd_slot_number = __find_vacant_fd_entry();
 	if(fd_slot_number < 0)
 	{
-		if(__grow_fd_table() < 0)
+		if(__grow_fd_table(0) < 0)
 		{
 			SHOWMSG("couldn't find a vacant fd slot and no memory to create one");
 			goto out;

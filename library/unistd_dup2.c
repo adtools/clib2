@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_dup2.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: unistd_dup2.c,v 1.8 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,7 +75,7 @@ dup2(int file_descriptor1, int file_descriptor2)
 		if(file_descriptor2 < 0)
 		{
 			/* No free space, so let's grow the table. */
-			if(__grow_fd_table() < 0)
+			if(__grow_fd_table(0) < 0)
 			{
 				SHOWMSG("not enough memory for new file descriptor");
 				goto out;
@@ -88,14 +88,8 @@ dup2(int file_descriptor1, int file_descriptor2)
 	else if (file_descriptor1 != file_descriptor2)
 	{
 		/* Make sure the requested duplicate exists. */
-		while(file_descriptor2 >= __num_fd)
-		{
-			if(__check_abort_enabled)
-				__check_abort();
-
-			if(__grow_fd_table() < 0)
-				goto out;
-		}
+		if(__grow_fd_table(file_descriptor2 + 1) < 0)
+			goto out;
 
 		assert( file_descriptor2 >= 0 && file_descriptor2 < __num_fd );
 		assert( __fd[file_descriptor2] != NULL );

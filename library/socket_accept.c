@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.8 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: socket_accept.c,v 1.9 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -94,7 +94,7 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 	new_fd_slot_number = __find_vacant_fd_entry();
 	if(new_fd_slot_number < 0)
 	{
-		if(__grow_fd_table() < 0)
+		if(__grow_fd_table(0) < 0)
 		{
 			SHOWMSG("couldn't find a vacant fd slot and no memory to create one");
 			goto out;

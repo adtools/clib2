@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.11 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.12 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -216,30 +216,18 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				goto out;
 			}
 
-			__stdio_lock();
-
-			/* Check if we have that many fd's already */
-			while(fdbase >= __num_fd)
-			{
-				__stdio_unlock();
-
-				if(__check_abort_enabled)
-					__check_abort();
-
-				/* No; enlarge it */
-				if(__grow_fd_table() < 0)
-					goto out;
-
-				__stdio_lock();
-			}
-
-			__stdio_unlock();
+			/* Make sure that we have the required number of file
+			   descriptors available. */
+			if(__grow_fd_table(fdbase + 1) < 0)
+				goto out;
 
 			vacant_slot = -1;
 
 			/* Guaranteed to have enough here */
 			do
 			{
+				__stdio_unlock();
+
 				if(__check_abort_enabled)
 					__check_abort();
 
@@ -254,10 +242,8 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 					}
 				}
 
-				__stdio_unlock();
-
 				/* Didn't really find any, grow the table further */
-				if(vacant_slot < 0 && __grow_fd_table() < 0)
+				if(vacant_slot < 0 && __grow_fd_table(0) < 0)
 					goto out;
 			}
 			while(vacant_slot < 0);

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fdopen.c,v 1.5 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: unistd_fdopen.c,v 1.6 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -80,7 +80,7 @@ fdopen(int file_descriptor, const char * type)
 	slot_number = __find_vacant_iob_entry();
 	if(slot_number < 0)
 	{
-		if(__grow_iob_table() < 0)
+		if(__grow_iob_table(0) < 0)
 		{
 			SHOWMSG("not enough memory for a file buffer slot");
 			goto out;

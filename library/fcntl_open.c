@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.13 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.14 2005-03-04 09:07:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -144,7 +144,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 	fd_slot_number = __find_vacant_fd_entry();
 	if(fd_slot_number < 0)
 	{
-		if(__grow_fd_table() < 0)
+		if(__grow_fd_table(0) < 0)
 		{
 			SHOWMSG("couldn't find a vacant file descriptor, and couldn't allocate one either");
 			goto out;
