@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fclose.c,v 1.8 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: stdio_fclose.c,v 1.9 2005-03-09 12:06:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,8 +139,12 @@ fclose(FILE *stream)
 	if(file->iob_CustomBuffer != NULL)
 		free(file->iob_CustomBuffer);
 
-	/* Free the lock semaphore now. */
-	__delete_semaphore(file->iob_Lock);
+	#if defined(__THREAD_SAFE)
+	{
+		/* Free the lock semaphore now. */
+		__delete_semaphore(file->iob_Lock);
+	}
+	#endif /* __THREAD_SAFE */
 
 	memset(file,0,sizeof(*file));
 

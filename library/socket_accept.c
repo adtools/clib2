@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.9 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: socket_accept.c,v 1.10 2005-03-09 12:06:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,7 +139,11 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 
 	__stdio_unlock();
 
-	__delete_semaphore(lock);
+	#if defined(__THREAD_SAFE)
+	{
+		__delete_semaphore(lock);
+	}
+	#endif /* __THREAD_SAFE */
 
 	if(__check_abort_enabled)
 		__check_abort();

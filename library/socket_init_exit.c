@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.14 2005-03-09 10:48:59 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.15 2005-03-09 12:06:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -322,7 +322,11 @@ __socket_init(void)
 					{
 						SHOWMSG("could not duplicate daemon socket");
 
-						__delete_semaphore(lock);
+						#if defined(__THREAD_SAFE)
+						{
+							__delete_semaphore(lock);
+						}
+						#endif /* __THREAD_SAFE */
 
 						__show_error("Network server streams could not be initialized.");
 						goto out;

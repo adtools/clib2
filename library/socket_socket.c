@@ -1,5 +1,5 @@
 /*
- * $Id: socket_socket.c,v 1.7 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: socket_socket.c,v 1.8 2005-03-09 12:06:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -104,7 +104,11 @@ socket(int domain,int type,int protocol)
 
 	__stdio_unlock();
 
-	__delete_semaphore(lock);
+	#if defined(__THREAD_SAFE)
+	{
+		__delete_semaphore(lock);
+	}
+	#endif /* __THREAD_SAFE */
 
 	if(__check_abort_enabled)
 		__check_abort();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.18 2005-03-07 11:58:49 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.19 2005-03-09 12:06:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -341,8 +341,12 @@ __fd_hook_entry(
 
 			__fd_unlock(fd);
 
-			/* Free the lock semaphore now. */
-			__delete_semaphore(fd->fd_Lock);
+			#if defined(__THREAD_SAFE)
+			{
+				/* Free the lock semaphore now. */
+				__delete_semaphore(fd->fd_Lock);
+			}
+			#endif /* __THREAD_SAFE */
 
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));

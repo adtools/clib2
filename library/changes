@@ -37,6 +37,9 @@
   socket_data.c, dirent_data.c and stdio_data.c and into the
   code that initializes them.
 
+- Moved a few __delete_semaphore() calls into conditional compilation
+  sections where they should have been in the first place.
+
 
 c.lib 1.189 (5.3.2005)
 
