@@ -1,4 +1,9 @@
-c.lib 1.179 (22.10.2004)
+c.lib 1.180 (23.10.2004)
+
+- The printf() family now produces no output at all for floating point
+  numbers (%e, %f and %g) if the floating point support code is disabled.
+  In previous versions of the library some output (series of 0 or blank
+  space characters) could still be produced.
 
 - The scanf() family no longer ignores a conversion request of
   type '%x' (hexadecimal) and treats the number to be processed

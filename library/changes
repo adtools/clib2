@@ -1,3 +1,11 @@
+c.lib 1.180 (23.10.2004)
+
+- The printf() family now produces no output at all for %e, %f and %g if the
+  floating point support code is disabled. Previously, a minimum field width
+  specification could take effect, printing a series of 0 or blank space
+  characters where no output should have been produced.
+
+
 c.lib 1.179 (22.10.2004)
 
 - The scanf() family no longer assumes that a leading '0' indicates that the
