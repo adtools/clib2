@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.20 2005-02-28 10:07:31 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.21 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,6 +66,8 @@ __close_all_files(void)
 
 	__check_abort_enabled = FALSE;
 
+	__stdio_lock();
+
 	if(__iob != NULL && __num_iob > 0)
 	{
 		for(i = 0 ; i < __num_iob ; i++)
@@ -90,6 +92,8 @@ __close_all_files(void)
 		__fd		= NULL;
 	}
 
+	__stdio_unlock();
+
 	LEAVE();
 }
 
@@ -113,7 +117,8 @@ __stdio_init(void)
 {
 	const int num_standard_files = (STDERR_FILENO-STDIN_FILENO+1);
 
-	struct SignalSemaphore * lock;
+	struct SignalSemaphore * stdio_lock;
+	struct SignalSemaphore * fd_lock;
 	BPTR default_file;
 	ULONG fd_flags,iob_flags;
 	int result = ERROR;
@@ -197,15 +202,24 @@ __stdio_init(void)
 		{
 			/* Allocate memory for an arbitration mechanism, then
 			   initialize it. */
-			lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
-			if(lock == NULL)
-				goto out;
+			stdio_lock	= AllocVec(sizeof(*stdio_lock),MEMF_ANY|MEMF_PUBLIC);
+			fd_lock		= AllocVec(sizeof(*fd_lock),MEMF_ANY|MEMF_PUBLIC);
 
-			InitSemaphore(lock);
+			if(stdio_lock == NULL || fd_lock == NULL)
+			{
+				FreeVec(stdio_lock);
+				FreeVec(fd_lock);
+
+				goto out;
+			}
+
+			InitSemaphore(stdio_lock);
+			InitSemaphore(fd_lock);
 		}
 		#else
 		{
-			lock = NULL;
+			stdio_lock	= NULL;
+			fd_lock		= NULL;
 		}
 		#endif /* __THREAD_SAFE */
 
@@ -223,7 +237,7 @@ __stdio_init(void)
 		/* Align the buffer start address to a cache line boundary. */
 		aligned_buffer = (char *)((ULONG)(buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
 
-		__initialize_fd(__fd[i],__fd_hook_entry,default_file,fd_flags);
+		__initialize_fd(__fd[i],__fd_hook_entry,default_file,fd_flags,fd_lock);
 
 		__initialize_iob(__iob[i],__iob_hook_entry,
 			buffer,
@@ -231,7 +245,7 @@ __stdio_init(void)
 			i,
 			i,
 			iob_flags,
-			lock);
+			stdio_lock);
 	}
 
 	/* If the program was launched from Workbench, we continue by

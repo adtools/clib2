@@ -1,5 +1,5 @@
 /*
- * $Id: socket_ioctl.c,v 1.6 2005-02-21 10:21:43 obarthel Exp $
+ * $Id: socket_ioctl.c,v 1.7 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,7 +56,7 @@ ioctl(int sockfd,unsigned long request, ... /* char *arg */)
 {
 	va_list arg;
 	char * param;
-	struct fd * fd;
+	struct fd * fd = NULL;
 	int result = -1;
 
 	ENTER();
@@ -75,9 +75,11 @@ ioctl(int sockfd,unsigned long request, ... /* char *arg */)
 	if(fd == NULL)
 		goto out;
 
-	va_start(arg,request);
+	__fd_lock(fd);
 
+	va_start(arg,request);
 	param = va_arg(arg,char *);
+	va_end(arg);
 
 	SHOWPOINTER(param);
 
@@ -105,9 +107,9 @@ ioctl(int sockfd,unsigned long request, ... /* char *arg */)
 		}
 	}
 
-	va_end(arg);
-
  out:
+
+	__fd_unlock(fd);
 
 	if(__check_abort_enabled)
 		__check_abort();

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.10 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -221,6 +221,7 @@ __socket_init(void)
 
 		if(TypeOfMem(dm) != 0 && TypeOfMem(((char *)dm) + sizeof(*dm)-1) != 0)
 		{
+			struct SignalSemaphore * lock;
 			int daemon_socket;
 			struct fd * fd;
 			int sockfd;
@@ -254,6 +255,20 @@ __socket_init(void)
 			/* Put the socket into the three standard I/O streams. */
 			for(i = STDIN_FILENO ; i <= STDERR_FILENO ; i++)
 			{
+				#if defined(__THREAD_SAFE)
+				{
+					lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
+					if(lock == NULL)
+						goto out;
+
+					InitSemaphore(lock);
+				}
+				#else
+				{
+					lock = NULL;
+				}
+				#endif /* __THREAD_SAFE */
+
 				fd = __fd[i];
 
 				assert( fd != NULL && FLAG_IS_CLEAR(fd->fd_Flags,FDF_IN_USE) );
@@ -271,13 +286,15 @@ __socket_init(void)
 					if(sockfd == -1)
 					{
 						SHOWMSG("could not duplicate daemon socket");
-	
+
+						FreeVec(lock);
+
 						__show_error("Network server streams could not be initialized.");
 						goto out;
 					}
 				}
 
-				__initialize_fd(fd,__socket_hook_entry,(BPTR)sockfd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE);
+				__initialize_fd(fd,__socket_hook_entry,(BPTR)sockfd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE,lock);
 			}
 
 			/* This program now runs as an internet superserver client (daemon). */

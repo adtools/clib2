@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: socket_accept.c,v 1.7 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,8 @@
 int
 accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 {
-	struct fd * fd;
+	struct SignalSemaphore * lock = NULL;
+	struct fd * fd = NULL;
 	struct fd * new_fd;
 	int new_fd_slot_number;
 	int result = -1;
@@ -88,6 +89,8 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 	if(fd == NULL)
 		goto out;
 
+	__fd_lock(fd);
+
 	new_fd_slot_number = __find_vacant_fd_entry();
 	if(new_fd_slot_number < 0)
 	{
@@ -101,6 +104,19 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 		assert( new_fd_slot_number >= 0 );
 	}
 
+	#if defined(__THREAD_SAFE)
+	{
+		lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
+		if(lock == NULL)
+		{
+			__set_errno(ENOMEM);
+			goto out;
+		}
+
+		InitSemaphore(lock);
+	}
+	#endif /* __THREAD_SAFE */
+
 	PROFILE_OFF();
 	new_socket_fd = __accept((LONG)fd->fd_DefaultFile,cliaddr,(LONG *)addrlen);
 	PROFILE_ON();
@@ -113,13 +129,19 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 
 	new_fd = __fd[new_fd_slot_number];
 
-	__initialize_fd(new_fd,__socket_hook_entry,(BPTR)new_socket_fd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE);
+	__initialize_fd(new_fd,__socket_hook_entry,(BPTR)new_socket_fd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE,lock);
+
+	lock = NULL;
 
 	result = new_fd_slot_number;
 
  out:
 
+	__fd_unlock(fd);
+
 	__stdio_unlock();
+
+	FreeVec(lock);
 
 	if(__check_abort_enabled)
 		__check_abort();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_remove_fd_alias.c,v 1.1 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_remove_fd_alias.c,v 1.2 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,6 +42,8 @@ __remove_fd_alias(struct fd * fd)
 {
 	assert( fd != NULL );
 
+	__stdio_lock();
+
 	if(fd->fd_Original != NULL) /* this is an alias */
 	{
 		struct fd * list_fd;
@@ -78,4 +80,6 @@ __remove_fd_alias(struct fd * fd)
 			list_fd->fd_Original = first_alias;
 		}
 	}
+
+	__stdio_unlock();
 }

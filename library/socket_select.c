@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: socket_select.c,v 1.7 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -592,9 +592,13 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 	 * to the local copies, which take the files and sockets
 	 * into account.
 	 */
+	__stdio_lock();
+
 	map_descriptor_sets(read_fds,	num_fds,	socket_read_fds,	num_socket_used,	&total_socket_fd,	file_read_fds,		num_file_used,	&total_file_fd);
 	map_descriptor_sets(write_fds,	num_fds,	socket_write_fds,	num_socket_used,	&total_socket_fd,	file_write_fds,		num_file_used,	&total_file_fd);
 	map_descriptor_sets(except_fds,	num_fds,	socket_except_fds,	num_socket_used,	&total_socket_fd,	NULL,				0,				&total_file_fd);
+
+	__stdio_unlock();
 
 	/* Wait for socket input? */
 	if(total_socket_fd > 0)
@@ -981,9 +985,13 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 	{
 		SHOWMSG("remapping fd_sets");
 
+		__stdio_lock();
+
 		remap_descriptor_sets(socket_read_fds,		total_socket_fd,	file_read_fds,		total_file_fd,	read_fds,	num_fds);
 		remap_descriptor_sets(socket_write_fds,		total_socket_fd,	file_write_fds,		total_file_fd,	write_fds,	num_fds);
 		remap_descriptor_sets(socket_except_fds,	total_socket_fd,	NULL,				0,				except_fds,	num_fds);
+
+		__stdio_unlock();
 	}
 
 	if(__check_abort_enabled)

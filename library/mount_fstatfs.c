@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: mount_fstatfs.c,v 1.8 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,7 @@ fstatfs(int file_descriptor, struct statfs *buf)
 	D_S(struct InfoData,id);
 	BPTR parent_dir = ZERO;
 	int result = -1;
-	struct fd * fd;
+	struct fd * fd = NULL;
 	LONG success;
 
 	ENTER();
@@ -88,6 +88,8 @@ fstatfs(int file_descriptor, struct statfs *buf)
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
@@ -124,6 +126,8 @@ fstatfs(int file_descriptor, struct statfs *buf)
 	result = 0;
 
  out:
+
+	__fd_unlock(fd);
 
 	UnLock(parent_dir);
 

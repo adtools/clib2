@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.10 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.11 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 	struct flock * l;
 	int vacant_slot;
 	int result = -1;
-	struct fd * fd;
+	struct fd * fd = NULL;
 	va_list arg;
 	int error;
 	int flags;
@@ -73,6 +73,8 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	switch(cmd)
 	{
@@ -276,6 +278,8 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 	}
 
  out:
+
+	__fd_unlock(fd);
 
 	RETURN(result);
 	return(result);

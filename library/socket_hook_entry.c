@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.9 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.10 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,8 @@ __socket_hook_entry(
 	int param;
 
 	assert( fam != NULL && fd != NULL );
+
+	__fd_lock(fd);
 
 	switch(fam->fam_Action)
 	{
@@ -119,6 +121,11 @@ __socket_hook_entry(
 					PROFILE_ON();
 				}
 			}
+
+			__fd_unlock(fd);
+
+			/* Free the lock semaphore now. */
+			FreeVec(fd->fd_Lock);
 
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));
@@ -189,6 +196,8 @@ __socket_hook_entry(
 
 			break;
 	}
+
+	__fd_unlock(fd);
 
 	RETURN(result);
 	return(result);

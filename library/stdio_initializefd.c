@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_initializefd.c,v 1.4 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,10 +39,11 @@
 
 void
 __initialize_fd(
-	struct fd *			fd,
-	file_action_fd_t	action_function,
-	BPTR				default_file,
-	ULONG				flags)
+	struct fd *					fd,
+	file_action_fd_t			action_function,
+	BPTR						default_file,
+	ULONG						flags,
+	struct SignalSemaphore *	lock)
 {
 	assert( fd != NULL && action_function != NULL );
 
@@ -51,4 +52,5 @@ __initialize_fd(
 	fd->fd_DefaultFile	= default_file;
 	fd->fd_Flags		= flags;
 	fd->fd_Action		= action_function;
+	fd->fd_Lock			= lock;
 }

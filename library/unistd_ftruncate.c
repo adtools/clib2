@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.5 2005-02-18 18:53:17 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.6 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@ ftruncate(int file_descriptor, off_t length)
 {
 	D_S(struct FileInfoBlock,fib);
 	int result = -1;
-	struct fd * fd;
+	struct fd * fd = NULL;
 	long int position;
 	BOOL success;
 
@@ -68,6 +68,8 @@ ftruncate(int file_descriptor, off_t length)
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
@@ -144,6 +146,8 @@ ftruncate(int file_descriptor, off_t length)
 	result = 0;
 
  out:
+
+	__fd_unlock(fd);
 
 	RETURN(result);
 	return(result);

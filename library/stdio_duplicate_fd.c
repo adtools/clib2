@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_duplicate_fd.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_duplicate_fd.c,v 1.4 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,8 +42,10 @@ __duplicate_fd(struct fd * duplicate_fd,struct fd * original_fd)
 {
 	assert( duplicate_fd != NULL && original_fd != NULL );
 
+	__fd_lock(original_fd);
+
 	/* Initialize the duplicate to match the original. */
-	__initialize_fd(duplicate_fd,original_fd->fd_Action,original_fd->fd_DefaultFile,original_fd->fd_Flags);
+	__initialize_fd(duplicate_fd,original_fd->fd_Action,original_fd->fd_DefaultFile,original_fd->fd_Flags,original_fd->fd_Lock);
 
 	/* Figure out where the linked list of file descriptors associated
 	   with this one starts. */
@@ -55,4 +57,6 @@ __duplicate_fd(struct fd * duplicate_fd,struct fd * original_fd)
 	/* Add the duplicate at the beginning of the list. */
 	duplicate_fd->fd_NextLink				= duplicate_fd->fd_Original->fd_NextLink;
 	duplicate_fd->fd_Original->fd_NextLink	= duplicate_fd;
+
+	__fd_unlock(original_fd);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.17 2005-02-28 10:07:31 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.18 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -341,6 +341,8 @@ struct fd
 	BPTR				fd_DefaultFile;		/* A dos.library file handle */
 	LONG				fd_Position;		/* Cached file position (seek offset). */
 	fd_cleanup_t		fd_Cleanup;			/* Cleanup function, if any. */
+
+	struct SignalSemaphore * fd_Lock;		/* For thread locking */
 };
 
 /****************************************************************************/
@@ -439,6 +441,11 @@ extern int	__stdio_lock_init(void);
 
 /****************************************************************************/
 
+extern void __fd_lock(struct fd *fd);
+extern void __fd_unlock(struct fd *fd);
+
+/****************************************************************************/
+
 #else
 
 /****************************************************************************/
@@ -447,6 +454,11 @@ extern int	__stdio_lock_init(void);
 #define __stdio_unlock()	((void)0)
 #define __stdio_lock_exit()	((void)0)
 #define __stdio_lock_init()	(0)
+
+/****************************************************************************/
+
+#define __fd_lock(fd)		((void)0)
+#define __fd_unlock(fd)		((void)0)
 
 /****************************************************************************/
 

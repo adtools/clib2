@@ -72,6 +72,8 @@
   preprocessor symbol __THREAD_SAFE defined to get thread-safe
   code.
 
+- Extended the thread-safety locking to the file descriptors.
+
 
 c.lib 1.188 (7.2.2005)
 

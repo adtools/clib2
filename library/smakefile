@@ -1,5 +1,5 @@
 _#
-# $Id: smakefile,v 1.25 2005-02-27 21:58:21 obarthel Exp $
+# $Id: smakefile,v 1.26 2005-02-28 13:22:53 obarthel Exp $
 #
 # :ts=8
 #
@@ -161,6 +161,7 @@ FCNTL_OBJ = \
 	fcntl_close.o \
 	fcntl_creat.o \
 	fcntl_fcntl.o \
+	fcntl_lock.o \
 	fcntl_lseek.o \
 	fcntl_open.o \
 	fcntl_read.o \

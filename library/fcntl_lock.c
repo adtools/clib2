@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_sync_fd.c,v 1.2 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: fcntl_lock.c,v 1.1 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,44 +31,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _UNISTD_HEADERS_H
-#include "unistd_headers.h"
-#endif /* _UNISTD_HEADERS_H */
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-#if defined(__amigaos4__) && !defined(Flush)
-#define Flush(fh) FFlush(fh)
-#endif /* __amigaos4__ && !Flush */
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard. */
+#if defined(__THREAD_SAFE)
 
 /****************************************************************************/
 
 void
-__sync_fd(struct fd * fd,int mode)
+__fd_lock(struct fd * fd)
 {
-	assert( fd != NULL );
-
-	__fd_lock(fd);
-
-	if(fd->fd_DefaultFile != ZERO)
-	{
-		/* The mode tells us what to flush. 0 means "flush just the data", and
-		   everything else means "flush everything. */
-		Flush(fd->fd_DefaultFile);
-
-		if(mode != 0)
-		{
-			struct FileHandle * fh = BADDR(fd->fd_DefaultFile);
-
-			/* Verify that this file is not bound to "NIL:". */
-			if(fh->fh_Type != NULL)
-				DoPkt(fh->fh_Type,ACTION_FLUSH,	0,0,0,0,0);
-		}
-	}
-
-	__fd_unlock(fd);
+	if(fd != NULL && fd->fd_Lock != NULL)
+		ObtainSemaphore(fd->fd_Lock);
 }
+
+/****************************************************************************/
+
+void
+__fd_unlock(struct fd * fd)
+{
+	if(fd != NULL && fd->fd_Lock != NULL)
+		ReleaseSemaphore(fd->fd_Lock);
+}
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */

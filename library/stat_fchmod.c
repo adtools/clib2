@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fchmod.c,v 1.6 2005-02-21 10:21:44 obarthel Exp $
+ * $Id: stat_fchmod.c,v 1.7 2005-02-28 13:22:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@ fchmod(int file_descriptor, mode_t mode)
 	BPTR old_current_dir = ZERO;
 	BOOL current_dir_changed = FALSE;
 	int result = -1;
-	struct fd * fd;
+	struct fd * fd = NULL;
 	LONG success;
 
 	ENTER();
@@ -71,6 +71,8 @@ fchmod(int file_descriptor, mode_t mode)
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
@@ -158,6 +160,8 @@ fchmod(int file_descriptor, mode_t mode)
 	result = 0;
 
  out:
+
+	__fd_unlock(fd);
 
 	if(current_dir_changed)
 		CurrentDir(old_current_dir);
