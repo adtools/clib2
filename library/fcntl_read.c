@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_read.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: fcntl_read.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,6 +63,9 @@ read(int file_descriptor, void * buffer, size_t num_bytes)
 	assert( buffer != NULL );
 	assert( (int)num_bytes >= 0);
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(buffer == NULL)
@@ -78,9 +81,6 @@ read(int file_descriptor, void * buffer, size_t num_bytes)
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
 	assert( FLAG_IS_SET(__fd[file_descriptor]->fd_Flags,FDF_IN_USE) );
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)

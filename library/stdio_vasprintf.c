@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf.c,v 1.8 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_vasprintf.c,v 1.9 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,6 +71,9 @@ __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg)
 
 	assert( ret != NULL && format != NULL && arg != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(ret == NULL || format == NULL || format == arg)
@@ -82,9 +85,6 @@ __vasprintf(const char *file,int line,char **ret,const char *format,va_list arg)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	(*ret) = NULL;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -999,7 +999,9 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 
 					(*error_ptr) = EINTR;
 
-					__check_abort();
+					if(__check_abort_enabled)
+						__check_abort();
+
 					goto out;
 				}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_lock.c,v 1.1 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_lock.c,v 1.2 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,10 @@
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+#if defined(__THREAD_SAFE)
 
 /****************************************************************************/
 
@@ -94,3 +98,7 @@ __stdio_lock_init(void)
 
 	return(result);
 }
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */

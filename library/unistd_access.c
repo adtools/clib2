@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_access.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_access.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,6 +63,9 @@ access(const char * path_name, int mode)
 
 	assert( path_name != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(path_name == NULL)
@@ -74,9 +77,6 @@ access(const char * path_name, int mode)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	if(mode < 0 || mode > (R_OK|W_OK|X_OK|F_OK))
 	{

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_unsetenv.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: stdlib_unsetenv.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,8 @@ unsetenv(const char *original_name)
 	char * name_copy = NULL;
 	unsigned i;
 
-	__check_abort();
+	if(__check_abort_enabled)
+		__check_abort();
 
 	assert( name != NULL );
 

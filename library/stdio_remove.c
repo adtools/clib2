@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_remove.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_remove.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,6 +54,9 @@ remove(const char *filename)
 
 	assert( filename != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(filename == NULL)
@@ -65,9 +68,6 @@ remove(const char *filename)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{

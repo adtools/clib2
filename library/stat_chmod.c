@@ -1,5 +1,5 @@
 /*
- * $Id: stat_chmod.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stat_chmod.c,v 1.5 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,9 @@ chmod(const char * path_name, mode_t mode)
 
 	assert( path_name != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(path_name == NULL)
@@ -75,9 +78,6 @@ chmod(const char * path_name, mode_t mode)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{

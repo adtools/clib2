@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf.c,v 1.5 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_sscanf.c,v 1.6 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,6 +58,9 @@ sscanf(const char *s,const char *format, ...)
 
 	assert( s != NULL && format != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(s == NULL || format == NULL)
@@ -69,9 +72,6 @@ sscanf(const char *s,const char *format, ...)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	__initialize_iob(&string_iob,__sscanf_hook_entry,
 		NULL,

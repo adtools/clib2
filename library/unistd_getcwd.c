@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_getcwd.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_getcwd.c,v 1.7 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,6 +81,9 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 	assert( buffer != NULL );
 	assert( (int)buffer_size >= 0 );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(buffer == NULL || buffer_size == 0)
@@ -92,9 +95,6 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	PROFILE_OFF();
 	dir_lock = Lock("",SHARED_LOCK);

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sprintf.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_sprintf.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,6 +56,9 @@ sprintf(char *s, const char *format, ...)
 
 	assert( s != NULL && format != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(s == NULL || format == NULL)
@@ -65,9 +68,6 @@ sprintf(char *s, const char *format, ...)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	va_start(arg,format);
 	result = vsprintf(s,format,arg);

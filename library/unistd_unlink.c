@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_unlink.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_unlink.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,6 +70,9 @@ unlink(const char * path_name)
 
 	assert( path_name != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(path_name == NULL)
@@ -81,9 +84,6 @@ unlink(const char * path_name)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{

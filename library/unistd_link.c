@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_link.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_link.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,9 @@ link(const char * existing_path,const char * new_path)
 
 	assert( existing_path != NULL && new_path != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(existing_path == NULL || new_path == NULL)
@@ -76,9 +79,6 @@ link(const char * existing_path,const char * new_path)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{

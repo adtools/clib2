@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_popen.c,v 1.5 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_popen.c,v 1.6 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,9 @@ pclose(FILE *stream)
 
 	assert(stream != NULL);
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -75,9 +78,6 @@ pclose(FILE *stream)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	fclose(stream);
 
@@ -117,6 +117,9 @@ popen(const char *command, const char *type)
 
 	assert(command != NULL && type != NULL);
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(command == NULL || type == NULL)
@@ -128,9 +131,6 @@ popen(const char *command, const char *type)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	/* The first character selects the access mode: read or write. We don't
 	   support anything else. */

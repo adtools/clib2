@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rename.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_rename.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,6 +60,9 @@ rename(const char *oldname,const char *newname)
 
 	assert( oldname != NULL && newname != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(oldname == NULL || newname == NULL)
@@ -71,9 +74,6 @@ rename(const char *oldname,const char *newname)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{

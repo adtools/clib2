@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_getenv.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdlib_getenv.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,9 @@ getenv(const char * name)
 
 	assert( name != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(name == NULL)
@@ -66,9 +69,6 @@ getenv(const char * name)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	if(GetVar((STRPTR)name,env_var_buffer,sizeof(env_var_buffer),0) < 0)
 	{

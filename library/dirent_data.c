@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_data.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: dirent_data.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,6 +42,10 @@ struct MinList NOCOMMON __directory_list;
 
 /****************************************************************************/
 
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
 static struct SignalSemaphore * dirent_lock;
 
 /****************************************************************************/
@@ -64,6 +68,10 @@ __dirent_unlock(void)
 
 /****************************************************************************/
 
+#endif /* __THREAD_SAFE */
+
+/****************************************************************************/
+
 CLIB_CONSTRUCTOR(__dirent_init)
 {
 	BOOL success = FALSE;
@@ -72,11 +80,15 @@ CLIB_CONSTRUCTOR(__dirent_init)
 
 	NewList((struct List *)&__directory_list);
 
-	dirent_lock = AllocVec(sizeof(*dirent_lock),MEMF_ANY|MEMF_PUBLIC);
-	if(dirent_lock == NULL)
-		goto out;
+	#if defined(__THREAD_SAFE)
+	{
+		dirent_lock = AllocVec(sizeof(*dirent_lock),MEMF_ANY|MEMF_PUBLIC);
+		if(dirent_lock == NULL)
+			goto out;
 
-	InitSemaphore(dirent_lock);
+		InitSemaphore(dirent_lock);
+	}
+	#endif /* __THREAD_SAFE */
 
 	success = TRUE;
 
@@ -102,8 +114,12 @@ CLIB_DESTRUCTOR(__dirent_exit)
 			closedir((DIR *)__directory_list.mlh_Head);
 	}
 
-	FreeVec(dirent_lock);
-	dirent_lock = NULL;
+	#if defined(__THREAD_SAFE)
+	{
+		FreeVec(dirent_lock);
+		dirent_lock = NULL;
+	}
+	#endif /* __THREAD_SAFE */
 
 	LEAVE();
 }

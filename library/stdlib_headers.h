@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.10 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.11 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -198,10 +198,9 @@ extern unsigned int NOCOMMON __random_seed;
 
 /****************************************************************************/
 
-extern struct SignalSemaphore * NOCOMMON	__memory_semaphore;
-extern struct MemoryTree NOCOMMON			__memory_tree;
-extern struct MinList NOCOMMON				__memory_list;
-extern APTR NOCOMMON						__memory_pool;
+extern struct MemoryTree NOCOMMON	__memory_tree;
+extern struct MinList NOCOMMON		__memory_list;
+extern APTR NOCOMMON				__memory_pool;
 
 /****************************************************************************/
 
@@ -260,6 +259,28 @@ extern UBYTE * NOCOMMON __quote_vector;
 
 extern int NOCOMMON __default_pool_size;
 extern int NOCOMMON __default_puddle_size;
+
+/****************************************************************************/
+
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
+extern void __memory_lock(void);
+extern void __memory_unlock(void);
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
+#define __memory_lock()		((void)0)
+#define __memory_unlock()	((void)0)
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */
 
 /****************************************************************************/
 

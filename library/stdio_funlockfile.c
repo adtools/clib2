@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_funlockfile.c,v 1.1 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_funlockfile.c,v 1.2 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,6 +54,9 @@ funlockfile(FILE *stream)
 
 	assert( stream != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -65,9 +68,6 @@ funlockfile(FILE *stream)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	assert( __is_valid_iob(file) );
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );

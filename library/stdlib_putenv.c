@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_putenv.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdlib_putenv.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,6 +58,9 @@ putenv(const char *string)
 
 	assert( string != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(string == NULL)
@@ -69,9 +72,6 @@ putenv(const char *string)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	result = setenv(string,"",1);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.16 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.17 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -425,6 +425,32 @@ extern BOOL NOCOMMON __no_standard_io;
 
 #define __fd_is_aliased(fd) \
 	((fd)->fd_Original != NULL || (fd)->fd_NextLink != NULL)
+
+/****************************************************************************/
+
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
+extern void	__stdio_lock(void);
+extern void	__stdio_unlock(void);
+extern void	__stdio_lock_exit(void);
+extern int	__stdio_lock_init(void);
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
+#define __stdio_lock()		((void)0)
+#define __stdio_unlock()	((void)0)
+#define __stdio_lock_exit()	((void)0)
+#define __stdio_lock_init()	(0)
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */
 
 /****************************************************************************/
 

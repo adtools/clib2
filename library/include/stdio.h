@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.6 2005-02-27 18:09:12 obarthel Exp $
+ * $Id: stdio.h,v 1.7 2005-02-28 10:07:35 obarthel Exp $
  *
  * :ts=4
  *
@@ -292,7 +292,7 @@ extern int __unlockfile(FILE *stream,int c);
 	    ((FILE *)(f))->buffer[((FILE *)(f))->position++] : \
 	    fgetc(f))
 
-#define getc_unlocked(f)
+#define getc_unlocked(f) __getc_unlocked(f)
 
 /****************************************************************************/
 
@@ -311,7 +311,7 @@ extern int __unlockfile(FILE *stream,int c);
 	   (((FILE *)(f))->buffer[((FILE *)(f))->num_write_bytes-1]))) : \
 	   fputc((c),(f)))
 
-#define putc_unlocked(c,f) __putc((c),(f))
+#define putc_unlocked(c,f) __putc_unlocked((c),(f))
 
 /****************************************************************************/
 
@@ -320,8 +320,20 @@ extern int __unlockfile(FILE *stream,int c);
 
 /****************************************************************************/
 
+#if defined(__THREAD_SAFE)
+
 #define getc(f)		(flockfile(f), __unlockfile((f),__getc_unlocked(f)))
 #define putc(c,f)	(flockfile(f), __unlockfile((f),__putc_unlocked((c),(f))))
+
+#else
+
+#define getc(f)		__getc_unlocked(f)
+#define putc(c,f)	__putc_unlocked((c),(f))
+
+#endif /* __THREAD_SAFE */
+
+/****************************************************************************/
+
 #define getchar()	getc(stdin)
 #define putchar(c)	putc((c),stdout)
 

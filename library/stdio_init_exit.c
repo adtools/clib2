@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.19 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.20 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -193,13 +193,21 @@ __stdio_init(void)
 		if(buffer == NULL)
 			goto out;
 
-		/* Allocate memory for an arbitration mechanism, then
-		   initialize it. */
-		lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
-		if(lock == NULL)
-			goto out;
+		#if defined(__THREAD_SAFE)
+		{
+			/* Allocate memory for an arbitration mechanism, then
+			   initialize it. */
+			lock = AllocVec(sizeof(*lock),MEMF_ANY|MEMF_PUBLIC);
+			if(lock == NULL)
+				goto out;
 
-		InitSemaphore(lock);
+			InitSemaphore(lock);
+		}
+		#else
+		{
+			lock = NULL;
+		}
+		#endif /* __THREAD_SAFE */
 
 		/* Check if this stream is attached to a console window. */
 		if(default_file != ZERO)

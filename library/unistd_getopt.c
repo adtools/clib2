@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_getopt.c,v 1.4 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_getopt.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,6 +70,9 @@ getopt(int argc, char * argv[], char *opts)
 
 	assert( argc > 0 && argv != NULL && opts != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(argv == NULL || opts == NULL)
@@ -81,9 +84,6 @@ getopt(int argc, char * argv[], char *opts)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	SHOWVALUE(optind);
 

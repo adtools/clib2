@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fclose.c,v 1.6 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_fclose.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,9 @@ fclose(FILE *stream)
 
 	assert( file->iob_Lock == NULL || file->iob_Lock->ss_Owner == NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(stream == NULL)
@@ -77,9 +80,6 @@ fclose(FILE *stream)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	assert( __is_valid_iob(file) );
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );

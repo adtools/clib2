@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_printf.c,v 1.3 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_printf.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,9 @@ printf(const char *format, ...)
 
 	assert( format != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(format == NULL)
@@ -64,9 +67,6 @@ printf(const char *format, ...)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	va_start(arg,format);
 	result = vfprintf(stdout,format,arg);

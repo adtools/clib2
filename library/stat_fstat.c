@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fstat.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: stat_fstat.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,6 +62,9 @@ fstat(int file_descriptor, struct stat * buffer)
 
 	assert( buffer != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(buffer == NULL)
@@ -77,9 +80,6 @@ fstat(int file_descriptor, struct stat * buffer)
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
 	assert( FLAG_IS_SET(__fd[file_descriptor]->fd_Flags,FDF_IN_USE) );
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)

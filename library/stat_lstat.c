@@ -1,5 +1,5 @@
 /*
- * $Id: stat_lstat.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stat_lstat.c,v 1.5 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,6 +59,9 @@ lstat(const char * path_name, struct stat * buffer)
 
 	assert( path_name != NULL && buffer != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(path_name == NULL || buffer == NULL)
@@ -70,9 +73,6 @@ lstat(const char * path_name, struct stat * buffer)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	result = stat(path_name,buffer);
 

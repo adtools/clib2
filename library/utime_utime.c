@@ -1,5 +1,5 @@
 /*
- * $Id: utime_utime.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: utime_utime.c,v 1.7 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,6 +67,9 @@ utime(const char * path_name,const struct utimbuf * times)
 
 	assert( path_name != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(path_name == NULL)
@@ -76,9 +79,6 @@ utime(const char * path_name,const struct utimbuf * times)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	/* If a modification time is provided, convert it into the local
 	   DateStamp format, as used by the SetFileDate() function. */

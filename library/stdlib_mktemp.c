@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_mktemp.c,v 1.6 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdlib_mktemp.c,v 1.7 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,7 +77,8 @@ mktemp(char * name_template)
 
 	assert(name_template != NULL);
 
-	this_process = (struct Process *)FindTask(NULL);
+	if(__check_abort_enabled)
+		__check_abort();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -91,8 +92,7 @@ mktemp(char * name_template)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(__check_abort_enabled)
-		__check_abort();
+	this_process = (struct Process *)FindTask(NULL);
 
 	SHOWSTRING(name_template);
 

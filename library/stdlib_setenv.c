@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setenv.c,v 1.6 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: stdlib_setenv.c,v 1.7 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,6 +106,9 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 
 	assert(original_name != NULL || original_value != NULL);
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(original_name == NULL && original_value == NULL)
@@ -117,9 +120,6 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	if(name != NULL)
 	{

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.8 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.9 2005-02-28 10:07:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,7 +63,6 @@ struct MemoryTree __memory_tree;
 
 /****************************************************************************/
 
-struct SignalSemaphore * NOCOMMON	__memory_semaphore;
 APTR NOCOMMON						__memory_pool;
 struct MinList NOCOMMON				__memory_list;
 
@@ -267,11 +266,19 @@ malloc(size_t size)
 
 /****************************************************************************/
 
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
+static struct SignalSemaphore * memory_semaphore;
+
+/****************************************************************************/
+
 void
 __memory_lock(void)
 {
-	if(__memory_semaphore != NULL)
-		ObtainSemaphore(__memory_semaphore);
+	if(memory_semaphore != NULL)
+		ObtainSemaphore(memory_semaphore);
 }
 
 /****************************************************************************/
@@ -279,8 +286,84 @@ __memory_lock(void)
 void
 __memory_unlock(void)
 {
-	if(__memory_semaphore != NULL)
-		ReleaseSemaphore(__memory_semaphore);
+	if(memory_semaphore != NULL)
+		ReleaseSemaphore(memory_semaphore);
+}
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */
+
+/****************************************************************************/
+
+void
+__memory_exit(void)
+{
+	ENTER();
+
+	#ifdef __MEM_DEBUG
+	{
+		kprintf("[%s] %ld bytes still allocated upon exit, maximum of %ld bytes allocated at a time.\n",
+			__program_name,__current_memory_allocated,__maximum_memory_allocated);
+
+		kprintf("[%s] %ld chunks of memory still allocated upon exit, maximum of %ld chunks allocated at a time.\n",
+			__program_name,__current_num_memory_chunks_allocated,__maximum_num_memory_chunks_allocated);
+
+		__check_memory_allocations(__FILE__,__LINE__);
+
+		__never_free = FALSE;
+
+		if(__memory_list.mlh_Head != NULL)
+		{
+			while(NOT IsListEmpty((struct List *)&__memory_list))
+			{
+				((struct MemoryNode *)__memory_list.mlh_Head)->mn_AlreadyFree = FALSE;
+
+				__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
+			}
+		}
+
+		#if defined(__USE_MEM_TREES)
+		{
+			__initialize_red_black_tree(&__memory_tree);
+		}
+		#endif /* __USE_MEM_TREES */
+	}
+	#endif /* __MEM_DEBUG */
+
+	if(__memory_pool != NULL)
+	{
+		NewList((struct List *)&__memory_list);
+
+		DeletePool(__memory_pool);
+		__memory_pool = NULL;
+	}
+	else
+	{
+		if(__memory_list.mlh_Head != NULL)
+		{
+			#ifdef __MEM_DEBUG
+			{
+				while(NOT IsListEmpty((struct List *)&__memory_list))
+					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
+			}
+			#else
+			{
+				while(NOT IsListEmpty((struct List *)&__memory_list))
+					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,NULL,0);
+			}
+			#endif /* __MEM_DEBUG */
+		}
+	}
+
+	#if defined(__THREAD_SAFE)
+	{
+		FreeVec(memory_semaphore);
+		memory_semaphore = NULL;
+	}
+	#endif /* __THREAD_SAFE */
+
+	LEAVE();
 }
 
 /****************************************************************************/
@@ -292,11 +375,15 @@ __memory_init(void)
 
 	ENTER();
 
-	__memory_semaphore = AllocVec(sizeof(*__memory_semaphore),MEMF_ANY|MEMF_PUBLIC);
-	if(__memory_semaphore == NULL)
-		goto out;
+	#if defined(__THREAD_SAFE)
+	{
+		memory_semaphore = AllocVec(sizeof(*memory_semaphore),MEMF_ANY|MEMF_PUBLIC);
+		if(memory_semaphore == NULL)
+			goto out;
 
-	InitSemaphore(__memory_semaphore);
+		InitSemaphore(memory_semaphore);
+	}
+	#endif /* __THREAD_SAFE */
 
 	#if defined(__USE_MEM_TREES) && defined(__MEM_DEBUG)
 	{

@@ -67,6 +67,11 @@
   not reentrant (this is not ixemul.library) it should be thread-safe
   now. Thread-safe in the sense of POSIX 1003.1c-1995.
 
+- The thread-safety code is now subject to conditional compilation.
+  Both the library and the user code need to be rebuilt with the
+  preprocessor symbol __THREAD_SAFE defined to get thread-safe
+  code.
+
 
 c.lib 1.188 (7.2.2005)
 

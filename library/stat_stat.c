@@ -1,5 +1,5 @@
 /*
- * $Id: stat_stat.c,v 1.6 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: stat_stat.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,6 +74,9 @@ stat(const char * path_name, struct stat * st)
 
 	assert( path_name != NULL && st != NULL );
 
+	if(__check_abort_enabled)
+		__check_abort();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(path_name == NULL || st == NULL)
@@ -85,9 +88,6 @@ stat(const char * path_name, struct stat * st)
 		}
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	if(__check_abort_enabled)
-		__check_abort();
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{

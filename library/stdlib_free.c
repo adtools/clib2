@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_free.c,v 1.7 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdlib_free.c,v 1.8 2005-02-28 10:07:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -521,72 +521,4 @@ void
 free(void * ptr)
 {
 	__free(ptr,NULL,0);
-}
-
-/****************************************************************************/
-
-void
-__memory_exit(void)
-{
-	ENTER();
-
-	#ifdef __MEM_DEBUG
-	{
-		kprintf("[%s] %ld bytes still allocated upon exit, maximum of %ld bytes allocated at a time.\n",
-			__program_name,__current_memory_allocated,__maximum_memory_allocated);
-
-		kprintf("[%s] %ld chunks of memory still allocated upon exit, maximum of %ld chunks allocated at a time.\n",
-			__program_name,__current_num_memory_chunks_allocated,__maximum_num_memory_chunks_allocated);
-
-		__check_memory_allocations(__FILE__,__LINE__);
-
-		__never_free = FALSE;
-
-		if(__memory_list.mlh_Head != NULL)
-		{
-			while(NOT IsListEmpty((struct List *)&__memory_list))
-			{
-				((struct MemoryNode *)__memory_list.mlh_Head)->mn_AlreadyFree = FALSE;
-
-				__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
-			}
-		}
-
-		#if defined(__USE_MEM_TREES)
-		{
-			__initialize_red_black_tree(&__memory_tree);
-		}
-		#endif /* __USE_MEM_TREES */
-	}
-	#endif /* __MEM_DEBUG */
-
-	if(__memory_pool != NULL)
-	{
-		NewList((struct List *)&__memory_list);
-
-		DeletePool(__memory_pool);
-		__memory_pool = NULL;
-	}
-	else
-	{
-		if(__memory_list.mlh_Head != NULL)
-		{
-			#ifdef __MEM_DEBUG
-			{
-				while(NOT IsListEmpty((struct List *)&__memory_list))
-					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
-			}
-			#else
-			{
-				while(NOT IsListEmpty((struct List *)&__memory_list))
-					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,NULL,0);
-			}
-			#endif /* __MEM_DEBUG */
-		}
-	}
-
-	FreeVec(__memory_semaphore);
-	__memory_semaphore = NULL;
-
-	LEAVE();
 }

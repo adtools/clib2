@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,10 +38,6 @@
 /****************************************************************************/
 
 #include "stdlib_protos.h"
-
-/****************************************************************************/
-
-static struct SignalSemaphore * locale_lock;
 
 /****************************************************************************/
 
@@ -188,6 +184,14 @@ __locale_init(void)
 
 /****************************************************************************/
 
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
+static struct SignalSemaphore * locale_lock;
+
+/****************************************************************************/
+
 void
 __locale_lock(void)
 {
@@ -206,14 +210,22 @@ __locale_unlock(void)
 
 /****************************************************************************/
 
+#endif /* __THREAD_SAFE */
+
+/****************************************************************************/
+
 CLIB_DESTRUCTOR(__locale_exit_destructor)
 {
 	ENTER();
 
 	__locale_exit();
 
-	FreeVec(locale_lock);
-	locale_lock = NULL;
+	#if defined(__THREAD_SAFE)
+	{
+		FreeVec(locale_lock);
+		locale_lock = NULL;
+	}
+	#endif /* __THREAD_SAFE */
 
 	LEAVE();
 }
@@ -227,11 +239,15 @@ CLIB_CONSTRUCTOR(__locale_init_constructor)
 
 	ENTER();
 
-	locale_lock = AllocVec(sizeof(*locale_lock),MEMF_ANY|MEMF_PUBLIC);
-	if(locale_lock == NULL)
-		goto out;
+	#if defined(__THREAD_SAFE)
+	{
+		locale_lock = AllocVec(sizeof(*locale_lock),MEMF_ANY|MEMF_PUBLIC);
+		if(locale_lock == NULL)
+			goto out;
 
-	InitSemaphore(locale_lock);
+		InitSemaphore(locale_lock);
+	}
+	#endif /* __THREAD_SAFE */
 
 	for(i = 0 ; i < NUM_LOCALES ; i++)
 		strcpy(__locale_name_table[i],"C");
