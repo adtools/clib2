@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.21 2005-03-12 09:49:47 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.22 2005-03-14 10:03:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -151,17 +151,28 @@ __fd_hook_entry(
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_APPEND))
 			{
+				LONG position;
+
 				SHOWMSG("appending data");
 
 				PROFILE_OFF();
 
-				if(Seek(file,0,OFFSET_END) >= 0)
+				position = Seek(file,0,OFFSET_END);
+				if(position >= 0)
 				{
 					if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 						fd->fd_Position = Seek(file,0,OFFSET_CURRENT);
 				}
 
 				PROFILE_ON();
+
+				if(position < 0)
+				{
+					D(("seek to end of file failed; ioerr=%ld",IoErr()));
+
+					fam->fam_Error = __translate_io_error_to_errno(IoErr());
+					goto out;
+				}
 			}
 
 			D(("write %ld bytes to position %ld from 0x%08lx",fam->fam_Size,Seek(file,0,OFFSET_CURRENT),fam->fam_Data));
@@ -349,6 +360,8 @@ __fd_hook_entry(
 
 						old_dir = CurrentDir(parent_dir);
 
+						/* ZZZ we probably ought to observe the current umask settings. */
+
 						flags = fib->fib_Protection ^ (FIBF_READ|FIBF_WRITE|FIBF_EXECUTE|FIBF_DELETE);
 
 						CLEAR_FLAG(flags,FIBF_EXECUTE);
@@ -454,18 +467,14 @@ __fd_hook_entry(
 
 					#if defined(UNIX_PATH_SEMANTICS)
 					{
-						if(NOT fib_is_valid && CANNOT __safe_examine_file_handle(file,fib))
-						{
-							fam->fam_Error = __translate_io_error_to_errno(IoErr());
+						/* Check if this operation failed because the file is shorter than
+						   the new file position. First, we need to find out if the file
+						   is really shorter than required. If not, then it must have
+						   been a different error. */
+						if((NOT fib_is_valid && CANNOT __safe_examine_file_handle(file,fib)) || (new_position <= fib->fib_Size))
 							goto out;
-						}
 
-						if(new_position <= fib->fib_Size)
-						{
-							fam->fam_Error = __translate_io_error_to_errno(IoErr());
-							goto out;
-						}
-
+						/* Now try to make that file larger. */
 						if(__grow_file_size(fd,new_position - fib->fib_Size) < 0)
 						{
 							fam->fam_Error = __translate_io_error_to_errno(IoErr());

@@ -91,6 +91,9 @@
   entire library constructor/destructor functionality to use the
   same approach as libnix.
 
+- ftruncate() ended up changing the current file position, contrary
+  to what it is supposed to do. Fixed.
+
 
 c.lib 1.189 (5.3.2005)
 

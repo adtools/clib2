@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_grow_file.c,v 1.1 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: stdio_grow_file.c,v 1.2 2005-03-14 10:03:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,7 +41,8 @@
 
 /****************************************************************************/
 
-/* Seek to the end of a file, then add a certain number of 0 bytes. */
+/* Seek to the end of a file, then add a certain number of 0 bytes. Note that
+   this function will change the current file position! */
 int
 __grow_file_size(struct fd * fd,int num_bytes)
 {
@@ -104,7 +105,7 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	position = Seek(fd->fd_DefaultFile,0,OFFSET_END);
 	PROFILE_ON();
 
-	if(position == -1)
+	if(position < 0)
 	{
 		SHOWMSG("could not move to the end of the file");
 		goto out;
