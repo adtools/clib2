@@ -1,3 +1,7 @@
+- The name of the public record locking semaphore has to be preallocated
+  for OS4 if the AllocSysObject() function is used to create it.
+
+
 c.lib 1.190 (25.3.2005)
 
 - DoTimer() now calls AllocSysObject() rather than making up

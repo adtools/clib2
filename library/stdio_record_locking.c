@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.7 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.8 2005-03-26 10:53:35 obarthel Exp $
  *
  * :ts=4
  *
@@ -138,17 +138,24 @@ obtain_file_lock_semaphore(BOOL shared)
 
 	if(FileLockSemaphore == NULL && __file_lock_semaphore_name != NULL && __file_lock_semaphore_name[0] != '\0')
 	{
-		struct FileLockSemaphore * fls;
+		struct FileLockSemaphore * fls = NULL;
+		char * semaphore_name_copy = NULL;
 
 		/* We allocate the new semaphore first, so that we don't spend
 		   any time in Forbid() allocating memory. */
 		#if defined(__amigaos4__)
 		{
-			fls = AllocSysObjectTags(ASOT_SEMAPHORE,
-				ASOSEM_Size,	sizeof(*fls),
-				ASOSEM_Name,	__file_lock_semaphore_name,
-				ASOSEM_Pri,		1,
-			TAG_END);
+			semaphore_name_copy = AllocVec(strlen(__file_lock_semaphore_name)+1,MEMF_ANY|MEMF_PUBLIC);
+			if(semaphore_name_copy != NULL)
+			{
+				strcpy(semaphore_name_copy,__file_lock_semaphore_name);
+
+				fls = AllocSysObjectTags(ASOT_SEMAPHORE,
+					ASOSEM_Size,	sizeof(*fls),
+					ASOSEM_Name,	semaphore_name_copy,
+					ASOSEM_Pri,		1,
+				TAG_END);
+			}
 		}
 		#else
 		{
@@ -156,8 +163,6 @@ obtain_file_lock_semaphore(BOOL shared)
 			if(fls != NULL)
 			{
 				memset(fls,0,sizeof(*fls));
-
-				InitSemaphore(&fls->fls_Semaphore);
 
 				fls->fls_Semaphore.ss_Link.ln_Name = (char *)(fls + 1);
 				strcpy(fls->fls_Semaphore.ss_Link.ln_Name,__file_lock_semaphore_name);
@@ -187,6 +192,8 @@ obtain_file_lock_semaphore(BOOL shared)
 
 				FileLockSemaphore = fls;
 				fls = NULL;
+
+				semaphore_name_copy = NULL;
 			}
 			else
 			{
@@ -212,6 +219,8 @@ obtain_file_lock_semaphore(BOOL shared)
 		{
 			#if defined(__amigaos4__)
 			{
+				FreeVec(semaphore_name_copy);
+
 				FreeSysObject(ASOT_SEMAPHORE,fls);
 			}
 			#else
