@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.1.1.1 2004-07-26 16:31:07 obarthel Exp $
+# $Id: smakefile,v 1.2 2004-07-28 15:50:45 obarthel Exp $
 #
 # :ts=8
 #
@@ -243,7 +243,8 @@ SOCKET_OBJ = \
 	socket_setsockopt.o \
 	socket_shutdown.o \
 	socket_socket.o \
-	socket_hook_entry.o
+	socket_hook_entry.o \
+	socket_hstrerror.o
 
 STAT_OBJ = \
 	stat_chmod.o \

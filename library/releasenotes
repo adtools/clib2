@@ -1,3 +1,14 @@
+c.lib 1.166 (28.7.2004)
+
+- Added h_strerror() function to libnet.a; there's a global 'h_errno'
+  variable available, too.
+
+- <signal.h> now defines a type 'sig_t'.
+
+- <unistd.h> now allows the 'fd_set' type to be referenced as
+  'struct fd_set', too.
+
+
 c.lib 1.165 (26.7.2004)
 
 - In printf(), if the precision is 0 and the value to be printed for

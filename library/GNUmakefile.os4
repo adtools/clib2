@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.1.1.1 2004-07-26 16:30:15 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.2 2004-07-28 15:50:44 obarthel Exp $
 #
 # :ts=8
 #
@@ -568,6 +568,7 @@ NET_LIB = \
 	socket_shutdown.o \
 	socket_socket.o \
 	socket_hook_entry.o \
+	socket_hstrerror.o \
 	usergroup_crypt.o \
 	usergroup_data.o \
 	usergroup_endgrent.o \

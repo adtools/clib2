@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.1.1.1 2004-07-26 16:31:16 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.2 2004-07-28 15:50:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,6 +61,7 @@ extern BOOL __detach;
 #define SBTC_BREAKMASK		1	/* Interrupt signal mask */
 #define SBTC_LOGTAGPTR		11	/* Under which name log entries are filed */
 #define SBTC_ERRNOLONGPTR	24	/* Pointer to errno, length == sizeof(errno) */
+#define SBTC_HERRNOLONGPTR	25	/* 'h_errno' pointer (with sizeof(h_errno) == sizeof(long)) */
 
 /****************************************************************************/
 
@@ -151,7 +152,7 @@ int
 __socket_init(void)
 {
 	struct Process * this_process;
-	struct TagItem tags[4];
+	struct TagItem tags[5];
 	int result = ERROR;
 	LONG status;
 
@@ -203,7 +204,11 @@ __socket_init(void)
 	tags[2].ti_Tag	= SBTM_SETVAL(SBTC_LOGTAGPTR);
 	tags[2].ti_Data	= (ULONG)__program_name;
 
-	tags[3].ti_Tag = TAG_END;
+	/* Wire the library's h_errno variable to our local h_errno. */
+	tags[3].ti_Tag	= SBTM_SETVAL(SBTC_HERRNOLONGPTR);
+	tags[3].ti_Data	= (ULONG)&errno;
+
+	tags[4].ti_Tag = TAG_END;
 
 	PROFILE_OFF();
 	status = __SocketBaseTagList(tags);

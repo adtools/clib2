@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.2 2004-07-28 15:25:59 obarthel Exp $
+ * $Id: unistd.h,v 1.3 2004-07-28 15:50:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -195,6 +195,11 @@ struct in_addr
 
 /****************************************************************************/
 
+/* Error codes set by the name<->address resolution functions. */
+extern int h_errno;
+
+/****************************************************************************/
+
 extern int accept(int sockfd,struct sockaddr *cliaddr,int *addrlen);
 extern int bind(int sockfd,struct sockaddr *name,int namelen);
 extern int connect(int sockfd,struct sockaddr *name,int namelen);
@@ -230,6 +235,7 @@ extern unsigned long inet_lnaof(struct in_addr in);
 extern struct in_addr inet_makeaddr(int net,int host);
 extern unsigned long inet_netof(struct in_addr in);
 extern unsigned long inet_network(const char *cp);
+extern const char * hstrerror(int error_number);
 
 /****************************************************************************/
 
