@@ -1,5 +1,5 @@
 /*
- * $Id: stat_lstat.c,v 1.6 2005-03-02 12:57:53 obarthel Exp $
+ * $Id: stat_lstat.c,v 1.7 2005-03-02 14:47:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -88,7 +88,7 @@ lstat_lock(const char *name,const int mode,int *link_length)
 	while(TRUE)
 	{
 		/* Get a handle on the device, volume or assignment name in the path. */
-		dvp = GetDeviceProc(name,dvp);
+		dvp = GetDeviceProc((STRPTR)name,dvp);
 		if(dvp == NULL)
 			goto out;
 
@@ -138,7 +138,7 @@ lstat_lock(const char *name,const int mode,int *link_length)
 			}
 
 			/* Now ask the file system to resolve the entire path. */
-			result = ReadLink(dvp->dvp_Port,dvp->dvp_Lock,name,name,name_size);
+			result = ReadLink(dvp->dvp_Port,dvp->dvp_Lock,(STRPTR)name,(STRPTR)name,name_size);
 			if(result < 0)
 			{
 				/* This will return either -1 (resolution error) or -2
@@ -148,7 +148,7 @@ lstat_lock(const char *name,const int mode,int *link_length)
 			}
 
 			/* Remember the length of the link name. */
-			if(result > 0)
+			if((*link_length) < result)
 				(*link_length) = result;
 
 			/* We now have a new name to resolve. */
@@ -160,7 +160,7 @@ lstat_lock(const char *name,const int mode,int *link_length)
 		else
 		{
 			/* Some other error; ask if the user wants to have another go at it. */
-			if(ErrorReport(error,REPORT_LOCK,dvp->dvp_Lock,dp->dvp_Port) != 0)
+			if(ErrorReport(error,REPORT_LOCK,dvp->dvp_Lock,dvp->dvp_Port) != 0)
 				break;
 		}
 
@@ -250,6 +250,7 @@ lstat(const char * path_name, struct stat * st)
 				st->st_blksize	= 512;
 
 				result = 0;
+
 				goto out;
 			}
 		}
@@ -272,7 +273,6 @@ lstat(const char * path_name, struct stat * st)
 
 	if(link_length > 0)
 	{
-		struct DateStamp ds;
 		time_t mtime;
 
 		/* Build a dummy stat for the link. */
@@ -281,14 +281,10 @@ lstat(const char * path_name, struct stat * st)
 
 		memset(st,0,sizeof(*st));
 
-		PROFILE_OFF();
-		DateStamp(&ds);
-		PROFILE_ON();
-
-		mtime = __convert_datestamp_to_time(&ds);
+		time(&mtime);
 
 		st->st_mode		= S_IFLNK | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
-		st->st_dev		= DeviceProc(path_name);
+		st->st_dev		= (ULONG)DeviceProc((STRPTR)path_name);
 		st->st_size		= link_length;
 		st->st_mtime	= mtime;
 		st->st_atime	= mtime;

@@ -1,5 +1,5 @@
 /*
- * $Id: utsname_uname.c,v 1.1 2005-03-02 12:57:53 obarthel Exp $
+ * $Id: utsname_uname.c,v 1.2 2005-03-02 14:47:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@
 #ifdef	__amigaos4__
 #define	ARCH "ppc"
 #else
-#define	ARCH "m68k"		/* XXX: How should Coldfire accelerators be handled? */
+#define	ARCH "m68k" /* XXX: How should Coldfire accelerators be handled? */
 #endif /* __amigaos4__ */
 
 /****************************************************************************/
@@ -87,11 +87,15 @@ uname(struct utsname *info)
 
 	strlcpy(info->sysname,OSNAME,sizeof(info->sysname));
 
-#if defined(SOCKET_SUPPORT)
-	__gethostname((STRPTR)info->nodename,sizeof(info->nodename));
-#else
-	strlcpy(info->nodename,"localhost",sizeof(info->nodename));
-#endif /* SOCKET_SUPPORT */
+	#if defined(SOCKET_SUPPORT)
+	{
+		__gethostname((STRPTR)info->nodename,sizeof(info->nodename));
+	}
+	#else
+	{
+		strlcpy(info->nodename,"localhost",sizeof(info->nodename));
+	}
+	#endif /* SOCKET_SUPPORT */
 
 	VersionBase = OpenLibrary("version.library",0L);
 	if(VersionBase != NULL)
@@ -109,16 +113,17 @@ uname(struct utsname *info)
 
 	snprintf(info->release,sizeof(info->release),"%d.%d",Version,Revision);
 
-	/* This is mostly a stab in the dark. Is there any "official" way of finding out the OS version?
+	/*
+	 * This is mostly a stab in the dark. Is there any "official" way of finding out the OS version?
 	 * Also, this could be more detailed e.g. "3.9-BB2" instead of just "3.9".
 	 * For the curious:
 	 *
-	 * V.R    OS Version
+	 *  V.R		OS Version
 	 *
 	 * 30.x		1.0 (Never released)
-	 *	31.x		1.1 (NTSC)
-	 *	32.x		1.1 (PAL)
-	 *	33.x		1.2
+	 * 31.x		1.1 (NTSC)
+	 * 32.x		1.1 (PAL)
+	 * 33.x		1.2
 	 * 34.x		1.3
 	 * 35.x		1.3 (with A2024 support)
 	 * 36.x		2.0-2.02
@@ -126,24 +131,22 @@ uname(struct utsname *info)
 	 * 38.x		2.1
 	 * 39.x		3.0
 	 * 40.x		3.1
-	 * 43.x		3.2 (Never released)
 	 * 44.2		3.5
 	 * 44.4		3.5-BB1
 	 * 44.5		3.5-BB2
 	 * 45.1		3.9
 	 * 45.2		3.9-BB1
 	 * 45.3		3.9-BB2
-	 *
 	 */
 
-	if (Version >= 46)
+	if (46 <= Version && Version <= 52)
 		version_string = "4.0";
 	else if (Version == 45)
 		version_string = "3.9";
 	else if (Version >= 44)
 		version_string = "3.5";
 	else if (Version >= 40)
-		version_string = 3.1";
+		version_string = "3.1";
 	else if (Version >= 39)
 		version_string = "3.0";
 	else
