@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.13 2005-03-10 09:55:03 obarthel Exp $
+ * $Id: macros.h,v 1.14 2005-03-10 13:58:13 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,12 +54,6 @@
 
 /****************************************************************************/
 
-#ifndef ZERO
-#define ZERO ((BPTR)NULL)
-#endif /* ZERO */
-
-/****************************************************************************/
-
 #define NUM_ENTRIES(t) (sizeof(t) / sizeof(t[0]))
 
 /****************************************************************************/
@@ -75,14 +69,132 @@
 /****************************************************************************/
 
 /* Macro to get longword-aligned stack space for a structure
- * Uses ANSI token catenation to form a name for the char array
- * based on the variable name, then creates an appropriately
- * typed pointer to point to the first longword boundary in the
- * char array allocated.
- */
+   Uses ANSI token catenation to form a name for the char array
+   based on the variable name, then creates an appropriately
+   typed pointer to point to the first longword boundary in the
+   char array allocated. */
 #define D_S(type, name) \
 	char a_##name[sizeof(type)+3]; \
 	type *name = (type *)((LONG)(a_##name+3) & ~3)
+
+/****************************************************************************/
+
+/* BCPL style "NULL"; this should be in <dos/dos.h>. */
+#ifndef ZERO
+#define ZERO ((BPTR)NULL)
+#endif /* ZERO */
+
+/****************************************************************************/
+
+/* Constructor and destructor functions, as used by the library for data
+   initialization and cleanup. These particular functions are invoked by
+   the startup code before and after the main() function is/was called.
+   How this works is very compiler specific. We support three flavours
+   below. */
+
+/****************************************************************************/
+
+#ifdef __SASC
+
+#define CONSTRUCTOR(name,pri) \
+	int __stdargs _STI_##pri##_##name(void); \
+	int __stdargs _STI_##pri##_##name(void)
+
+#define DESTRUCTOR(name,pri) \
+	int __stdargs _STD_##pri##_##name(void); \
+	int __stdargs _STD_##pri##_##name(void)
+
+#define CONSTRUCTOR_SUCCEED() \
+	return(0)
+
+#define CONSTRUCTOR_FAIL() \
+	return(1)
+
+#endif /* __SASC */
+
+/****************************************************************************/
+
+#ifdef __GNUC__
+
+#if defined(__amigaos4__)
+
+#define CONSTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((used)) name##_ctor(VOID); \
+	STATIC VOID (*__##name##_ctor)(VOID) __attribute__((used,section(".ctors._" #pri))) = name##_ctor; \
+	STATIC VOID name##_ctor(VOID)
+
+#define DESTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((used)) name##_dtor(VOID); \
+	STATIC VOID (*__##name##_dtor)(VOID) __attribute__((used,section(".dtors._" #pri))) = name##_dtor; \
+	STATIC VOID name##_dtor(VOID)
+
+#else
+
+#define CONSTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((constructor)) __ctor##pri##_##name##(VOID); \
+	STATIC void __ctor##pri##_##name##(VOID)
+
+#define DESTRUCTOR(name,pri) \
+	STATIC VOID __attribute__((destructor)) __dtor##pri##_##name##(VOID); \
+	STATIC VOID __dtor##pri##_##name##(VOID)
+
+#endif /* __amigaos4__ */
+
+#define CONSTRUCTOR_SUCCEED() \
+	return
+
+#define CONSTRUCTOR_FAIL() \
+	exit(RETURN_FAIL)
+
+#endif /* __GNUC__ */
+
+/****************************************************************************/
+
+/* These macros are for declaring functions to serve as constructors or
+   destructors. In which order these should be invoked is defined by the
+   priority, which is a number in the range 0-999. User-supplied
+   constructor/destructor functions should have priority 0. That way,
+   the user-supplied constructors will be invoked after the library
+   constructors and the user-supplied destructors before the library
+   destructors. */
+
+#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	500)
+#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	500)
+#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	150)
+#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	150)
+	
+/****************************************************************************/
+
+/* Magic macros for code profiling, SAS/C style. Normally, you would find
+   these in <sprof.h>, which is SAS/C-specific. */
+
+/****************************************************************************/
+
+#ifdef __SASC
+extern void ASM _PROLOG(REG(a0,char *));
+extern void ASM _EPILOG(REG(a0,char *));
+
+#if _PROFILE
+#define PROFILE_OFF()	_PROLOG(0L)
+#define PROFILE_ON()	_EPILOG(0L)
+#else
+#define PROFILE_OFF()	((void)0)
+#define PROFILE_ON()	((void)0)
+#endif /* _PROFILE */
+#endif /* __SASC */
+
+/****************************************************************************/
+
+#ifdef __GNUC__
+#define PROFILE_OFF()	((void)0)
+#define PROFILE_ON()	((void)0)
+#endif /* __GNUC__ */
+
+/****************************************************************************/
+
+/* Special data and function attributes; for OS4 most, if not all of them
+   are in a file called <amiga_compiler.h> which is pulled in by the
+   <exec/types.h> header file. */
 
 /****************************************************************************/
 
@@ -144,97 +256,20 @@
 #ifndef UNUSED
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
-#define NOCOMMON __attribute__((nocommon))
 #else
 #define UNUSED /* UNUSED */
-#define NOCOMMON /* NOCOMMON */
 #endif /* __GNUC__ */
 #endif /* UNUSED */
 
 /****************************************************************************/
 
-#ifdef __SASC
-
-#define CONSTRUCTOR(name,pri) \
-	int __stdargs _STI_##pri##_##name(void); \
-	int __stdargs _STI_##pri##_##name(void)
-
-#define DESTRUCTOR(name,pri) \
-	int __stdargs _STD_##pri##_##name(void); \
-	int __stdargs _STD_##pri##_##name(void)
-
-#define CONSTRUCTOR_SUCCEED() \
-	return(0)
-
-#define CONSTRUCTOR_FAIL() \
-	return(1)
-
-#endif /* __SASC */
-
-/****************************************************************************/
-
+#ifndef NOCOMMON
 #ifdef __GNUC__
-
-#if defined(__amigaos4__)
-
-#define CONSTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((used)) name##_ctor(VOID); \
-	STATIC VOID (*__##name##_ctor)(VOID) __attribute__((used,section(".ctors._" #pri))) = name##_ctor; \
-	STATIC VOID name##_ctor(VOID)
-
-#define DESTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((used)) name##_dtor(VOID); \
-	STATIC VOID (*__##name##_dtor)(VOID) __attribute__((used,section(".dtors._" #pri))) = name##_dtor; \
-	STATIC VOID name##_dtor(VOID)
-
+#define NOCOMMON __attribute__((nocommon))
 #else
-
-#define CONSTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((constructor)) __ctor##pri##_##name##(VOID); \
-	STATIC void __ctor##pri##_##name##(VOID)
-
-#define DESTRUCTOR(name,pri) \
-	STATIC VOID __attribute__((destructor)) __dtor##pri##_##name##(VOID); \
-	STATIC VOID __dtor##pri##_##name##(VOID)
-
-#endif /* __amigaos4__ */
-
-#define CONSTRUCTOR_SUCCEED() \
-	return
-
-#define CONSTRUCTOR_FAIL() \
-	exit(RETURN_FAIL)	/* ZZZ not a nice thing to do; fix the constructor invocation code! */
-
+#define NOCOMMON /* NOCOMMON */
 #endif /* __GNUC__ */
-
-/****************************************************************************/
-
-#define CLIB_CONSTRUCTOR(name)		CONSTRUCTOR(name,	500)
-#define CLIB_DESTRUCTOR(name)		DESTRUCTOR(name,	500)
-#define PROFILE_CONSTRUCTOR(name)	CONSTRUCTOR(name,	150)
-#define PROFILE_DESTRUCTOR(name)	DESTRUCTOR(name,	150)
-	
-/****************************************************************************/
-
-#ifdef __SASC
-extern void ASM _PROLOG(REG(a0,char *));
-extern void ASM _EPILOG(REG(a0,char *));
-
-#if _PROFILE
-#define PROFILE_OFF()	_PROLOG(0L)
-#define PROFILE_ON()	_EPILOG(0L)
-#else
-#define PROFILE_OFF()	((void)0)
-#define PROFILE_ON()	((void)0)
-#endif /* _PROFILE */
-#endif /* __SASC */
-
-/****************************************************************************/
-
-#ifdef __GNUC__
-#define PROFILE_OFF()	((void)0)
-#define PROFILE_ON()	((void)0)
-#endif /* __GNUC__ */
+#endif /* NOCOMMON */
 
 /****************************************************************************/
 
