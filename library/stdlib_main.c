@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.1.1.1 2004-07-26 16:31:58 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.2 2004-09-18 09:03:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,10 @@ extern int main(int arg_c,char ** arg_v);
 
 /****************************************************************************/
 
-#if 0
+/* The SAS/C profiling hooks can be used to track call chains. Neat
+   trick, but not always necessary. Don't enable this unless you know
+   what you're doing... */
+#if defined(__USE_SAS_PROFILING_FOR_MONITORING)
 
 /****************************************************************************/
 
@@ -100,7 +103,7 @@ _EPILOG(REG(a0,char * id))
 
 /****************************************************************************/
 
-#endif
+#endif /* __USE_SAS_PROFILING_FOR_MONITORING */
 
 /****************************************************************************/
 
@@ -164,14 +167,25 @@ call_main(void)
 	/* Go through the constructor list */
 	_init();
 
-	//show_profile_names = TRUE;
+	/* If the SAS/C profiling code is set up for printing function
+	   call chains, switch it on now. */
+	#if defined(__USE_SAS_PROFILING_FOR_MONITORING)
+	{
+		show_profile_names = TRUE;
+	}
+	#endif /* __USE_SAS_PROFILING_FOR_MONITORING */
 
 	/* After all these preparations, get this show on the road... */
 	exit(main((int)__argc,(char **)__argv));
 
  out:
 
-	//show_profile_names = FALSE;
+	/* Switch off function name printing, if it was enabled. */
+	#if defined(__USE_SAS_PROFILING_FOR_MONITORING)
+	{
+		show_profile_names = FALSE;
+	}
+	#endif /* __USE_SAS_PROFILING_FOR_MONITORING */
 
 	/* If we end up here with the __stack_overflow variable
 	 * set then the stack overflow handler dropped into
@@ -398,8 +412,9 @@ _main(void)
 			stack_size = (__stack_size + 15UL) & ~15UL;
 
 			/* We allocate a little more memory so that we can align
-			   the stack to a 128 bit boundary. */
-			stk = AllocVec(sizeof(*stk) + 15 + stack_size,MEMF_PUBLIC|MEMF_ANY);
+			   the stack to a 128 bit boundary. The extra 20 bytes are
+			   to mimic the Task stack setup in dos.library/CreateProc. */
+			stk = AllocVec(sizeof(*stk) + 15 + 20 + stack_size,MEMF_PUBLIC|MEMF_ANY);
 			if(stk == NULL)
 				goto out;
 
@@ -410,9 +425,12 @@ _main(void)
 			lower = (((ULONG)(stk+1)) + 15UL) & ~15UL;
 			upper = lower + stack_size;
 
+			/* Fill in the lower and upper bounds, then take care of
+			   the stack pointer itself. This layout mimics the process
+			   creation code in dos.library. */
 			stk->stk_Lower		= (APTR)lower;
-			stk->stk_Upper		= upper;
-			stk->stk_Pointer	= (APTR)upper;
+			stk->stk_Upper		= upper - 4;
+			stk->stk_Pointer	= (APTR)(upper - 20);
 
 			/* If necessary, set up for stack size usage measurement. */
 			__stack_usage_init(stk);
