@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.8 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.9 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,6 @@ __socket_hook_entry(
 	struct file_action_message *	fam)
 {
 	struct FileInfoBlock * fib;
-	int error = OK;
 	int result;
 	int param;
 
@@ -73,7 +72,7 @@ __socket_hook_entry(
 
 			result = __recv((LONG)fd->fd_DefaultFile,fam->fam_Data,fam->fam_Size,0);
 			if(result < 0)
-				error = __get_errno();
+				fam->fam_Error = __get_errno();
 
 			PROFILE_ON();
 
@@ -93,7 +92,7 @@ __socket_hook_entry(
 
 			result = __send((LONG)fd->fd_DefaultFile,fam->fam_Data,fam->fam_Size,0);
 			if(result < 0)
-				error = __get_errno();
+				fam->fam_Error = __get_errno();
 
 			PROFILE_ON();
 
@@ -132,8 +131,9 @@ __socket_hook_entry(
 
 			SHOWMSG("file_action_seek");
 
-			result	= -1;
-			error	= ESPIPE;
+			result = -1;
+
+			fam->fam_Error = ESPIPE;
 
 			break;
 
@@ -145,7 +145,7 @@ __socket_hook_entry(
 
 			result = __IoctlSocket(fd->fd_DefaultFile,FIONBIO,&param);
 			if(result < 0)
-				error = __get_errno();
+				fam->fam_Error = __get_errno();
 
 			break;
 
@@ -157,7 +157,7 @@ __socket_hook_entry(
 
 			result = __IoctlSocket(fd->fd_DefaultFile,FIOASYNC,&param);
 			if(result < 0)
-				error = __get_errno();
+				fam->fam_Error = __get_errno();
 
 			break;
 
@@ -183,13 +183,12 @@ __socket_hook_entry(
 
 			SHOWVALUE(fam->fam_Action);
 
-			result	= -1;
-			error	= EBADF;
+			result = -1;
+
+			fam->fam_Error = EBADF;
 
 			break;
 	}
-
-	fam->fam_Error = error;
 
 	RETURN(result);
 	return(result);

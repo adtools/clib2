@@ -1,5 +1,5 @@
 /*
- * $Id: socket_send.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_send.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -86,7 +86,7 @@ send(int sockfd,const void *buff,size_t nbytes,int flags)
 		goto out;
 
 	PROFILE_OFF();
-	result = __send((LONG)fd->fd_DefaultFile,buff,(LONG)nbytes,flags);
+	result = __send((LONG)fd->fd_DefaultFile,(void *)buff,(LONG)nbytes,flags);
 	PROFILE_ON();
 
  out:

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.9 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: fcntl_close.c,v 1.10 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,9 +70,13 @@ close(int file_descriptor)
 
 	assert( fd->fd_Action != NULL );
 
-	result = (*fd->fd_Action)(fd,&fam);
-	if(result < 0)
+	if((*fd->fd_Action)(fd,&fam) < 0)
+	{
 		__set_errno(fam.fam_Error);
+		goto out;
+	}
+
+	result = 0;
 
  out:
 

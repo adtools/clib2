@@ -1,5 +1,5 @@
 /*
- * $Id: types.h,v 1.3 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: types.h,v 1.4 2005-02-20 15:46:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,7 @@ typedef unsigned int gid_t;
 typedef unsigned int ino_t;
 typedef unsigned int mode_t;
 typedef unsigned int nlink_t;
-typedef int off_t;
+typedef long int off_t;
 typedef int pid_t;
 typedef unsigned int rlim_t;
 typedef int ssize_t;

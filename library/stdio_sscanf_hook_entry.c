@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf_hook_entry.c,v 1.3 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_sscanf_hook_entry.c,v 1.4 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -86,7 +86,6 @@ __sscanf_hook_entry(
 	result = num_bytes;
 
  out:
-
 
 	return(result);
 }

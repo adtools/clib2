@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_read.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: fcntl_read.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,8 +50,9 @@
 ssize_t
 read(int file_descriptor, void * buffer, size_t num_bytes)
 {
+	ssize_t num_bytes_read;
+	ssize_t result = -1;
 	struct fd * fd;
-	off_t result = -1;
 
 	ENTER();
 
@@ -108,14 +109,19 @@ read(int file_descriptor, void * buffer, size_t num_bytes)
 
 		assert( fd->fd_Action != NULL );
 
-		result = (*fd->fd_Action)(fd,&fam);
-		if(result < 0)
+		num_bytes_read = (*fd->fd_Action)(fd,&fam);
+		if(num_bytes_read < 0)
+		{
 			__set_errno(fam.fam_Error);
+			goto out;
+		}
 	}
 	else
 	{
-		result = 0;
+		num_bytes_read = 0;
 	}
+
+	result = num_bytes_read;
 
  out:
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf_hook_entry.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_vasprintf_hook_entry.c,v 1.5 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,6 @@ __vasprintf_hook_entry(
 	struct file_action_message *	fam)
 {
 	int result = -1;
-	int error = OK;
 	int num_bytes_left;
 	int num_bytes;
 
@@ -64,7 +63,7 @@ __vasprintf_hook_entry(
 
 	if(fam->fam_Action != file_action_write)
 	{
-		error = EBADF;
+		fam->fam_Error = EBADF;
 		goto out;
 	}
 
@@ -80,7 +79,7 @@ __vasprintf_hook_entry(
 		buffer = __malloc(new_size,string_iob->iob_File,string_iob->iob_Line);
 		if(buffer == NULL)
 		{
-			error = ENOBUFS;
+			fam->fam_Error = ENOBUFS;
 			goto out;
 		}
 
@@ -112,8 +111,6 @@ __vasprintf_hook_entry(
 	result = num_bytes;
 
  out:
-
-	fam->fam_Error = error;
 
 	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.12 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.13 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,12 +59,11 @@ __fd_hook_entry(
 {
 	D_S(struct FileInfoBlock,fib);
 	BOOL fib_is_valid = FALSE;
-	LONG current_position;
-	LONG new_position;
-	LONG new_mode;
+	off_t current_position;
+	off_t new_position;
+	int new_mode;
 	char * buffer = NULL;
 	int result = -1;
-	int error = OK;
 
 	ENTER();
 
@@ -81,7 +80,7 @@ __fd_hook_entry(
 			{
 				SHOWMSG("file is closed");
 
-				error = EBADF;
+				fam->fam_Error = EBADF;
 				break;
 			}
 
@@ -100,7 +99,7 @@ __fd_hook_entry(
 			{
 				D(("read failed ioerr=%ld",IoErr()));
 
-				error = __translate_io_error_to_errno(IoErr());
+				fam->fam_Error = __translate_io_error_to_errno(IoErr());
 				break;
 			}
 
@@ -117,7 +116,7 @@ __fd_hook_entry(
 			{
 				SHOWMSG("file is closed");
 
-				error = EBADF;
+				fam->fam_Error = EBADF;
 				break;
 			}
 
@@ -151,7 +150,7 @@ __fd_hook_entry(
 			{
 				D(("write failed ioerr=%ld",IoErr()));
 
-				error = __translate_io_error_to_errno(IoErr());
+				fam->fam_Error = __translate_io_error_to_errno(IoErr());
 				break;
 			}
 
@@ -176,9 +175,12 @@ __fd_hook_entry(
 				{
 					SHOWMSG("file is closed");
 
-					error = EBADF;
+					fam->fam_Error = EBADF;
 					break;
 				}
+
+				/* The following is almost guaranteed not to fail. */
+				result = 0;
 
 				/* Are we disallowed to close this file? */
 				if(FLAG_IS_SET(fd->fd_Flags,FDF_NO_CLOSE))
@@ -212,7 +214,11 @@ __fd_hook_entry(
 					}
 
 					if(CANNOT Close(fd->fd_DefaultFile))
-						error = __translate_io_error_to_errno(IoErr());
+					{
+						fam->fam_Error = __translate_io_error_to_errno(IoErr());
+
+						result = -1;
+					}
 
 					PROFILE_ON();
 
@@ -348,9 +354,6 @@ __fd_hook_entry(
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));
 
-			if(error == OK)
-				result = 0;
-
 			break;
 
 		case file_action_seek:
@@ -364,7 +367,7 @@ __fd_hook_entry(
 			else
 				new_mode = OFFSET_END;
 
-			D(("seek to offset %ld, new_mode %ld; current position = %ld",fam->fam_Position,new_mode,Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT)));
+			D(("seek to offset %ld, new_mode %ld; current position = %ld",fam->fam_Offset,new_mode,Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT)));
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 			{
@@ -378,7 +381,7 @@ __fd_hook_entry(
 
 				if(current_position < 0)
 				{
-					error = EBADF;
+					fam->fam_Error = EBADF;
 					break;
 				}
 			}
@@ -389,19 +392,19 @@ __fd_hook_entry(
 			{
 				case OFFSET_CURRENT:
 
-					new_position += fam->fam_Position;
+					new_position += fam->fam_Offset;
 					break;
 
 				case OFFSET_BEGINNING:
 
-					new_position = fam->fam_Position;
+					new_position = fam->fam_Offset;
 					break;
 
 				case OFFSET_END:
 
 					if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
 					{
-						new_position = fib->fib_Size + fam->fam_Position;
+						new_position = fib->fib_Size + fam->fam_Offset;
 
 						fib_is_valid = TRUE;
 					}
@@ -414,32 +417,32 @@ __fd_hook_entry(
 				LONG position;
 
 				PROFILE_OFF();
-				position = Seek(fd->fd_DefaultFile,fam->fam_Position,new_mode);
+				position = Seek(fd->fd_DefaultFile,fam->fam_Offset,new_mode);
 				PROFILE_ON();
 
 				if(position < 0)
 				{
-					D(("seek failed, fam->fam_Mode=%ld (%ld), offset=%ld, ioerr=%ld",new_mode,fam->fam_Mode,fam->fam_Position,IoErr()));
+					D(("seek failed, fam->fam_Mode=%ld (%ld), offset=%ld, ioerr=%ld",new_mode,fam->fam_Mode,fam->fam_Offset,IoErr()));
 
-					error = __translate_io_error_to_errno(IoErr());
+					fam->fam_Error = __translate_io_error_to_errno(IoErr());
 
 					#if defined(UNIX_PATH_SEMANTICS)
 					{
 						if(NOT fib_is_valid && CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
 						{
-							error = __translate_io_error_to_errno(IoErr());
+							fam->fam_Error = __translate_io_error_to_errno(IoErr());
 							break;
 						}
 
 						if(new_position <= fib->fib_Size)
 						{
-							error = __translate_io_error_to_errno(IoErr());
+							fam->fam_Error = __translate_io_error_to_errno(IoErr());
 							break;
 						}
 
 						if(__grow_file_size(fd,new_position - fib->fib_Size) != OK)
 						{
-							error = __translate_io_error_to_errno(IoErr());
+							fam->fam_Error = __translate_io_error_to_errno(IoErr());
 							break;
 						}
 					}
@@ -449,10 +452,10 @@ __fd_hook_entry(
 					}
 					#endif /* UNIX_PATH_SEMANTICS */
 				}
-			}
 
-			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-				fd->fd_Position = new_position;
+				if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
+					fd->fd_Position = new_position;
+			}
 
 			result = new_position;
 
@@ -477,7 +480,7 @@ __fd_hook_entry(
 
 				if(CANNOT SetMode(fd->fd_DefaultFile,mode))
 				{
-					error = __translate_io_error_to_errno(IoErr());
+					fam->fam_Error = __translate_io_error_to_errno(IoErr());
 					break;
 				}
 
@@ -487,7 +490,7 @@ __fd_hook_entry(
 			{
 				SHOWMSG("can't do anything here");
 
-				error = EBADF;
+				fam->fam_Error = EBADF;
 			}
 
 			PROFILE_ON();
@@ -506,7 +509,7 @@ __fd_hook_entry(
 				{
 					SHOWMSG("couldn't examine the file");
 
-					error = __translate_io_error_to_errno(IoErr());
+					fam->fam_Error = __translate_io_error_to_errno(IoErr());
 					break;
 				}
 
@@ -520,7 +523,7 @@ __fd_hook_entry(
 			{
 				SHOWMSG("file is already closed");
 
-				error = EBADF;
+				fam->fam_Error = EBADF;
 			}
 
 			break;
@@ -529,7 +532,7 @@ __fd_hook_entry(
 
 			SHOWVALUE(fam->fam_Action);
 
-			error = EBADF;
+			fam->fam_Error = EBADF;
 			break;
 	}
 
@@ -537,8 +540,6 @@ __fd_hook_entry(
 		free(buffer);
 
 	SHOWVALUE(result);
-
-	fam->fam_Error = error;
 
 	RETURN(result);
 	return(result);

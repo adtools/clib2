@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ftell.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_ftell.c,v 1.5 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,8 @@ ftell(FILE *stream)
 {
 	struct iob * file = (struct iob *)stream;
 	struct file_action_message fam;
-	long result = -1;
+	long int result = -1;
+	int position;
 
 	assert( stream != NULL );
 
@@ -83,20 +84,21 @@ ftell(FILE *stream)
 
 	SHOWPOINTER(&fam);
 
-	fam.fam_Action		= file_action_seek;
-	fam.fam_Position	= 0;
-	fam.fam_Mode		= SEEK_CUR;
+	fam.fam_Action	= file_action_seek;
+	fam.fam_Offset	= 0;
+	fam.fam_Mode	= SEEK_CUR;
 
-	SHOWVALUE(fam.fam_Position);
+	SHOWVALUE(fam.fam_Offset);
 	SHOWVALUE(fam.fam_Mode);
 
 	assert( file->iob_Action != NULL );
 
-	if((*file->iob_Action)(file,&fam) < 0)
+	position = (*file->iob_Action)(file,&fam);
+	if(position < 0)
 	{
-		__set_errno(fam.fam_Error);
-
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
+
+		__set_errno(fam.fam_Error);
 
 		goto out;
 	}
@@ -106,15 +108,17 @@ ftell(FILE *stream)
 		/* Subtract the number of bytes still in the buffer which have
 		 * not been read before.
 		 */
-		result -= __iob_num_unread_bytes(file);
+		position -= __iob_num_unread_bytes(file);
 	}
 	else if (__iob_write_buffer_is_valid(file))
 	{
 		/* Add the number of bytes still stored in the buffer which have
 		 * not been written to disk yet.
 		 */
-		result += __iob_num_unwritten_bytes(file);
+		position += __iob_num_unwritten_bytes(file);
 	}
+
+	result = position;
 
  out:
 

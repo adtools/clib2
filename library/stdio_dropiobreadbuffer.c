@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_dropiobreadbuffer.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_dropiobreadbuffer.c,v 1.5 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,9 +77,9 @@ __drop_iob_read_buffer(struct iob * file)
 
 				SHOWMSG("calling the action function");
 
-				fam.fam_Action		= file_action_seek;
-				fam.fam_Position	= -num_unread_bytes;
-				fam.fam_Mode		= SEEK_CUR;
+				fam.fam_Action	= file_action_seek;
+				fam.fam_Offset	= -num_unread_bytes;
+				fam.fam_Mode	= SEEK_CUR;
 
 				assert( file->iob_Action != NULL );
 

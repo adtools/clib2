@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fseek.c,v 1.4 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_fseek.c,v 1.5 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -162,20 +162,21 @@ fseek(FILE *stream, long int offset, int wherefrom)
 
 			SHOWPOINTER(&fam);
 
-			fam.fam_Action		= file_action_seek;
-			fam.fam_Position	= offset;
-			fam.fam_Mode		= wherefrom;
+			fam.fam_Action	= file_action_seek;
+			fam.fam_Offset	= offset;
+			fam.fam_Mode	= wherefrom;
 
-			SHOWVALUE(fam.fam_Position);
+			SHOWVALUE(fam.fam_Offset);
 			SHOWVALUE(fam.fam_Mode);
 
 			assert( file->iob_Action != NULL );
 
 			if((*file->iob_Action)(file,&fam) < 0)
 			{
+				SET_FLAG(file->iob_Flags,IOBF_ERROR);
+
 				__set_errno(fam.fam_Error);
 
-				SET_FLAG(file->iob_Flags,IOBF_ERROR);
 				goto out;
 			}
 		}

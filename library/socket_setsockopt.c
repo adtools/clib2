@@ -1,5 +1,5 @@
 /*
- * $Id: socket_setsockopt.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_setsockopt.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -86,7 +86,7 @@ setsockopt(int sockfd,int level,int optname,const void *optval,int optlen)
 		goto out;
 
 	PROFILE_OFF();
-	result = __setsockopt((LONG)fd->fd_DefaultFile,level,optname,optval,optlen);
+	result = __setsockopt((LONG)fd->fd_DefaultFile,level,optname,(void *)optval,optlen);
 	PROFILE_ON();
 
  out:

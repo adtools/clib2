@@ -1,5 +1,5 @@
 /*
- * $Id: socket_sendto.c,v 1.5 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_sendto.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -87,7 +87,7 @@ sendto(int sockfd,const void *buff,int len,int flags,struct sockaddr *to,int tol
 		goto out;
 
 	PROFILE_OFF();
-	result = __sendto((LONG)fd->fd_DefaultFile,buff,len,flags,to,tolen);
+	result = __sendto((LONG)fd->fd_DefaultFile,(void *)buff,len,flags,to,tolen);
 	PROFILE_ON();
 
  out:

@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fstat.c,v 1.5 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stat_fstat.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -103,6 +103,8 @@ fstat(int file_descriptor, struct stat * buffer)
 	}
 
 	__convert_file_info_to_stat(fam.fam_FileSystem,fib,buffer);
+
+	result = 0;
 
  out:
 

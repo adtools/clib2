@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.14 2005-02-20 13:19:40 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.15 2005-02-20 15:46:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -147,10 +147,10 @@ struct file_action_message
 {
 	enum file_action_t		fam_Action;		/* What to do */
 	char *					fam_Data;		/* Where to read/write the data */
-	long					fam_Size;		/* How much data to write */
+	int						fam_Size;		/* How much data to write */
 
-	long					fam_Position;	/* The seek position */
-	long					fam_Mode;		/* The seek mode */
+	long int				fam_Offset;		/* The seek offset */
+	int						fam_Mode;		/* The seek mode */
 
 	int						fam_Arg;		/* Whether or not this file should
 											   be set non-blocking or use
