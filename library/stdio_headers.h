@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.4 2004-11-27 12:43:11 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.5 2004-11-28 10:01:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -327,7 +327,7 @@ struct file_hook_message
 	struct flock *			lock;		/* Record locking request */
 	int						command;	/* What kind of locking command was sent */
 
-	int						block;		/* Whether or not this file should
+	int						arg;		/* Whether or not this file should
 										   be set non-blocking */
 
 	uid_t					owner;

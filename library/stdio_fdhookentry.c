@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.1.1.1 2004-07-26 16:31:28 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.2 2004-11-28 10:01:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -1829,7 +1829,7 @@ __fd_hook_entry(
 
 				SHOWMSG("changing the mode");
 
-				if(message->block)
+				if(message->arg != 0)
 					mode = 0; /* buffered mode */
 				else
 					mode = 1; /* single character mode */

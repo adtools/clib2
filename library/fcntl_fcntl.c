@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.3 2004-11-27 12:43:11 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.4 2004-11-28 10:01:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -150,7 +150,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			   (FLAG_IS_CLEAR(flags,O_NONBLOCK) && FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING)))
 			{
 				message.action	= file_hook_action_set_blocking;
-				message.block	= FLAG_IS_CLEAR(flags,O_NONBLOCK);
+				message.arg		= FLAG_IS_CLEAR(flags,O_NONBLOCK);
 
 				assert( fd->fd_Hook != NULL );
 
@@ -175,7 +175,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			   (FLAG_IS_CLEAR(flags,O_ASYNC) && FLAG_IS_SET(fd->fd_Flags,FDF_ASYNC_IO)))
 			{
 				message.action	= file_hook_action_set_async;
-				message.block	= FLAG_IS_SET(flags,O_ASYNC);
+				message.arg		= FLAG_IS_SET(flags,O_ASYNC);
 
 				assert( fd->fd_Hook != NULL );
 

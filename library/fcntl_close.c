@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.2 2004-08-07 09:15:32 obarthel Exp $
+ * $Id: fcntl_close.c,v 1.3 2004-11-28 10:01:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -135,7 +135,7 @@ __close(int file_descriptor,int * error_ptr)
 			SHOWMSG("resetting non-blocking access mode");
 
 			message.action	= file_hook_action_set_blocking;
-			message.block	= 1;
+			message.arg		= 1;
 
 			assert( fd->fd_Hook != NULL );
 
