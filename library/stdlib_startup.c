@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_startup.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: stdlib_startup.c,v 1.3 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -423,6 +423,8 @@ __startup_init(void)
 
 CLIB_DESTRUCTOR(__startup_exit)
 {
+	ENTER();
+
 	PROFILE_OFF();
 
 	/* Now clean up after the streams set up for the Workbench
@@ -460,4 +462,6 @@ CLIB_DESTRUCTOR(__startup_exit)
 	}
 
 	PROFILE_ON();
+
+	LEAVE();
 }

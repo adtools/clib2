@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.4 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.5 2004-09-29 19:57:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,8 @@
 
 CLIB_DESTRUCTOR(__math_exit)
 {
+	ENTER();
+
 	#if defined(IEEE_FLOATING_POINT_SUPPORT)
 	{
 		if(MathIeeeSingBasBase != NULL)
@@ -76,6 +78,8 @@ CLIB_DESTRUCTOR(__math_exit)
 		}
 	}
 	#endif /* IEEE_FLOATING_POINT_SUPPORT */
+
+	LEAVE();
 }
 
 /****************************************************************************/

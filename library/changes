@@ -31,6 +31,14 @@ c.lib 1.177 (29.9.2004)
 - The socket exit code now calls the common stdio function which
   flushes and shuts down all buffered and unbuffered files.
 
+- The start time used by clock() is now initialized by a constructor
+  function.
+
+- NOTE THAT ALL THE CHANGES WITH REGARD TO USE OF DESTRUCTOR AND
+  CONSTRUCTOR FUNCTIONS REQUIRE A COMPLETE REBUILD OF THE LIBRARY! IF
+  YOU DO NOT DO THIS, THE CONSTRUCTOR/DESTRUCTOR FUNCTIONS MAY NOT
+  GET CALLED.
+
 
 c.lib 1.175 (10.9.2004)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: time_headers.h,v 1.1.1.1 2004-07-26 16:32:23 obarthel Exp $
+ * $Id: time_headers.h,v 1.2 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,10 +81,6 @@
 #ifndef _MATH_FP_SUPPORT_H
 #include "math_fp_support.h"
 #endif /* _MATH_FP_SUPPORT_H */
-
-/****************************************************************************/
-
-extern struct DateStamp __start_time;
 
 /****************************************************************************/
 

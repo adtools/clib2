@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_headers.h,v 1.2 2004-09-29 12:10:29 obarthel Exp $
+ * $Id: unistd_headers.h,v 1.3 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,30 +47,29 @@ extern char __current_path_name[MAXPATHLEN];
 /****************************************************************************/
 
 /* Names of files and directories to delete when shutting down. */
-extern struct MinList __unlink_list;
+extern struct MinList NOCOMMON __unlink_list;
 
 /****************************************************************************/
 
 /* Local timer I/O. */
-extern struct MsgPort *		__timer_port;
-extern struct timerequest *	__timer_request;
-extern BOOL					__timer_busy;
-extern struct Library *		__TimerBase;
+extern struct MsgPort *		NOCOMMON __timer_port;
+extern struct timerequest *	NOCOMMON __timer_request;
+extern BOOL					NOCOMMON __timer_busy;
+extern struct Library *		NOCOMMON __TimerBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-extern struct TimerIFace * __ITimer;
+extern struct TimerIFace * NOCOMMON __ITimer;
 #endif /* __amigaos4__ */
 
 /****************************************************************************/
 
 /* If the program's current directory was changed, here is where
- * we find out about it.
- */
-extern BPTR __original_current_directory;
-extern BOOL __current_directory_changed;
-extern BOOL __unlock_current_directory;
+   we find out about it. */
+extern BPTR NOCOMMON __original_current_directory;
+extern BOOL NOCOMMON __current_directory_changed;
+extern BOOL NOCOMMON __unlock_current_directory;
 
 /****************************************************************************/
 

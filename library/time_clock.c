@@ -1,5 +1,5 @@
 /*
- * $Id: time_clock.c,v 1.1.1.1 2004-07-26 16:32:21 obarthel Exp $
+ * $Id: time_clock.c,v 1.2 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,6 +37,22 @@
 
 /****************************************************************************/
 
+static struct DateStamp start_time;
+
+/****************************************************************************/
+
+CLIB_CONSTRUCTOR(init_start_time)
+{
+	/* Remember when this program was started. */
+	DateStamp(&start_time);
+
+	RETURN(OK);
+
+	CONSTRUCTOR_SUCCEED();
+}
+
+/****************************************************************************/
+
 clock_t
 clock(void)
 {
@@ -57,8 +73,8 @@ clock(void)
 	minutes_now		= now.ds_Days * 24 * 60 + now.ds_Minute;
 	ticks_now		= now.ds_Tick;
 
-	minutes_start	= __start_time.ds_Days * 24 * 60 + __start_time.ds_Minute;
-	ticks_start		= __start_time.ds_Tick;
+	minutes_start	= start_time.ds_Days * 24 * 60 + start_time.ds_Minute;
+	ticks_start		= start_time.ds_Tick;
 
 	/* Subtract the start time from the current time. We start
 	 * with the ticks.

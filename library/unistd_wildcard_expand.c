@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.3 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,13 +76,15 @@ static struct AnchorPath * anchor;
 
 CLIB_DESTRUCTOR(__wildcard_expand_exit)
 {
+	ENTER();
+
 	if(anchor != NULL)
 	{
 		MatchEnd(anchor);
-
-		free(anchor);
 		anchor = NULL;
 	}
+
+	LEAVE();
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.1.1.1 2004-07-26 16:30:36 obarthel Exp $
+ * $Id: macros.h,v 1.2 2004-09-29 19:57:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -148,8 +148,10 @@
 #ifndef UNUSED
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
+#define NOCOMMON __attribute__((nocommon))
 #else
 #define UNUSED /* UNUSED */
+#define NOCOMMON /* NOCOMMON */
 #endif
 #endif /* UNUSED */
 

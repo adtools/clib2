@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_locale_utility.h,v 1.1.1.1 2004-07-26 16:31:57 obarthel Exp $
+ * $Id: stdlib_locale_utility.h,v 1.2 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,8 +49,14 @@
 
 /****************************************************************************/
 
-extern struct Library * __UtilityBase;
-extern struct Library * __LocaleBase;
+#ifndef _MACROS_H
+#include "macros.h"
+#endif /* _MACROS_H */
+
+/****************************************************************************/
+
+extern struct Library * NOCOMMON __UtilityBase;
+extern struct Library * NOCOMMON __LocaleBase;
 
 /****************************************************************************/
 
@@ -58,8 +64,8 @@ extern struct Library * __LocaleBase;
 
 /****************************************************************************/
 
-extern struct UtilityIFace *	__IUtility;
-extern struct LocaleIFace *		__ILocale;
+extern struct UtilityIFace NOCOMMON *	__IUtility;
+extern struct LocaleIFace NOCOMMON *	__ILocale;
 
 /****************************************************************************/
 

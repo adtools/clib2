@@ -1,5 +1,5 @@
 /*
- * $Id: locale_headers.h,v 1.1.1.1 2004-07-26 16:30:35 obarthel Exp $
+ * $Id: locale_headers.h,v 1.2 2004-09-29 19:57:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,12 +69,12 @@
 
 /****************************************************************************/
 
-extern struct Locale * __default_locale;
-extern struct Locale * __locale_table[NUM_LOCALES];
+extern struct Locale * NOCOMMON __default_locale;
+extern struct Locale * NOCOMMON __locale_table[NUM_LOCALES];
 
 /****************************************************************************/
 
-extern char __locale_name_table[NUM_LOCALES][MAX_LOCALE_NAME_LEN];
+extern char NOCOMMON __locale_name_table[NUM_LOCALES][MAX_LOCALE_NAME_LEN];
 
 /****************************************************************************/
 

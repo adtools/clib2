@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_init_exit.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: usergroup_init_exit.c,v 1.3 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,16 +54,12 @@ extern char * __program_name;
 
 /****************************************************************************/
 
-extern void __show_error(const char * message);
-
-/****************************************************************************/
-
-struct Library * __UserGroupBase;
+struct Library * NOCOMMON __UserGroupBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-struct UserGroupIFace * __IUserGroup;
+struct UserGroupIFace * NOCOMMON __IUserGroup;
 #endif /* __amigaos4__ */
 
 /****************************************************************************/

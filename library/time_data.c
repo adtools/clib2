@@ -1,5 +1,5 @@
 /*
- * $Id: time_data.c,v 1.1.1.1 2004-07-26 16:32:22 obarthel Exp $
+ * $Id: time_data.c,v 1.2 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,10 +34,6 @@
 #ifndef _TIME_HEADERS_H
 #include "time_headers.h"
 #endif /* _TIME_HEADERS_H */
-
-/****************************************************************************/
-
-struct DateStamp __start_time;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.3 2004-09-29 14:17:44 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.4 2004-09-29 19:57:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -142,18 +142,31 @@ call_main(void)
 
 	static size_t i;
 
+	ENTER();
+
 	/* This plants the return buffer for _exit(). */
 	if(setjmp(__exit_jmp_buf) != 0)
 		goto out;
 
+	SHOWMSG("calling init functions");
+
 	for(i = 0 ; init_functions[i] != NULL ; i++)
 	{
+		D(("calling init function #%ld",i));
+
 		if((*init_functions[i])() != OK)
+		{
+			SHOWMSG("that didn't work");
 			goto out;
+		}
 	}
+
+	SHOWMSG("now invoking the constructors");
 
 	/* Go through the constructor list */
 	_init();
+
+	SHOWMSG("done.");
 
 	/* If the SAS/C profiling code is set up for printing function
 	   call chains, switch it on now. */
@@ -183,6 +196,8 @@ call_main(void)
 	 */
 	if(__stack_overflow)
 	{
+		SHOWMSG("we have a stack overflow");
+
 		/* Dump whatever is waiting to be written to the
 		 * standard I/O streams, and make sure that no
 		 * break signal is about to make things any more
@@ -205,8 +220,14 @@ call_main(void)
 	/* If necessary, print stack size usage information. */
 	__stack_usage_exit();
 
+	SHOWMSG("invoking the destructors");
+
 	/* Go through the destructor list */
 	_fini();
+
+	SHOWMSG("done.");
+
+	SHOWMSG("calling the exit functions");
 
 	/* Any of the following cleanup routines may call
 	 * _exit() by way of abort() or through a hook
@@ -215,10 +236,13 @@ call_main(void)
 	 */
 	for(i = 0 ; exit_functions[i] != NULL ; i++)
 	{
+		D(("calling exit function #%ld",i));
+
 		if(setjmp(__exit_jmp_buf) == 0)
 			(*exit_functions[i])();
 	}
 
+	RETURN(__exit_value);
 	return(__exit_value);
 }
 
@@ -348,9 +372,6 @@ _main(void)
 		}
 	}
 	#endif /* __amigaos4__ */
-
-	/* Remember when this program was started. */
-	DateStamp(&__start_time);
 
 	/* If a callback was provided which can fill us in on which
 	 * minimum stack size should be used, invoke it now and

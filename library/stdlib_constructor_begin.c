@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor_begin.c,v 1.1.1.1 2004-07-26 16:31:52 obarthel Exp $
+ * $Id: stdlib_constructor_begin.c,v 1.2 2004-09-29 19:57:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,80 +42,7 @@
 
 /****************************************************************************/
 
-#if defined(__amigaos4__)
-
-/****************************************************************************/
-
-/*
- * Dummy constructor and destructor array. The linker script will put these at the
- * very beginning of section ".ctors" and ".dtors". crtend.o contains a similar entry
- * with a NULL pointer entry and is put at the end of the sections. This way, the init
- * code can find the global constructor/destructor pointers
- */
-static void (*__CTOR_LIST__[1]) (void) __attribute__((section(".ctors"))) = { (void *)-1 };
-static void (*__DTOR_LIST__[1]) (void) __attribute__((section(".dtors"))) = { (void *)-1 };
-
-/****************************************************************************/
-
-static void
-_do_ctors(void)
-{
-	void (**pFuncPtr)(void);
-
-	/* Skip the first entry in the list (it's -1 anyway) */
-	pFuncPtr = __CTOR_LIST__ + 1;
-
-	/* Call all constructors in forward order */
-	while (*pFuncPtr != NULL)
-		(**pFuncPtr++)();
-}
-
-/****************************************************************************/
-
-static void
-_do_dtors(void)
-{
-	static ULONG i = ~0UL;
-	void (**pFuncPtr)(void);
-
-	if(i == ~0UL)
-	{
-		ULONG j = (ULONG)__DTOR_LIST__[0];
-
-		if(j == ~0UL)
-		{
-			/* Find the end of the destructors list. */
-			j = 1;
-
-			while(__DTOR_LIST__[j] != NULL)
-				j++;
-
-			/* We're at the NULL entry now. Go back by one. */
-			j--;
-		}
-
-		i = j;
-	}
-
-	/* If one of the destructors drops into
-	 * exit(), processing will continue with
-	 * the next following destructor.
-	 */
-	(void)setjmp(__exit_jmp_buf);
-
-	/* Call all destructors in reverse order. */
-	pFuncPtr = &__DTOR_LIST__[i];
-	while(i > 0)
-	{
-		i--;
-
-		(**pFuncPtr--)();
-	}
-}
-
-/****************************************************************************/
-
-#elif defined(__SASC)
+#if defined(__SASC)
 
 /****************************************************************************/
 
@@ -201,9 +128,21 @@ _do_ctors(void)
 	ULONG nptrs = (ULONG)__CTOR_LIST__[0];
 	ULONG i;
 
+	ENTER();
+
+	D(("there are %ld constructors to be called",nptrs));
+
 	/* Call all constructors in forward order */
 	for(i = 0 ; i < nptrs ; i++)
+	{
+		D(("calling constructor #%ld, 0x%08lx",i,__CTOR_LIST__[1+i]));
+
 		__CTOR_LIST__[1+i]();
+	}
+
+	SHOWMSG("all done.");
+
+	LEAVE();
 }
 
 /****************************************************************************/
@@ -216,6 +155,10 @@ _do_dtors(void)
 	ULONG nptrs = (ULONG)__DTOR_LIST__[0];
 	static ULONG i;
 
+	ENTER();
+
+	D(("there are %ld destructors to be called",nptrs));
+
 	/* If one of the destructors drops into
 	 * exit(), processing will continue with
 	 * the next following destructor.
@@ -224,7 +167,15 @@ _do_dtors(void)
 
 	/* Call all destructors in reverse order */
 	while(i++ < nptrs)
+	{
+		D(("calling destructor #%ld, 0x%08lx",i,__DTOR_LIST__[1+nptrs - i]));
+
 		__DTOR_LIST__[1+nptrs - i]();
+	}
+
+	SHOWMSG("all done.");
+
+	LEAVE();
 }
 
 /****************************************************************************/
