@@ -1,5 +1,5 @@
 /*
- * $Id: stdarg.h,v 1.1.1.1 2004-07-26 16:32:53 obarthel Exp $
+ * $Id: stdarg.h,v 1.2 2004-09-09 08:25:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,12 +57,25 @@ typedef char * va_list;
 /****************************************************************************/
 
 #else
- #if defined(__GNUC__)
-  #undef _STDARG_H
-  #include_next "stdarg.h"
- #else
-  #error "Unknown compiler"
- #endif /* __GNUC__ */
+
+/****************************************************************************/
+
+#if defined(__GNUC__)
+
+/* Use the compiler supplied, machine specific <stdarg.h> file. */
+#undef _STDARG_H
+#include_next "stdarg.h"
+
+#include <sys/amigaos-va.h>
+
+#else
+
+#error "Unknown compiler"
+
+#endif /* __GNUC__ */
+
+/****************************************************************************/
+
 #endif /* __amigaos4__ */
 
 /****************************************************************************/

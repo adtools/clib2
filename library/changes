@@ -1,3 +1,11 @@
+- <stdarg.h> now tries to use the compiler supplied, machine specific
+  <stdarg.h> file and also includes the OS4-specifc <sys/amigaos-va.h>
+  file, if necessary.
+
+- Added another test to <sys/time.h> to check if the "timeval" definition is
+  already in place. If it is, <exec/types.h> will not be included.
+
+
 c.lib 1.174 (27.8.2004)
 
 - The parameters of atan2() were swapped. Fixed.
