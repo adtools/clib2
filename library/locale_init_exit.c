@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.1.1.1 2004-07-26 16:30:35 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,25 @@
 
 /****************************************************************************/
 
+struct Library * __LocaleBase;
+
+/****************************************************************************/
+
+#if defined(__amigaos4__)
+struct LocaleIFace * __ILocale;
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
+struct Locale * __default_locale;
+struct Locale * __locale_table[NUM_LOCALES];
+
+/****************************************************************************/
+
+char __locale_name_table[NUM_LOCALES][MAX_LOCALE_NAME_LEN];
+
+/****************************************************************************/
+
 void
 __close_all_locales(void)
 {
@@ -71,8 +90,7 @@ __close_all_locales(void)
 
 /****************************************************************************/
 
-void
-__locale_exit(void)
+CLIB_DESTRUCTOR(__locale_exit)
 {
 	ENTER();
 
@@ -107,8 +125,7 @@ __locale_exit(void)
 
 /****************************************************************************/
 
-int
-__locale_init(void)
+CLIB_CONSTRUCTOR(__locale_init)
 {
 	int i;
 
@@ -145,5 +162,6 @@ __locale_init(void)
 	PROFILE_ON();
 
 	RETURN(OK);
-	return(OK);
+
+	CONSTRUCTOR_SUCCEED();
 }

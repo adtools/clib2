@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.2 2004-08-08 10:55:57 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.3 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,6 +62,11 @@ struct iob;
 struct fd;
 
 #endif /* _STDIO_HEADERS_H */
+
+/****************************************************************************/
+
+/* stdio_init_exit.c */
+void __close_all_files(void);
 
 /****************************************************************************/
 

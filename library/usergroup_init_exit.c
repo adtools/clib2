@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_init_exit.c,v 1.1.1.1 2004-07-26 16:32:38 obarthel Exp $
+ * $Id: usergroup_init_exit.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,8 +58,17 @@ extern void __show_error(const char * message);
 
 /****************************************************************************/
 
-void
-__usergroup_exit(void)
+struct Library * __UserGroupBase;
+
+/****************************************************************************/
+
+#if defined(__amigaos4__)
+struct UserGroupIFace * __IUserGroup;
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
+CLIB_DESTRUCTOR(__usergroup_exit)
 {
 	ENTER();
 
@@ -84,8 +93,7 @@ __usergroup_exit(void)
 
 /****************************************************************************/
 
-int
-__usergroup_init(void)
+CLIB_CONSTRUCTOR(__usergroup_init)
 {
 	struct TagItem tags[2];
 	int result = ERROR;
@@ -139,7 +147,11 @@ __usergroup_init(void)
 	PROFILE_ON();
 
 	RETURN(result);
-	return(result);
+
+	if(result == OK)
+		CONSTRUCTOR_SUCCEED();
+	else
+		CONSTRUCTOR_FAIL();
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_startup.c,v 1.1.1.1 2004-07-26 16:32:10 obarthel Exp $
+ * $Id: stdlib_startup.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -421,8 +421,7 @@ __startup_init(void)
 
 /****************************************************************************/
 
-void
-__startup_exit(void)
+CLIB_DESTRUCTOR(__startup_exit)
 {
 	PROFILE_OFF();
 

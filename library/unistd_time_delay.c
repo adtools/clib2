@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_time_delay.c,v 1.1 2004-09-29 12:10:29 obarthel Exp $
+ * $Id: unistd_time_delay.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,10 @@
 #ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
+
+/****************************************************************************/
+
+#include <proto/timer.h>
 
 /****************************************************************************/
 

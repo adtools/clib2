@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_data.c,v 1.1.1.1 2004-07-26 16:32:34 obarthel Exp $
+ * $Id: usergroup_data.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,18 +38,6 @@
 #ifndef _USERGROUP_HEADERS_H
 #include "usergroup_headers.h"
 #endif /* _USERGROUP_HEADERS_H */
-
-/****************************************************************************/
-
-struct Library * __UserGroupBase;
-
-/****************************************************************************/
-
-#if defined(__amigaos4__)
-
-struct UserGroupIFace *__IUserGroup;
-
-#endif /* __amigaos4__ */
 
 /****************************************************************************/
 

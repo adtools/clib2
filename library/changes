@@ -1,3 +1,27 @@
+c.lib 1.177 (29.9.2004)
+
+- Moved the locale initialization/cleanup code into constructors
+  and destructors.
+
+- The socket cleanup function is now a destructor.
+
+- The math cleanup function is now a destructor.
+
+- The wildcard cleanup function is now a destructor.
+
+- The stdio cleanup function is now a destructor.
+
+- The stack extension cleanup function is now a destructor.
+
+- The code that cleans up after the program's current directory
+  was changed is now a destructor function.
+
+- Moved the initialization/cleanup code for unlink() into constructors
+  and destructors.
+
+- Moved the initialization/cleanup code for usergroup.library into
+  constructors and destructors.
+
 - Added usleep(), and created wrapper code that both sleep() and
   usleep() can use.
 

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.8 2004-09-27 15:04:51 tfrieden Exp $
+# $Id: GNUmakefile.os4,v 1.9 2004-09-29 14:17:44 obarthel Exp $
 #
 # :ts=8
 #
@@ -145,7 +145,6 @@ C_LIB = \
 	fcntl_get_default_file.o \
 	libgen_basename.o \
 	libgen_dirname.o \
-	locale_data.o \
 	locale_init_exit.o \
 	locale_localeconv.o \
 	locale_setlocale.o \
@@ -313,7 +312,6 @@ C_LIB = \
 	stdlib_termination_message.o \
 	stdlib_threshold.o \
 	stdlib_unsetenv.o \
-	stdlib_usergroup.o \
 	stdlib_wildcard_expand.o \
 	strings_strcasecmp.o \
 	strings_strncasecmp.o \
@@ -359,9 +357,9 @@ C_LIB = \
 	time_time.o \
 	unistd_access.o \
 	unistd_chdir.o \
+	unistd_chdir_exit.o \
 	unistd_chown.o \
 	unistd_currentpathname.o \
-	unistd_data.o \
 	unistd_dup.o \
 	unistd_dup2.o \
 	unistd_fchown.o \
@@ -379,8 +377,11 @@ C_LIB = \
 	unistd_realpath.o \
 	unistd_sleep.o \
 	unistd_symlink.o \
+	unistd_time_delay.o \
+	unistd_timer.o \
 	unistd_truncate.o \
 	unistd_unlink.o \
+	unistd_usleep.o \
 	utime_utime.o 
 
 
@@ -420,6 +421,7 @@ UNIX_LIB = \
 	stdlib_system.o \
 	unistd_access.o \
 	unistd_chdir.o \
+	unistd_chdir_exit.o \
 	unistd_chown.o \
 	unistd_getcwd.o \
 	unistd_lchown.o \

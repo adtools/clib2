@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_data.c,v 1.1.1.1 2004-07-26 16:31:53 obarthel Exp $
+ * $Id: stdlib_data.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -85,15 +85,11 @@ ULONG __stk_extensions;
 /****************************************************************************/
 
 struct Library * __UtilityBase;
-struct Library * __LocaleBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-
-struct UtilityIFace *	__IUtility;
-struct LocaleIFace *	__ILocale;
-
+struct UtilityIFace * __IUtility;
 #endif /* __amigaos4__ */
 
 /****************************************************************************/

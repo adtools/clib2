@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.1.1.1 2004-07-26 16:32:02 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,6 @@ struct MemoryTree;
 
 /* math_init_exit.c */
 extern int	__math_init(void);
-extern void	__math_exit(void);
 
 /****************************************************************************/
 
@@ -69,33 +68,14 @@ extern int __machine_test(void);
 
 /****************************************************************************/
 
-/* locale_init_exit.c */
-extern int	__locale_init(void);
-extern void	__locale_exit(void);
-
-/****************************************************************************/
-
 /* stdio_init_exit.c */
 extern int	__stdio_init(void);
-extern void	__stdio_exit(void);
 
 /****************************************************************************/
 
 /* stdlib_init_exit.c */
 extern int	__stdlib_init(void);
 extern void	__stdlib_exit(void);
-
-/****************************************************************************/
-
-/* unistd_init_exit.c */
-extern int	__unistd_init(void);
-extern void	__unistd_exit(void);
-
-/****************************************************************************/
-
-/* dirent_init_exit.c */
-extern int	__dirent_init(void);
-extern void	__dirent_exit(void);
 
 /****************************************************************************/
 
@@ -106,13 +86,6 @@ extern void	__exit_trap_trigger(void);
 
 /* socket_init_exit.c */
 extern int	__socket_init(void);
-extern void	__socket_exit(void);
-
-/****************************************************************************/
-
-/* usergroup_init_exit.c */
-extern int	__usergroup_init(void);
-extern void	__usergroup_exit(void);
 
 /****************************************************************************/
 
@@ -134,13 +107,11 @@ extern unsigned long __get_sp(void);
 /* stdlib_wildcard_expand.c */
 extern UBYTE *	__allocate_quote_vector(int num_parameters);
 extern int		__wildcard_expand_init(void);
-extern void		__wildcard_expand_exit(void);
 
 /****************************************************************************/
 
 /* stdlib_stackextension.c */
 extern int	__stk_init(void);
-extern void	__stk_exit(void);
 
 /****************************************************************************/
 
@@ -163,7 +134,6 @@ void _fini(void);
 
 /* stdlib_startup.c */
 extern int	__startup_init(void);
-extern void	__startup_exit(void);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.3 2004-08-21 18:57:40 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.4 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,8 +53,7 @@
 
 /****************************************************************************/
 
-void
-__math_exit(void)
+CLIB_DESTRUCTOR(__math_exit)
 {
 	#if defined(IEEE_FLOATING_POINT_SUPPORT)
 	{

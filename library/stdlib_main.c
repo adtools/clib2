@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.2 2004-09-18 09:03:30 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.3 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -122,10 +122,7 @@ call_main(void)
 		__stdio_init,
 		__machine_test,
 		__math_init,
-		__locale_init,
-		__unistd_init,
 		__socket_init,
-		__usergroup_init,
 		__wildcard_expand_init,
 
 		NULL
@@ -138,15 +135,6 @@ call_main(void)
 	 */
 	static exit_func_ptr exit_functions[] =
 	{
-		__wildcard_expand_exit,
-		__usergroup_exit,
-		__socket_exit,
-		__unistd_exit,
-		__locale_exit,
-		__math_exit,
-		__stdio_exit,
-		__startup_exit,
-		__stk_exit,
 		__stdlib_exit,
 
 		NULL

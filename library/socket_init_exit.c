@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.2 2004-07-28 15:50:45 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.3 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,16 +84,11 @@ extern BOOL		__is_daemon;
 
 /****************************************************************************/
 
-extern void __show_error(const char * message);
-
-/****************************************************************************/
-
 extern void __socket_hook_entry(struct Hook * hook,struct fd * fd,struct file_hook_message * message);
 
 /****************************************************************************/
 
-void
-__socket_exit(void)
+CLIB_DESTRUCTOR(__socket_exit)
 {
 	ENTER();
 
@@ -116,7 +111,7 @@ __socket_exit(void)
 	 *          does not happen, the stdio cleanup function will
 	 *          crash (with bells on).
 	 */
-	if(__fd != NULL)
+	if(__fd != NULL && __num_fd > 0)
 	{
 		int i;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_init_exit.c,v 1.4 2004-09-29 12:10:29 obarthel Exp $
+ * $Id: unistd_init_exit.c,v 1.5 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,21 +41,25 @@
 
 /****************************************************************************/
 
-int
-__unistd_init(void)
+/* Names of files and directories to delete when shutting down. */
+struct MinList __unlink_list;
+
+/****************************************************************************/
+
+CLIB_CONSTRUCTOR(__unistd_init)
 {
 	ENTER();
 
 	NewList((struct List *)&__unlink_list);
 
 	RETURN(OK);
-	return(OK);
+
+	CONSTRUCTOR_SUCCEED();
 }
 
 /****************************************************************************/
 
-void
-__unistd_exit(void)
+CLIB_DESTRUCTOR(__unistd_exit)
 {
 	ENTER();
 
@@ -65,6 +69,9 @@ __unistd_exit(void)
 	{
 		struct UnlinkNode * uln;
 		BPTR old_dir;
+
+		/* Close all the files that still might be open. */
+		__close_all_files();
 
 		while((uln = (struct UnlinkNode *)RemHead((struct List *)&__unlink_list)))
 		{
@@ -78,23 +85,6 @@ __unistd_exit(void)
 
 			UnLock(uln->uln_Lock);
 		}
-	}
-
-	if(__current_directory_changed)
-	{
-		BPTR old_dir;
-
-		old_dir = CurrentDir(__original_current_directory);
-		__original_current_directory = ZERO;
-
-		if(__unlock_current_directory)
-		{
-			UnLock(old_dir);
-
-			__unlock_current_directory = FALSE;
-		}
-
-		__current_directory_changed = FALSE;
 	}
 
 	PROFILE_ON();

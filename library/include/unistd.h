@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.5 2004-09-29 12:10:35 obarthel Exp $
+ * $Id: unistd.h,v 1.6 2004-09-29 14:17:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,6 +49,13 @@ extern "C" {
 #ifndef _FCNTL_H
 #include <fcntl.h>
 #endif /* _FCNTL_H */
+
+/****************************************************************************/
+
+/* Endianness: we assume a big endian memory layout (for 68k and PowerPC). */
+#define LITTLE_ENDIAN	1234
+#define BIG_ENDIAN		4321
+#define BYTE_ORDER		BIG_ENDIAN
 
 /****************************************************************************/
 
@@ -201,28 +208,32 @@ extern int h_errno;
 
 /****************************************************************************/
 
-extern int accept(int sockfd,struct sockaddr *cliaddr,int *addrlen);
+typedef int socklen_t;
+
+/****************************************************************************/
+
+extern int accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen);
 extern int bind(int sockfd,struct sockaddr *name,int namelen);
-extern int connect(int sockfd,struct sockaddr *name,int namelen);
-extern struct hostent * gethostbyaddr(const char *addr, int len, int type);
+extern int connect(int sockfd,struct sockaddr *name,socklen_t namelen);
+extern struct hostent * gethostbyaddr(const char *addr, socklen_t len, int type);
 extern struct hostent * gethostbyname(const char *name);
 extern int gethostname(const char *name, int namelen);
 extern struct netent * getnetbyname(const char *name);
-extern int getpeername(int sockfd,struct sockaddr *name,int *namelen);
-extern int getsockname(int sockfd,struct sockaddr *name,int *namelen);
-extern int getsockopt(int sockfd,int level,int optname,void *optval,int *optlen);
+extern int getpeername(int sockfd,struct sockaddr *name,socklen_t *namelen);
+extern int getsockname(int sockfd,struct sockaddr *name,socklen_t *namelen);
+extern int getsockopt(int sockfd,int level,int optname,void *optval,socklen_t *optlen);
 extern unsigned long inet_addr(const char *addr);
 extern char * inet_ntoa(struct in_addr in);
 extern int ioctl(int fd,unsigned long request, ... /* char *arg */);
 extern int listen(int sockfd,int backlog);
 extern int recv(int fd,void *buff,size_t nbytes,int flags);
-extern int recvfrom(int sockfd,void *buff,int len,int flags,struct sockaddr *from,int *fromlen);
+extern int recvfrom(int sockfd,void *buff,int len,int flags,struct sockaddr *from,socklen_t *fromlen);
 extern int recvmsg(int socket,struct msghdr *msg,int flags);
 extern int select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout);
-extern int send(int fd,void *buff,size_t nbytes,int flags);
+extern int send(int fd,const void *buff,size_t nbytes,int flags);
 extern int sendmsg(int socket,struct msghdr *msg,int flags);
-extern int sendto(int sockfd,void *buff,int len,int flags,struct sockaddr *to,int tolen);
-extern int setsockopt(int sockfd,int level,int optname,void *optval,int optlen);
+extern int sendto(int sockfd,const void *buff,int len,int flags,struct sockaddr *to,socklen_t tolen);
+extern int setsockopt(int sockfd,int level,int optname,const void *optval,socklen_t optlen);
 extern int shutdown(int socket, int how);
 extern int socket(int domain,int type,int protocol);
 extern long gethostid(void);

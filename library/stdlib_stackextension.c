@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackextension.c,v 1.1.1.1 2004-07-26 16:32:08 obarthel Exp $
+ * $Id: stdlib_stackextension.c,v 1.2 2004-09-29 14:17:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -294,8 +294,7 @@ __stk_init(void)
 /****************************************************************************/
 
 /* Free all spare stackframes */
-void
-__stk_exit(void)
+CLIB_DESTRUCTOR(__stk_exit)
 {
 	ENTER();
 
