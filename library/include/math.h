@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.3 2004-08-12 12:31:29 obarthel Exp $
+ * $Id: math.h,v 1.4 2004-08-16 09:33:13 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,6 +90,7 @@ extern float rintf(float x);
 extern int isinf(double x);
 extern int isnan(double x);
 extern double logb(double x);
+extern double hypot(double x,double y);
 
 /****************************************************************************/
 

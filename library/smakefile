@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.5 2004-08-12 12:31:27 obarthel Exp $
+# $Id: smakefile,v 1.6 2004-08-16 09:33:12 obarthel Exp $
 #
 # :ts=8
 #
@@ -189,6 +189,7 @@ MATH_OBJ = \
 	math_floor.o \
 	math_fmod.o \
 	math_frexp.o \
+	math_hypot.o \
 	math_init_exit.o \
 	math_isinf.o \
 	math_isnan.o \
