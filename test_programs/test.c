@@ -1,5 +1,5 @@
 /*
- * $Id: test.c,v 1.3 2005-01-29 17:48:07 obarthel Exp $
+ * $Id: test.c,v 1.4 2005-01-30 10:23:26 obarthel Exp $
  *
  * :ts=4
  */
@@ -88,6 +88,10 @@ main(int argc,char ** argv)
 	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
 	printf("gmt = %s\n",time_buffer);
 
+	tm = (*gmtime(&now));
+	strftime(time_buffer,sizeof(time_buffer),"%c %U %W %j",&tm);
+	printf("%s\n",time_buffer);
+
 	tm.tm_year	= 105;
 	tm.tm_mon	= 0;
 	tm.tm_mday	= 25;
@@ -102,14 +106,9 @@ main(int argc,char ** argv)
 	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
 	printf("2005-01-25 12:03:53 -> local time = %s\n",time_buffer);
 
-	time(&now);
 	tm = (*gmtime(&now));
 	strftime(time_buffer,sizeof(time_buffer),"%c",&tm);
 	printf("2005-01-25 12:03:53 -> gmt = %s\n",time_buffer);
-
-	tm = (*gmtime(&now));
-	strftime(time_buffer,sizeof(time_buffer),"%c %U %W %j",&tm);
-	printf("%s\n",time_buffer);
 
 	#if defined(IEEE_FLOATING_POINT_SUPPORT) || defined(M68881_FLOATING_POINT_SUPPORT)
 	{
