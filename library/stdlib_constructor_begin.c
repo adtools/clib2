@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_constructor_begin.c,v 1.8 2005-03-20 11:57:11 obarthel Exp $
+ * $Id: stdlib_constructor_begin.c,v 1.9 2005-03-20 12:14:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,7 +78,7 @@ _init(void)
 
 		for(i = 0 ; i < num_constructors ; i++)
 		{
-			if((*__ctors[num_constructors - (i+1)])() != 0)
+			if((*__ctors[num_constructors - (i + 1)])() != 0)
 				exit(RETURN_FAIL);
 		}
 	}
@@ -190,7 +190,7 @@ sort_private_functions(struct private_function * base, size_t count)
 /****************************************************************************/
 
 /* Sort all the init and exit functions (private library constructors), then
-   invoke the init functions in ascending order. */
+   invoke the init functions in descending order. */
 static void
 call_init_functions(void)
 {
@@ -212,10 +212,12 @@ call_init_functions(void)
 	if(num_init_functions > 0)
 	{
 		struct private_function * t = (struct private_function *)&__INIT_LIST__[1];
-		LONG i;
+		LONG i,j;
 
-		for(i = 0 ; i < num_init_functions ; i++)
+		for(j = 0 ; j < num_init_functions ; j++)
 		{
+			i = num_init_functions - (j + 1);
+
 			D(("calling init function #%ld, 0x%08lx",i,t[i].function));
 
 			(*t[i].function)();
@@ -227,7 +229,7 @@ call_init_functions(void)
 
 /****************************************************************************/
 
-/* Call all exit functions in descending order; this assumes that the function
+/* Call all exit functions in ascending order; this assumes that the function
    table was prepared by call_init_functions() above. */
 static void
 call_exit_functions(void)
@@ -243,9 +245,9 @@ call_exit_functions(void)
 		struct private_function * t = (struct private_function *)&__EXIT_LIST__[1];
 		LONG i;
 
-		for( ; j < num_exit_functions ; j++)
+		while(j++ < num_exit_functions)
 		{
-			i = num_exit_functions - (j+1);
+			i = j - 1;
 
 			D(("calling exit function #%ld, 0x%08lx",i,t[i].function));
 
