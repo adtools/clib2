@@ -1,5 +1,5 @@
 /*
- * $Id: math_data.c,v 1.1.1.1 2004-07-26 16:30:40 obarthel Exp $
+ * $Id: math_data.c,v 1.2 2004-08-21 18:57:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,3 +48,5 @@ struct Library * MathIeeeDoubTransBase;
 /****************************************************************************/
 
 double __huge_val;
+double __not_a_number;
+double __infinity;

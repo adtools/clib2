@@ -1,3 +1,20 @@
+c.lib 1.172 (21.8.2004)
+
+- acos() now returns 0 for a domain error.
+
+- asin() now returns 0 for a domain error.
+
+- atan2() now returns 0 for a domain error.
+
+- fmod() now returns x if y == 0 and sets a
+  domain error.
+
+- sqrt() now returns 0 for a domain error.
+
+- Added NaN and +Inf constants to the math library
+  initialization code which could come in handy later.
+
+
 c.lib 1.171 (16.8.2004)
 
 - Added "math_hypot.c"

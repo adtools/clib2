@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.2 2004-08-12 12:31:16 obarthel Exp $
+ * $Id: math_headers.h,v 1.3 2004-08-21 18:57:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -162,6 +162,11 @@ extern double __scalbn(double x, int n);
 #ifndef _MATH_FP_SUPPORT_H
 #include "math_fp_support.h"
 #endif /* _MATH_FP_SUPPORT_H */
+
+/****************************************************************************/
+
+extern double __not_a_number;
+extern double __infinity;
 
 /****************************************************************************/
 

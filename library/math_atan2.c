@@ -1,5 +1,5 @@
 /*
- * $Id: math_atan2.c,v 1.1.1.1 2004-07-26 16:30:39 obarthel Exp $
+ * $Id: math_atan2.c,v 1.2 2004-08-21 18:57:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -107,7 +107,7 @@ __atan2(double x,double y)
 			}
 			else
 			{
-				result = HUGE_VAL;
+				result = 0;
 				errno = EDOM;
 			}
 		}
@@ -186,7 +186,7 @@ __atan2(double x,double y)
 			}
 			else
 			{
-				result = HUGE_VAL;
+				result = 0;
 				errno = EDOM;
 			}
 		}
@@ -200,9 +200,6 @@ __atan2(double x,double y)
 /****************************************************************************/
 
 #if defined(PPC_FLOATING_POINT_SUPPORT)
-
-
-
 
 static const double 
 tiny  = 1.0e-300,
@@ -326,15 +323,7 @@ atan2(double x,double y)
 {
 	double result;
 
-	if(x != 0.0 && y != 0.0)
-	{
-		result = __atan2(x,y);
-	}
-	else
-	{
-		result = HUGE_VAL;
-		errno = EDOM;
-	}
+	result = __atan2(x,y);
 
 	return(result);
 }

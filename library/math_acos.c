@@ -1,5 +1,5 @@
 /*
- * $Id: math_acos.c,v 1.1.1.1 2004-07-26 16:30:37 obarthel Exp $
+ * $Id: math_acos.c,v 1.2 2004-08-21 18:57:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -226,7 +226,7 @@ acos(double x)
 	}
 	else
 	{
-		result = HUGE_VAL;
+		result = 0;
 		errno = EDOM;
 	}
 

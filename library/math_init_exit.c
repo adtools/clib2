@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.2 2004-08-08 10:55:57 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.3 2004-08-21 18:57:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -130,9 +130,23 @@ __math_init(void)
 			0x7f7fffff
 		};
 
+		static const unsigned long not_a_number[1] =
+		{
+			/* Exponent = 255 and fraction != 0.0 */
+			0x7fffffff
+		};
+
+		static const unsigned long infinity[1] =
+		{
+			/* Exponent = 255 and fraction = 0.0 */
+			0x7f800000
+		};
+
 		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
 
 		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
+		memmove((void *)&__not_a_number,not_a_number,sizeof(not_a_number));
+		memmove((void *)&__infinity,infinity,sizeof(infinity));
 	}
 	else if (sizeof(__huge_val) == 8) /* double precision */
 	{
@@ -142,9 +156,23 @@ __math_init(void)
 			0x7fefffff,0xffffffff
 		};
 
+		static const unsigned long not_a_number[2] =
+		{
+			/* Exponent = 2047 and fraction != 0.0 */
+			0x7fffffff,0xffffffff
+		};
+
+		static const unsigned long infinity[2] =
+		{
+			/* Exponent = 2047 and fraction = 0.0 */
+			0x7ff00000,0x00000000
+		};
+
 		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
 
 		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
+		memmove((void *)&__not_a_number,not_a_number,sizeof(not_a_number));
+		memmove((void *)&__infinity,infinity,sizeof(infinity));
 	}
 #if defined(USE_LONG_DOUBLE)
 	else if (sizeof(__huge_val) == 12) /* extended precision */
@@ -155,9 +183,23 @@ __math_init(void)
 			0x7ffe0000,0xffffffff,0xffffffff
 		};
 
+		static const unsigned long not_a_number[3] =
+		{
+			/* Exponent = 32767 and fraction != 0.0 */
+			0x7fff0000,0xffffffff,0xffffffff
+		};
+
+		static const unsigned long infinity[3] =
+		{
+			/* Exponent = 32767 and fraction = 0.0 */
+			0x7fff0000,0x00000000,0x00000000
+		};
+
 		assert( sizeof(largest_fp_value) == sizeof(__huge_val) );
 
 		memmove((void *)&__huge_val,largest_fp_value,sizeof(largest_fp_value));
+		memmove((void *)&__not_a_number,not_a_number,sizeof(not_a_number));
+		memmove((void *)&__infinity,infinity,sizeof(infinity));
 	}
 #endif /* USE_LONG_DOUBLE */
 
