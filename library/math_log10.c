@@ -1,5 +1,5 @@
 /*
- * $Id: math_log10.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_log10.c,v 1.3 2005-01-18 20:00:08 obarthel Exp $
  *
  * :ts=4
  *
@@ -186,11 +186,10 @@ log10(double x)
 {
 	double result;
 
-	/* ZZZ when do we consider 'x' to be invalid? If it's close
-	 * enough to zero or negative. How large is epsilon, and how
-	 * do we return minus infinity?
+	/* When do we consider 'x' to be invalid? If it's close
+	 * enough to zero or negative.
 	 */
-	if(x > 0.0)
+	if(x > DBL_EPSILON)
 	{
 		result = __log10(x);
 	}
