@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.17 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.18 2005-03-07 11:58:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,7 @@ __fd_hook_entry(
 	int new_mode;
 	char * buffer = NULL;
 	int result = -1;
+	BPTR file;
 
 	ENTER();
 
@@ -73,7 +74,8 @@ __fd_hook_entry(
 
 	__fd_lock(fd);
 
-	if(fd->fd_DefaultFile == ZERO)
+	file = fd->fd_DefaultFile;
+	if(file == ZERO)
 	{
 		SHOWMSG("file is closed");
 
@@ -90,11 +92,11 @@ __fd_hook_entry(
 			assert( fam->fam_Data != NULL );
 			assert( fam->fam_Size > 0 );
 
-			D(("read %ld bytes from position %ld to 0x%08lx",fam->fam_Size,Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT),fam->fam_Data));
+			D(("read %ld bytes from position %ld to 0x%08lx",fam->fam_Size,Seek(file,0,OFFSET_CURRENT),fam->fam_Data));
 
 			PROFILE_OFF();
 
-			result = Read(fd->fd_DefaultFile,fam->fam_Data,fam->fam_Size);
+			result = Read(file,fam->fam_Data,fam->fam_Size);
 
 			PROFILE_ON();
 
@@ -124,20 +126,20 @@ __fd_hook_entry(
 
 				PROFILE_OFF();
 
-				if(Seek(fd->fd_DefaultFile,0,OFFSET_END) >= 0)
+				if(Seek(file,0,OFFSET_END) >= 0)
 				{
 					if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-						fd->fd_Position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
+						fd->fd_Position = Seek(file,0,OFFSET_CURRENT);
 				}
 
 				PROFILE_ON();
 			}
 
-			D(("write %ld bytes to position %ld from 0x%08lx",fam->fam_Size,Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT),fam->fam_Data));
+			D(("write %ld bytes to position %ld from 0x%08lx",fam->fam_Size,Seek(file,0,OFFSET_CURRENT),fam->fam_Data));
 
 			PROFILE_OFF();
 
-			result = Write(fd->fd_DefaultFile,fam->fam_Data,fam->fam_Size);
+			result = Write(file,fam->fam_Data,fam->fam_Size);
 
 			PROFILE_ON();
 
@@ -174,7 +176,7 @@ __fd_hook_entry(
 					/* OK, so we cannot close it. But we might be obliged to
 					   reset a console into buffered mode. */
 					if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-						SetMode(fd->fd_DefaultFile,DOSFALSE);
+						SetMode(file,DOSFALSE);
 				}
 				else
 				{
@@ -192,14 +194,14 @@ __fd_hook_entry(
 
 					PROFILE_OFF();
 
-					parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile);
+					parent_dir = __safe_parent_of_file_handle(file);
 					if(parent_dir != ZERO)
 					{
-						if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+						if(__safe_examine_file_handle(file,fib))
 							name_and_path_valid = TRUE;
 					}
 
-					if(CANNOT Close(fd->fd_DefaultFile))
+					if(CANNOT Close(file))
 					{
 						fam->fam_Error = __translate_io_error_to_errno(IoErr());
 
@@ -358,7 +360,7 @@ __fd_hook_entry(
 			else
 				new_mode = OFFSET_END;
 
-			D(("seek to offset %ld, new_mode %ld; current position = %ld",fam->fam_Offset,new_mode,Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT)));
+			D(("seek to offset %ld, new_mode %ld; current position = %ld",fam->fam_Offset,new_mode,Seek(file,0,OFFSET_CURRENT)));
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 			{
@@ -367,7 +369,7 @@ __fd_hook_entry(
 			else
 			{
 				PROFILE_OFF();
-				current_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
+				current_position = Seek(file,0,OFFSET_CURRENT);
 				PROFILE_ON();
 
 				if(current_position < 0)
@@ -393,7 +395,7 @@ __fd_hook_entry(
 
 				case OFFSET_END:
 
-					if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+					if(__safe_examine_file_handle(file,fib))
 					{
 						new_position = fib->fib_Size + fam->fam_Offset;
 
@@ -408,7 +410,7 @@ __fd_hook_entry(
 				LONG position;
 
 				PROFILE_OFF();
-				position = Seek(fd->fd_DefaultFile,fam->fam_Offset,new_mode);
+				position = Seek(file,fam->fam_Offset,new_mode);
 				PROFILE_ON();
 
 				if(position < 0)
@@ -419,7 +421,7 @@ __fd_hook_entry(
 
 					#if defined(UNIX_PATH_SEMANTICS)
 					{
-						if(NOT fib_is_valid && CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
+						if(NOT fib_is_valid && CANNOT __safe_examine_file_handle(file,fib))
 						{
 							fam->fam_Error = __translate_io_error_to_errno(IoErr());
 							goto out;
@@ -469,7 +471,7 @@ __fd_hook_entry(
 				else
 					mode = DOSTRUE;		/* single character mode */
 
-				if(CANNOT SetMode(fd->fd_DefaultFile,mode))
+				if(CANNOT SetMode(file,mode))
 				{
 					fam->fam_Error = __translate_io_error_to_errno(IoErr());
 					goto out;
@@ -492,7 +494,7 @@ __fd_hook_entry(
 
 			SHOWMSG("file_action_examine");
 
-			if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fam->fam_FileInfo))
+			if(CANNOT __safe_examine_file_handle(file,fam->fam_FileInfo))
 			{
 				SHOWMSG("couldn't examine the file");
 
@@ -500,7 +502,7 @@ __fd_hook_entry(
 				goto out;
 			}
 
-			fh = BADDR(fd->fd_DefaultFile);
+			fh = BADDR(file);
 
 			fam->fam_FileSystem = fh->fh_Type;
 

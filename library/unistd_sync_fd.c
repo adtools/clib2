@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_sync_fd.c,v 1.3 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: unistd_sync_fd.c,v 1.4 2005-03-07 11:58:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,12 +47,26 @@
 
 /****************************************************************************/
 
-void
+int
 __sync_fd(struct fd * fd,int mode)
 {
+	int result = -1;
+
 	assert( fd != NULL );
 
 	__fd_lock(fd);
+
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	{
+		__set_errno(EINVAL);
+		goto out;
+	}
+
+	if(fd->fd_DefaultFile == ZERO)
+	{
+		__set_errno(EBADF);
+		goto out;
+	}
 
 	/* The mode tells us what to flush. 0 means "flush just the data", and
 	   everything else means "flush everything. */
@@ -67,5 +81,11 @@ __sync_fd(struct fd * fd,int mode)
 			DoPkt(fh->fh_Type,ACTION_FLUSH,	0,0,0,0,0);
 	}
 
+	result = 0;
+
+ out:
+
 	__fd_unlock(fd);
+
+	return(result);
 }

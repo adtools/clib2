@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_protos.h,v 1.13 2005-03-07 11:16:43 obarthel Exp $
+ * $Id: stdio_protos.h,v 1.14 2005-03-07 11:58:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -201,7 +201,7 @@ extern int __grow_file_size(struct fd * fd,int num_bytes);
 /****************************************************************************/
 
 /* unistd_sync_fd.c */
-extern void __sync_fd(struct fd * fd,int mode);
+extern int __sync_fd(struct fd * fd,int mode);
 
 /****************************************************************************/
 
