@@ -1,5 +1,5 @@
 /*
- * $Id: string_memcpy.c,v 1.1.1.1 2004-07-26 16:32:15 obarthel Exp $
+ * $Id: string_memcpy.c,v 1.2 2004-08-14 10:00:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -184,8 +184,16 @@ extern void __bcopy(const void *src,void *dst,size_t len);
 
 /****************************************************************************/
 
+/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
+   memcmp/memcpy/memset functions instead of 'size_t'. This can produce warnings
+   where none are necessary. */
+#if defined(__GNUC__) && (__GNUC__ < 3)
+void *
+memcpy(void *dst, const void *src, unsigned long len)
+#else
 void *
 memcpy(void *dst, const void *src, size_t len)
+#endif /* __GNUC__ && __GNUC__ < 3 */
 {
 	void * result = dst;
 
@@ -322,8 +330,16 @@ __memcpy(unsigned char * to,unsigned char * from,size_t len)
 
 /****************************************************************************/
 
+/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
+   memcmp/memcpy/memset functions instead of 'size_t'. This can produce warnings
+   where none are necessary. */
+#if defined(__GNUC__) && (__GNUC__ < 3)
+void *
+memcpy(void *dst, const void *src, unsigned long len)
+#else
 void *
 memcpy(void *dst, const void *src, size_t len)
+#endif /* __GNUC__ && __GNUC__ < 3 */
 {
 	void * result = dst;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: string_memset.c,v 1.1.1.1 2004-07-26 16:32:17 obarthel Exp $
+ * $Id: string_memset.c,v 1.2 2004-08-14 10:00:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -132,8 +132,16 @@ __memset(unsigned char * to,unsigned char value,size_t len)
 
 /****************************************************************************/
 
+/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
+   memcmp/memcpy/memset functions instead of 'size_t'. This can produce warnings
+   where none are necessary. */
+#if defined(__GNUC__) && (__GNUC__ < 3)
+void *
+memset(void *ptr, int val, unsigned long len)
+#else
 void *
 memset(void *ptr, int val, size_t len)
+#endif /* __GNUC__ && __GNUC__ < 3 */
 {
 	void * result = ptr;
 	unsigned char * m = ptr;
