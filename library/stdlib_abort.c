@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_abort.c,v 1.3 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdlib_abort.c,v 1.4 2005-03-27 10:02:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,14 +48,18 @@
 void
 abort(void)
 {
+	/* Try to call the signal handler that might be in charge of
+	   handling cleanup operations, etc. */
 	raise(SIGABRT);
+
+	/* If the signal handler returns it means that we still have
+	   to terminate the program. */
 
 	__check_abort_enabled = FALSE;
 
 	__print_termination_message(NULL);
 
 	/* Note that we drop into the exit() function which
-	 * does not trigger the exit trap.
-	 */
+	   does not trigger the exit trap. */
 	_exit(EXIT_FAILURE);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_unlink.c,v 1.6 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: unistd_unlink.c,v 1.7 2005-03-27 10:02:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,6 +53,7 @@
 
 /****************************************************************************/
 
+/* ZZZ unlink() must be reentrant according to POSIX.1 */
 int
 unlink(const char * path_name)
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chdir.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_chdir.c,v 1.6 2005-03-27 10:02:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,6 +47,7 @@
 
 /****************************************************************************/
 
+/* ZZZ chdir() must be reentrant according to POSIX.1 */
 int
 chdir(const char * path_name)
 {

@@ -6,6 +6,15 @@
   This makes it possible to override the default definition of the
   __check_abort_enabled variable in your own programs.
 
+- raise() no longer resets the signal handler before it invokes the one
+  currently configured. It merely blocks the delivery of the respective
+  signal to prevent recursion.
+
+- raise() now drops into abort() if a signal handler is set to
+  SIG_DFL. The exception is in SIGINT delivery, which has the
+  effect of printing a different termination message but otherwise
+  program flow takes the same path as abort().
+
 
 c.lib 1.190 (25.3.2005)
 

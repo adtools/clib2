@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.30 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.31 2005-03-27 10:02:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,8 +71,6 @@ __close_all_files(void)
 	int i;
 
 	ENTER();
-
-	__check_abort_enabled = FALSE;
 
 	__stdio_lock();
 

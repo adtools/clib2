@@ -1,5 +1,5 @@
 /*
- * $Id: signal_kill.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: signal_kill.c,v 1.5 2005-03-27 10:02:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,58 +55,34 @@ kill(pid_t pid, int signal_number)
 
 	if(pid > 0)
 	{
-		#if 0
+		ULONG max_cli_number,i;
+		BOOL found = FALSE;
+
+		max_cli_number = MaxCli();
+
+		for(i = 1 ; i <= max_cli_number ; i++)
 		{
-			struct Process * cli_process;
-
-			cli_process = FindCliProc((ULONG)pid);
-			if(cli_process == NULL)
+			if(FindCliProc(i) == (struct Process *)pid)
 			{
-				SHOWMSG("didn't find the process");
-
-				__set_errno(ESRCH);
-				goto out;
+				found = TRUE;
+				break;
 			}
-
-			SHOWMSG("found the process");
-
-			if(signal_number == SIGTERM || signal_number == SIGINT)
-				Signal((struct Task *)cli_process,SIGBREAKF_CTRL_C);
-			else
-				SHOWMSG("but won't shut it down");
 		}
-		#else
+
+		if(NOT found)
 		{
-			ULONG max_cli_number,i;
-			BOOL found = FALSE;
+			SHOWMSG("didn't find the process");
 
-			max_cli_number = MaxCli();
-
-			for(i = 1 ; i <= max_cli_number ; i++)
-			{
-				if(FindCliProc(i) == (struct Process *)pid)
-				{
-					found = TRUE;
-					break;
-				}
-			}
-
-			if(NOT found)
-			{
-				SHOWMSG("didn't find the process");
-
-				__set_errno(ESRCH);
-				goto out;
-			}
-
-			SHOWMSG("found the process");
-
-			if(signal_number == SIGTERM || signal_number == SIGINT)
-				Signal((struct Task *)pid,SIGBREAKF_CTRL_C);
-			else
-				SHOWMSG("but won't shut it down");
+			__set_errno(ESRCH);
+			goto out;
 		}
-		#endif
+
+		SHOWMSG("found the process");
+
+		if(signal_number == SIGTERM || signal_number == SIGINT)
+			Signal((struct Task *)pid,SIGBREAKF_CTRL_C);
+		else
+			SHOWMSG("but won't shut it down");
 	}
 
 	result = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_sleep.c,v 1.4 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_sleep.c,v 1.5 2005-03-27 10:02:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,7 @@
 
 /****************************************************************************/
 
+/* ZZZ sleep() must be reentrant according to POSIX.1 */
 unsigned int
 sleep(unsigned int seconds)
 {

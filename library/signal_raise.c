@@ -1,5 +1,5 @@
 /*
- * $Id: signal_raise.c,v 1.5 2005-03-26 11:01:13 obarthel Exp $
+ * $Id: signal_raise.c,v 1.6 2005-03-27 10:02:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,18 +37,22 @@
 
 /****************************************************************************/
 
+/* This table holds pointers to all signal handlers configured at a time. */
 signal_handler_t __signal_handler_table[NUM_SIGNALS] =
 {
-	SIG_DFL,
-	SIG_DFL,
-	SIG_DFL,
-	SIG_DFL,
-	SIG_DFL,
-	SIG_DFL
+	SIG_DFL,	/* SIGABRT */
+	SIG_DFL,	/* SIGFPE */
+	SIG_DFL,	/* SIGILL */
+	SIG_DFL,	/* SIGINT */
+	SIG_DFL,	/* SIGSEGV */
+	SIG_DFL		/* SIGTERM */
 };
 
 /****************************************************************************/
 
+/* This holds a mask of all signals whose delivery is currently blocked.
+   The sigaddset(), sigblock(), sigprocmask() and sigsetmask() functions
+   modify or query it. */
 int __signals_blocked;
 
 /****************************************************************************/
@@ -56,6 +60,8 @@ int __signals_blocked;
 int
 raise(int sig)
 {
+	static int local_signals_blocked;
+
 	int result = -1;
 
 	ENTER();
@@ -64,6 +70,7 @@ raise(int sig)
 
 	assert( SIGABRT <= sig && sig <= SIGTERM );
 
+	/* This has to be a well-known and supported signal. */
 	if(sig < SIGABRT || sig > SIGTERM)
 	{
 		SHOWMSG("unknown signal number");
@@ -72,43 +79,61 @@ raise(int sig)
 		goto out;
 	}
 
-	if(FLAG_IS_CLEAR(__signals_blocked,(1 << sig)))
+	/* Can we deliver the signal? */
+	if(FLAG_IS_CLEAR(__signals_blocked,		(1 << sig)) &&
+	   FLAG_IS_CLEAR(local_signals_blocked,	(1 << sig)))
 	{
-		int table_entry = sig - SIGABRT;
 		signal_handler_t handler;
 
-		handler = __signal_handler_table[table_entry];
+		/* Which handler is installed for this signal? */
+		handler = __signal_handler_table[sig - SIGABRT];
 
-		/* Revert to the default handler to prevent recursion. */
-		__signal_handler_table[table_entry] = SIG_DFL;
-
-		if(handler == SIG_DFL)
+		/* Should we ignore this signal? */
+		if(handler != SIG_IGN)
 		{
-			char break_string[80];
+			/* Block delivery of this signal to prevent recursion. */
+			SET_FLAG(local_signals_blocked,(1 << sig));
 
-			SHOWMSG("this is the default handler");
+			/* The default behaviour is to drop into abort(), or do
+			   something very much like it. */
+			if(handler == SIG_DFL)
+			{
+				SHOWMSG("this is the default handler");
 
-			/* Don't trigger a recursion. */
-			__check_abort_enabled = FALSE;
+				if(sig == SIGINT)
+				{
+					char break_string[80];
 
-			Fault(ERROR_BREAK,NULL,break_string,(LONG)sizeof(break_string));
+					/* Turn off ^C checking for good. */
+					__check_abort_enabled = FALSE;
 
-			__print_termination_message((sig == SIGINT) ? break_string : NULL);
+					Fault(ERROR_BREAK,NULL,break_string,(LONG)sizeof(break_string));
 
-			SHOWMSG("bye, bye...");
+					__print_termination_message(break_string);
 
-			/* Note that we drop into the exit() function which
-			 * does not trigger the exit trap.
-			 */
-			_exit(EXIT_FAILURE);
-		}
-		else if (handler != SIG_IGN)
-		{
-			SHOWMSG("calling the handler");
+					SHOWMSG("bye, bye...");
 
-			(*handler)(sig);
+					/* Note that we drop into the exit() function which
+					   does not trigger the exit trap. */
+					_exit(EXIT_FAILURE);
+				}
 
-			SHOWMSG("done.");
+				/* Drop straight into abort(), which might call signal()
+				   again but is otherwise guaranteed to eventually
+				   land us in _exit(). */
+				abort();
+			}
+			else 
+			{
+				SHOWMSG("calling the handler");
+
+				(*handler)(sig);
+
+				SHOWMSG("done.");
+			}
+
+			/* Unblock signal delivery again. */
+			CLEAR_FLAG(local_signals_blocked,(1 << sig));
 		}
 	}
 	else
