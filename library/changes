@@ -1,3 +1,17 @@
+c.lib 1.183 (13.11.2004)
+
+- Cleaned up the OS4 build makefile, losing redundant libraries,
+  adding more startup object code and ultimatively making the whole
+  rebuild logic work again: if code changes and dependencies are
+  set up correctly, it will now get rebuilt. Previously, such
+  changes went unnoticed and you had to rebuild the entire library
+  from scratch.
+
+- Added stubs for CreatePort(), DeletePort(), CreateTask(), DeleteTask()
+  and NewList() which have equivalents in exec.library V50 but for which
+  it might be useful if ported code didn't have to reference these
+  explicitly.
+
 - mktemp() was broken in libunix.a with Unix path semantics enabled.
   This was because the name template was translated and translated
   back again, overwriting the translation buffer. This, funny enough,

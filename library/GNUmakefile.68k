@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.13 2004-10-26 16:25:03 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.14 2004-11-13 12:55:39 obarthel Exp $
 #
 # :ts=8
 #
@@ -486,7 +486,6 @@ MATH_LIB = \
 	stdio_sscanf.o \
 	stdio_vasprintf.o \
 	stdio_vfprintf.o \
-	stdio_vfscanf.o \
 	stdio_vfscanf.o \
 	stdio_vprintf.o \
 	stdio_vsnprintf.o \

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.12 2004-10-07 11:03:46 tfrieden Exp $
+# $Id: GNUmakefile.os4,v 1.13 2004-11-13 12:55:39 obarthel Exp $
 #
 # :ts=8
 #
@@ -35,7 +35,6 @@ ifeq (,$(TYPE))
 LIBC_OBJS	= libc_objs
 LIBUNIX_OBJS	= libunix_objs
 LIBM_OBJS	= libm_objs
-LIBSTACK_OBJS	= libstack_objs
 LIBNET_OBJS	= libnet_objs
 LIBDEBUG_OBJS	= libdebug_objs
 LIBAMIGA_OBJS	= libamiga_objs
@@ -43,7 +42,6 @@ else
 LIBC_OBJS	= $(TYPE)/libc_objs
 LIBUNIX_OBJS	= $(TYPE)/libunix_objs
 LIBM_OBJS	= $(TYPE)/libm_objs
-LIBSTACK_OBJS	= $(TYPE)/libstack_objs
 LIBNET_OBJS	= $(TYPE)/libnet_objs
 LIBDEBUG_OBJS	= $(TYPE)/libdebug_objs
 LIBAMIGA_OBJS	= $(TYPE)/libamiga_objs
@@ -51,6 +49,7 @@ endif
 
 ##############################################################################
 
+# General build rules for all object files and the individual libraries
 %.o : %.c
 	@echo "Compiling $<"
 	@$(CC) -c $(CFLAGS) $<
@@ -67,10 +66,6 @@ $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
 	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) $(FLOAT_TYPE) $<
 
-$(LIBSTACK_OBJS)/%.o : %.c
-	@echo "Compiling $< [$(TYPE):stack]"
-	@$(CC) -o $(LIBSTACK_OBJS)/$*.o -c $(CFLAGS) $<
-
 $(LIBNET_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):net]"
 	@$(CC) -o $(LIBNET_OBJS)/$*.o -c $(CFLAGS) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT $<
@@ -85,6 +80,7 @@ $(LIBAMIGA_OBJS)/%.o : %.c
 
 ##############################################################################
 
+# Build options for the individual libraries
 ifeq (small_data,$(TYPE))
 CODE_TYPE := -msdata=sysv -DSMALL_DATA
 FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
@@ -95,7 +91,7 @@ CODE_TYPE := -msdata=data
 FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
 endif
 
-ifeq (large_data_softfloat, $(TYPE))
+ifeq (large_data_softfloat,$(TYPE))
 CODE_TYPE := -msdata=data -msoft-float
 FLOAT_TYPE :=
 endif
@@ -115,6 +111,7 @@ CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
 
 ##############################################################################
 
+# All objects files which make up libc.a
 C_LIB = \
 	c.lib_rev.o \
 	ctype_isalnum.o \
@@ -134,9 +131,9 @@ C_LIB = \
 	ctype_table.o \
 	dirent_closedir.o \
 	dirent_data.o \
+	dirent_rewinddir.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
-	dirent_rewinddir.o \
 	errno_data.o \
 	fcntl_close.o \
 	fcntl_creat.o \
@@ -255,39 +252,36 @@ C_LIB = \
 	stdlib_atol.o \
 	stdlib_bsearch.o \
 	stdlib_calloc.o \
+	stdlib_checkdetach.o \
+	stdlib_constructor.o \
+	stdlib_constructor_begin.o \
+	stdlib_constructor_end.o \
 	stdlib_data.o \
 	stdlib_default_pool_size.o \
 	stdlib_default_puddle_size.o \
 	stdlib_destructor.o \
+	stdlib_detach.o \
 	stdlib_disablerequesters.o \
 	stdlib_div.o \
-	stdlib_modsi3.o \
 	stdlib_divsi3.o \
 	stdlib_divsi4.o \
-	stdlib_umodsi3.o \
-	stdlib_udivsi3.o \
-	stdlib_udivsi4.o \
+	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
+	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
 	stdlib_getsp.o \
 	stdlib_init_exit.o \
+	stdlib_isresident.o \
 	stdlib_labs.o \
 	stdlib_ldiv.o \
-	stdlib_getdefstacksize.o \
-	stdlib_stackargbytes.o \
-	stdlib_stack_usage.o \
-	stdlib_checkdetach.o \
-	stdlib_detach.o \
-	stdlib_isresident.o \
-	stdlib_sysbase.o \
-	stdlib_dosbase.o \
 	stdlib_machine_test.o \
 	stdlib_malloc.o \
 	stdlib_math.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
+	stdlib_modsi3.o \
 	stdlib_mulsi3.o \
 	stdlib_never_free.o \
 	stdlib_putenv.o \
@@ -301,19 +295,25 @@ C_LIB = \
 	stdlib_showerror.o \
 	stdlib_socket.o \
 	stdlib_srand.o \
+	stdlib_stackargbytes.o \
 	stdlib_stackcheck.o \
 	stdlib_stackoverflow.o \
 	stdlib_stacksafezone.o \
 	stdlib_stacksize.o \
+	stdlib_stack_usage.o \
 	stdlib_startup.o \
 	stdlib_strtol.o \
 	stdlib_strtoul.o \
 	stdlib_strtoll.o \
 	stdlib_strtoull.o \
 	stdlib_swapstack.o \
+	stdlib_sysbase.o \
 	stdlib_system.o \
 	stdlib_termination_message.o \
 	stdlib_threshold.o \
+	stdlib_udivsi3.o \
+	stdlib_udivsi4.o \
+	stdlib_umodsi3.o \
 	stdlib_unsetenv.o \
 	stdlib_wildcard_expand.o \
 	strings_strcasecmp.o \
@@ -380,21 +380,21 @@ C_LIB = \
 	unistd_realpath.o \
 	unistd_sleep.o \
 	unistd_symlink.o \
-	unistd_time_delay.o \
 	unistd_timer.o \
+	unistd_time_delay.o \
 	unistd_truncate.o \
 	unistd_unlink.o \
 	unistd_usleep.o \
-	utime_utime.o 
+	utime_utime.o
 
-
+# All objects files which make up libunix.a
 UNIX_LIB = \
 	unix.lib_rev.o \
 	dirent_closedir.o \
 	dirent_data.o \
+	dirent_rewinddir.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
-	dirent_rewinddir.o \
 	fcntl_creat.o \
 	fcntl_fcntl.o \
 	fcntl_open.o \
@@ -408,12 +408,12 @@ UNIX_LIB = \
 	stat_rmdir.o \
 	stat_stat.o \
 	stdio_fdhookentry.o \
-	stdio_init_exit.o \
-	stdio_locksemaphorename.o \
-	stdio_openiob.o \
 	stdio_fflush.o \
 	stdio_fopen.o \
 	stdio_fopen.o \
+	stdio_init_exit.o \
+	stdio_locksemaphorename.o \
+	stdio_openiob.o \
 	stdio_popen.o \
 	stdio_remove.o \
 	stdio_rename.o \
@@ -443,6 +443,7 @@ UNIX_LIB = \
 	unistd_wildcard_expand.o \
 	utime_utime.o
 
+# All objects files which make up libm.a
 MATH_LIB = \
 	math_acos.o \
 	math_asin.o \
@@ -492,7 +493,6 @@ MATH_LIB = \
 	stdio_vasprintf.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
-	stdio_vfscanf.o \
 	stdio_vprintf.o \
 	stdio_vsnprintf.o \
 	stdio_vsprintf.o \
@@ -501,48 +501,7 @@ MATH_LIB = \
 	stdlib_strtod.o \
 	time_difftime.o
 
-MATH_LIB_IEEE = \
-	m.lib_rev.o \
-	$(MATH_LIB) \
-	math_adddf3.o \
-	math_addsf3.o \
-	math_divdf3.o \
-	math_divsf3.o \
-	math_eqdf2.o \
-	math_eqsf2.o \
-	math_extendsfdf2.o \
-	math_fixdfsi.o \
-	math_fixsfsi.o \
-	math_fixunsdfsi.o \
-	math_fixunssfsi.o \
-	math_floatsidf.o \
-	math_floatsisf.o \
-	math_gedf2.o \
-	math_gesf2.o \
-	math_gtdf2.o \
-	math_gtsf2.o \
-	math_ledf2.o \
-	math_lesf2.o \
-	math_ltdf2.o \
-	math_ltsf2.o \
-	math_muldf3.o \
-	math_mulsf3.o \
-	math_nedf2.o \
-	math_negdf2.o \
-	math_negsf2.o \
-	math_nesf2.o \
-	math_subdf3.o \
-	math_subsf3.o \
-	math_truncdfsf2.o
-
-STACK_LIB = \
-	stack.lib_rev.o \
-	stdlib_setjmp.o \
-	stdlib_stackextension.o \
-	stdlib_stackminframe.o \
-	stdlib_stackoverflow.o \
-	stdlib_stacksafezone.o
-
+# All objects files which make up libnet.a
 NET_LIB = \
 	net.lib_rev.o \
 	socket_accept.o \
@@ -586,6 +545,7 @@ NET_LIB = \
 	socket_socket.o \
 	socket_hook_entry.o \
 	socket_hstrerror.o \
+	stat_umask.o \
 	usergroup_crypt.o \
 	usergroup_data.o \
 	usergroup_endgrent.o \
@@ -614,13 +574,12 @@ NET_LIB = \
 	usergroup_setregid.o \
 	usergroup_setreuid.o \
 	usergroup_setsid.o \
-	usergroup_setuid.o \
-	stat_umask.o
+	usergroup_setuid.o
 
+# All objects files which make up libdebug.a
 DEBUG_LIB = \
 	debug.lib_rev.o \
 	debug.o \
-	debug_level.o \
 	debug_cmpstrexec.o \
 	debug_kcmpstr.o \
 	debug_kdofmt.o \
@@ -646,8 +605,10 @@ DEBUG_LIB = \
 	debug_kputstr1.o \
 	debug_kputstr2.o \
 	debug_kvprintf1.o \
-	debug_kvprintf2.o
+	debug_kvprintf2.o \
+	debug_level.o
 
+# All objects files which make up libamiga.a
 AMIGA_LIB = \
 	amiga.lib_rev.o \
 	amiga_acrypt.o \
@@ -656,10 +617,17 @@ AMIGA_LIB = \
 	amiga_argarrayinit.o \
 	amiga_argint.o \
 	amiga_argstring.o \
+	amiga_beginio.o \
 	amiga_callhooka.o \
 	amiga_coercemethod.o \
+	amiga_createextio.o \
+	amiga_createport.o \
 	amiga_createstdio.o \
+	amiga_createtask.o \
+	amiga_deleteextio.o \
+	amiga_deleteport.o \
 	amiga_deletestdio.o \
+	amiga_deletetask.o \
 	amiga_domethod.o \
 	amiga_dosupermethod.o \
 	amiga_dotimer.o \
@@ -667,6 +635,7 @@ AMIGA_LIB = \
 	amiga_freeievents.o \
 	amiga_hotkey.o \
 	amiga_invertstring.o \
+	amiga_newlist.o \
 	amiga_rangerand.o \
 	amiga_remtof.o \
 	amiga_setsuperattrs.o \
@@ -675,46 +644,52 @@ AMIGA_LIB = \
 
 ##############################################################################
 
-LIBS := $(LIBC_OBJS)/libc.a $(LIBSTACK_OBJS)/libstack.a $(LIBUNIX_OBJS)/libunix.a \
-            $(LIBDEBUG_OBJS)/libdebug.a $(LIBAMIGA_OBJS)/libamiga.a \
-            $(LIBM_OBJS)/libm.a $(LIBNET_OBJS)/libnet.a
+# The libraries to be built, prefixed by the respective path names
+LIBS := \
+	$(LIBC_OBJS)/libc.a \
+	$(LIBUNIX_OBJS)/libunix.a \
+	$(LIBDEBUG_OBJS)/libdebug.a \
+	$(LIBAMIGA_OBJS)/libamiga.a \
+	$(LIBM_OBJS)/libm.a \
+	$(LIBNET_OBJS)/libnet.a
 
 ##############################################################################
 
+# The startup object files to be built
+STARTUPS := bcrt0.o bcrtbegin.o bcrtend.o crt0.o crtbegin.o crtend.o mainb.o mainnb.o
 
 ##############################################################################
 
-STARTUPS := crt0.o crtbegin.o crtend.o mainnb.o
-
-##############################################################################
-
+# This is the first target: it creates the necessary directories, then proceeds
+# to build the startup object files and finally the libraries
 all: \
-	lib/crt0.o \
-	lib/crtbegin.o \
-	lib/crtend.o \
-	lib/mainnb.o \
-	lib/libm.a \
-	lib/small-data/libm.a \
+	lib \
+	lib/soft-float \
+	lib/small-data \
+	small_data \
+	large_data \
+	large_data_softfloat \
 	lib/bcrt0.o \
 	lib/bcrtbegin.o \
 	lib/bcrtend.o \
-	lib/soft-float/libc.a
-
-copy:
-	$(COPY) $(foreach file,$(LIBS),large_data/$(file)) lib
+	lib/crt0.o \
+	lib/crtbegin.o \
+	lib/crtend.o \
+	lib/mainb.o \
+	lib/mainnb.o \
+	lib/libm.a \
+	lib/small-data/libm.a \
+	lib/soft-float/libm.a
 
 ##############################################################################
 
+# Delete all object files and libraries
 clean:
-	-$(DELETE) $(TYPE)  $(STARTUPS) \
-		$(LIBC_OBJS) $(LIBUNIX_OBJS) $(LIBM_OBJS) $(LIBSTACK_OBJS) $(LIBNET_OBJS) $(LIBDEBUG_OBJS) $(LIBAMIGA_OBJS)
-
-realclean:
-	$(MAKE) clean
-	-$(DELETE) lib small_data large_data large_data_softfloat
+	-$(DELETE) $(STARTUPS) lib small_data large_data large_data_softfloat
 
 ##############################################################################
 
+# Update the version numbers bound to the individual libraries
 version:
 	cp c.lib_rev.rev amiga.lib_rev.rev
 	cp c.lib_rev.rev debug.lib_rev.rev
@@ -734,43 +709,74 @@ version:
 
 ##############################################################################
 
+# Tag all files with a certain version number
 cvs-tag:
 	cvs -q tag V1_`cat c.lib_rev.rev`
 
 ##############################################################################
 
-kitchen_sink: $(TYPE) $(LIBS) $(STARTUPS)
+# This target first creates a directory to store the object files in, then
+# proceeds to build the libraries from the code. It is invoked by the
+# individual library build targets below.
+all_libraries: $(TYPE) $(LIBS)
 
 ##############################################################################
 
-ifneq (,$(TYPE))
-$(TYPE):
-	$(MAKEDIR) $@
-endif
-
-##############################################################################
-
+# These create the required subdirectories to store object files and
+# libraries in
 lib:
 	-$(MAKEDIR) $@
 
-lib/small-data:
+lib/small-data: lib
 	-$(MAKEDIR) $@
 
-lib/soft-float:
+lib/soft-float: lib
 	-$(MAKEDIR) $@
 
-lib/libm.a: lib
-	$(MAKE) TYPE=large_data kitchen_sink
+small_data:
+	-$(MAKEDIR) $@
+
+large_data:
+	-$(MAKEDIR) $@
+
+large_data_softfloat:
+	-$(MAKEDIR) $@
+
+##############################################################################
+
+# Dependencies for libm.a (large data variant with hardware floating point code
+# support): this actually ends up building all the libraries rather than just
+# libm.a
+lib/libm.a: large_data large_data/libm.a
+
+large_data/libm.a:
+	$(MAKE) TYPE=large_data all_libraries
 	$(COPY) $(foreach file,$(LIBS),large_data/$(file)) lib
 
-lib/small-data/libm.a: lib lib/small-data
-	$(MAKE) TYPE=small_data kitchen_sink
-	$(COPY) $(foreach file,$(LIBS),small_data/$(file)) lib/small-data
+##############################################################################
 
-lib/soft-float/libc.a: lib lib/soft-float
-	$(MAKE) TYPE=large_data_softfloat kitchen_sink
+# Dependencies for libm.a (large data variant with software floating point code
+# support): this actually ends up building all the libraries rather than just
+# libm.a
+lib/soft-float/libm.a: large_data_softfloat large_data_softfloat/libm.a
+
+large_data_softfloat/libm.a:
+	$(MAKE) TYPE=large_data_softfloat all_libraries
 	$(COPY) $(foreach file,$(LIBS),large_data_softfloat/$(file)) lib/soft-float
 
+##############################################################################
+
+# Dependencies for libm.a (small data variant): this actually ends up building all
+# the libraries rather than just libm.a
+lib/small-data/libm.a: small_data small_data/libm.a
+
+small_data/libm.a:
+	$(MAKE) TYPE=small_data all_libraries
+	$(COPY) $(foreach file,$(LIBS),small_data/$(file)) lib/small-data
+
+##############################################################################
+
+# Rules to build and move the startup code
 lib/crt0.o : lib crt0.o
 	$(COPY) crt0.o lib
 
@@ -794,25 +800,38 @@ lib/bcrtbegin.o : lib bcrtbegin.o
 
 lib/bcrtend.o : lib bcrtend.o
 	$(COPY) bcrtend.o lib
-	
+
 ##############################################################################
 
-$(LIBAMIGA_OBJS)/amiga_hookentry.o : amiga_hookentry.c
-
+# Individual dependencies which tell make to build the object files from
+# 'C' source files rather than the assembly language source files of the
+# same name (e.g. stdlib_getsp.c instead of stdlib_getsp.asm).
 $(LIBC_OBJS)/stdlib_getsp.o : stdlib_getsp.c
 
 $(LIBC_OBJS)/stdlib_swapstack.o : stdlib_swapstack.c
 
 $(LIBC_OBJS)/stdlib_setjmp.o : stdlib_setjmp.c
 
-$(LIBSTACK_OBJS)/stdlib_setjmp.o : stdlib_setjmp.c
+##############################################################################
+
+# Build rules for version information that goes into each library
+$(LIBC_OBJS)/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+
+$(LIBUNIX_OBJS)/unix.lib_rev.o : unix.lib_rev.c unix.lib_rev.h
+
+$(LIBM_OBJS)/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
+
+$(LIBNET_OBJS)/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+
+$(LIBDEBUG_OBJS)/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+
+$(LIBAMIGA_OBJS)/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
 
 ##############################################################################
 
-$(LIBC_OBJS)/stdlib_stacksize.o : stdlib_stacksize.c stdlib_gcc_help.h
-
-$(LIBC_OBJS)/stdlib_shell_escape.o : stdlib_shell_escape.c stdlib_gcc_help.h
-
+# Build rules for the debug version of the library which has special
+# memory allocation debugging code, controlled by the contents of
+# the stdlib_mem_debug.h file.
 $(LIBC_OBJS)/stdlib_alloca.o : stdlib_alloca.c stdlib_mem_debug.h
 
 $(LIBC_OBJS)/stdlib_calloc.o : stdlib_calloc.c stdlib_mem_debug.h
@@ -829,6 +848,7 @@ $(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_mem_debug.h
 
 ##############################################################################
 
+# Individual build rules for libc.a
 $(LIBC_OBJS) :
 	$(MAKEDIR) $@
 
@@ -839,6 +859,7 @@ $(LIBC_OBJS)/libc.a : $(LIBC_OBJS) $(foreach file,$(C_LIB),$(LIBC_OBJS)/$(file))
 
 ##############################################################################
 
+# Individual build rules for libunix.a
 $(LIBUNIX_OBJS) :
 	$(MAKEDIR) $@
 
@@ -849,26 +870,18 @@ $(LIBUNIX_OBJS)/libunix.a : $(LIBUNIX_OBJS) $(foreach file,$(UNIX_LIB),$(LIBUNIX
 
 ##############################################################################
 
+# Individual build rules for libm.a
 $(LIBM_OBJS) :
 	$(MAKEDIR) $@
 
-$(LIBM_OBJS)/libm.a : $(LIBM_OBJS) $(foreach file,$(MATH_LIB_IEEE),$(LIBM_OBJS)/$(file))
+$(LIBM_OBJS)/libm.a : $(LIBM_OBJS) $(foreach file,$(MATH_LIB),$(LIBM_OBJS)/$(file))
 	-$(DELETE) $@
-	@$(AR) $@ $(foreach file,$(MATH_LIB_IEEE),$(LIBM_OBJS)/$(file))
+	@$(AR) $@ $(foreach file,$(MATH_LIB),$(LIBM_OBJS)/$(file))
 	$(RANLIB) $@
 
 ##############################################################################
 
-$(LIBSTACK_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBSTACK_OBJS)/libstack.a : $(LIBSTACK_OBJS) $(foreach file,$(STACK_LIB),$(LIBSTACK_OBJS)/$(file))
-	-$(DELETE) $@
-	@$(AR) $@ $(foreach file,$(STACK_LIB),$(LIBSTACK_OBJS)/$(file))
-	$(RANLIB) $@
-
-##############################################################################
-
+# Individual build rules for libnet.a
 $(LIBNET_OBJS) :
 	$(MAKEDIR) $@
 
@@ -879,6 +892,7 @@ $(LIBNET_OBJS)/libnet.a : $(LIBNET_OBJS) $(foreach file,$(NET_LIB),$(LIBNET_OBJS
 
 ##############################################################################
 
+# Individual build rules for libdebug.a
 $(LIBDEBUG_OBJS) :
 	$(MAKEDIR) $@
 
@@ -889,6 +903,7 @@ $(LIBDEBUG_OBJS)/libdebug.a : $(LIBDEBUG_OBJS) $(foreach file,$(DEBUG_LIB),$(LIB
 
 ##############################################################################
 
+# Individual build rules for libamiga.a
 $(LIBAMIGA_OBJS) :
 	$(MAKEDIR) $@
 
@@ -899,6 +914,7 @@ $(LIBAMIGA_OBJS)/libamiga.a : $(LIBAMIGA_OBJS) $(foreach file,$(AMIGA_LIB),$(LIB
 
 ##############################################################################
 
+# Individual build rules for the startup code.
 crt0.o : crt0.S
 	@echo "Assembling $<"
 	@$(CC) -Wa,-mregnames -o crt0.o -c crt0.S
@@ -920,13 +936,3 @@ bcrtbegin.o : crtbegin.c
 
 bcrtend.o : crtend.c
 	$(CC) -o bcrtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c 
-
-
-##############################################################################
-
-mkid:
-#	mkid -v #?.(c|h|asm|i) include/#?.(c|h|asm|i) include/sys/#?.(c|h|asm|i)
-	mkid *.[ch] include/*.h include/sys/*.h
-
-update:
-	mkid -v -u

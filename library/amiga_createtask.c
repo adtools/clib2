@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_createtask.c,v 1.1.1.1 2004-07-26 16:30:18 obarthel Exp $
+ * $Id: amiga_createtask.c,v 1.2 2004-11-13 12:55:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,8 +31,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __PPC__
-
 /****************************************************************************/
 
 #include <exec/libraries.h>
@@ -50,6 +48,10 @@
 
 #include "macros.h"
 #include "debug.h"
+
+/****************************************************************************/
+
+#ifndef __PPC__
 
 /****************************************************************************/
 
@@ -184,6 +186,46 @@ CreateTask(CONST_STRPTR name,LONG pri,CONST APTR init_pc,ULONG stack_size)
 
 	if(ml != NULL)
 		FreeEntry(ml);
+
+	RETURN(result);
+	return(result);
+}
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
+#if defined(CreateTask)
+#undef CreateTask
+#endif /* CreateTask */
+
+/****************************************************************************/
+
+struct Task *
+CreateTask(CONST_STRPTR name,LONG pri,CONST APTR init_pc,ULONG stack_size)
+{
+	struct Task * result = NULL;
+
+	ENTER();
+
+	SHOWSTRING(name);
+	SHOWVALUE(pri);
+	SHOWPOINTER(init_pc);
+	SHOWVALUE(stack_size);
+
+	assert( name != NULL && (-128 <= pri && pri <= 127) && init_pc != NULL && stack_size > 0 );
+
+	if(name == NULL || pri < -128 || pri > 127 || init_pc == NULL || stack_size == 0)
+	{
+		SHOWMSG("invalid parameters");
+		goto out;
+	}
+
+	result = IExec->CreateTask(name,pri,init_pc,stack_size,NULL);
+
+ out:
 
 	RETURN(result);
 	return(result);
