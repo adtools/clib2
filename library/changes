@@ -1,3 +1,5 @@
+c.lib 1.188 (7.2.2005)
+
 - Folded duplicate code in "stdio_init_exit.c" into a common function.
 
 - Simplified the code in "time_asctime_r.c" which builds the time
@@ -39,6 +41,8 @@
 - Added the fsync() and fdatasync() functions and the <stdint.h> and
   <inttypes.h> header files contributed by Peter Bengtsson. Thank
   you very much!
+
+- Tweaked the build makefiles to produce fewer meaningless warnings.
 
 
 c.lib 1.187 (29.1.2005)

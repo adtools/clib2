@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.25 2005-02-04 15:03:09 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.26 2005-02-07 10:52:16 obarthel Exp $
 #
 # :ts=8
 #
@@ -100,7 +100,7 @@ endif
 
 WARNINGS = \
 	-Wall -W -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
-	-Wundef -Wbad-function-cast -Wmissing-declarations
+	-Wundef -Wbad-function-cast -Wmissing-declarations -Wunused
 
 #	-Wconversion -Wshadow
 
@@ -108,7 +108,7 @@ INCLUDES = -Iinclude -I. -Inetinclude
  OPTIONS = -DNDEBUG -fno-builtin
 #OPTIONS = -D__MEM_DEBUG -fno-builtin
 #OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
-#OPTIMIZE = -O -fomit-frame-pointer -fstrength-reduce -finline-functions
+ OPTIMIZE = -O -fomit-frame-pointer -fstrength-reduce -finline-functions
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g2
 
