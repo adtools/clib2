@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.50 2005-04-03 10:22:47 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.51 2005-04-13 14:35:06 obarthel Exp $
 #
 # :ts=8
 #
@@ -100,7 +100,6 @@ ifeq (baserel,$(TYPE))
 CODE_TYPE := -mbaserel -DBASEREL_DATA
 FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
 endif
-
 
 ##############################################################################
 
@@ -733,7 +732,7 @@ LIBS := \
 ##############################################################################
 
 # The startup object files to be built
-STARTUPS := bcrt0.o bcrtbegin.o bcrtend.o crt0.o crtbegin.o crtend.o mainb.o mainnb.o
+STARTUPS := crt0.o crtbegin.o crtend.o
 
 ##############################################################################
 
@@ -748,22 +747,18 @@ all: \
 	large_data \
 	large_data_softfloat \
 	baserel \
-	lib/bcrt0.o \
-	lib/bcrtbegin.o \
-	lib/bcrtend.o \
 	lib/crt0.o \
 	lib/crtbegin.o \
 	lib/crtend.o \
-	lib/mainb.o \
-	lib/mainnb.o \
 	lib/libm.a \
+	lib/small-data/crt0.o \
+	lib/small-data/crtbegin.o \
+	lib/small-data/crtend.o \
 	lib/small-data/libm.a \
 	lib/soft-float/libm.a \
 	lib/baserel/crt0.o \
 	lib/baserel/crtbegin.o \
 	lib/baserel/crtend.o \
-	lib/baserel/mainb.o \
-	lib/baserel/mainnb.o \
 	lib/baserel/libm.a
 
 ##############################################################################
@@ -887,20 +882,14 @@ lib/crtbegin.o : lib crtbegin.o
 lib/crtend.o : lib crtend.o
 	$(COPY) crtend.o lib
 
-lib/mainnb.o : lib mainnb.o
-	$(COPY) mainnb.o lib
+lib/small-data/crt0.o : lib small-data/crt0.o
+	$(COPY) small-data/crt0.o lib/small-data
 
-lib/mainb.o : lib mainb.o
-	$(COPY) mainb.o lib
+lib/small-data/crtbegin.o : lib small-data/crtbegin.o
+	$(COPY) small-data/crtbegin.o lib/small-data
 
-lib/bcrt0.o : lib bcrt0.o
-	$(COPY) bcrt0.o lib
-
-lib/bcrtbegin.o : lib bcrtbegin.o
-	$(COPY) bcrtbegin.o lib
-
-lib/bcrtend.o : lib bcrtend.o
-	$(COPY) bcrtend.o lib
+lib/small-data/crtend.o : lib small-data/crtend.o
+	$(COPY) small-data/crtend.o lib/small-data
 
 lib/baserel/crt0.o : lib baserel/crt0.o
 	$(COPY) baserel/crt0.o lib/baserel
@@ -910,13 +899,6 @@ lib/baserel/crtbegin.o : lib baserel/crtbegin.o
 
 lib/baserel/crtend.o : lib baserel/crtend.o
 	$(COPY) baserel/crtend.o lib/baserel
-
-lib/baserel/mainnb.o : lib baserel/mainnb.o
-	$(COPY) baserel/mainnb.o lib/baserel
-
-lib/baserel/mainb.o : lib baserel/mainb.o
-	$(COPY) baserel/mainb.o lib/baserel
-
 
 ##############################################################################
 
@@ -1084,35 +1066,19 @@ crt0.o : crt0.S
 	@echo "Assembling $<"
 	@$(CC) -Wa,-mregnames -o crt0.o -c crt0.S
 
-bcrt0.o : crt0.S
+small-data/crt0.o : crt0.S
 	@echo "Assembling $<"
-	@$(CC) -DSMALL_DATA -Wa,-mregnames -o bcrt0.o -c crt0.S
+	@$(CC) -DSMALL_DATA -Wa,-mregnames -o small-data/crt0.o -c crt0.S
 
-mainnb.o : stdlib_main.c
-	@echo "Compiling $<"
-	@$(CC) -o mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=data stdlib_main.c
+small-data/crtbegin.o : crtbegin.c
+	$(CC) -o small-data/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c
 
-mainb.o : stdlib_main.c
-	@echo "Compiling $<"
-	@$(CC) -o mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA stdlib_main.c
-
-bcrtbegin.o : crtbegin.c
-	$(CC) -o bcrtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c
-
-bcrtend.o : crtend.c
-	$(CC) -o bcrtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c
+small-data/crtend.o : crtend.c
+	$(CC) -o small-data/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c
 
 baserel/crt0.o : crt0.S
 	@echo "Assembling $<"
 	@$(CC) -Wa,-mregnames -o baserel/crt0.o -mbaserel -DBASEREL_DATA -c crt0.S
-
-baserel/mainnb.o : stdlib_main.c
-	@echo "Compiling $<"
-	@$(CC) -o baserel/mainnb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA stdlib_main.c
-
-baserel/mainb.o : stdlib_main.c
-	@echo "Compiling $<"
-	@$(CC) -o baserel/mainb.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA stdlib_main.c
 
 baserel/crtbegin.o : crtbegin.c
 	$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c
