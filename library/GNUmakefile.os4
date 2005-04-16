@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.51 2005-04-13 14:35:06 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.52 2005-04-16 10:11:26 obarthel Exp $
 #
 # :ts=8
 #
@@ -16,7 +16,7 @@ CC = ppc-amigaos-gcc
 AR = ppc-amigaos-ar -q
 RANLIB = ppc-amigaos-ranlib
 COPY = cp -a
-DELETE = rm -r
+DELETE = rm -rf
 MAKEDIR = mkdir
 
 # The following are for the native OS4 compiler
@@ -882,14 +882,14 @@ lib/crtbegin.o : lib crtbegin.o
 lib/crtend.o : lib crtend.o
 	$(COPY) crtend.o lib
 
-lib/small-data/crt0.o : lib small-data/crt0.o
-	$(COPY) small-data/crt0.o lib/small-data
+lib/small-data/crt0.o : lib small_data/crt0.o
+	$(COPY) small_data/crt0.o lib/small-data
 
-lib/small-data/crtbegin.o : lib small-data/crtbegin.o
-	$(COPY) small-data/crtbegin.o lib/small-data
+lib/small-data/crtbegin.o : lib small_data/crtbegin.o
+	$(COPY) small_data/crtbegin.o lib/small-data
 
-lib/small-data/crtend.o : lib small-data/crtend.o
-	$(COPY) small-data/crtend.o lib/small-data
+lib/small-data/crtend.o : lib small_data/crtend.o
+	$(COPY) small_data/crtend.o lib/small-data
 
 lib/baserel/crt0.o : lib baserel/crt0.o
 	$(COPY) baserel/crt0.o lib/baserel
@@ -1066,22 +1066,27 @@ crt0.o : crt0.S
 	@echo "Assembling $<"
 	@$(CC) -Wa,-mregnames -o crt0.o -c crt0.S
 
-small-data/crt0.o : crt0.S
+small_data/crt0.o : crt0.S
 	@echo "Assembling $<"
-	@$(CC) -DSMALL_DATA -Wa,-mregnames -o small-data/crt0.o -c crt0.S
+	@$(CC) -DSMALL_DATA -Wa,-mregnames -o small_data/crt0.o -c crt0.S
 
-small-data/crtbegin.o : crtbegin.c
-	$(CC) -o small-data/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c
+small_data/crtbegin.o : crtbegin.c
+	@echo "Assembling $<"
+	@$(CC) -o small_data/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c
 
-small-data/crtend.o : crtend.c
-	$(CC) -o small-data/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c
+small_data/crtend.o : crtend.c
+	@echo "Assembling $<"
+	@$(CC) -o small_data/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c
 
 baserel/crt0.o : crt0.S
 	@echo "Assembling $<"
 	@$(CC) -Wa,-mregnames -o baserel/crt0.o -mbaserel -DBASEREL_DATA -c crt0.S
 
 baserel/crtbegin.o : crtbegin.c
-	$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c
+	@echo "Assembling $<"
+	@$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c
 
 baserel/crtend.o : crtend.c
-	$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c
+	@echo "Assembling $<"
+	@$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c
+
