@@ -1,0 +1,31 @@
+; Simple release archive build script for Amiga systems.
+
+; Set the name of the archive and the directory the
+; files go into
+set dir_name clib2-1.`type c.lib_rev.rev`
+
+; Start with a clean slate
+delete all quiet ram:$dir_name
+
+; Create the directory, copy all the libraries, header files
+; and release note files inside.
+makedir ram:$dir_name
+copy lib ram:${dir_name}/lib all clone quiet
+copy include ram:${dir_name}/include all clone quiet
+copy changes ram:$dir_name clone
+
+; Delete the CVS data from the include directory
+delete ram:${dir_name}/include/CVS ram:${dir_name}/include/sys/CVS all quiet
+
+; Finally, create an lha archive in RAM:
+pushcd ram:
+lha -r -x -a a ${dir_name}-gcc-68k.lha ${dir_name}
+popcd
+
+; Move the archive back to this directory
+copy ram:${dir_name}-gcc-68k.lha "" clone
+
+; Clean up...
+delete ram:$dir_name all quiet
+unset dir_name
+
