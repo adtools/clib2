@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rename.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
+ * $Id: stdio_rename.c,v 1.5 2005-04-20 12:06:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,6 +63,8 @@ rename(const char *oldname,const char *newname)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	PROFILE_OFF();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(oldname == NULL || newname == NULL)
@@ -96,9 +98,7 @@ rename(const char *oldname,const char *newname)
 
 	D(("renaming '%s' to '%s'",oldname,newname));
 
-	PROFILE_OFF();
 	status = Rename((STRPTR)oldname,(STRPTR)newname);
-	PROFILE_ON();
 
 	if(status == DOSFALSE)
 	{
@@ -106,13 +106,14 @@ rename(const char *oldname,const char *newname)
 
 		#if defined(UNIX_PATH_SEMANTICS)
 		{
-			BOOL renamed;
+			LONG error;
 
-			if(IoErr() != ERROR_OBJECT_EXISTS)
+			error = IoErr();
+			if(error != ERROR_OBJECT_EXISTS)
 			{
 				SHOWMSG("that was some other error");
 
-				__set_errno(__translate_io_error_to_errno(IoErr()));
+				__set_errno(__translate_io_error_to_errno(error));
 				goto out;
 			}
 
@@ -120,11 +121,35 @@ rename(const char *oldname,const char *newname)
 
 			/* ZZZ there should be a safer solution for this */
 
-			PROFILE_OFF();
-			renamed = (BOOL)(DeleteFile((STRPTR)newname) && Rename((STRPTR)oldname,(STRPTR)newname));
-			PROFILE_ON();
+			if(CANNOT DeleteFile((STRPTR)newname))
+			{
+				error = IoErr();
+				if(error != ERROR_DELETE_PROTECTED && error != ERROR_OBJECT_NOT_FOUND)
+				{
+					SHOWMS("couldn't delete the file");
 
-			if(NOT renamed)
+					__set_errno(__translate_io_error_to_errno(error));
+					goto out;
+				}
+
+				if(CANNOT SetProtection((STRPTR)newname,0))
+				{
+					SHOWMS("couldn't reset the protection");
+
+					__set_errno(__translate_io_error_to_errno(IoErr()));
+					goto out;
+				}
+
+				if(CANNOT DeleteFile((STRPTR)newname))
+				{
+					SHOWMS("couldn't delete the file again");
+
+					__set_errno(__translate_io_error_to_errno(IoErr()));
+					goto out;
+				}
+			}
+
+			if(CANNOT Rename((STRPTR)oldname,(STRPTR)newname))
 			{
 				SHOWMSG("that didn't work");
 
@@ -143,6 +168,8 @@ rename(const char *oldname,const char *newname)
 	result = 0;
 
  out:
+
+	PROFILE_ON();
 
 	RETURN(result);
 	return(result);

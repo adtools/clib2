@@ -1,3 +1,7 @@
+- The Unix-like rename() now removes the target file even if that
+  file has been protected from deletion.
+
+
 c.lib 1.191 (9.4.2005)
 
 - The name of the public record locking semaphore has to be preallocated
