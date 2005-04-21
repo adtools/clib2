@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rename.c,v 1.5 2005-04-20 12:06:00 obarthel Exp $
+ * $Id: stdio_rename.c,v 1.6 2005-04-21 10:23:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,30 +123,10 @@ rename(const char *oldname,const char *newname)
 
 			if(CANNOT DeleteFile((STRPTR)newname))
 			{
-				error = IoErr();
-				if(error != ERROR_DELETE_PROTECTED && error != ERROR_OBJECT_NOT_FOUND)
-				{
-					SHOWMS("couldn't delete the file");
+				SHOWMS("couldn't delete the file");
 
-					__set_errno(__translate_io_error_to_errno(error));
-					goto out;
-				}
-
-				if(CANNOT SetProtection((STRPTR)newname,0))
-				{
-					SHOWMS("couldn't reset the protection");
-
-					__set_errno(__translate_io_error_to_errno(IoErr()));
-					goto out;
-				}
-
-				if(CANNOT DeleteFile((STRPTR)newname))
-				{
-					SHOWMS("couldn't delete the file again");
-
-					__set_errno(__translate_io_error_to_errno(IoErr()));
-					goto out;
-				}
+				__set_errno(__translate_io_error_to_errno(error));
+				goto out;
 			}
 
 			if(CANNOT Rename((STRPTR)oldname,(STRPTR)newname))
