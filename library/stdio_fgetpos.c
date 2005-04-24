@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgetpos.c,v 1.6 2005-04-24 09:53:12 obarthel Exp $
+ * $Id: stdio_fgetpos.c,v 1.7 2005-04-24 19:38:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,7 +81,7 @@ fgetpos(FILE *stream, fpos_t *pos)
 		goto out;
 	}
 
-	(*pos) = position;
+	(*pos) = (fpos_t)position;
 
 	result = OK;
 

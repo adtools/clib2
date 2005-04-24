@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fread.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_fread.c,v 1.6 2005-04-24 19:38:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -137,6 +137,9 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 		SHOWVALUE(count);
 
 		SHOWMSG("either element size or count is zero");
+
+		/* Don't let this appear like an EOF or error. */
+		clearerr((FILE *)file);
 	}
 
 	D(("total number of elements read = %ld",result));

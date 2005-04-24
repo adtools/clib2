@@ -16,6 +16,10 @@
 - Added code to the startup routine which allows you to monitor where command
   was started from and which parameters it was invoked with.
 
+- If fread()/fwrite() fail to read/write any data because either the number
+  of records or the size of each record is zero, both now call clearerr() to
+  avoid giving the caller the wrong impression that an EOF or error occured.
+
 
 c.lib 1.191 (9.4.2005)
 
