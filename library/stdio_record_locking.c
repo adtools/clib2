@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.11 2005-04-24 09:53:12 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.12 2005-04-24 12:19:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -153,6 +153,7 @@ obtain_file_lock_semaphore(BOOL shared)
 				fls = AllocSysObjectTags(ASOT_SEMAPHORE,
 					ASOSEM_Size,	sizeof(*fls),
 					ASOSEM_Name,	semaphore_name_copy,
+					ASOSEM_Public,	FALSE; /* we want to add it ourselves */
 					ASOSEM_Pri,		1,
 				TAG_END);
 			}

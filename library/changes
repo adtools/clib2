@@ -8,6 +8,9 @@
 - Changed how ftell() and fseek() are used, double-checking the return
   value and the errno code.
 
+- The record locking semaphore could wind up getting added to the public
+  list twice. Fixed.
+
 
 c.lib 1.191 (9.4.2005)
 
