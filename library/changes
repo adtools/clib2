@@ -11,6 +11,11 @@
 - The record locking semaphore could wind up getting added to the public
   list twice. Fixed.
 
+- Fixed two linker errors which were caused by duplicate symbol definitions.
+
+- Added code to the startup routine which allows you to monitor where command
+  was started from and which parameters it was invoked with.
+
 
 c.lib 1.191 (9.4.2005)
 
