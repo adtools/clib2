@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ftell.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_ftell.c,v 1.9 2005-04-24 09:53:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -96,8 +96,13 @@ ftell(FILE *stream)
 
 	assert( file->iob_Action != NULL );
 
+	/* Note that a return value of -1 (= SEEK_ERROR) may be a
+	   valid file position in files larger than 2 GBytes. Just
+	   to be sure, we therefore also check the secondary error
+	   to verify that what could be a file position is really
+	   an error indication. */
 	position = (*file->iob_Action)(file,&fam);
-	if(position == EOF)
+	if(position == SEEK_ERROR && fam.fam_Error != OK)
 	{
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 
@@ -105,6 +110,11 @@ ftell(FILE *stream)
 
 		goto out;
 	}
+
+ 	/* If this is a valid file position, clear 'errno' so that
+	   it cannot be mistaken for an error. */
+	if(position < 0)
+		__set_errno(OK);
 
 	if(__iob_read_buffer_is_valid(file))
 	{

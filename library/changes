@@ -1,3 +1,14 @@
+- Changed how errors are detected, as returned by Write(), Read() and
+  Seek(). Seek() is particularly challenging because the value it
+  returns might be a valid file position and not an error.
+
+- Replaced numeric function return codes of 0 and -1 with macros OK,
+  SEEK_ERROR/ERROR to clarify the respective purposes.
+
+- Changed how ftell() and fseek() are used, double-checking the return
+  value and the errno code.
+
+
 c.lib 1.191 (9.4.2005)
 
 - The name of the public record locking semaphore has to be preallocated

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgetpos.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_fgetpos.c,v 1.6 2005-04-24 09:53:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,7 +74,7 @@ fgetpos(FILE *stream, fpos_t *pos)
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
 	position = ftell(stream);
-	if(position == SEEK_ERROR)
+	if(position == SEEK_ERROR && __get_errno() != OK)
 	{
 		SHOWMSG("ftell() didn't work.");
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_lseek.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: fcntl_lseek.c,v 1.9 2005-04-24 09:53:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -83,12 +83,22 @@ lseek(int file_descriptor, off_t offset, int mode)
 
 	assert( fd->fd_Action != NULL );
 
+	/* Note that a return value of -1 (= SEEK_ERROR) may be a
+	   valid file position in files larger than 2 GBytes. Just
+	   to be sure, we therefore also check the secondary error
+	   to verify that what could be a file position is really
+	   an error indication. */
 	position = (*fd->fd_Action)(fd,&fam);
-	if(position == EOF)
+	if(position == SEEK_ERROR && fam.fam_Error != OK)
 	{
 		__set_errno(fam.fam_Error);
 		goto out;
 	}
+
+	/* If this is a valid file position, clear 'errno' so that
+	   it cannot be mistaken for an error. */
+	if(position < 0)
+		__set_errno(OK);
 
 	result = position;
 

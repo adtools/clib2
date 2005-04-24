@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.29 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.30 2005-04-24 09:53:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -192,8 +192,11 @@ __fd_hook_entry(
 
 				PROFILE_OFF();
 
+				/* Make sure that if we get a value of -1 out of Seek()
+				   to check whether this was an error or a numeric
+				   overflow. */
 				position = Seek(file,0,OFFSET_END);
-				if(position != SEEK_ERROR)
+				if(position != SEEK_ERROR || IoErr() == OK)
 				{
 					if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 						fd->fd_Position = Seek(file,0,OFFSET_CURRENT);
@@ -444,19 +447,28 @@ __fd_hook_entry(
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 			{
-				current_position = fd->fd_Position;
+				current_position = (off_t)fd->fd_Position;
 			}
 			else
 			{
+				LONG position;
+
 				PROFILE_OFF();
-				current_position = Seek(file,0,OFFSET_CURRENT);
+				position = Seek(file,0,OFFSET_CURRENT);
 				PROFILE_ON();
 
-				if(current_position == SEEK_ERROR)
+				/* Note that a return value of -1 (= SEEK_ERROR) may be a
+				   valid file position in files larger than 2 GBytes. Just
+				   to be sure, we therefore also check the secondary error
+				   to verify that what could be a file position is really
+				   an error indication. */
+				if(position == SEEK_ERROR && IoErr() != OK)
 				{
 					fam->fam_Error = EBADF;
 					goto out;
 				}
+
+				current_position = (off_t)position;
 			}
 
 			new_position = current_position;
@@ -493,7 +505,10 @@ __fd_hook_entry(
 				position = Seek(file,fam->fam_Offset,new_mode);
 				PROFILE_ON();
 
-				if(position == SEEK_ERROR)
+				/* Same as above: verify that what we got out of
+				   Seek() is really an error and not a valid
+				   file position. */
+				if(position == SEEK_ERROR && IoErr() != OK)
 				{
 					D(("seek failed, fam->fam_Mode=%ld (%ld), offset=%ld, ioerr=%ld",new_mode,fam->fam_Mode,fam->fam_Offset,IoErr()));
 
@@ -505,11 +520,11 @@ __fd_hook_entry(
 						   the new file position. First, we need to find out if the file
 						   is really shorter than required. If not, then it must have
 						   been a different error. */
-						if((NOT fib_is_valid && CANNOT __safe_examine_file_handle(file,fib)) || (new_position <= fib->fib_Size))
+						if((NOT fib_is_valid && CANNOT __safe_examine_file_handle(file,fib)) || (new_position <= (off_t)fib->fib_Size))
 							goto out;
 
 						/* Now try to make that file larger. */
-						if(__grow_file_size(fd,new_position - fib->fib_Size) < 0)
+						if(__grow_file_size(fd,new_position - (off_t)fib->fib_Size) < 0)
 						{
 							fam->fam_Error = __translate_io_error_to_errno(IoErr());
 							goto out;

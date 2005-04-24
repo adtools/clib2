@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rename.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_rename.c,v 1.8 2005-04-24 09:53:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,7 +123,7 @@ rename(const char *oldname,const char *newname)
 
 			if(CANNOT DeleteFile((STRPTR)newname))
 			{
-				SHOWMS("couldn't delete the file");
+				SHOWMSG("couldn't delete the file");
 
 				__set_errno(__translate_io_error_to_errno(error));
 				goto out;

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.11 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.12 2005-04-24 09:53:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,9 +47,9 @@ ftruncate(int file_descriptor, off_t length)
 	D_S(struct FileInfoBlock,fib);
 	int result = ERROR;
 	struct fd * fd = NULL;
-	BOOL restore_initial_position = FALSE;
 	off_t current_file_size;
-	off_t initial_position = -1;
+	LONG initial_position = 0;
+	BOOL initial_position_valid = FALSE;
 
 	ENTER();
 
@@ -113,21 +113,23 @@ ftruncate(int file_descriptor, off_t length)
 		goto out;
 	}
 
-	current_file_size = fib->fib_Size;
+	current_file_size = (off_t)fib->fib_Size;
 
 	/* Is the file to be made shorter than it is right now? */
 	if(length < current_file_size)
 	{
 		/* Remember where we started. */
-		if(initial_position < 0)
+		if(NOT initial_position_valid)
 		{
 			initial_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
-			if(initial_position == SEEK_ERROR)
+			if(initial_position == SEEK_ERROR && IoErr() != OK)
 				goto out;
+
+			initial_position_valid = TRUE;
 		}
 
 		/* Careful: seek to a position where the file can be safely truncated. */
-		if(Seek(fd->fd_DefaultFile,length,OFFSET_BEGINNING) == SEEK_ERROR)
+		if(Seek(fd->fd_DefaultFile,length,OFFSET_BEGINNING) == SEEK_ERROR && IoErr() != OK)
 		{
 			D(("could not move to file offset %ld",length));
 
@@ -146,29 +148,29 @@ ftruncate(int file_descriptor, off_t length)
 		/* If the file is now shorter than the file position, which must
 		   not be changed by a call to ftruncate(), extend the file again,
 		   filling the extension with 0 bytes. */
-		if(initial_position > length)
+		if((off_t)initial_position > length)
 		{
 			current_file_size = length;
 
-			length = initial_position;
+			length = (off_t)initial_position;
 		}
-
-		restore_initial_position = TRUE;
 	}
 
 	/* Is the size of the file to grow? */
 	if(length > current_file_size)
 	{
 		/* Remember where we started. */
-		if(initial_position < 0)
+		if(NOT initial_position_valid)
 		{
 			initial_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
-			if(initial_position == SEEK_ERROR)
+			if(initial_position == SEEK_ERROR && IoErr() != OK)
 				goto out;
+
+			initial_position_valid = TRUE;
 		}
 
 		/* Move to what should be the end of the file. */
-		if(Seek(fd->fd_DefaultFile,current_file_size,OFFSET_BEGINNING) == SEEK_ERROR)
+		if(Seek(fd->fd_DefaultFile,current_file_size,OFFSET_BEGINNING) == SEEK_ERROR && IoErr() != OK)
 		{
 			D(("could not move to file offset %ld",current_file_size));
 
@@ -185,15 +187,15 @@ ftruncate(int file_descriptor, off_t length)
 			__set_errno(__translate_io_error_to_errno(IoErr()));
 			goto out;
 		}
-
-		restore_initial_position = TRUE;
 	}
 
 	result = OK;
 
  out:
 
-	if(restore_initial_position)
+	/* ftruncate() may change the size of the file, but it may
+	   not change the current file position. */
+	if(initial_position_valid)
 		Seek(fd->fd_DefaultFile,initial_position,OFFSET_CURRENT);
 
 	__fd_unlock(fd);

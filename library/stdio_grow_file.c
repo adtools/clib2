@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_grow_file.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_grow_file.c,v 1.5 2005-04-24 09:53:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,8 +54,9 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	int bytes_written;
 	int buffer_size;
 	int size;
-	int position;
-	int current_position;
+	LONG seek_position;
+	off_t position;
+	off_t current_position;
 	int alignment_skip;
 	int result = ERROR;
 
@@ -104,18 +105,22 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	memset(aligned_buffer,0,(size_t)buffer_size);
 
 	PROFILE_OFF();
-	position = Seek(fd->fd_DefaultFile,0,OFFSET_END);
+	seek_position = Seek(fd->fd_DefaultFile,0,OFFSET_END);
 	PROFILE_ON();
 
-	if(position == SEEK_ERROR)
+	if(seek_position == SEEK_ERROR && IoErr() != OK)
 	{
 		SHOWMSG("could not move to the end of the file");
 		goto out;
 	}
 
+	position = (off_t)seek_position;
+
 	PROFILE_OFF();
-	current_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
+	seek_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
 	PROFILE_ON();
+
+	current_position = (off_t)seek_position;
 
 	/* Try to make the first write access align the file position
 	 * to a block offset. Subsequent writes will then access the

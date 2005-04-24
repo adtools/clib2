@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fsetpos.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_fsetpos.c,v 1.7 2005-04-24 09:53:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,7 +72,7 @@ fsetpos(FILE *stream, fpos_t *pos)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(fseek(stream,(long int)(*pos),SEEK_SET) != 0)
+	if(fseek(stream,(long int)(*pos),SEEK_SET) == SEEK_ERROR && __get_errno() != OK)
 	{
 		SHOWMSG("fseek failed");
 		goto out;

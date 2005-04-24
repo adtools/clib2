@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_dropiobreadbuffer.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_dropiobreadbuffer.c,v 1.8 2005-04-24 09:53:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,6 +74,7 @@ __drop_iob_read_buffer(struct iob * file)
 			if(num_unread_bytes > 0)
 			{
 				struct file_action_message fam;
+				LONG position;
 
 				SHOWMSG("calling the action function");
 
@@ -83,7 +84,13 @@ __drop_iob_read_buffer(struct iob * file)
 
 				assert( file->iob_Action != NULL );
 
-				if((*file->iob_Action)(file,&fam) == EOF)
+				/* Note that a return value of -1 (= SEEK_ERROR) may be a
+				   valid file position in files larger than 2 GBytes. Just
+				   to be sure, we therefore also check the secondary error
+				   to verify that what could be a file position is really
+				   an error indication. */
+				position = (*file->iob_Action)(file,&fam);
+				if(position == SEEK_ERROR && fam.fam_Error != OK)
 				{
 					SHOWMSG("that didn't work");
 
@@ -95,6 +102,11 @@ __drop_iob_read_buffer(struct iob * file)
 
 					goto out;
 				}
+
+			 	/* If this is a valid file position, clear 'errno' so that
+				   it cannot be mistaken for an error. */
+				if(position < 0)
+					__set_errno(OK);
 			}
 
 			file->iob_BufferReadBytes	= 0;

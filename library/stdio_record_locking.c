@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.11 2005-04-24 09:53:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -746,13 +746,14 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 	D_S(struct FileInfoBlock,fib);
 	BOOL fib_is_valid = FALSE;
 	BPTR parent_dir = ZERO;
-	LONG current_position;
+	LONG seek_position;
+	off_t current_position;
 	int result = ERROR;
-	LONG original_len;
+	off_t original_len;
 	LONG error = OK;
-	LONG start = 0;
-	LONG len = 0;
-	LONG stop;
+	off_t start = 0;
+	off_t len = 0;
+	off_t stop;
 
 	ENTER();
 
@@ -828,18 +829,18 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 			SHOWMSG("SEEK_CUR");
 
 			PROFILE_OFF();
-
-			current_position = Seek(file_handle,0,OFFSET_CURRENT);
-
+			seek_position = Seek(file_handle,0,OFFSET_CURRENT);
 			PROFILE_ON();
 
-			if(current_position == SEEK_ERROR)
+			if(seek_position == SEEK_ERROR && IoErr() != OK)
 			{
 				SHOWMSG("could not obtain current seek position");
 
 				error = IoErr();
 				goto out;
 			}
+
+			current_position = (off_t)seek_position;
 
 			start = current_position + l->l_start;
 
@@ -867,7 +868,7 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 
 			fib_is_valid = TRUE;
 
-			start = fib->fib_Size + l->l_start;
+			start = (off_t)fib->fib_Size + l->l_start;
 
 			if(l->l_len == 0)
 				len = LONG_MAX;
