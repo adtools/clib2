@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_getdefstacksize.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_getdefstacksize.c,v 1.3 2005-04-24 14:04:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,4 +37,14 @@
 
 /****************************************************************************/
 
+#ifndef _STDLIB_GCC_HELP_H
+#include "stdlib_gcc_help.h"
+#endif /* _STDLIB_GCC_HELP_H */
+
+/****************************************************************************/
+
+#ifndef GCC_HELP_SUPPORT
+
 unsigned int (* __get_default_stack_size)(void);
+
+#endif /* GCC_HELP_SUPPORT */

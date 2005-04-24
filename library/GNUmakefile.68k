@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.48 2005-04-03 10:22:47 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.49 2005-04-24 14:04:36 obarthel Exp $
 #
 # :ts=8
 #
@@ -928,6 +928,8 @@ $(LIBAMIGA_OBJS)/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
 ##############################################################################
 
 $(LIBC_OBJS)/stdlib_stacksize.o : stdlib_stacksize.c stdlib_gcc_help.h
+
+$(LIBC_OBJS)/stdlib_getdefstacksize.o : stdlib_getdefstacksize.c stdlib_gcc_help.h
 
 $(LIBC_OBJS)/stdlib_shell_escape.o : stdlib_shell_escape.c stdlib_gcc_help.h
 

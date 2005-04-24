@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.23 2005-04-04 11:56:22 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.24 2005-04-24 14:04:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,6 +89,39 @@ call_main(void)
 	/* If the SAS/C profiling code is set up for printing function
 	   call chains, switch it on now. */
 	__show_profile_names();
+
+	/* This can be helpful for debugging purposes: print the name of the current
+	   directory, followed by the name of the command and all the parameters
+	   passed to it. */
+	#ifndef NDEBUG
+	{
+		UBYTE value_str[10];
+		LONG value;
+
+		/* Careful: only echo this information if a global environment
+		            variable is set to enable this feature! */
+		if(GetVar("_echo",value_str,sizeof(value_str),GVF_GLOBAL_ONLY) > 0 && StrToLong(value_str,&value) > 0 && value != 0)
+		{
+			struct Process * this_process = (struct Process *)FindTask(NULL);
+			UBYTE * arg_str = GetArgStr();
+			size_t arg_str_len = strlen(arg_str);
+			UBYTE * arg_str_copy = AllocVec(arg_str_len+1,MEMF_ANY);
+			UBYTE current_dir_name[256];
+
+			if(arg_str_copy != NULL && NameFromLock(this_process->pr_CurrentDir,current_dir_name,sizeof(current_dir_name)))
+			{
+				strcpy(arg_str_copy,arg_str);
+
+				while(arg_str_len > 0 && arg_str_copy[arg_str_len-1] <= ' ')
+					arg_str_copy[--arg_str_len] = '\0';
+
+				kprintf("[%s] %s %s\n",current_dir_name,__program_name,arg_str_copy);
+			}
+
+			FreeVec(arg_str_copy);
+		}
+	}
+	#endif /* NDEBUG */
 
 	/* After all these preparations, get this show on the road... */
 	exit(main((int)__argc,(char **)__argv));
@@ -268,8 +301,8 @@ get_stack_size(void)
 int
 _main(void)
 {
-	volatile struct Process * child_process = NULL;
-	volatile struct WBStartup * startup_message;
+	struct Process * volatile child_process = NULL;
+	struct WBStartup * volatile startup_message;
 	volatile APTR old_window_pointer = NULL;
 	volatile BOOL old_window_pointer_valid = FALSE;
 	struct Process * this_process;
