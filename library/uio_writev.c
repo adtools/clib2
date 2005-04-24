@@ -1,5 +1,5 @@
 /*
- * $Id: uio_writev.c,v 1.2 2005-04-03 10:53:24 obarthel Exp $
+ * $Id: uio_writev.c,v 1.3 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@
 ssize_t
 writev(int file_descriptor,const struct iovec *iov,int vec_count)
 {
-	ssize_t result = -1;
+	ssize_t result = EOF;
 	struct file_action_message msg;
 	ssize_t total_num_bytes_written;
 	char * buffer = NULL;
@@ -113,7 +113,7 @@ writev(int file_descriptor,const struct iovec *iov,int vec_count)
 		msg.fam_Data	= buffer;
 		msg.fam_Size	= total_num_bytes_written;
 
-		if((*fd->fd_Action)(fd,&msg) < 0)
+		if((*fd->fd_Action)(fd,&msg) == EOF)
 		{
 			__set_errno(msg.fam_Error);
 			goto out;
@@ -132,7 +132,7 @@ writev(int file_descriptor,const struct iovec *iov,int vec_count)
 				msg.fam_Data	= (char *)iov[i].iov_base;
 				msg.fam_Size	= iov[i].iov_len;
 
-				if((*fd->fd_Action)(fd,&msg) < 0)
+				if((*fd->fd_Action)(fd,&msg) == EOF)
 				{
 					__set_errno(msg.fam_Error);
 					goto out;

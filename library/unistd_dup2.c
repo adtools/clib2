@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_dup2.c,v 1.8 2005-03-04 09:07:09 obarthel Exp $
+ * $Id: unistd_dup2.c,v 1.9 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,7 @@ int
 dup2(int file_descriptor1, int file_descriptor2)
 {
 	struct fd * fd1;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fchmod.c,v 1.9 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: stat_fchmod.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,7 +49,7 @@ fchmod(int file_descriptor, mode_t mode)
 	BPTR parent_dir = ZERO;
 	BPTR old_current_dir = ZERO;
 	BOOL current_dir_changed = FALSE;
-	int result = -1;
+	int result = ERROR;
 	struct fd * fd = NULL;
 	LONG success;
 
@@ -163,7 +163,7 @@ fchmod(int file_descriptor, mode_t mode)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

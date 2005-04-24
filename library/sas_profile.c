@@ -1,5 +1,5 @@
 /*
- * $Id: sas_profile.c,v 1.5 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: sas_profile.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -117,7 +117,7 @@ send_profiler_message(ULONG clock_value,char * id,ULONG flags)
 	extern long __builtin_getreg(int);
 
 	struct SPROFMSG * spm;
-	int result = -1;
+	int result = ERROR;
 
 	spm = (struct SPROFMSG *)GetMsg(reply_port);
 	if(spm != NULL)

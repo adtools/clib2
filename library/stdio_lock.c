@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_lock.c,v 1.3 2005-03-03 14:20:55 obarthel Exp $
+ * $Id: stdio_lock.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -79,13 +79,13 @@ __stdio_lock_exit(void)
 int
 __stdio_lock_init(void)
 {
-	int result = -1;
+	int result = ERROR;
 
 	stdio_lock = __create_semaphore();
 	if(stdio_lock == NULL)
 		goto out;
 
-	result = 0;
+	result = OK;
 
  out:
 

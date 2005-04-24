@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_system.c,v 1.7 2005-03-25 08:50:59 obarthel Exp $
+ * $Id: stdlib_system.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -122,7 +122,7 @@ system(const char * command)
 				{
 					__set_errno(ENAMETOOLONG);
 
-					result = -1;
+					result = ERROR;
 					goto out;
 				}
 
@@ -140,7 +140,7 @@ system(const char * command)
 
 				if(__translate_unix_to_amiga_path_name((const char **)&command_name,&command_nti) != 0)
 				{
-					result = -1;
+					result = ERROR;
 					goto out;
 				}
 
@@ -150,7 +150,7 @@ system(const char * command)
 				{
 					__set_errno(ENOMEM);
 
-					result = -1;
+					result = ERROR;
 					goto out;
 				}
 

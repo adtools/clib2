@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_flush_all_files.c,v 1.1 2005-03-19 11:06:57 obarthel Exp $
+ * $Id: stdio_flush_all_files.c,v 1.2 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,13 +55,13 @@ __flush_all_files(int buffer_mode)
 		{
 			if(__flush_iob_write_buffer(__iob[i]) < 0)
 			{
-				result = -1;
+				result = ERROR;
 				goto out;
 			}
 		}
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

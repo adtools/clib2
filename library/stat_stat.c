@@ -1,5 +1,5 @@
 /*
- * $Id: stat_stat.c,v 1.7 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: stat_stat.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,7 +63,7 @@ stat(const char * path_name, struct stat * st)
 	#endif /* UNIX_PATH_SEMANTICS */
 	D_S(struct FileInfoBlock,fib);
 	struct FileLock * fl;
-	int result = -1;
+	int result = ERROR;
 	LONG status;
 	BPTR file_lock = ZERO;
 
@@ -121,7 +121,8 @@ stat(const char * path_name, struct stat * st)
 				st->st_nlink	= 2;
 				st->st_blksize	= 512;
 
-				result = 0;
+				result = OK;
+
 				goto out;
 			}
 		}
@@ -158,7 +159,7 @@ stat(const char * path_name, struct stat * st)
 
 	__convert_file_info_to_stat(fl->fl_Task,fib,st);
 
-	result = 0;
+	result = OK;
 
  out:
 

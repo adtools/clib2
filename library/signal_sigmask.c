@@ -1,5 +1,5 @@
 /*
- * $Id: signal_sigmask.c,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: signal_sigmask.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,7 @@ sigmask(int sig)
 	assert( 0 <= sig && sig <= 31 );
 
 	if(SIGABRT <= sig && sig <= SIGTERM)
-		result = (1<<sig);
+		result = (1 << sig);
 	else
 		result = 0;
 

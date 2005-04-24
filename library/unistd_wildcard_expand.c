@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.11 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.12 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ int
 __wildcard_quote_parameter(unsigned int parameter)
 {
 	size_t num_bytes;
-	int result = -1;
+	int result = ERROR;
 
 	/* Can we mark this parameter as quoted or do we need more
 	   room in the buffer? */
@@ -97,7 +97,7 @@ __wildcard_quote_parameter(unsigned int parameter)
 
 	quote_vector[parameter / 8] |= 1 << (7 - (parameter & 7));
 
-	result = 0;
+	result = OK;
 
  out:
 

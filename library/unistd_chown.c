@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chown.c,v 1.6 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_chown.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 	#endif /* UNIX_PATH_SEMANTICS */
 	struct DevProc * dvp = NULL;
 	LONG status;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -158,7 +158,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

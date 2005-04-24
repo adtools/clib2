@@ -1,5 +1,5 @@
 /*
- * $Id: socket_setsockopt.c,v 1.6 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: socket_setsockopt.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@ int
 setsockopt(int sockfd,int level,int optname,const void *optval,int optlen)
 {
 	struct fd * fd;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

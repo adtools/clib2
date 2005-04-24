@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fdatasync.c,v 1.5 2005-03-07 11:58:50 obarthel Exp $
+ * $Id: unistd_fdatasync.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@ int
 fdatasync(int file_descriptor)
 {
 	struct fd * fd;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -74,7 +74,7 @@ fdatasync(int file_descriptor)
 	if(__sync_fd(fd,0) < 0) /* flush just the data */
 		goto out;
 
-	result = 0;
+	result = OK;
 
  out:
 

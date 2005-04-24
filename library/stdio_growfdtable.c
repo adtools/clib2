@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_growfdtable.c,v 1.7 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_growfdtable.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@ __grow_fd_table(int max_fd)
 {
 	const int granularity = 10;
 	int new_num_fd;
-	int result = -1;
+	int result = ERROR;
 
 	if(max_fd == 0)
 		new_num_fd = __num_fd + granularity;
@@ -102,7 +102,7 @@ __grow_fd_table(int max_fd)
 		__num_fd	= new_num_fd;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

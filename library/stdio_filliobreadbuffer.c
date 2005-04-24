@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_filliobreadbuffer.c,v 1.9 2005-03-19 11:06:57 obarthel Exp $
+ * $Id: stdio_filliobreadbuffer.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,7 +42,7 @@ __fill_iob_read_buffer(struct iob * file)
 {
 	struct file_action_message fam;
 	int num_bytes_read;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -72,7 +72,7 @@ __fill_iob_read_buffer(struct iob * file)
 	assert( file->iob_Action != NULL );
 
 	num_bytes_read = (*file->iob_Action)(file,&fam);
-	if(num_bytes_read < 0)
+	if(num_bytes_read == EOF)
 	{
 		D(("got error %ld",fam.fam_Error));
 
@@ -88,7 +88,7 @@ __fill_iob_read_buffer(struct iob * file)
 
 	SHOWVALUE(file->iob_BufferReadBytes);
 
-	result = 0;
+	result = OK;
 
  out:
 

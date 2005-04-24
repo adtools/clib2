@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translatea2u.c,v 1.4 2005-02-28 13:32:11 obarthel Exp $
+ * $Id: unistd_translatea2u.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,7 +44,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 	char local_replacement[sizeof(nti->substitute)];
 	BOOL have_double_slash;
 	int len,replace_len;
-	int result = -1;
+	int result = ERROR;
 	int i;
 	char * replace;
 	char * name;
@@ -275,7 +275,7 @@ __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translati
 
 	D(("translated '%s' to '%s'",nti->original_name,name));
 
-	result = 0;
+	result = OK;
 
  out:
 

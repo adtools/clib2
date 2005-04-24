@@ -1,5 +1,5 @@
 /*
- * $Id: socket_socket.c,v 1.8 2005-03-09 12:06:10 obarthel Exp $
+ * $Id: socket_socket.c,v 1.9 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,7 @@ int
 socket(int domain,int type,int protocol)
 {
 	struct SignalSemaphore * lock = NULL;
-	int result = -1;
+	int result = ERROR;
 	struct fd * fd;
 	int fd_slot_number;
 	LONG socket_fd;

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_get_default_file.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: fcntl_get_default_file.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,7 @@ int
 __get_default_file(int file_descriptor,long * file_ptr)
 {
 	struct fd * fd;
-	int result = -1;
+	int result = ERROR;
 
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );

@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_setreuid.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_setreuid.c,v 1.3 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,7 +61,7 @@ setreuid(uid_t real, uid_t eff)
 		if(eff != (uid_t)-1)
 			__root_euid = eff;
 
-		result = 0;
+		result = OK;
 	}
 	else
 	{

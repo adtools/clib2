@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_isatty.c,v 1.5 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_isatty.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,7 +44,7 @@
 int
 isatty(int file_descriptor)
 {
-	int result = -1;
+	int result = ERROR;
 	struct fd * fd;
 
 	ENTER();

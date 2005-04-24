@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_mkstemp.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdlib_mkstemp.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@
 int
 mkstemp(char *name_template)
 {
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

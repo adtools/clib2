@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fileno.c,v 1.5 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: unistd_fileno.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@ int
 fileno(FILE * file)
 {
 	struct iob * iob = (struct iob *)file;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

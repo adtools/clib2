@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_scanf.c,v 1.5 2005-04-03 10:22:47 obarthel Exp $
+ * $Id: stdio_scanf.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@
 int
 scanf(const char *format, ...)
 {
-	int result = -1;
+	int result = EOF;
 	va_list arg;
 
 	ENTER();

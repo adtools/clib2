@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ftell.c,v 1.7 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_ftell.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@ ftell(FILE *stream)
 {
 	struct iob * file = (struct iob *)stream;
 	struct file_action_message fam;
-	long int result = -1;
+	long int result = ERROR;
 	int position;
 
 	assert( stream != NULL );
@@ -97,7 +97,7 @@ ftell(FILE *stream)
 	assert( file->iob_Action != NULL );
 
 	position = (*file->iob_Action)(file,&fam);
-	if(position < 0)
+	if(position == EOF)
 	{
 		SET_FLAG(file->iob_Flags,IOBF_ERROR);
 

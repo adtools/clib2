@@ -1,5 +1,5 @@
 /*
- * $Id: locale_init_exit.c,v 1.12 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: locale_init_exit.c,v 1.13 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,7 +139,7 @@ __locale_exit(void)
 int
 __locale_init(void)
 {
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -174,7 +174,7 @@ __locale_init(void)
 	}
 
 	if(__default_locale != NULL)
-		result = 0;
+		result = OK;
 
 	__locale_unlock();
 

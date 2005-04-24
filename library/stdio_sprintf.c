@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sprintf.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
+ * $Id: stdio_sprintf.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@
 int
 sprintf(char *s, const char *format, ...)
 {
-	int result = -1;
+	int result = EOF;
 	va_list arg;
 
 	ENTER();

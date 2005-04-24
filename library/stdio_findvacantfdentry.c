@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_findvacantfdentry.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_findvacantfdentry.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -76,7 +76,7 @@ __is_valid_fd(struct fd * fd)
 int
 __find_vacant_fd_entry(void)
 {
-	int result = -1;
+	int result = ERROR;
 	int i;
 
 	assert( __fd != NULL || __num_fd == 0 );

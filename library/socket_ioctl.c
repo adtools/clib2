@@ -1,5 +1,5 @@
 /*
- * $Id: socket_ioctl.c,v 1.7 2005-02-28 13:22:53 obarthel Exp $
+ * $Id: socket_ioctl.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,7 +57,7 @@ ioctl(int sockfd,unsigned long request, ... /* char *arg */)
 	va_list arg;
 	char * param;
 	struct fd * fd = NULL;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

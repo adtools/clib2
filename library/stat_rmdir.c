@@ -1,5 +1,5 @@
 /*
- * $Id: stat_rmdir.c,v 1.5 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: stat_rmdir.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ rmdir(const char * path_name)
 	#endif /* UNIX_PATH_SEMANTICS */
 	D_S(struct FileInfoBlock,fib);
 	BPTR dir_lock = ZERO;
-	int result = -1;
+	int result = ERROR;
 	LONG status;
 
 	ENTER();
@@ -149,7 +149,7 @@ rmdir(const char * path_name)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

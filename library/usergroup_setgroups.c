@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_setgroups.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: usergroup_setgroups.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@
 int
 setgroups(int ngroups,const gid_t *groups)
 {
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -80,7 +80,7 @@ setgroups(int ngroups,const gid_t *groups)
 	}
 	else
 	{
-		result = 0;
+		result = OK;
 	}
 
  out:

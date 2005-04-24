@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_flushiobwritebuffer.c,v 1.6 2005-02-21 10:21:48 obarthel Exp $
+ * $Id: stdio_flushiobwritebuffer.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,7 @@
 int
 __flush_iob_write_buffer(struct iob * file)
 {
-	int result = 0;
+	int result = OK;
 
 	ENTER();
 
@@ -75,11 +75,11 @@ __flush_iob_write_buffer(struct iob * file)
 
 		assert( file->iob_Action != NULL );
 
-		if((*file->iob_Action)(file,&fam) < 0)
+		if((*file->iob_Action)(file,&fam) == EOF)
 		{
 			SHOWMSG("that didn't work");
 
-			result = -1;
+			result = ERROR;
 
 			SET_FLAG(file->iob_Flags,IOBF_ERROR);
 

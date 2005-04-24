@@ -1,5 +1,5 @@
 /*
- * $Id: ftw_ftw.c,v 1.3 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: ftw_ftw.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@
 static int
 walk(const char *path,int (*func)(const char *,const struct stat *,int),int depth,int level)
 {
-	int result = 0;
+	int result = OK;
 	DIR *dp;
 	struct dirent *de;
 	struct stat st;
@@ -109,7 +109,7 @@ walk(const char *path,int (*func)(const char *,const struct stat *,int),int dept
 		dp = opendir(path);	/* Also takes care of Unix->Amiga pathname conversion. */
 		if(dp == NULL)
 		{
-			result = -1; /* Pass errno from opendir() */
+			result = ERROR; /* Pass errno from opendir() */
 			goto out;
 		}
 
@@ -120,7 +120,7 @@ walk(const char *path,int (*func)(const char *,const struct stat *,int),int dept
 		{
 			__set_errno(ENOMEM);
 
-			result = -1;
+			result = ERROR;
 			goto out;
 		}
 
@@ -153,7 +153,7 @@ walk(const char *path,int (*func)(const char *,const struct stat *,int),int dept
 int
 ftw(const char *path,int (*func)(const char *,const struct stat *,int),int depth)
 {
-	int result = -1;
+	int result = ERROR;
 	char *base;
 	int len;
 

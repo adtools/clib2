@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_setcurrentpath.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_setcurrentpath.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,7 +40,7 @@
 int
 __set_current_path(const char * path_name)
 {
-	int result = -1;
+	int result = ERROR;
 
 	SHOWSTRING(path_name);
 
@@ -62,7 +62,7 @@ __set_current_path(const char * path_name)
 	else
 		strcpy(__current_path_name,"");
 
-	result = 0;
+	result = OK;
 
  out:
 

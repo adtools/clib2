@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ftrylockfile.c,v 1.3 2005-02-28 13:42:52 obarthel Exp $
+ * $Id: stdio_ftrylockfile.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@ int
 ftrylockfile(FILE *stream)
 {
 	struct iob * file = (struct iob *)stream;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -88,7 +88,7 @@ ftrylockfile(FILE *stream)
 	if(file->iob_Lock != NULL && CANNOT AttemptSemaphore(file->iob_Lock))
 		goto out;
 
-	result = 0;
+	result = OK;
 
  out:
 

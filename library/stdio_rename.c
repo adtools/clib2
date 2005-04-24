@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rename.c,v 1.6 2005-04-21 10:23:17 obarthel Exp $
+ * $Id: stdio_rename.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@ rename(const char *oldname,const char *newname)
 	struct name_translation_info old_nti;
 	struct name_translation_info new_nti;
 	#endif /* UNIX_PATH_SEMANTICS */
-	int result = -1;
+	int result = ERROR;
 	LONG status;
 
 	ENTER();
@@ -145,7 +145,7 @@ rename(const char *oldname,const char *newname)
 		#endif /* UNIX_PATH_SEMANTICS */
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

@@ -1,5 +1,5 @@
 /*
- * $Id: utsname_uname.c,v 1.3 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: utsname_uname.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ uname(struct utsname *info)
 	struct Library * VersionBase;
 	int Version,Revision;
 	char * version_string;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -158,7 +158,7 @@ uname(struct utsname *info)
 	SHOWSTRING(info->version);
 	SHOWSTRING(info->machine);
 
-	result = 0;
+	result = OK;
 
 out:
 

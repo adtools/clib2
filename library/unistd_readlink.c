@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_readlink.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_readlink.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,7 +56,7 @@ readlink(const char * path_name, char * buffer, int buffer_size)
 	#endif /* UNIX_PATH_SEMANTICS */
 	struct DevProc * dvp = NULL;
 	BPTR lock = ZERO;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

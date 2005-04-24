@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.28 2005-04-04 10:09:57 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.29 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ __fd_hook_entry(
 	off_t new_position;
 	int new_mode;
 	char * buffer = NULL;
-	int result = -1;
+	int result = EOF;
 	BOOL is_aliased;
 	BPTR file;
 
@@ -164,7 +164,7 @@ __fd_hook_entry(
 
 			PROFILE_ON();
 
-			if(result < 0)
+			if(result == -1)
 			{
 				D(("read failed ioerr=%ld",IoErr()));
 
@@ -173,7 +173,7 @@ __fd_hook_entry(
 			}
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-				fd->fd_Position += result;
+				fd->fd_Position += (ULONG)result;
 
 			break;
 
@@ -193,7 +193,7 @@ __fd_hook_entry(
 				PROFILE_OFF();
 
 				position = Seek(file,0,OFFSET_END);
-				if(position >= 0)
+				if(position != SEEK_ERROR)
 				{
 					if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 						fd->fd_Position = Seek(file,0,OFFSET_CURRENT);
@@ -201,7 +201,7 @@ __fd_hook_entry(
 
 				PROFILE_ON();
 
-				if(position < 0)
+				if(position == SEEK_ERROR)
 				{
 					D(("seek to end of file failed; ioerr=%ld",IoErr()));
 
@@ -218,7 +218,7 @@ __fd_hook_entry(
 
 			PROFILE_ON();
 
-			if(result < 0)
+			if(result == -1)
 			{
 				D(("write failed ioerr=%ld",IoErr()));
 
@@ -227,7 +227,7 @@ __fd_hook_entry(
 			}
 
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-				fd->fd_Position += result;
+				fd->fd_Position += (ULONG)result;
 
 			break;
 
@@ -236,7 +236,7 @@ __fd_hook_entry(
 			SHOWMSG("file_action_close");
 
 			/* The following is almost guaranteed not to fail. */
-			result = 0;
+			result = OK;
 
 			/* If this is an alias, just remove it. */
 			is_aliased = __fd_is_aliased(fd);
@@ -278,7 +278,7 @@ __fd_hook_entry(
 					{
 						fam->fam_Error = __translate_io_error_to_errno(IoErr());
 
-						result = -1;
+						result = EOF;
 					}
 
 					PROFILE_ON();
@@ -452,7 +452,7 @@ __fd_hook_entry(
 				current_position = Seek(file,0,OFFSET_CURRENT);
 				PROFILE_ON();
 
-				if(current_position < 0)
+				if(current_position == SEEK_ERROR)
 				{
 					fam->fam_Error = EBADF;
 					goto out;
@@ -493,7 +493,7 @@ __fd_hook_entry(
 				position = Seek(file,fam->fam_Offset,new_mode);
 				PROFILE_ON();
 
-				if(position < 0)
+				if(position == SEEK_ERROR)
 				{
 					D(("seek failed, fam->fam_Mode=%ld (%ld), offset=%ld, ioerr=%ld",new_mode,fam->fam_Mode,fam->fam_Offset,IoErr()));
 
@@ -553,7 +553,7 @@ __fd_hook_entry(
 					goto out;
 				}
 
-				result = 0;
+				result = OK;
 			}
 			else
 			{
@@ -608,7 +608,7 @@ __fd_hook_entry(
 
 			fam->fam_FileSystem = fh->fh_Type;
 
-			result = 0;
+			result = OK;
 
 			break;
 

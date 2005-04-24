@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_access.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_access.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,7 @@ access(const char * path_name, int mode)
 	#if defined(UNIX_PATH_SEMANTICS)
 	struct name_translation_info path_name_nti;
 	#endif /* UNIX_PATH_SEMANTICS */
-	int result = -1;
+	int result = ERROR;
 	BPTR lock = ZERO;
 
 	ENTER();
@@ -218,7 +218,7 @@ access(const char * path_name, int mode)
 		}
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

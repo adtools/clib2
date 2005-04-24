@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.10 2005-03-09 12:06:10 obarthel Exp $
+ * $Id: socket_accept.c,v 1.11 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
 	struct fd * fd = NULL;
 	struct fd * new_fd;
 	int new_fd_slot_number;
-	int result = -1;
+	int result = ERROR;
 	LONG new_socket_fd;
 
 	ENTER();

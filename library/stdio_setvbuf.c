@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_setvbuf.c,v 1.7 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_setvbuf.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -186,7 +186,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 
 	new_buffer = NULL;
 
-	result = 0;
+	result = OK;
 
  out:
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ftw_nftw.c,v 1.3 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: ftw_nftw.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,7 @@
 static int
 walk(const char *path,int (*func)(const char *,const struct stat *,int,struct FTW *),const int depth,int level,const int flags,const int base,int * const prune)
 {
-	int result = 0;
+	int result = OK;
 	DIR *dp;
 	struct dirent *de;
 	struct stat st;
@@ -131,7 +131,7 @@ walk(const char *path,int (*func)(const char *,const struct stat *,int,struct FT
 			dp = opendir(path);	/* Also takes care of Unix->Amiga pathname conversion. */
 			if(dp == NULL)
 			{
-				result = -1;
+				result = ERROR;
 				goto out;
 			}
 
@@ -142,7 +142,7 @@ walk(const char *path,int (*func)(const char *,const struct stat *,int,struct FT
 				{
 					__set_errno(ENOMEM);
 
-					result = -1;
+					result = ERROR;
 					goto out;
 				}
 
@@ -155,7 +155,7 @@ walk(const char *path,int (*func)(const char *,const struct stat *,int,struct FT
 			{
 				__set_errno(ENOMEM);
 
-				result = -1;
+				result = ERROR;
 				goto out;
 			}
 
@@ -216,7 +216,7 @@ walk(const char *path,int (*func)(const char *,const struct stat *,int,struct FT
 static int
 index_of_end_part(const char *path)
 {
-	int result = 0;
+	int result = OK;
 	int i;
 
 	i = strlen(path) - 1;
@@ -241,7 +241,7 @@ nftw(const char *path,int (*func)(const char *,const struct stat *,int,struct FT
 	int len;
 	int base_index;
 	int prune = 0;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

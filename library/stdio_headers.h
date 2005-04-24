@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.22 2005-04-02 13:25:53 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.23 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -383,7 +383,7 @@ struct fd
 	struct fd *			fd_NextLink;		/* Points to next duplicate of this
 											   file descriptor; NULL for none */
 	BPTR				fd_DefaultFile;		/* A dos.library file handle */
-	LONG				fd_Position;		/* Cached file position (seek offset). */
+	ULONG				fd_Position;		/* Cached file position (seek offset). */
 	fd_cleanup_t		fd_Cleanup;			/* Cleanup function, if any. */
 
 	struct SignalSemaphore * fd_Lock;		/* For thread locking */

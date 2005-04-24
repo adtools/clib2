@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_symlink.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_symlink.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,7 @@
 int
 symlink(const char * actual_path, const char * symbolic_path)
 {
-	int result = -1;
+	int result = ERROR;
 	LONG status;
 
 	ENTER();
@@ -92,7 +92,7 @@ symlink(const char * actual_path, const char * symbolic_path)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

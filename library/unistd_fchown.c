@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fchown.c,v 1.9 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: unistd_fchown.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 	BPTR parent_dir = ZERO;
 	BPTR old_current_dir = ZERO;
 	BOOL current_dir_changed = FALSE;
-	int result = -1;
+	int result = ERROR;
 	struct fd * fd = NULL;
 	LONG success;
 
@@ -167,7 +167,7 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

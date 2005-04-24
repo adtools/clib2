@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_asprintf.c,v 1.5 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: stdio_asprintf.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@
 int
 asprintf(char **ret, const char *format, ...)
 {
-	int result = -1;
+	int result = EOF;
 	va_list arg;
 
 	ENTER();

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fputs.c,v 1.5 2005-02-27 18:09:10 obarthel Exp $
+ * $Id: stdio_fputs.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,7 +90,7 @@ fputs(const char *s, FILE *stream)
 			goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

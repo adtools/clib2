@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_remove.c,v 1.4 2005-02-28 10:07:31 obarthel Exp $
+ * $Id: stdio_remove.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@
 int
 remove(const char *filename)
 {
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -89,7 +89,7 @@ remove(const char *filename)
 			goto out;
 		}
 
-		result = 0;
+		result = OK;
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 

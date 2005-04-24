@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.10 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: socket_select.c,v 1.11 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -495,7 +495,7 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 	int total_file_fd;
 
 	struct fd * fd;
-	int result = -1;
+	int result = ERROR;
 
 	int num_socket_used;
 	int num_file_used;

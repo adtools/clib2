@@ -1,5 +1,5 @@
 /*
- * $Id: signal_sigprocmask.c,v 1.4 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: signal_sigprocmask.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,7 +44,7 @@
 int
 sigprocmask(int how, const sigset_t *set, sigset_t *oset)
 {
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -92,7 +92,7 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oset)
 		}
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

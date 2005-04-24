@@ -1,5 +1,5 @@
 /*
- * $Id: utime_utime.c,v 1.9 2005-03-19 10:15:56 obarthel Exp $
+ * $Id: utime_utime.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ utime(const char * path_name,const struct utimbuf * times)
 	struct name_translation_info path_name_nti;
 	#endif /* UNIX_PATH_SEMANTICS */
 	struct DateStamp ds;
-	int result = -1;
+	int result = ERROR;
 	LONG status;
 
 	assert( path_name != NULL );
@@ -115,7 +115,7 @@ utime(const char * path_name,const struct utimbuf * times)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

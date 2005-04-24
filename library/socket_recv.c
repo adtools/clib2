@@ -1,5 +1,5 @@
 /*
- * $Id: socket_recv.c,v 1.4 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_recv.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@ int
 recv(int sockfd,void *buff,size_t nbytes,int flags)
 {
 	struct fd * fd;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

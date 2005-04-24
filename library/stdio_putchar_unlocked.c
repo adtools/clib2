@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_putchar_unlocked.c,v 1.1 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_putchar_unlocked.c,v 1.2 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@
 int
 putchar_unlocked(int c)
 {
-	int result = -1;
+	int result = EOF;
 
 	assert( stdout != NULL );
 

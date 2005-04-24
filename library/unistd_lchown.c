@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_lchown.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_lchown.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@
 int
 lchown(const char * path_name, uid_t owner, gid_t group)
 {
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

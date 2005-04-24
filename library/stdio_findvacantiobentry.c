@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_findvacantiobentry.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_findvacantiobentry.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,7 +73,7 @@ __is_valid_iob(struct iob * iob)
 int
 __find_vacant_iob_entry(void)
 {
-	int result = -1;
+	int result = ERROR;
 	int i;
 
 	assert( __iob != NULL || __num_iob == 0 );

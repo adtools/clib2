@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_atexit.c,v 1.4 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdlib_atexit.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ int
 atexit(void (*function)(void))
 {
 	struct ExitTrapNode * etn;
-	int result = -1;
+	int result = ERROR;
 
 	assert( function != NULL );
 
@@ -114,7 +114,7 @@ atexit(void (*function)(void))
 
 	AddHead((struct List *)&exit_trap_list,(struct Node *)etn);
 
-	result = 0;
+	result = OK;
 
  out:
 

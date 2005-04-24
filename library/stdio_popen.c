@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_popen.c,v 1.7 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_popen.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,7 +56,7 @@
 int
 pclose(FILE *stream)
 {
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -84,7 +84,7 @@ pclose(FILE *stream)
 	/* ZZZ we actually could catch the program's termination code
 	 * by passing an exit function address to SystemTags() below.
 	 */
-	result = 0;
+	result = OK;
 
  out:
 

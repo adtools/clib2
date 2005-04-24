@@ -1,5 +1,5 @@
 /*
- * $Id: stat_lstat.c,v 1.9 2005-04-03 10:22:47 obarthel Exp $
+ * $Id: stat_lstat.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -174,7 +174,7 @@ lstat(const char * path_name, struct stat * st)
 	#endif /* UNIX_PATH_SEMANTICS */
 	D_S(struct FileInfoBlock,fib);
 	struct FileLock * fl;
-	int result = -1;
+	int result = ERROR;
 	LONG status;
 	BPTR file_lock = ZERO;
 	int link_length = -1;
@@ -227,7 +227,7 @@ lstat(const char * path_name, struct stat * st)
 				st->st_nlink	= 2;
 				st->st_blksize	= 512;
 
-				result = 0;
+				result = OK;
 
 				goto out;
 			}
@@ -288,7 +288,7 @@ lstat(const char * path_name, struct stat * st)
 		__convert_file_info_to_stat(fl->fl_Task,fib,st);
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

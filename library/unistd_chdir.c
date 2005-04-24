@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chdir.c,v 1.6 2005-03-27 10:02:50 obarthel Exp $
+ * $Id: unistd_chdir.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,7 +57,7 @@ chdir(const char * path_name)
 	D_S(struct FileInfoBlock,fib);
 	BPTR dir_lock = ZERO;
 	LONG status;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -100,7 +100,7 @@ chdir(const char * path_name)
 				/* ZZZ this must not fail */
 				__set_current_path(path_name);
 
-				result = 0;
+				result = OK;
 
 				goto out;
 			}
@@ -172,7 +172,7 @@ chdir(const char * path_name)
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
-	result = 0;
+	result = OK;
 
  out:
 

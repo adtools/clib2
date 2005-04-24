@@ -1,5 +1,5 @@
 /*
- * $Id: signal_raise.c,v 1.7 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: signal_raise.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ raise(int sig)
 {
 	static int local_signals_blocked;
 
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -137,7 +137,7 @@ raise(int sig)
 		SHOWMSG("that signal is blocked");
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

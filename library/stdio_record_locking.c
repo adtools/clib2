@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.9 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -1223,7 +1223,7 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 		}
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

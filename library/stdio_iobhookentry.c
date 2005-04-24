@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_iobhookentry.c,v 1.5 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: stdio_iobhookentry.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -69,7 +69,7 @@ __iob_hook_entry(
 			{
 				fam->fam_Error = EBADF;
 
-				result = -1;
+				result = EOF;
 
 				break;
 			}
@@ -86,7 +86,7 @@ __iob_hook_entry(
 
 			fam->fam_Error = EBADF;
 
-			result = -1;
+			result = EOF;
 
 			break;
 	}

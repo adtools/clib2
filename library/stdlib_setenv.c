@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setenv.c,v 1.8 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: stdlib_setenv.c,v 1.9 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,7 +101,7 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 	struct LocalVariable * lv = NULL;
 	struct LocalVar * found;
 	int status;
-	int result = -1;
+	int result = ERROR;
 	size_t i;
 
 	ENTER();
@@ -192,7 +192,7 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 		{
 			SHOWMSG("variable already exists; leaving...");
 
-			result = 0;
+			result = OK;
 			goto out;
 		}
 	}
@@ -243,7 +243,7 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

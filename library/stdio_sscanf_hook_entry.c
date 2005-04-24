@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf_hook_entry.c,v 1.4 2005-02-20 15:46:52 obarthel Exp $
+ * $Id: stdio_sscanf_hook_entry.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@ __sscanf_hook_entry(
 	struct iob *					string_iob,
 	struct file_action_message *	fam)
 {
-	int result = -1;
+	int result = EOF;
 	int num_bytes;
 
 	assert( fam != NULL && string_iob != NULL );

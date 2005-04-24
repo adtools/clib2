@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_growiobtable.c,v 1.7 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_growiobtable.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@ __grow_iob_table(int max_iob)
 {
 	const int granularity = 10;
 	int new_num_iob;
-	int result = -1;
+	int result = ERROR;
 
 	if(max_iob == 0)
 		new_num_iob = __num_iob + granularity;
@@ -102,7 +102,7 @@ __grow_iob_table(int max_iob)
 		__num_iob	= new_num_iob;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

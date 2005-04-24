@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.12 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.13 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -145,7 +145,7 @@ int
 closedir(DIR * directory_pointer)
 {
 	struct DirectoryHandle * dh;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -204,7 +204,7 @@ closedir(DIR * directory_pointer)
 
 	free(dh);
 
-	result = 0;
+	result = OK;
 
  out:
 

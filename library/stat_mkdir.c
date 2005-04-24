@@ -1,5 +1,5 @@
 /*
- * $Id: stat_mkdir.c,v 1.5 2005-02-28 10:07:30 obarthel Exp $
+ * $Id: stat_mkdir.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ mkdir(const char * path_name, mode_t mode)
 	struct name_translation_info path_name_nti;
 	#endif /* UNIX_PATH_SEMANTICS */
 	ULONG protection;
-	int result = -1;
+	int result = ERROR;
 	BPTR dir_lock;
 
 	ENTER();
@@ -158,7 +158,7 @@ mkdir(const char * path_name, mode_t mode)
 	SetProtection((STRPTR)path_name,(LONG)(protection ^ (FIBF_READ|FIBF_WRITE|FIBF_EXECUTE|FIBF_DELETE)));
 	PROFILE_ON();
 
-	result = 0;
+	result = OK;
 
  out:
 

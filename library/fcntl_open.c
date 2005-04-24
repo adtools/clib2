@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_open.c,v 1.15 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: fcntl_open.c,v 1.16 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -104,7 +104,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 	int fd_slot_number;
 	struct fd * fd;
 	int access_mode;
-	int result = -1;
+	int result = ERROR;
 	int i;
 
 	ENTER();
@@ -456,7 +456,7 @@ open(const char *path_name, int open_flag, ... /* mode_t mode */ )
 
 	handle = ZERO;
 
-	assert( result != -1 );
+	assert( result != ERROR );
 
  out:
 

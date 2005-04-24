@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_puts.c,v 1.6 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_puts.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -92,7 +92,7 @@ puts(const char *s)
 	if(__putc('\n',stdout,buffer_mode) == EOF)
 		goto out;
 
-	result = 0;
+	result = OK;
 
  out:
 

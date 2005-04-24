@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_setuid.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_setuid.c,v 1.3 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,7 +56,7 @@ setuid(uid_t id)
 	{
 		__root_uid = id;
 
-		result = 0;
+		result = OK;
 	}
 	else
 	{

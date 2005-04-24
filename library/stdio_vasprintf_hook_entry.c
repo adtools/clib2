@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vasprintf_hook_entry.c,v 1.6 2005-03-19 10:15:56 obarthel Exp $
+ * $Id: stdio_vasprintf_hook_entry.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,7 +58,7 @@ __vasprintf_hook_entry(
 	struct iob *					string_iob,
 	struct file_action_message *	fam)
 {
-	int result = -1;
+	int result = EOF;
 	int num_bytes_left;
 	int num_bytes;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translaterel.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: unistd_translaterel.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,7 +40,7 @@
 int
 __translate_relative_path_name(char const ** name_ptr,char *replacement_buffer,size_t replacement_buffer_size)
 {
-	int result = -1;
+	int result = ERROR;
 	char * name;
 
 	assert( name_ptr != NULL && (*name_ptr) != NULL && replacement_buffer != NULL );
@@ -95,7 +95,7 @@ __translate_relative_path_name(char const ** name_ptr,char *replacement_buffer,s
 		(*name_ptr) = replacement_buffer;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

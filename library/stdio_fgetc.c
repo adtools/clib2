@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fgetc.c,v 1.6 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: stdio_fgetc.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ int
 __fgetc_check(FILE * stream)
 {
 	struct iob * file = (struct iob *)stream;
-	int result = -1;
+	int result = EOF;
 
 	assert( stream != NULL );
 
@@ -122,7 +122,7 @@ __fgetc_check(FILE * stream)
 	if(__iob_write_buffer_is_valid(file) && __flush_iob_write_buffer(file) < 0)
 		goto out;
 
-	result = 0;
+	result = OK;
 
  out:
 

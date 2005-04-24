@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_truncate.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_truncate.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,7 +50,7 @@
 int
 truncate(const char * path_name, off_t length)
 {
-	int result = -1;
+	int result = ERROR;
 	int fd;
 
 	ENTER();

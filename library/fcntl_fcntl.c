@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.16 2005-04-04 10:09:56 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.17 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,7 +47,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 	struct file_action_message fam;
 	struct flock * l;
 	int vacant_slot;
-	int result = -1;
+	int result = ERROR;
 	struct fd * fd = NULL;
 	va_list arg;
 	int error;
@@ -130,7 +130,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				goto out;
 			}
 
-			result = 0;
+			result = OK;
 
 			break;
 
@@ -144,7 +144,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_ASYNC_IO))
 				SET_FLAG(result,O_ASYNC);
 
-			result = 0;
+			result = OK;
 
 			break;
 
@@ -205,7 +205,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 					CLEAR_FLAG(fd->fd_Flags,FDF_ASYNC_IO);
 			}
 
-			result = 0;
+			result = OK;
 
 			break;
 

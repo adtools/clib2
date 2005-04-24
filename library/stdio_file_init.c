@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.8 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.9 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -124,7 +124,7 @@ FILE_DESTRUCTOR(workbench_exit)
 STATIC int
 wb_file_init(void)
 {
-	int result = -1;
+	int result = ERROR;
 
 	PROFILE_OFF();
 
@@ -191,7 +191,7 @@ wb_file_init(void)
 
 	restore_streams = TRUE;
 
-	result = 0;
+	result = OK;
 
  out:
 

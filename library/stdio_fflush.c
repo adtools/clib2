@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fflush.c,v 1.7 2005-04-04 11:56:22 obarthel Exp $
+ * $Id: stdio_fflush.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -134,7 +134,7 @@ fflush(FILE *stream)
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
-	result = 0;
+	result = OK;
 
  out:
 

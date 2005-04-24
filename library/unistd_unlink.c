@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_unlink.c,v 1.7 2005-03-27 10:02:50 obarthel Exp $
+ * $Id: unistd_unlink.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ unlink(const char * path_name)
 	struct name_translation_info path_name_nti;
 	#endif /* UNIX_PATH_SEMANTICS */
 	BPTR current_dir = ZERO;
-	int result = -1;
+	int result = ERROR;
 	LONG status;
 
 	ENTER();
@@ -179,7 +179,7 @@ unlink(const char * path_name)
 		#endif /* UNIX_PATH_SEMANTICS */
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 

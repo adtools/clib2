@@ -1,5 +1,5 @@
 /*
- * $Id: socket_getsockopt.c,v 1.4 2005-02-18 18:53:16 obarthel Exp $
+ * $Id: socket_getsockopt.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@ int
 getsockopt(int sockfd,int level,int optname,void *optval,int *optlen)
 {
 	struct fd * fd;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 

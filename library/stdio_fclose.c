@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fclose.c,v 1.10 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdio_fclose.c,v 1.11 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ fclose(FILE *stream)
 {
 	struct iob * file = (struct iob *)stream;
 	struct file_action_message fam;
-	int result = 0;
+	int result = OK;
 
 	ENTER();
 

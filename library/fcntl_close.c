@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_close.c,v 1.11 2005-04-01 18:46:37 obarthel Exp $
+ * $Id: fcntl_close.c,v 1.12 2005-04-24 08:46:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,7 @@ close(int file_descriptor)
 {
 	struct file_action_message fam;
 	struct fd * fd;
-	int result = -1;
+	int result = ERROR;
 
 	ENTER();
 
@@ -78,7 +78,7 @@ close(int file_descriptor)
 		goto out;
 	}
 
-	result = 0;
+	result = OK;
 
  out:
 
