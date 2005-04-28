@@ -20,6 +20,9 @@
   of records or the size of each record is zero, both now call clearerr() to
   avoid giving the caller the wrong impression that an EOF or error occured.
 
+- The libunix.a flavour of system() no longer attempts to translate the name
+  of a command unless it contains path separator characters.
+
 
 c.lib 1.191 (9.4.2005)
 
