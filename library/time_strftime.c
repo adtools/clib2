@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.11 2005-05-07 13:40:19 obarthel Exp $
+ * $Id: time_strftime.c,v 1.12 2005-05-07 14:03:08 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,6 +98,37 @@ store_string_via_hook(const char * string,int len,struct Hook * hook)
 
 	while(len-- > 0)
 		CallHookPkt(hook,(APTR)((ULONG)(*string++)),NULL);
+}
+
+/****************************************************************************/
+
+/* The algorithm for calculating the ISO 8601 week number value comes from
+   the "Calendar FAQ" at <http://www.tondering.dk/claus/calendar.html>. */
+INLINE STATIC int
+julian_day(int day,int month,int year)
+{
+	int a,y,m,result;
+
+	a = (14 - month) / 12;
+	y = year + 4800 - a;
+	m = month + 12 * a - 3;
+
+	result = day + (153 * m + 2) / 5 + 365 * y + (y/4) - (y/100) + (y/400) - 32045;
+}
+
+STATIC int
+iso8601_calendar_week(int day,int month,int year)
+{
+	int J = julian_day(day,month,year);
+	int d1,d4,L,result;
+
+	d4 = (J + 31741 - (J % 7)) % 146097 % 36524 % 1461;
+	L = d4 / 1460;
+	d1 = ((d4 - L) % 365) + L;
+
+	result = (d1 / 7) + 1;
+
+	return(result);
 }
 
 /****************************************************************************/
@@ -321,10 +352,11 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 			/* ISO 8601 week number ("01"-"53"; C99). */
 			case 'V':
 
-				week_number = (tm->tm_yday + 7 - ((tm->tm_wday + 6) % 7)) / 7;
-				if(week_number < 1)
-					week_number = 53;
+				assert( 1 <= tm->tm_mday && tm->tm_mday <= 31 );
+				assert( 0 <= tm->tm_mon && tm->tm_mon <= 11 );
+				assert( 0 <= tm->tm_year );
 
+				week_number = iso8601_calendar_week(tm->tm_mday,tm->tm_mon+1,tm->tm_year + 1900);
 				__number_to_string(week_number,buffer,sizeof(buffer),2);
 				store_string_via_hook(buffer,2,hook);
 				break;
