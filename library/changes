@@ -26,6 +26,7 @@
 - Added strtof(), llabs(), lldiv(), vsscanf() and vscanf() for C99.
 
 - strftime() now supports %C, %n, %r, %R, %t, %T, %u, %V, and %z for C99.
+  And it ignores the E and O modifiers.
 
 
 c.lib 1.191 (9.4.2005)

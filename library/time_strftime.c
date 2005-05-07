@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.10 2005-05-07 13:21:49 obarthel Exp $
+ * $Id: time_strftime.c,v 1.11 2005-05-07 13:40:19 obarthel Exp $
  *
  * :ts=4
  *
@@ -124,6 +124,11 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 
 		/* OK, what kind of format is expected? */
 		c = (*format++);
+
+		/* For C99, check if the 'E' or 'O' modifiers are present. If so,
+		   skip them for now. */
+		if(c == 'E' || c == 'O')
+			c = (*format++);
 
 		/* We stop if the string ends here. Hm... should this count as an error? */
 		if(c == '\0')
