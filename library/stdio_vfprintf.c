@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.12 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.13 2005-05-07 16:39:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,20 +72,20 @@
 /****************************************************************************/
 
 STATIC int
-get_num_leading_digits(__long_double_t v)
+get_num_leading_digits(__long_double_t v,int radix)
 {
 	int num_digits;
 
-	if(v < 10.0)
+	if(v < radix)
 	{
 		num_digits = 1;
 	}
 	else
 	{
-		/* For some reason log10() can crash on GCC 68k... */
+		/* For some reason log() can crash on GCC 68k... */
 		#if (!defined(__GNUC__) || defined(__PPC__))
 		{
-			num_digits = 1 + floor(log10(v));
+			num_digits = 1 + floor(log(v) / log(radix));
 		}
 		#else
 		{
@@ -96,7 +96,7 @@ get_num_leading_digits(__long_double_t v)
 			{
 				num_digits++;
 
-				v /= 10.0;
+				v /= radix;
 			}
 		}
 		#endif /* __GNUC__ && !__PPC__ */
@@ -116,11 +116,15 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 {
 	enum parameter_size_t
 	{
+		parameter_size_byte,
 		parameter_size_long,
-		parameter_size_long_long,
 		parameter_size_short,
+		parameter_size_size_t,
+		parameter_size_ptrdiff_t,
+		parameter_size_long_long,
 		parameter_size_long_double,
-		parameter_size_default
+		parameter_size_intmax_t,
+		parameter_size_default,
 	};
 
 	struct iob * iob = (struct iob *)stream;
@@ -434,6 +438,27 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			parameter_size = parameter_size_short;
 			format++;
 		}
+		else if (c == 'j')
+		{
+			SHOWMSG("format size = intmax_t");
+
+			parameter_size = parameter_size_intmax_t;
+			format++;
+		}
+		else if (c == 't')
+		{
+			SHOWMSG("format size = ptrdiff_t");
+
+			parameter_size = parameter_size_ptrdiff_t;
+			format++;
+		}
+		else if (c == 'z')
+		{
+			SHOWMSG("format size = size_t");
+
+			parameter_size = parameter_size_size_t;
+			format++;
+		}
 		else
 		{
 			SHOWMSG("format size = default");
@@ -449,13 +474,29 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 		if(c == '\0')
 			break;
 
+		/* Check for byte parameters. */
+		if(parameter_size == parameter_size_short && c == 'h')
+		{
+			SHOWMSG("format size = byte");
+
+			parameter_size = parameter_size_byte;
+
+			format++;
+
+			/* The conversion_type type follows. */
+			c = (*format);
+
+			/* End of the format string? */
+			if(c == '\0')
+				break;
+		}
+
 		#if defined(USE_64_BIT_INTS) && defined(__GNUC__)
 		{
 			/* Check for long long parameters. */
-			if(c == 'l')
+			if(parameter_size == parameter_size_long && c == 'l')
 			{
-				if(parameter_size == parameter_size_long)
-					parameter_size = parameter_size_long_long;
+				parameter_size = parameter_size_long_long;
 
 				format++;
 
@@ -508,6 +549,16 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				format++;
 				break;
 
+			/* floating point number (hexadecimal digits; exponential notation) */
+			case 'A':
+
+				SET_FLAG(format_flags,FORMATF_CapitalLetters);
+
+				conversion_type = 'a';
+
+				format++;
+				break;
+
 			/* floating point number (plain or exponential notation) */
 			case 'G':
 
@@ -531,6 +582,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				format++;
 				break;
 
+			case 'a':	/* floating point number (hexadecimal digits; exponential notation) */
 			case 'c':	/* character */
 			case 'd':	/* signed integer */
 			case 'f':	/* floating point number */
@@ -586,11 +638,23 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 				ch = short_integer;
 			}
+			else if (parameter_size == parameter_size_byte)
+			{
+				/* Parameter is a byte-sized integer which
+				 * must be cast to a long integer before
+				 * it can be used.
+				 */
+				char byte_integer;
+
+				byte_integer = (char)va_arg(arg, int);
+
+				ch = byte_integer;
+			}
 			else
 			{
 				#if defined(USE_64_BIT_INTS) && defined(__GNUC__)
 				{
-					if(parameter_size == parameter_size_long_long)
+					if(parameter_size == parameter_size_long_long || parameter_size == parameter_size_intmax_t)
 						ch = va_arg(arg, long long);
 					else
 						ch = va_arg(arg, int);
@@ -612,7 +676,8 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			CLEAR_FLAG(format_flags,FORMATF_ProduceSign);
 			CLEAR_FLAG(format_flags,FORMATF_ProduceSpace);
 		}
-		else if (conversion_type == 'e' ||
+		else if (conversion_type == 'a' ||
+		         conversion_type == 'e' ||
 		         conversion_type == 'f' ||
 		         conversion_type == 'g')
 		{
@@ -635,8 +700,26 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				const char *	buffer_stop		= &buffer[sizeof(buffer)-1];
 				char *			buffer_start	= buffer;
 
+				const char * digit_encoding;
 				__long_double_t v;
+				int radix;
 				int sign;
+
+				if(conversion_type == 'a')
+				{
+					SET_FLAG(format_flags,FORMATF_HexPrefix);
+
+					radix = 16;
+				}
+				else
+				{
+					radix = 10;
+				}
+
+				if(FLAG_IS_SET(format_flags,FORMATF_CapitalLetters))
+					digit_encoding = "0123456789ABCDEF";
+				else
+					digit_encoding = "0123456789abcdef";
 
 				output_buffer = buffer_start;
 
@@ -651,7 +734,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				{
 					SHOWMSG("infinity");
 
-					strcpy(output_buffer,"Inf");
+					strcpy(output_buffer,"inf");
 					output_len = 3;
 
 					if(sign < 0)
@@ -663,7 +746,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				{
 					SHOWMSG("not a number");
 
-					strcpy(output_buffer,"NaN");
+					strcpy(output_buffer,"nan");
 					output_len = 3;
 
 					if(FLAG_IS_SET(format_flags,FORMATF_ProduceSign))
@@ -713,7 +796,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					}
 
 					/* Figure out whether 'e' or 'f' format should be used. */
-					if(conversion_type == 'g' || conversion_type == 'e')
+					if(conversion_type == 'g' || conversion_type == 'e' || conversion_type == 'a')
 					{
 						__long_double_t local_v = v;
 						int local_exponent = 0;
@@ -721,13 +804,13 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 						/* Put one single digit in front of the decimal point. */
 						while(local_v != 0.0 && local_v < 1.0)
 						{
-							local_v *= 10.0;
+							local_v *= radix;
 							local_exponent--;
 						}
 
-						while(local_v >= 10.0)
+						while(local_v >= radix)
 						{
-							local_v /= 10.0;
+							local_v /= radix;
 							local_exponent++;
 						}
 
@@ -754,7 +837,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 							strip_trailing_zeroes = TRUE;
 						}
 
-						if(conversion_type == 'e')
+						if(conversion_type == 'e' || conversion_type == 'a')
 						{
 							v			= local_v;
 							exponent	= local_exponent;
@@ -770,16 +853,16 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 						int roundoff_position;
 
 						if(v >= 1.0)
-							roundoff_position = max_digits - get_num_leading_digits(v);
+							roundoff_position = max_digits - get_num_leading_digits(v,radix);
 						else
 							roundoff_position = max_digits;
 
 						if(roundoff_position >= 0)
-							roundoff_fudge = pow(10.0,(double)(roundoff_position + 1));
+							roundoff_fudge = pow(radix,(double)(roundoff_position + 1));
 					}
 					else
 					{
-						roundoff_fudge = pow(10.0,(double)(precision + 1));
+						roundoff_fudge = pow(radix,(double)(precision + 1));
 					}
 
 					if(roundoff_fudge > 0.0)
@@ -788,11 +871,11 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					/* The rounding may have caused an overflow, putting
 					   two digits in front of the decimal point. This
 					   needs to be corrected. */
-					if(conversion_type == 'e')
+					if(conversion_type == 'e' || conversion_type == 'a')
 					{
-						while(v >= 10.0)
+						while(v >= radix)
 						{
-							v /= 10.0;
+							v /= radix;
 							exponent++;
 						}
 					}
@@ -808,21 +891,21 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 						   simply scale the value without any loss of
 						   precision (we just change the floating point
 						   exponent). */
-						num_leading_digits = get_num_leading_digits(v);
+						num_leading_digits = get_num_leading_digits(v,radix);
 
-						v /= pow(10.0,(double)num_leading_digits);
+						v /= pow(radix,(double)num_leading_digits);
 
 						for(i = 0 ; (max_digits != 0) && (i < num_leading_digits) && (output_buffer < buffer_stop) ; i++)
 						{
-							v *= 10.0;
+							v *= radix;
 
 							digit = floor(v);
 
-							D(("next digit = %lc (digit = %ld)",'0' + digit,digit));
+							D(("next digit = %lc (digit = %ld)",digit_encoding[digit],digit));
 
-							assert( 0 <= digit && digit <= 9 );
+							assert( 0 <= digit && digit < radix );
 
-							(*output_buffer++) = '0' + digit;
+							(*output_buffer++) = digit_encoding[digit];
 
 							v -= digit;
 
@@ -848,15 +931,15 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 							for(i = 0 ; (max_digits != 0) && (i < precision) && (output_buffer < buffer_stop) ; i++)
 							{
-								v *= 10.0;
+								v *= radix;
 
 								digit = floor(v);
 
-								D(("next digit = %lc",'0' + digit));
+								D(("next digit = %lc",digit_encoding[digit]));
 
-								assert( 0 <= digit && digit <= 9 );
+								assert( 0 <= digit && digit < radix );
 
-								(*output_buffer++) = '0' + digit;
+								(*output_buffer++) = digit_encoding[digit];
 
 								v -= digit;
 
@@ -911,7 +994,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					}
 					#endif /* DEBUG */
 
-					if(conversion_type == 'e')
+					if(conversion_type == 'e' || conversion_type == 'a')
 					{
 						/* For 'long double' the exponent is 15 bits in size, which
 						   allows for a minimum of -16384 to be used. Eight digits
@@ -952,10 +1035,20 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 							else
 								exponent_string[exponent_string_len++] = '+';
 
-							if(FLAG_IS_SET(format_flags,FORMATF_CapitalLetters))
-								exponent_string[exponent_string_len++] = 'E';
+							if(conversion_type == 'a')
+							{
+								if(FLAG_IS_SET(format_flags,FORMATF_CapitalLetters))
+									exponent_string[exponent_string_len++] = 'P';
+								else
+									exponent_string[exponent_string_len++] = 'p';
+							}
 							else
-								exponent_string[exponent_string_len++] = 'e';
+							{
+								if(FLAG_IS_SET(format_flags,FORMATF_CapitalLetters))
+									exponent_string[exponent_string_len++] = 'E';
+								else
+									exponent_string[exponent_string_len++] = 'e';
+							}
 						}
 
 						/* Add the exponent string in reverse order. */
@@ -1034,11 +1127,23 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 					sv = short_integer;
 				}
+				else if (parameter_size == parameter_size_byte)
+				{
+					/* Parameter is a byte-sized integer which
+					 * must be cast to a long integer before
+					 * it can be used.
+					 */
+					short byte_integer;
+
+					byte_integer = (char)va_arg(arg, int);
+
+					sv = byte_integer;
+				}
 				else
 				{
 					#if defined(USE_64_BIT_INTS) && defined(__GNUC__)
 					{
-						if(parameter_size == parameter_size_long_long)
+						if(parameter_size == parameter_size_long_long || parameter_size == parameter_size_intmax_t)
 							sv = va_arg(arg, long long);
 						else
 							sv = va_arg(arg, int);
@@ -1084,11 +1189,23 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 					v = short_integer;
 				}
+				else if (parameter_size == parameter_size_byte)
+				{
+					/* Parameter is a byte-sized integer which
+					 * must be cast to a long integer before
+					 * it can be used.
+					 */
+					unsigned char byte_integer;
+
+					byte_integer = (unsigned char)va_arg(arg, unsigned int);
+
+					v = byte_integer;
+				}
 				else
 				{
 					#if defined(USE_64_BIT_INTS) && defined(__GNUC__)
 					{
-						if(parameter_size == parameter_size_long_long)
+						if(parameter_size == parameter_size_long_long || parameter_size == parameter_size_intmax_t)
 							v = va_arg(arg, unsigned long long);
 						else
 							v = va_arg(arg, unsigned int);
@@ -1109,14 +1226,14 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			if(v != 0 || precision != 0)
 			{
 				const char * digit_encoding;
-				int base;
+				int radix;
 
 				if(conversion_type == 'o')
-					base = 8;
+					radix = 8;
 				else if (conversion_type == 'x')
-					base = 16;
+					radix = 16;
 				else
-					base = 10;
+					radix = 10;
 
 				if(FLAG_IS_SET(format_flags,FORMATF_CapitalLetters))
 					digit_encoding = "0123456789ABCDEF";
@@ -1128,8 +1245,8 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					output_buffer--;
 					output_len++;
 
-					(*output_buffer) = digit_encoding[v % base];
-					v /= base;
+					(*output_buffer) = digit_encoding[v % radix];
+					v /= radix;
 				}
 				while(v > 0 && buffer < output_buffer);
 
@@ -1241,11 +1358,31 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 				(*short_ptr) = len;
 			}
+			else if (parameter_size == parameter_size_byte)
+			{
+				char * byte_ptr;
+
+				byte_ptr = va_arg(arg, byte *);
+
+				assert( byte_ptr != NULL );
+
+				#if defined(CHECK_FOR_NULL_POINTERS)
+				{
+					if(byte_ptr == NULL)
+					{
+						__set_errno(EFAULT);
+						goto out;
+					}
+				}
+				#endif /* CHECK_FOR_NULL_POINTERS */
+
+				(*byte_ptr) = len;
+			}
 			else
 			{
 				#if defined(USE_64_BIT_INTS) && defined(__GNUC__)
 				{
-					if(parameter_size == parameter_size_long_long)
+					if(parameter_size == parameter_size_long_long || parameter_size == parameter_size_intmax_t)
 					{
 						long long * int_ptr;
 

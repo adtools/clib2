@@ -28,6 +28,10 @@
 - strftime() now supports %C, %n, %r, %R, %t, %T, %u, %V, and %z for C99.
   And it ignores the E and O modifiers.
 
+- The printf() family now supports the %hh, %j, %t and %z modifiers and the
+  %a/%A conversions for C99. The %j is treated like %ll, %t and %z are treated
+  like %l.
+
 
 c.lib 1.191 (9.4.2005)
 
