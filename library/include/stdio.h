@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.11 2005-04-04 10:10:02 obarthel Exp $
+ * $Id: stdio.h,v 1.12 2005-05-07 13:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -424,6 +424,8 @@ extern int __vasprintf(const char *file,int line,char **ret,const char *format,v
 /****************************************************************************/
 
 extern int vfscanf(FILE *stream, const char *format, va_list arg);
+extern int vsscanf(const char *s, const char *format, va_list arg);
+extern int vscanf(const char *format,va_list arg);
 
 /****************************************************************************/
 

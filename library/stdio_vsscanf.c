@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf.c,v 1.8 2005-05-07 13:21:49 obarthel Exp $
+ * $Id: stdio_vsscanf.c,v 1.1 2005-05-07 13:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,10 +44,11 @@
 /****************************************************************************/
 
 int
-sscanf(const char *s,const char *format, ...)
+vsscanf(const char *s,const char *format,va_list arg)
 {
+	struct iob string_iob;
+	char local_buffer[32];
 	int result = EOF;
-	va_list arg;
 
 	ENTER();
 
@@ -55,6 +56,9 @@ sscanf(const char *s,const char *format, ...)
 	SHOWSTRING(format);
 
 	assert( s != NULL && format != NULL );
+
+	if(__check_abort_enabled)
+		__check_abort();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -68,9 +72,18 @@ sscanf(const char *s,const char *format, ...)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	va_start(arg,format);
-	result = vsscanf(s,format,arg);
-	va_end(arg);
+	__initialize_iob(&string_iob,__sscanf_hook_entry,
+		NULL,
+		local_buffer,sizeof(local_buffer),
+		-1,
+		-1,
+		IOBF_IN_USE | IOBF_READ | IOBF_BUFFER_MODE_FULL | IOBF_INTERNAL,
+		NULL);
+
+	string_iob.iob_String		= (STRPTR)s;
+	string_iob.iob_StringLength	= strlen(s);
+
+	result = vfscanf((FILE *)&string_iob,format,arg);
 
  out:
 

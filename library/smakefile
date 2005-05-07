@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.37 2005-04-03 10:22:47 obarthel Exp $
+# $Id: smakefile,v 1.38 2005-05-07 13:21:49 obarthel Exp $
 #
 # :ts=8
 #
@@ -362,6 +362,8 @@ STDIO_OBJ = \
 	stdio_vasprintf_hook_entry.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
+	stdio_vsscanf.o \
+	stdio_vscanf.o \
 	stdio_vprintf.o \
 	stdio_vsnprintf.o \
 	stdio_vsnprintf_hook_entry.o \
@@ -432,6 +434,7 @@ STDLIB_OBJ = \
 	stdlib_stack_usage.o \
 	stdlib_stacksize.o \
 	stdlib_strtod.o \
+	stdlib_strtof.o \
 	stdlib_strtol.o \
 	stdlib_strtoul.o \
 	stdlib_strtoll.o \

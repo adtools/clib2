@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.49 2005-04-24 14:04:36 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.50 2005-05-07 13:21:49 obarthel Exp $
 #
 # :ts=8
 #
@@ -269,6 +269,8 @@ C_LIB = \
 	stdio_vsnprintf_hook_entry.o \
 	stdio_vsprintf.o \
 	stdio_vsprintf_hook_entry.o \
+	stdio_vsscanf.o \
+	stdio_vscanf.o \
 	stdlib_abort.o \
 	stdlib_abs.o \
 	stdlib_alloca.o \
@@ -300,7 +302,9 @@ C_LIB = \
 	stdlib_init_exit.o \
 	stdlib_isresident.o \
 	stdlib_labs.o \
+	stdlib_llabs.o \
 	stdlib_ldiv.o \
+	stdlib_lldiv.o \
 	stdlib_machine_test.o \
 	stdlib_main.o \
 	stdlib_malloc.o \
@@ -553,11 +557,14 @@ MATH_LIB = \
 	stdio_vasprintf.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
+	stdio_vsscanf.o \
+	stdio_vscanf.o \
 	stdio_vprintf.o \
 	stdio_vsnprintf.o \
 	stdio_vsprintf.o \
 	stdlib_atof.o \
 	stdlib_strtod.o \
+	stdlib_strtof.o \
 	time_difftime.o
 
 MATH_LIB_881 = \

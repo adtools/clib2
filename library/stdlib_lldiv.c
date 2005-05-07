@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf.c,v 1.8 2005-05-07 13:21:49 obarthel Exp $
+ * $Id: stdlib_lldiv.c,v 1.1 2005-05-07 13:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,49 +31,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_NULL_POINTER_CHECK_H
-#include "stdlib_null_pointer_check.h"
-#endif /* _STDLIB_NULL_POINTER_CHECK_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
-
-/****************************************************************************/
-
-int
-sscanf(const char *s,const char *format, ...)
+lldiv_t
+lldiv(long long n,long long d)
 {
-	int result = EOF;
-	va_list arg;
+	lldiv_t result;
 
-	ENTER();
+	assert( d != 0 );
 
-	SHOWSTRING(s);
-	SHOWSTRING(format);
+	result.quot	= n / d;
+	result.rem	= n % d;
 
-	assert( s != NULL && format != NULL );
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
-	{
-		if(s == NULL || format == NULL)
-		{
-			SHOWMSG("invalid parameters");
-
-			__set_errno(EFAULT);
-			goto out;
-		}
-	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
-
-	va_start(arg,format);
-	result = vsscanf(s,format,arg);
-	va_end(arg);
-
- out:
-
-	RETURN(result);
 	return(result);
 }

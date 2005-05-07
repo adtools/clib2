@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_scanf.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_scanf.c,v 1.7 2005-05-07 13:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -71,7 +71,7 @@ scanf(const char *format, ...)
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
 	va_start(arg,format);
-	result = vfscanf(stdin,format,arg);
+	result = vscanf(format,arg);
 	va_end(arg);
 
  out:

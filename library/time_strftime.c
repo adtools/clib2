@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.9 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: time_strftime.c,v 1.10 2005-05-07 13:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -105,6 +105,8 @@ store_string_via_hook(const char * string,int len,struct Hook * hook)
 STATIC VOID
 format_date(const char *format,const struct tm *tm,struct Hook * hook)
 {
+	int gmt_offset;
+	int week_number;
 	char buffer[40];
 	const char * str;
 	char c;
@@ -187,6 +189,13 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				format_date("%a %b %d %H:%M:%S %Y",tm,hook);
 				break;
 
+			/* The last two digits of a year (C99). */
+			case 'C':
+
+				__number_to_string((unsigned int)(tm->tm_year % 100),buffer,sizeof(buffer),2);
+				store_string_via_hook(buffer,2,hook);
+				break;
+
 			/* Day of the month ("01"-"31"). */
 			case 'd':
 
@@ -239,12 +248,30 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				store_string_via_hook(buffer,2,hook);
 				break;
 
+			/* Line feed character (C99). */
+			case 'n':
+
+				store_string_via_hook("\n",1,hook);
+				break;
+
 			/* 'Ante meridiem'/'Post meridiem' indicator. */
 			case 'p':
 
 				assert( 0 <= tm->tm_hour && tm->tm_hour <= 23 );
 
 				store_string_via_hook((tm->tm_hour < 12) ? "AM" :" PM",2,hook);
+				break;
+
+			/* 12 hour clock time (C99). */
+			case 'r':
+
+				format_date("%I:%M:%S %p",tm,hook);
+				break;
+
+			/* Locale-specific time (C99). */
+			case 'R':
+
+				format_date("%H:%M",tm,hook);
 				break;
 
 			/* Seconds ("00"-"59"). */
@@ -256,12 +283,44 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				store_string_via_hook(buffer,2,hook);
 				break;
 
+			/* Horizontal tabulator character (C99). */
+			case 't':
+
+				store_string_via_hook("\t",1,hook);
+				break;
+
+			/* ISO 8601 time format (C99). */
+			case 'T':
+
+				format_date("%H:%M:%S",tm,hook);
+				break;
+
+			/* ISO 8601 week day number ("1"-"7"; 1 is Monday; C99). */
+			case 'u':
+
+				assert( 0 <= tm->tm_wday && tm->tm_wday <= 6 );
+
+				__number_to_string((unsigned int)(tm->tm_wday > 0 ? tm->tm_wday : 7),buffer,sizeof(buffer),0);
+				store_string_via_hook(buffer,1,hook);
+				break;
+
 			/* Week number of the year; first week is the one that contains
 			 * the first Sunday of the year ("00"-"53").
 			 */
 			case 'U':
 
 				__number_to_string((tm->tm_yday + 7 - tm->tm_wday) / 7,buffer,sizeof(buffer),2);
+				store_string_via_hook(buffer,2,hook);
+				break;
+
+			/* ISO 8601 week number ("01"-"53"; C99). */
+			case 'V':
+
+				week_number = (tm->tm_yday + 7 - ((tm->tm_wday + 6) % 7)) / 7;
+				if(week_number < 1)
+					week_number = 53;
+
+				__number_to_string(week_number,buffer,sizeof(buffer),2);
 				store_string_via_hook(buffer,2,hook);
 				break;
 
@@ -311,6 +370,31 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 
 				__number_to_string((unsigned int)1900 + tm->tm_year,buffer,sizeof(buffer),0);
 				store_string_via_hook(buffer,-1,hook);
+				break;
+
+			/* ISO 8601 offset of time zone from UTC (C99). */
+			case 'z':
+
+				__locale_lock();
+
+				if(__default_locale != NULL)
+				{
+					gmt_offset = __default_locale->loc_GMTOffset;
+					if(gmt_offset < 0)
+						gmt_offset = (-gmt_offset);
+					else if (gmt_offset > 0)
+						store_string_via_hook("-",1,hook);
+				}
+				else
+				{
+					gmt_offset = 0;
+				}
+
+				__locale_unlock();
+
+				__number_to_string((unsigned int)gmt_offset,buffer,sizeof(buffer),0);
+				store_string_via_hook(buffer,-1,hook);
+
 				break;
 
 			/* Time zone name. */

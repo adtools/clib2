@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_sscanf.c,v 1.8 2005-05-07 13:21:49 obarthel Exp $
+ * $Id: stdio_vscanf.c,v 1.1 2005-05-07 13:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,23 +44,24 @@
 /****************************************************************************/
 
 int
-sscanf(const char *s,const char *format, ...)
+vscanf(const char *format,va_list arg)
 {
 	int result = EOF;
-	va_list arg;
 
 	ENTER();
 
-	SHOWSTRING(s);
 	SHOWSTRING(format);
 
-	assert( s != NULL && format != NULL );
+	assert(format != NULL);
+
+	if(__check_abort_enabled)
+		__check_abort();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		if(s == NULL || format == NULL)
+		if(format == NULL)
 		{
-			SHOWMSG("invalid parameters");
+			SHOWMSG("invalid format parameter");
 
 			__set_errno(EFAULT);
 			goto out;
@@ -68,9 +69,7 @@ sscanf(const char *s,const char *format, ...)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	va_start(arg,format);
-	result = vsscanf(s,format,arg);
-	va_end(arg);
+	result = vfscanf(stdin,format,arg);
 
  out:
 

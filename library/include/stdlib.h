@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.9 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: stdlib.h,v 1.10 2005-05-07 13:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -153,16 +153,6 @@ extern int rand_r(unsigned int * seed);
 
 /****************************************************************************/
 
-/* These functions are unavailable under SAS/C for lack of a
-   "long long" data type. */
-#if ! defined(__SASC)
-extern long long strtoll(const char *str, char **ptr, int base);
-extern unsigned long long strtoull(const char *str, char **ptr, int base);
-extern long long atoll(const char *str);
-#endif /* __SASC */
-
-/****************************************************************************/
-
 #if defined(__GNUC__)
  #undef alloca
  #define alloca(size) __builtin_alloca(size)
@@ -189,6 +179,35 @@ extern char * mkdtemp(char *name_template);
 
 /* The following is not part of the ISO 'C' (1994) standard, but it should
    be part of ISO/IEC 9899:1999, also known as "C99". */
+
+/****************************************************************************/
+
+/* These functions and data structures are unavailable under SAS/C for lack
+   of a "long long" data type. */
+#if ! defined(__SASC)
+
+/****************************************************************************/
+
+extern long long strtoll(const char *str, char **ptr, int base);
+extern unsigned long long strtoull(const char *str, char **ptr, int base);
+extern long long atoll(const char *str);
+
+/****************************************************************************/
+
+typedef struct { long long quot; long long rem; } lldiv_t;
+
+/****************************************************************************/
+
+extern long long llabs(long long x);
+extern lldiv_t lldiv(long long n,long long d);
+
+/****************************************************************************/
+
+#endif /* __SASC */
+
+/****************************************************************************/
+
+extern float strtof(const char *str, char ** ptr);
 
 /****************************************************************************/
 

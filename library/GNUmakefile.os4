@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.52 2005-04-16 10:11:26 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.53 2005-05-07 13:21:49 obarthel Exp $
 #
 # :ts=8
 #
@@ -262,6 +262,8 @@ C_LIB = \
 	stdio_vasprintf_hook_entry.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
+	stdio_vsscanf.o \
+	stdio_vscanf.o \
 	stdio_vprintf.o \
 	stdio_vsnprintf.o \
 	stdio_vsnprintf_hook_entry.o \
@@ -298,7 +300,9 @@ C_LIB = \
 	stdlib_init_exit.o \
 	stdlib_isresident.o \
 	stdlib_labs.o \
+	stdlib_llabs.o \
 	stdlib_ldiv.o \
+	stdlib_lldiv.o \
 	stdlib_machine_test.o \
 	stdlib_main.o \
 	stdlib_malloc.o \
@@ -559,11 +563,14 @@ MATH_LIB = \
 	stdio_vasprintf.o \
 	stdio_vfprintf.o \
 	stdio_vfscanf.o \
+	stdio_vsscanf.o \
+	stdio_vscanf.o \
 	stdio_vprintf.o \
 	stdio_vsnprintf.o \
 	stdio_vsprintf.o \
 	stdlib_atof.o \
 	stdlib_strtod.o \
+	stdlib_strtof.o \
 	time_difftime.o
 
 # All objects files which make up libnet.a
