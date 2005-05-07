@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.13 2005-05-07 16:39:27 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.14 2005-05-07 17:03:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -1362,7 +1362,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			{
 				char * byte_ptr;
 
-				byte_ptr = va_arg(arg, byte *);
+				byte_ptr = va_arg(arg, char *);
 
 				assert( byte_ptr != NULL );
 

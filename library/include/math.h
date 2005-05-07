@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.6 2005-02-25 10:14:22 obarthel Exp $
+ * $Id: math.h,v 1.7 2005-05-07 17:04:07 obarthel Exp $
  *
  * :ts=4
  *
@@ -107,6 +107,19 @@ extern int isinf(double x);
 extern int isnan(double x);
 extern double logb(double x);
 extern double hypot(double x,double y);
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard, but it should
+   be part of ISO/IEC 9899:1999, also known as "C99". */
+
+/****************************************************************************/
+
+extern float __huge_val_float;
+
+/****************************************************************************/
+
+#define	HUGE_VALF ((const float)__huge_val_float)
 
 /****************************************************************************/
 

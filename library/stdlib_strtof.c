@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtof.c,v 1.1 2005-05-07 13:21:49 obarthel Exp $
+ * $Id: stdlib_strtof.c,v 1.2 2005-05-07 17:03:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,7 +89,7 @@ strtof(const char *str, char ** ptr)
 
 			__set_errno(EFAULT);
 
-			result = __get_huge_val();
+			result = __get_huge_valf();
 			goto out;
 		}
 	}
@@ -298,7 +298,7 @@ strtof(const char *str, char ** ptr)
 	{
 		__set_errno(error);
 
-		sum = __get_huge_val();
+		sum = __get_huge_valf();
 	}
 
 	if(is_negative)

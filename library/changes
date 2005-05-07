@@ -30,7 +30,10 @@
 
 - The printf() family now supports the %hh, %j, %t and %z modifiers and the
   %a/%A conversions for C99. The %j is treated like %ll, %t and %z are treated
-  like %l.
+  like %l. Also, the "infinity"/"not a number" signals now come out as the
+  strings "inf" and "nan".
+
+- Added HUGE_VALF to <math.h>.
 
 
 c.lib 1.191 (9.4.2005)

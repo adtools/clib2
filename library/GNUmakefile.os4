@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.53 2005-05-07 13:21:49 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.54 2005-05-07 17:03:55 obarthel Exp $
 #
 # :ts=8
 #
@@ -527,6 +527,7 @@ MATH_LIB = \
 	math_fmod.o \
 	math_frexp.o \
 	math_huge_val.o \
+	math_huge_valf.o \
 	math_hypot.o \
 	math_init_exit.o \
 	math_isnan.o \

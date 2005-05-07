@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.15 2005-03-20 17:14:58 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.16 2005-05-07 17:03:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,7 +73,8 @@ struct Library * MathIeeeDoubTransBase;
 
 /****************************************************************************/
 
-double __huge_val;
+float	__huge_val_float;
+double	__huge_val;
 
 /****************************************************************************/
 
@@ -114,6 +115,8 @@ MATH_DESTRUCTOR(math_exit)
 
 MATH_CONSTRUCTOR(math_init)
 {
+	union ieee_double * double_x;
+	union ieee_single * single_x;
 	BOOL success = FALSE;
 
 	ENTER();
@@ -163,34 +166,28 @@ MATH_CONSTRUCTOR(math_init)
 	}
 	#endif /* IEEE_FLOATING_POINT_SUPPORT */
 
-	/* Now fill in the HUGE_VAL constant, which is set to
-	   the largest representable floating point value. */
-	if(sizeof(__huge_val) == 4) /* single precision */
-	{
-		union ieee_single * x = (union ieee_single *)&__huge_val;
+	/* Now fill in HUGE_VAL and HUGE_VALF, respectively. TODO:
+	   also take care of HUGE_VALL. */
 
-		/* Exponent = +126, Mantissa = 8,388,607 */
-		x->raw[0] = 0x7f7fffff;
-	}
-	else if (sizeof(__huge_val) == 8) /* double precision */
-	{
-		union ieee_double * x = (union ieee_double *)&__huge_val;
+	/* Exponent = +126, Mantissa = 8,388,607 */
+	single_x = (union ieee_single *)&__huge_val_float;
+	single_x->raw[0] = 0x7f7fffff;
 
-		/* Exponent = +1022, Mantissa = 4,503,599,627,370,495 */
-		x->raw[0] = 0x7fefffff;
-		x->raw[1] = 0xffffffff;
-	}
-#if defined(USE_LONG_DOUBLE)
-	else if (sizeof(__huge_val) == 12) /* extended precision */
+	/* Exponent = +1022, Mantissa = 4,503,599,627,370,495 */
+	double_x = (union ieee_double *)&__huge_val;
+	double_x->raw[0] = 0x7fefffff;
+	double_x->raw[1] = 0xffffffff;
+
+	#if defined(USE_LONG_DOUBLE)
 	{
-		union ieee_long_double * x = (union ieee_long_double *)&__huge_val;
+		union ieee_long_double * x = (union ieee_long_double *)&__huge_val_long_double;
 
 		/* Exponent = +32766, Mantissa = 18,446,744,073,709,551,615 */
 		x->raw[0] = 0x7ffe0000;
 		x->raw[1] = 0xffffffff;
 		x->raw[2] = 0xffffffff;
 	}
-#endif /* USE_LONG_DOUBLE */
+	#endif /* USE_LONG_DOUBLE */
 
 	success = TRUE;
 
