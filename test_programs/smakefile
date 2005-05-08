@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.5 2005-03-03 15:12:18 obarthel Exp $
+# $Id: smakefile,v 1.6 2005-05-08 16:27:25 obarthel Exp $
 #
 # :ts=8
 #
@@ -65,7 +65,8 @@ AFLAGS = \
 
 all: \
 	setup \
-	test fgets_test iotest sscanf_test printf_test sprintf_test stack_size_test translate_test strtok_test uname simple \
+	test fgets_test iotest sscanf_test printf_test sprintf_test \
+	stack_size_test translate_test strtok_test uname simple fstat_stdout_test \
 	cleanup
 
 clean:
@@ -136,6 +137,11 @@ uname: uname.o
 simple: simple.o
 	@echo "Linking $@"
 	@slink $(LIB)startup.o simple.o to $@ lib $(LIB)c.lib addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+fstat_stdout_test: fstat_stdout_test.o
+	@echo "Linking $@"
+	@slink $(LIB)startup.o fstat_stdout_test.o to $@ lib $(LIB)c.lib addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 ##############################################################################
