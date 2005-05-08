@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.12 2005-05-07 13:21:49 obarthel Exp $
+ * $Id: stdio.h,v 1.13 2005-05-08 17:02:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -310,7 +310,7 @@ extern char *tmpnam(char *buf);
 
 /****************************************************************************/
 
-#define clearerr(file)	((void)(flockfile(file), (file)->flags &= ~(__FILE_EOF|__FILE_ERROR), unlockfile(file)))
+#define clearerr(file)	((void)(flockfile(file), (file)->flags &= ~(__FILE_EOF|__FILE_ERROR), funlockfile(file)))
 #define feof(file)		(flockfile(file), __unlockfile((file),((file)->flags & __FILE_EOF) != 0))
 #define ferror(file)	(flockfile(file), __unlockfile((file),((file)->flags & __FILE_ERROR) != 0))
 

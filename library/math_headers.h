@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.8 2005-05-07 17:03:55 obarthel Exp $
+ * $Id: math_headers.h,v 1.9 2005-05-08 17:02:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -86,6 +86,12 @@
 #ifndef PROTO_MATHIEEEDOUBTRANS_H
 #include <proto/mathieeedoubtrans.h>
 #endif /* PROTO_MATHIEEEDOUBTRANS_H */
+
+/****************************************************************************/
+
+extern struct Library * NOCOMMON MathIeeeSingBasBase;
+extern struct Library * NOCOMMON MathIeeeDoubBasBase;
+extern struct Library * NOCOMMON MathIeeeDoubTransBase;
 
 /****************************************************************************/
 
