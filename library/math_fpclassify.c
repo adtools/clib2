@@ -1,5 +1,5 @@
 /*
- * $Id: math_logb.c,v 1.6 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: math_fpclassify.c,v 1.1 2005-05-08 08:51:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,101 +29,65 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * PowerPC math library based in part on work by Sun Microsystems
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice
- * is preserved.
  */
 
-#ifndef _MATH_HEADERS_H
-#include "math_headers.h"
-#endif /* _MATH_HEADERS_H */
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-#if defined(FLOATING_POINT_SUPPORT)
+#if defined (FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
-#if defined(IEEE_FLOATING_POINT_SUPPORT) || defined(M68881_FLOATING_POINT_SUPPORT)
+/* The following is not part of the ISO 'C' (1994) standard, but it should
+   be part of ISO/IEC 9899:1999, also known as "C99". */
 
 /****************************************************************************/
 
-INLINE STATIC const double
-__logb(double x)
+int
+__fpclassify_float(float number)
 {
-	double result;
+	union ieee_single x;
+	int result;
 
-	result = log(x) / log((double)FLT_RADIX);
+	x.value = number;
+
+	if((x.raw[0] & 0x7f800000) == 0x7f800000 && (x.raw[0] & 0x007fffff) != 0)
+		result = FP_NAN; /* Exponent = 255 and fraction != 0.0 -> not a number */
+	else if ((x.raw[0] & 0x7fffffff) == 0x7f800000)
+		result = FP_INFINITE; /* Exponent = 255 and fraction = 0.0 -> infinity */
+	else if (x.raw[0] == 0) /* ZZZ test against epsilon? */
+		result = FP_ZERO; /* Both exponent and fraction are zero -> zero */
+	else if ((x.raw[0] & 0x7f800000) == 0)
+		result = FP_SUBNORMAL; /* Exponent = 0 -> subnormal */
+	else
+		result = FP_NORMAL;
 
 	return(result);
 }
 
-#endif /* IEEE_FLOATING_POINT_SUPPORT || M68881_FLOATING_POINT_SUPPORT */
-
 /****************************************************************************/
 
-#if defined(PPC_FLOATING_POINT_SUPPORT)
-
-INLINE STATIC const double
-__logb(double x)
+int
+__fpclassify_double(double number)
 {
-	unsigned int lx,ix;
+	union ieee_double x;
+	int result;
 
-	EXTRACT_WORDS(ix,lx,x);
+	x.value = number;
 
-	ix &= 0x7fffffff;	/* high |x| */
-	if((ix|lx)==0)
-		return -1.0/fabs(x);
-
-	if(ix>=0x7ff00000)
-		return x*x;
-
-	if((ix>>=20)==0)	/* IEEE 754 logb */
-		return -1022.0;
+	if(((x.raw[0] & 0x7ff00000) == 0x7ff00000) && ((x.raw[0] & 0x000fffff) != 0 || (x.raw[1] != 0)))
+		result = FP_NAN; /* Exponent = 2047 and fraction != 0.0 -> not a number */
+	else if (((x.raw[0] & 0x7fffffff) == 0x7ff00000) && (x.raw[1] == 0))
+		result = FP_INFINITE; /* Exponent = 2047 and fraction = 0.0 -> infinity */
+	else if (x.raw[0] == 0 && x.raw[1] == 0) /* ZZZ test against epsilon? */
+		result = FP_ZERO; /* Both exponent and fraction are zero -> zero */
+	else if ((x.raw[0] & 0x7fff0000) == 0)
+		result = FP_SUBNORMAL; /* Exponent = 0 -> subnormal */
 	else
-		return (double) (ix-1023);
-}
-
-#endif /* PPC_FLOATING_POINT_SUPPORT */
-
-/****************************************************************************/
-
-double
-logb(double x)
-{
-	double result;
-
-	if(x == 0.0)
-	{
-		result = -__get_huge_val();
-		goto out;
-	}
-
-	if(isnan(x))
-	{
-		result = x;
-		goto out;
-	}
-
-	if(isinf(x))
-	{
-		if(x < 0)
-			result = (-x);
-		else
-			result = x;
-
-		goto out;
-	}
-
-	result = __logb(x);
-
- out:
+		result = FP_NORMAL;
 
 	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: math_logb.c,v 1.6 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: math_fabsf.c,v 1.1 2005-05-08 08:51:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,15 +29,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * PowerPC math library based in part on work by Sun Microsystems
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice
- * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -50,80 +41,98 @@
 
 /****************************************************************************/
 
-#if defined(IEEE_FLOATING_POINT_SUPPORT) || defined(M68881_FLOATING_POINT_SUPPORT)
+#if defined(IEEE_FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
-INLINE STATIC const double
-__logb(double x)
-{
-	double result;
+#if defined(__GNUC__)
 
-	result = log(x) / log((double)FLT_RADIX);
+/****************************************************************************/
+
+#if defined(SMALL_DATA)
+#define A4(x) "a4@(" #x ":W)"
+#elif defined(SMALL_DATA32)
+#define A4(x) "a4@(" #x ":L)"
+#else
+#define A4(x) #x
+#endif /* SMALL_DATA */
+
+/****************************************************************************/
+
+extern float __fabsf(float x);
+
+/****************************************************************************/
+
+asm("
+
+	.text
+	.even
+
+	.globl	_MathIeeeSingBasBase
+	.globl	___fabsf
+
+___fabsf:
+
+	movel	a6,sp@-
+	movel	"A4(_MathIeeeSingBasBase)",a6
+	moveml	sp@(8),d0/d1
+	jsr		a6@(-54:W)
+	movel	sp@+,a6
+	rts
+
+");
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
+INLINE STATIC const float
+__fabsf(float x)
+{
+	float result;
+
+	result = IEEESPAbs(x);
 
 	return(result);
 }
 
-#endif /* IEEE_FLOATING_POINT_SUPPORT || M68881_FLOATING_POINT_SUPPORT */
+/****************************************************************************/
+
+#endif /* __GNUC__ */
 
 /****************************************************************************/
 
-#if defined(PPC_FLOATING_POINT_SUPPORT)
+#else
 
-INLINE STATIC const double
-__logb(double x)
+/****************************************************************************/
+
+INLINE STATIC const float
+__fabsf(float number)
 {
-	unsigned int lx,ix;
+	union ieee_single x;
 
-	EXTRACT_WORDS(ix,lx,x);
+	x.value = number;
 
-	ix &= 0x7fffffff;	/* high |x| */
-	if((ix|lx)==0)
-		return -1.0/fabs(x);
+	/* Knock off the sign bit. */
+	x.raw[0] &= 0x7fffffff;
 
-	if(ix>=0x7ff00000)
-		return x*x;
-
-	if((ix>>=20)==0)	/* IEEE 754 logb */
-		return -1022.0;
-	else
-		return (double) (ix-1023);
+	return(x.value);
 }
 
-#endif /* PPC_FLOATING_POINT_SUPPORT */
+/****************************************************************************/
+
+#endif /* IEEE_FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
 
-double
-logb(double x)
+float
+fabsf(float x)
 {
-	double result;
+	float result;
 
-	if(x == 0.0)
-	{
-		result = -__get_huge_val();
-		goto out;
-	}
-
-	if(isnan(x))
-	{
-		result = x;
-		goto out;
-	}
-
-	if(isinf(x))
-	{
-		if(x < 0)
-			result = (-x);
-		else
-			result = x;
-
-		goto out;
-	}
-
-	result = __logb(x);
-
- out:
+	result = __fabsf(x);
 
 	return(result);
 }

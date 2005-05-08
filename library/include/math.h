@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.7 2005-05-07 17:04:07 obarthel Exp $
+ * $Id: math.h,v 1.8 2005-05-08 08:51:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -103,8 +103,6 @@ extern double tanh(double x);
 
 extern double rint(double x);
 extern float rintf(float x);
-extern int isinf(double x);
-extern int isnan(double x);
 extern double logb(double x);
 extern double hypot(double x,double y);
 
@@ -120,6 +118,51 @@ extern float __huge_val_float;
 /****************************************************************************/
 
 #define	HUGE_VALF ((const float)__huge_val_float)
+
+/****************************************************************************/
+
+#define FP_INFINITE		0	/* -/+ infinity */
+#define FP_NAN			1	/* not a number */
+#define FP_NORMAL		2	/* normalized floating point number */
+#define FP_SUBNORMAL	3	/* very small floating point number; special
+							   case of IEEE 754 */
+#define FP_ZERO			4	/* exponent/fraction are zero */
+
+/****************************************************************************/
+
+extern int __fpclassify_float(float x);
+extern int __fpclassify_double(double x);
+extern int __isfinite_float(float x);
+extern int __isfinite_double(double x);
+extern int __signbit_float(float x);
+extern int __signbit_double(double x);
+
+#define fpclassify(x) \
+	((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x))
+
+#define isfinite(x) \
+	((sizeof(x) == sizeof(float)) ? __isfinite_single(x) : __isfinite_double(x))
+
+#define isinf(x) \
+	(((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x)) == FP_INFINITE)
+
+#define isnan(x) \
+	(((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x)) == FP_NAN)
+
+#define isnormal(x) \
+	(((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x)) == FP_NORMAL)
+
+#define signbit(x) \
+	((sizeof(x) == sizeof(float)) ? __signbit_single(x) : __signbit_double(x))
+
+/****************************************************************************/
+
+extern float fabsf(float x);
+
+/****************************************************************************/
+
+extern float nanf(const char *tagp);
+extern double nan(const char *tagp);
 
 /****************************************************************************/
 

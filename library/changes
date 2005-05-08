@@ -29,11 +29,26 @@
   And it ignores the E and O modifiers.
 
 - The printf() family now supports the %hh, %j, %t and %z modifiers and the
-  %a/%A conversions for C99. The %j is treated like %ll, %t and %z are treated
+  %a/%A conversions for C99. The %j is treated like %ll; %t and %z are treated
   like %l. Also, the "infinity"/"not a number" signals now come out as the
   strings "inf" and "nan".
 
 - Added HUGE_VALF to <math.h>.
+
+- For the printf() "%a" conversion the exponent now comes out as a binary
+  number rather than a decimal one. Now how odd is that?
+
+- strtod() and strtof() now support "inf"/"infinity"/"nan"/"nan(..)" and
+  hexadecimal floating point numbers, for C99.
+
+- Added the fpclassify(), isfinite(), isnormal() and signbit() macros for C99.
+
+- Reimplemented isnan() and isinf() as macros for C99. The corresponding
+  functions will be dropped from the library. Note that the isinf() macro
+  does not return -1, 0 or 1 like the old function did, but only 0 or 1
+  depending upon whether the parameter represents +/- infinity or not.
+
+- Added fabsf() for C99.
 
 
 c.lib 1.191 (9.4.2005)

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.51 2005-05-07 17:03:55 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.52 2005-05-08 08:51:29 obarthel Exp $
 #
 # :ts=8
 #
@@ -523,20 +523,24 @@ MATH_LIB = \
 	math_cosh.o \
 	math_exp.o \
 	math_fabs.o \
+	math_fabsf.o \
 	math_floor.o \
 	math_fmod.o \
+	math_fpclassify.o \
+	math_isfinite.o \
+	math_signbit.o \
 	math_frexp.o \
 	math_huge_val.o \
 	math_huge_valf.o \
 	math_hypot.o \
 	math_init_exit.o \
-	math_isinf.o \
-	math_isnan.o \
 	math_ldexp.o \
 	math_log.o \
 	math_log10.o \
 	math_logb.o \
 	math_modf.o \
+	math_nan.o \
+	math_nanf.o \
 	math_pow.o \
 	math_rint.o \
 	math_rintf.o \

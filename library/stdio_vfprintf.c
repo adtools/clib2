@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.14 2005-05-07 17:03:55 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.15 2005-05-08 08:51:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -703,7 +703,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				const char * digit_encoding;
 				__long_double_t v;
 				int radix;
-				int sign;
 
 				if(conversion_type == 'a')
 				{
@@ -730,14 +729,14 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				else
 					v = va_arg(arg, double);
 
-				if((sign = isinf(v)) != 0)
+				if(isinf(v))
 				{
 					SHOWMSG("infinity");
 
 					strcpy(output_buffer,"inf");
 					output_len = 3;
 
-					if(sign < 0)
+					if(v < 0)
 						SET_FLAG(format_flags,FORMATF_IsNegative);
 
 					fill_character = ' ';
@@ -996,12 +995,14 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 					if(conversion_type == 'e' || conversion_type == 'a')
 					{
-						/* For 'long double' the exponent is 15 bits in size, which
-						   allows for a minimum of -16384 to be used. Eight digits
-						   for the exponent should be plenty. */						   
-						char exponent_string[8];
+						char exponent_string[40];
 						size_t exponent_string_len,j;
 						int exponent_sign;
+
+						/* For the '%a' conversion the exponent is given in
+						   binary notation rather than decimal. */
+						if(conversion_type == 'a')
+							radix = 2;
 
 						/* Build the exponent string in reverse order. */
 						exponent_string_len = 0;
@@ -1019,9 +1020,9 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 						while(exponent > 0 && exponent_string_len < sizeof(exponent_string))
 						{
-							exponent_string[exponent_string_len++] = '0' + (exponent % 10);
+							exponent_string[exponent_string_len++] = '0' + (exponent % radix);
 
-							exponent /= 10;
+							exponent /= radix;
 						}
 
 						/* Minimum length of the exponent is two digits. */
