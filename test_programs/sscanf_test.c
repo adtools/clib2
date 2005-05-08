@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 int
@@ -7,6 +8,11 @@ main(void)
 	int first, second, third, num;
 	int n,a,b,c;
 	char str[4];
+	double f;
+
+	a = 0;
+	n = sscanf("060206","%x",&a);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, a = %d\n",n,a);
 
 	num = sscanf("day-month-year", "%d-%d-%d", &first, &second, &third);
 
@@ -103,6 +109,27 @@ main(void)
 	memset(str,0,sizeof(str));
 	n = sscanf("1,e","%*d,%[abc]",str);
 	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, str = '%s'\n",n,str);
+
+	n = sscanf("1","%lf",&f);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, f = '%f' (%f)\n",n,f,atof("1"));
+
+	n = sscanf("1234.567","%lf",&f);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, f = '%f' (%f)\n",n,f,atof("1234.567"));
+
+	n = sscanf("inf","%lf",&f);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, f = '%f' (%f)\n",n,f,atof("inf"));
+
+	n = sscanf("infinity","%lf",&f);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, f = '%f' (%f)\n",n,f,atof("infinity"));
+
+	n = sscanf("nan","%lf",&f);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, f = '%f' (%f)\n",n,f,atof("nan"));
+
+	n = sscanf("nan(23)","%lf",&f);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, f = '%f' (%f)\n",n,f,atof("nan(23)"));
+
+	n = sscanf("0xabc.defp+101","%lf",&f);
+	printf("%s:%d:",__FILE__,__LINE__);printf("n = %d, f = '%f' (%f)\n",n,f,atof("0xabc.defp+101"));
 
 	return(0);
 }

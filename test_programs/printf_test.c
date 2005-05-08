@@ -165,6 +165,20 @@ main(void)
 
 	printf("\n");
 
+	print_format_float("%10.2a",12.678,-12.678);
+	print_format_float("%010.2a",12.678,-12.678);
+	print_format_float("% 010.2a",12.678,-12.678);
+	print_format_float("%+10.2A",12.678,-12.678);
+	print_format_float("%+010.2A",12.678,-12.678);
+	print_format_float("%-10.2a",12.678,-12.678);
+	print_format_float("%- 10.2a",12.678,-12.678);
+	print_format_float("%-+10.2a",12.678,-12.678);
+	print_format_float("%a",12.678,-12.678);
+	print_format_float("%10a",12.678,-12.678);
+	print_format_float("%10.0a",12.678,-12.678);
+
+	printf("\n");
+
 	print_format_float("%10.2g",12.678,-12.678);
 	print_format_float("%010.2g",12.678,-12.678);
 	print_format_float("% 010.2g",12.678,-12.678);
