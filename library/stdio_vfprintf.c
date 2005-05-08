@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.15 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.16 2005-05-08 11:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,8 +37,6 @@
 
 /****************************************************************************/
 
-/*#define DEBUG*/
-
 #ifndef _STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
@@ -75,6 +73,8 @@ STATIC int
 get_num_leading_digits(__long_double_t v,int radix)
 {
 	int num_digits;
+
+	SHOWVALUE(radix);
 
 	if(v < radix)
 	{
@@ -124,7 +124,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 		parameter_size_long_long,
 		parameter_size_long_double,
 		parameter_size_intmax_t,
-		parameter_size_default,
+		parameter_size_default
 	};
 
 	struct iob * iob = (struct iob *)stream;
@@ -891,6 +891,8 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 						   precision (we just change the floating point
 						   exponent). */
 						num_leading_digits = get_num_leading_digits(v,radix);
+
+						SHOWVALUE(num_leading_digits);
 
 						v /= pow(radix,(double)num_leading_digits);
 

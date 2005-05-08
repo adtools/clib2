@@ -50,6 +50,10 @@
 
 - Added fabsf() for C99.
 
+- The scanf() family now supports the %hh, %j, %t and %z modifiers and the
+  %a/%A conversions for C99. The %j is treated like %ll; %t and %z are treated
+  like %l. Also, the "inf"/"infinity"/"nan"/"nan()" keywords are processed.
+
 
 c.lib 1.191 (9.4.2005)
 

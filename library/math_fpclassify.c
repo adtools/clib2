@@ -1,5 +1,5 @@
 /*
- * $Id: math_fpclassify.c,v 1.1 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: math_fpclassify.c,v 1.2 2005-05-08 11:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,16 +54,44 @@ __fpclassify_float(float number)
 
 	x.value = number;
 
+	D(("number = 0x%08lx",x.raw[0]));
+
 	if((x.raw[0] & 0x7f800000) == 0x7f800000 && (x.raw[0] & 0x007fffff) != 0)
-		result = FP_NAN; /* Exponent = 255 and fraction != 0.0 -> not a number */
+	{
+		SHOWMSG("not a number");
+
+		/* Exponent = 255 and fraction != 0.0 -> not a number */
+		result = FP_NAN;
+	}
 	else if ((x.raw[0] & 0x7fffffff) == 0x7f800000)
-		result = FP_INFINITE; /* Exponent = 255 and fraction = 0.0 -> infinity */
+	{
+		SHOWMSG("infinity");
+
+		/* Exponent = 255 and fraction = 0.0 -> infinity */
+		result = FP_INFINITE;
+	}
 	else if (x.raw[0] == 0) /* ZZZ test against epsilon? */
-		result = FP_ZERO; /* Both exponent and fraction are zero -> zero */
+	{
+		SHOWMSG("zero");
+
+		/* Both exponent and fraction are zero -> zero */
+		result = FP_ZERO;
+	}
 	else if ((x.raw[0] & 0x7f800000) == 0)
-		result = FP_SUBNORMAL; /* Exponent = 0 -> subnormal */
+	{
+		SHOWMSG("subnormal");
+
+		/* Exponent = 0 -> subnormal (IEEE 754) */
+		result = FP_SUBNORMAL;
+	}
 	else
+	{
+		SHOWMSG("normal");
+
 		result = FP_NORMAL;
+	}
+
+	SHOWVALUE(result);
 
 	return(result);
 }
@@ -78,16 +106,44 @@ __fpclassify_double(double number)
 
 	x.value = number;
 
+	D(("number = 0x%08lx%08lx",x.raw[0],x.raw[1]));
+
 	if(((x.raw[0] & 0x7ff00000) == 0x7ff00000) && ((x.raw[0] & 0x000fffff) != 0 || (x.raw[1] != 0)))
-		result = FP_NAN; /* Exponent = 2047 and fraction != 0.0 -> not a number */
+	{
+		SHOWMSG("not a number");
+
+		/* Exponent = 2047 and fraction != 0.0 -> not a number */
+		result = FP_NAN;
+	}
 	else if (((x.raw[0] & 0x7fffffff) == 0x7ff00000) && (x.raw[1] == 0))
-		result = FP_INFINITE; /* Exponent = 2047 and fraction = 0.0 -> infinity */
+	{
+		SHOWMSG("infinity");
+
+		/* Exponent = 2047 and fraction = 0.0 -> infinity */
+		result = FP_INFINITE;
+	}
 	else if (x.raw[0] == 0 && x.raw[1] == 0) /* ZZZ test against epsilon? */
-		result = FP_ZERO; /* Both exponent and fraction are zero -> zero */
+	{
+		SHOWMSG("zero");
+
+		/* Both exponent and fraction are zero -> zero */
+		result = FP_ZERO;
+	}
 	else if ((x.raw[0] & 0x7fff0000) == 0)
-		result = FP_SUBNORMAL; /* Exponent = 0 -> subnormal */
+	{
+		SHOWMSG("subnormal");
+
+		/* Exponent = 0 -> subnormal (IEEE 754) */
+		result = FP_SUBNORMAL;
+	}
 	else
+	{
+		SHOWMSG("normal");
+
 		result = FP_NORMAL;
+	}
+
+	SHOWVALUE(result);
 
 	return(result);
 }

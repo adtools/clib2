@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtod.c,v 1.5 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: stdlib_strtod.c,v 1.6 2005-05-08 11:27:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,17 +123,23 @@ strtod(const char *str, char ** ptr)
 	/* We begin by checking for the "inf" and "nan" strings. */
 	if(strcasecmp(str,"inf") == SAME || strcasecmp(str,"infinity") == SAME)
 	{
-		union ieee_double * x = (union ieee_double *)&sum;
+		union ieee_double x;
+
+		SHOWMSG("infinity");
 
 		str += strlen(str);
 
 		/* Exponent = 2047 and fraction = 0.0 */
-		x->raw[0] = 0x7ff00000;
-		x->raw[1] = 0x00000000;
+		x.raw[0] = 0x7ff00000;
+		x.raw[1] = 0x00000000;
+
+		sum = x.value;
 	}
 	else if (strncasecmp(str,"nan",3) == SAME && (str[3] == '(' || str[3] == '\0'))
 	{
-		union ieee_double * x = (union ieee_double *)&sum;
+		union ieee_double x;
+
+		SHOWMSG("not a number");
 
 		str += 3;
 
@@ -148,8 +154,10 @@ strtod(const char *str, char ** ptr)
 		}
 
 		/* Exponent = 2047 and fraction != 0.0 */
-		x->raw[0] = 0x7ff00000;
-		x->raw[1] = 0x00000001;
+		x.raw[0] = 0x7ff00000;
+		x.raw[1] = 0x00000001;
+
+		sum = x.value;
 	}
 	else
 	{
@@ -272,12 +280,15 @@ strtod(const char *str, char ** ptr)
 			int exponent_is_negative;
 			int new_exponent;
 			int exponent = 0;
+			int exponent_radix;
 
 			/* If we are processing a hexadecimal encoded
 			   floating point number, switch to a binary
 			   exponent. */
 			if(radix == 16)
-				radix = 2;
+				exponent_radix = 2;
+			else
+				exponent_radix = 10;
 
 			/* Skip the indicator. */
 			str++;
@@ -302,16 +313,16 @@ strtod(const char *str, char ** ptr)
 				if('0' <= c && c <= '9')
 					c -= '0';
 				else
-					c = radix;
+					c = exponent_radix;
 
-				if(c >= radix)
+				if(c >= exponent_radix)
 					break;
 
 				str++;
 
 				if(error == 0)
 				{
-					new_exponent = (radix * exponent) + c;
+					new_exponent = (exponent_radix * exponent) + c;
 					if(new_exponent < exponent) /* overflow? */
 						error = ERANGE;
 					else
