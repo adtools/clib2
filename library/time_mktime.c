@@ -1,5 +1,5 @@
 /*
- * $Id: time_mktime.c,v 1.8 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: time_mktime.c,v 1.9 2005-05-09 13:47:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -155,21 +155,23 @@ mktime(struct tm *tm)
 		goto out;
 	}
 
-	if(tm->tm_sec < 0 || tm->tm_sec > 59)
+	/* Note: the number of seconds can be larger than 59
+	         in order to account for leap seconds. */
+	if(tm->tm_sec < 0 || tm->tm_sec > 60)
 	{
 		SHOWVALUE(tm->tm_sec);
 		SHOWMSG("invalid seconds");
 		goto out;
 	}
 
-	clock_data.sec		= tm->tm_sec;
+	clock_data.sec		= (tm->tm_sec > 59) ? 59 : tm->tm_sec;
 	clock_data.min		= tm->tm_min;
 	clock_data.hour		= tm->tm_hour;
 	clock_data.mday		= tm->tm_mday;
 	clock_data.month	= tm->tm_mon + 1;
 	clock_data.year		= tm->tm_year + 1900;
 
-	seconds = Date2Amiga(&clock_data);
+	seconds = Date2Amiga(&clock_data) + (tm->tm_sec - 59);
 
 	/* The AmigaOS "epoch" starts with January 1st, 1978, which was
 	   a Sunday. */

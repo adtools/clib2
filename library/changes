@@ -54,6 +54,12 @@
   %a/%A conversions for C99. The %j is treated like %ll; %t and %z are treated
   like %l. Also, the "inf"/"infinity"/"nan"/"nan()" keywords are processed.
 
+- The strftime() %z conversion now prints the time zone difference as a
+  "decimal" number. That is, if the difference is 5 hours and 30 minutes,
+  then %z will now print "530" rather than "330".
+
+- mktime() now handles one leap second gracefully.
+
 
 c.lib 1.191 (9.4.2005)
 
