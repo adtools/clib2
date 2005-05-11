@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.13 2005-05-08 17:02:16 obarthel Exp $
+ * $Id: stdio.h,v 1.14 2005-05-11 20:15:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -377,7 +377,6 @@ extern int putchar_unlocked(int c);
 extern FILE * fdopen(int file_descriptor, const char * type);
 extern int fileno(FILE * file);
 extern int asprintf(char **ret, const char *format, ...);
-extern int snprintf(char *s,size_t size,const char *format,...);
 extern int vsnprintf(char *s,size_t size,const char *format,va_list arg);
 extern int pclose(FILE *stream);
 extern FILE * popen(const char *command, const char *type);
@@ -426,6 +425,7 @@ extern int __vasprintf(const char *file,int line,char **ret,const char *format,v
 extern int vfscanf(FILE *stream, const char *format, va_list arg);
 extern int vsscanf(const char *s, const char *format, va_list arg);
 extern int vscanf(const char *format,va_list arg);
+extern int snprintf(char *s,size_t size,const char *format,...);
 
 /****************************************************************************/
 

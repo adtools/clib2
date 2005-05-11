@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.52 2005-05-08 08:51:29 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.53 2005-05-11 20:15:24 obarthel Exp $
 #
 # :ts=8
 #
@@ -127,6 +127,7 @@ C_LIB = \
 	ctype_isalnum.o \
 	ctype_isalpha.o \
 	ctype_isascii.o \
+	ctype_isblank.o \
 	ctype_iscntrl.o \
 	ctype_isdigit.o \
 	ctype_isgraph.o \

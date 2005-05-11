@@ -60,6 +60,8 @@
 
 - mktime() now handles one leap second gracefully.
 
+- Added isblank().
+
 
 c.lib 1.191 (9.4.2005)
 
