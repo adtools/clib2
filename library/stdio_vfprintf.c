@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.16 2005-05-08 11:27:26 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.17 2005-05-12 14:42:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,6 +66,10 @@
 /****************************************************************************/
 
 #if defined(FLOATING_POINT_SUPPORT)
+
+/****************************************************************************/
+
+#define max(a,b) ((a) > (b) ? (a) : (b))
 
 /****************************************************************************/
 
@@ -139,11 +143,14 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 	char *output_buffer;
 	int output_len;
 	char *prefix;
+	char prefix_buffer[8];
 	int result = EOF;
 	int len = 0;
 	int c;
 
  #if defined(FLOATING_POINT_SUPPORT)
+ 	char * internal_buffer = NULL;
+ 	size_t internal_buffer_size = 0;
 	char trail_string[8];
 	int trail_string_len;
 	int num_trailing_zeroes;
@@ -761,6 +768,8 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				{
 					BOOL strip_trailing_zeroes = FALSE;
 					__long_double_t roundoff_fudge = 0.0;
+					int num_output_characters;
+					int num_leading_digits;
 					int max_digits = -1;
 					int exponent = 0;
 					int digit;
@@ -881,19 +890,52 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 					SHOWMSG("integral part");
 
+					num_leading_digits = get_num_leading_digits(v,radix);
+
+					SHOWVALUE(num_leading_digits);
+
+					/* Figure out how much room the number will need in order
+					   to be stored. */
+					num_output_characters =
+						1 +									/* sign */
+						num_leading_digits +				/* integral part */
+						1 +									/* decimal point */
+						max(0,max(precision,max_digits)) +	/* fractional part */
+						1 +									/* 'e' or 'p' */
+						1 +									/* sign of the exponent */
+						32 +								/* exponent */
+						1;									/* NUL termination */
+
+					/* Can we store that much? */
+					if((size_t)num_output_characters > sizeof(buffer))
+					{
+						if((size_t)num_output_characters > internal_buffer_size)
+						{
+							char * new_internal_buffer;
+
+							/* Try to (re-)allocate a larger output buffer. */
+							new_internal_buffer = realloc(internal_buffer,(size_t)num_output_characters);
+							if(new_internal_buffer == NULL)
+							{
+								__set_errno(ENOMEM);
+								goto out;
+							}
+
+							internal_buffer			= new_internal_buffer;
+							internal_buffer_size	= (size_t)num_output_characters;
+						}
+
+						buffer_start	= internal_buffer;
+						buffer_stop		= &internal_buffer[internal_buffer_size - 1];
+					}
+
 					if(v >= 1.0)
 					{
-						int num_leading_digits;
-
 						/* 'Normalize' the number so that we have a zero in
 						   front of the mantissa. We can't lose here: we
 						   simply scale the value without any loss of
 						   precision (we just change the floating point
 						   exponent). */
-						num_leading_digits = get_num_leading_digits(v,radix);
-
-						SHOWVALUE(num_leading_digits);
-
 						v /= pow(radix,(double)num_leading_digits);
 
 						for(i = 0 ; (max_digits != 0) && (i < num_leading_digits) && (output_buffer < buffer_stop) ; i++)
@@ -989,8 +1031,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 						output_len = output_buffer - buffer_start;
 
-						assert(output_len < (int)sizeof(buffer));
-
 						D(("length = %ld, output_buffer = '%s'",output_len,buffer_start));
 					}
 					#endif /* DEBUG */
@@ -1065,8 +1105,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 					output_len = output_buffer - buffer_start;
 					output_buffer = buffer_start;
-
-					assert(output_len < (int)sizeof(buffer));
 
 					D(("length = %ld, output_buffer = '%s'",output_len,output_buffer));
 				}
@@ -1466,31 +1504,22 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 		/* Get ready to prefix a sign character, if required. */
 		if(FLAG_IS_SET(format_flags,FORMATF_IsNegative))
-		{
 			prefix = "-";
-		}
 		else if (FLAG_IS_SET(format_flags,FORMATF_ProduceSign))
-		{
 			prefix = "+";
-		}
 		else if (FLAG_IS_SET(format_flags,FORMATF_ProduceSpace))
-		{
 			prefix = " ";
-		}
 		else if (FLAG_IS_SET(format_flags,FORMATF_ZeroPrefix))
-		{
 			prefix = "0";
-		}
-		else if (FLAG_IS_SET(format_flags,FORMATF_HexPrefix))
-		{
-			if(FLAG_IS_SET(format_flags,FORMATF_CapitalLetters))
-				prefix = "0X";
-			else
-				prefix = "0x";
-		}
 		else
-		{
 			prefix = NULL;
+
+		if(FLAG_IS_SET(format_flags,FORMATF_HexPrefix))
+		{
+			strcpy(prefix_buffer,(prefix != NULL ? prefix : ""));
+			strcat(prefix_buffer,FLAG_IS_SET(format_flags,FORMATF_CapitalLetters) ? "0X" : "0x");
+
+			prefix = prefix_buffer;
 		}
 
 		if(FLAG_IS_SET(format_flags,FORMATF_LeftJustified))
@@ -1646,6 +1675,13 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 	result = len;
 
  out:
+
+	#if defined(FLOATING_POINT_SUPPORT)
+	{
+		if(internal_buffer != NULL && internal_buffer_size > 0)
+			free(internal_buffer);
+	}
+	#endif /* FLOATING_POINT_SUPPORT */
 
 	/* Note: if buffering is disabled for this stream, then we still
 	   may have buffered data around, queued to be printed right now.

@@ -1,3 +1,5 @@
+c.lib 1.192 (12.5.2005)
+
 - Changed how errors are detected, as returned by Write(), Read() and
   Seek(). Seek() is particularly challenging because the value it
   returns might be a valid file position and not an error.
@@ -86,6 +88,11 @@
 
 - fflush() now consistently supports a NULL parameter, causing all
   streams to be flushed for which this behaviour is defined.
+
+- The printf() family can now produce output for floating point
+  numbers with more than about 77 characters, provided sufficient
+  memory is available. C99 calls for a minimum of 4095 characters,
+  but we're trying to allocate the space required dynamically.
 
 
 c.lib 1.191 (9.4.2005)
