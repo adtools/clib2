@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fflush.c,v 1.9 2005-05-12 13:21:43 obarthel Exp $
+ * $Id: stdio_fflush.c,v 1.10 2005-05-12 14:00:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,25 +55,14 @@ fflush(FILE *stream)
 	if(__check_abort_enabled)
 		__check_abort();
 
-	/* Subtlety alert: the thread-safe library needs to obtain locks for
-	   stdio, buffered files and file descriptors in a very particular
-	   order in order to steer clear of deadlocks. The order is as given
-	   above: stdio, buffered files, file descriptor table entries. Which
-	   normally means that if code has any business locking stdio or the
-	   file descriptor table entries, it should lock stdio first. This
-	   function, at least in the UNIX_PATH_SEMANTICS variant, does not do
-	   this. Here's why: if the 'stream' variable is NULL to start with,
-	   no per-stream locking is performed anyway, and the stdio lock can
-	   be obtained without running the risk of having obtain semaphores
-	   in the wrong order. */
-	flockfile(stream);
-
 	/* Flush a particular stream? */
 	if(stream != NULL)
 	{
 		struct iob * file = (struct iob *)stream;
 
 		assert( __is_valid_iob(file) );
+
+		flockfile(stream);
 
 		if(__iob_write_buffer_is_valid(file) && __flush_iob_write_buffer(file) < 0)
 			goto out;
@@ -111,7 +100,8 @@ fflush(FILE *stream)
 
  out:
 
-	funlockfile(stream);
+	if(stream != NULL)
+		funlockfile(stream);
 
 	RETURN(result);
 	return(result);
