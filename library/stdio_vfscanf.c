@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.13 2005-05-08 11:27:26 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.14 2005-05-12 14:50:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -309,7 +309,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 			/* Check for long long parameters. */
 			if(parameter_size == parameter_size_long && c == 'l')
 			{
-				parameter_size == parameter_size_long_long;
+				parameter_size = parameter_size_long_long;
 
 				format++;
 

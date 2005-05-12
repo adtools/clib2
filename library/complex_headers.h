@@ -1,5 +1,5 @@
 /*
- * $Id: complex_headers.h,v 1.2 2005-04-03 10:53:24 obarthel Exp $
+ * $Id: complex_headers.h,v 1.3 2005-05-12 14:50:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,7 +42,7 @@
 
 /****************************************************************************/
 
-#if defined(FLOATING_POINT_SUPPORT) && defined(__GNUC__) && ((__STDC_VERSION__ + 0) >= 199901L)
+#if defined(FLOATING_POINT_SUPPORT) && defined(__GNUC__) && defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 
 /****************************************************************************/
 

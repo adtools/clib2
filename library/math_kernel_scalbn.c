@@ -1,5 +1,5 @@
 /*
- * $Id: math_kernel_scalbn.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_kernel_scalbn.c,v 1.4 2005-05-12 14:50:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,17 +49,6 @@
 #if defined(FLOATING_POINT_SUPPORT) && defined(PPC_FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
-
-INLINE STATIC double copysign(double x, double y)
-{
-	unsigned int hx,hy;
-
-	GET_HIGH_WORD(hx,x);
-	GET_HIGH_WORD(hy,y);
-	SET_HIGH_WORD(x,(hx&0x7fffffff)|(hy&0x80000000));
-
-	return x;
-}
 
 static const double
 huge	= 1.0e+300,
