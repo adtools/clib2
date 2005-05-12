@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.9 2005-05-08 17:02:10 obarthel Exp $
+ * $Id: math_headers.h,v 1.10 2005-05-12 13:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,8 +98,6 @@ extern struct Library * NOCOMMON MathIeeeDoubTransBase;
 #endif /* IEEE_FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
-
-#if defined(PPC_FLOATING_POINT_SUPPORT)
 
 /*
  * ====================================================
@@ -211,6 +209,8 @@ do {							\
   sf_u.word = (i);				\
   (d) = sf_u.value;				\
 } while (0)
+
+#if defined(PPC_FLOATING_POINT_SUPPORT)
 
 extern double __kernel_cos(double x, double y);
 extern double __kernel_sin(double x, double y, int iy);

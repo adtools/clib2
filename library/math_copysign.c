@@ -1,5 +1,5 @@
 /*
- * $Id: stddef.h,v 1.4 2005-05-12 13:21:47 obarthel Exp $
+ * $Id: math_copysign.c,v 1.1 2005-05-12 13:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,43 +29,39 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
-#ifndef _STDDEF_H
-#define _STDDEF_H
+#ifndef _MATH_HEADERS_H
+#include "math_headers.h"
+#endif /* _MATH_HEADERS_H */
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#if defined(FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
-#ifndef NULL
-#ifndef __cplusplus
-#define NULL ((void *)0L)
-#else
-#define NULL 0L
-#endif /* __cplusplus */
-#endif /* NULL */
+double
+copysign(double x, double y)
+{
+	unsigned long hx,hy;
 
-/****************************************************************************/
+	GET_HIGH_WORD(hx,x);
+	GET_HIGH_WORD(hy,y);
+	SET_HIGH_WORD(x,(hx&0x7fffffff)|(hy&0x80000000U));
 
-typedef int ptrdiff_t;
-typedef unsigned int size_t;
-typedef unsigned short wchar_t;
-
-/****************************************************************************/
-
-#define offsetof(type, member) ((size_t)&((type *)0)->member)
-
-/****************************************************************************/
-
-#ifdef __cplusplus
+	return x;
 }
-#endif /* __cplusplus */
 
 /****************************************************************************/
 
-#endif /* _STDDEF_H */
+#endif /* FLOATING_POINT_SUPPORT */

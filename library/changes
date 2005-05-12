@@ -62,6 +62,31 @@
 
 - Added isblank().
 
+- Added isunordered(), isgreater(), isgreaterequal(), isless(),
+  islessequal() and islessgreater() to <math.h> for C99.
+
+- The wchar_t type is now an 'unsigned short' integer (16 bits wide).
+
+- Added PTRDIFF_MIN/PTRDIFF_MAX, WCHAR_MIN/WCHAR_MAX and
+  WINT_MIN/WINT_MAX to <stdint.h> for C99.
+
+- Added imaxdiv() and imaxabs() for C99.
+
+- Added strtoimax() and strtoumax() for C99.
+
+- Added nextafter() and nextafterf() for C99.
+
+- Added copysign() and copysignf() for C99.
+
+- Unless I missed something, clib2 should now be functionally complete
+  with regard to C99, except for the floating point operations covered.
+  These are a major challenge all by themselves, and I wonder both
+  whether they are worth the effort and how one could implement them
+  correctly.
+
+- fflush() now consistently supports a NULL parameter, causing all
+  streams to be flushed for which this behaviour is defined.
+
 
 c.lib 1.191 (9.4.2005)
 

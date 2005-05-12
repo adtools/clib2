@@ -1,5 +1,5 @@
 /*
- * $Id: wchar.h,v 1.2 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: wchar.h,v 1.3 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -159,6 +159,20 @@ extern int vswprintf(char *s, const wchar_t *format,va_list arg);
 /****************************************************************************/
 
 extern size_t wcsftime(wchar_t *s, size_t maxsize, const wchar_t *format, const struct tm *timeptr);
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard, but it should
+   be part of ISO/IEC 9899:1999, also known as "C99". */
+
+/****************************************************************************/
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+
+extern long long wcstoll(const wchar_t *str, wchar_t **ptr, int base);
+extern unsigned long long wcstoull(const wchar_t *str, wchar_t **ptr, int base);
+
+#endif /* __STDC_VERSION__ && __STDC_VERSION__ >= 199901L */
 
 /****************************************************************************/
 

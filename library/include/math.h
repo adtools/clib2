@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.8 2005-05-08 08:51:30 obarthel Exp $
+ * $Id: math.h,v 1.9 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -113,6 +113,14 @@ extern double hypot(double x,double y);
 
 /****************************************************************************/
 
+/* Note that the comparison operations performed on the floating point
+   data types ought to include float, double and long double. However,
+   because the current (2005-06-12) compiler technology available on the
+   Amiga does not support the long double type yet, this library is restricted
+   to operations on float and double. */
+
+/****************************************************************************/
+
 extern float __huge_val_float;
 
 /****************************************************************************/
@@ -137,23 +145,72 @@ extern int __isfinite_double(double x);
 extern int __signbit_float(float x);
 extern int __signbit_double(double x);
 
+/****************************************************************************/
+
 #define fpclassify(x) \
-	((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x))
+	(sizeof(x) == sizeof(float) ?	\
+		__fpclassify_float(x) :		\
+		__fpclassify_double(x))
 
 #define isfinite(x) \
-	((sizeof(x) == sizeof(float)) ? __isfinite_single(x) : __isfinite_double(x))
+	(sizeof(x) == sizeof(float) ?	\
+		__isfinite_float(x) :		\
+		__isfinite_double(x))
 
 #define isinf(x) \
-	(((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x)) == FP_INFINITE)
+	((sizeof(x) == sizeof(float) ?	\
+		__fpclassify_float(x) :		\
+		__fpclassify_double(x))		\
+	== FP_INFINITE)
 
 #define isnan(x) \
-	(((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x)) == FP_NAN)
+	((sizeof(x) == sizeof(float) ?	\
+		__fpclassify_float(x) :		\
+		__fpclassify_double(x))		\
+	== FP_NAN)
 
 #define isnormal(x) \
-	(((sizeof(x) == sizeof(float)) ? __fpclassify_float(x) : __fpclassify_double(x)) == FP_NORMAL)
+	((sizeof(x) == sizeof(float) ?	\
+		__fpclassify_float(x) :		\
+		__fpclassify_double(x))		\
+	== FP_NORMAL)
 
 #define signbit(x) \
-	((sizeof(x) == sizeof(float)) ? __signbit_single(x) : __signbit_double(x))
+	(sizeof(x) == sizeof(float) ?	\
+		__signbit_float(x) :		\
+		__signbit_double(x))
+
+/****************************************************************************/
+
+extern int __isunordered_float(float x,float y);
+extern int __isunordered_float_double(float x,double y);
+extern int __isunordered_double(double x,double y);
+
+/****************************************************************************/
+
+#define isunordered(x,y) \
+	(sizeof(x) == sizeof(float) ?					\
+		(sizeof(y) == sizeof(float) ?				\
+			__isunordered_float((x),y) :			\
+			__isunordered_float_double((x),(y))) :	\
+		(sizeof(y) == sizeof(float) ?				\
+			__isunordered_float_double((y),(x)) :	\
+			__isunordered_double((x),(y))))
+
+#define isgreater(x,y) \
+	(isunordered(x,y) ? 0 : (x) > (y))
+
+#define isgreaterequal(x,y) \
+	(isunordered(x,y) ? 0 : (x) >= (y))
+
+#define isless(x,y) \
+	(isunordered(x,y) ? 0 : (x) < (y))
+
+#define islessequal(x,y) \
+	(isunordered(x,y) ? 0 : (x) <= (y))
+
+#define islessgreater(x,y) \
+	(isunordered(x,y) ? 0 : (x) < (y) || (x) > (y))	/* ZZZ don't evaulate twice! */
 
 /****************************************************************************/
 
@@ -163,6 +220,16 @@ extern float fabsf(float x);
 
 extern float nanf(const char *tagp);
 extern double nan(const char *tagp);
+
+/****************************************************************************/
+
+extern float nextafterf(float x,float y);
+extern double nextafter(double x,double y);
+
+/****************************************************************************/
+
+extern double copysign(double x, double y);
+extern float copysignf(float x, float y);
 
 /****************************************************************************/
 

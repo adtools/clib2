@@ -1,5 +1,5 @@
 /*
- * $Id: limits.h,v 1.7 2005-05-12 13:21:47 obarthel Exp $
+ * $Id: math_isunordered.c,v 1.1 2005-05-12 13:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,55 +31,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIMITS_H
-#define _LIMITS_H
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-#define CHAR_BIT 8
-
-/****************************************************************************/
-
-#define SCHAR_MIN -128
-#define SCHAR_MAX 127
-#define UCHAR_MAX 255
-
-/****************************************************************************/
-
-/*
- * The following defines the range a 'char' can cover by checking a
- * preprocessor symbol; we support both SAS/C and GCC here.
- */
-
-#if (defined(__GNUC__) && defined(__CHAR_UNSIGNED__)) || (defined(__SASC) && defined(_UNSCHAR))
-
-#define CHAR_MIN 0
-#define CHAR_MAX 255
-
-#else
-
-#define CHAR_MIN -128
-#define CHAR_MAX 127
-
-#endif /* (__GNUC__ && __CHAR_UNSIGNED) || (__SASC && _UNSCHAR) */
-
-/****************************************************************************/
-
-#define SHRT_MIN	-32768
-#define SHRT_MAX	32767
-#define USHRT_MAX	65535
-
-/****************************************************************************/
-
-#define INT_MIN		(-2147483647L - 1)
-#define INT_MAX		2147483647L
-#define UINT_MAX	4294967295UL
-
-/****************************************************************************/
-
-#define LONG_MIN	(-2147483647L - 1)
-#define LONG_MAX	2147483647L
-#define ULONG_MAX	4294967295UL
+#if defined (FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
 
@@ -88,26 +46,72 @@
 
 /****************************************************************************/
 
-#define	LLONG_MIN	(-0x7fffffffffffffffLL-1)
-#define	LLONG_MAX	0x7fffffffffffffffLL
-#define	ULLONG_MAX	0xffffffffffffffffULL
+int
+__isunordered_float(float number_x,float number_y)
+{
+	union ieee_single x;
+	union ieee_single y;
+	int result;
+
+	x.value = number_x;
+	y.value = number_y;
+
+	/* Exponent = 255 and fraction != 0.0 -> not a number */
+	if((x.raw[0] & 0x7f800000) == 0x7f800000 && (x.raw[0] & 0x007fffff) != 0)
+		result = 1;
+	else if((y.raw[0] & 0x7f800000) == 0x7f800000 && (y.raw[0] & 0x007fffff) != 0)
+		result = 1;
+	else
+		result = 0;
+
+	return(result);
+}
 
 /****************************************************************************/
 
-#define MB_LEN_MAX 1
+int
+__isunordered_float_double(float number_x,double number_y)
+{
+	union ieee_single x;
+	union ieee_double y;
+	int result;
+
+	x.value = number_x;
+	y.value = number_y;
+
+	if((x.raw[0] & 0x7f800000) == 0x7f800000 && (x.raw[0] & 0x007fffff) != 0)
+		result = 1; /* Exponent = 255 and fraction != 0.0 -> not a number */
+	else if (((y.raw[0] & 0x7ff00000) == 0x7ff00000) && ((y.raw[0] & 0x000fffff) != 0 || (y.raw[1] != 0)))
+		result = 1; /* Exponent = 2047 and fraction != 0.0 -> not a number */
+	else
+		result = 0;
+
+	return(result);
+}
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
+int
+__isunordered_double(double number_x,double number_y)
+{
+	union ieee_double x;
+	union ieee_double y;
+	int result;
+
+	x.value = number_x;
+	y.value = number_y;
+
+	/* Exponent = 2047 and fraction != 0.0 -> not a number */
+	if(((x.raw[0] & 0x7ff00000) == 0x7ff00000) && ((x.raw[0] & 0x000fffff) != 0 || (x.raw[1] != 0)))
+		result = 1;
+	else if (((y.raw[0] & 0x7ff00000) == 0x7ff00000) && ((y.raw[0] & 0x000fffff) != 0 || (y.raw[1] != 0)))
+		result = 1;
+	else
+		result = 0;
+
+	return(result);
+}
 
 /****************************************************************************/
 
-#define SSIZE_MAX 2147483647L
-
-/****************************************************************************/
-
-#define PATH_MAX 1024
-
-/****************************************************************************/
-
-#endif /* _LIMITS_H */
+#endif /* FLOATING_POINT_SUPPORT */

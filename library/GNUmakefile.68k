@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.53 2005-05-11 20:15:24 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.54 2005-05-12 13:21:41 obarthel Exp $
 #
 # :ts=8
 #
@@ -156,6 +156,10 @@ C_LIB = \
 	fcntl_write.o \
 	ftw_ftw.o \
 	ftw_nftw.o \
+	inttypes_imaxdiv.o \
+	inttypes_imaxabs.o \
+	inttypes_strtoimax.o \
+	inttypes_strtoumax.o \
 	libgen_basename.o \
 	libgen_dirname.o \
 	locale_init_exit.o \
@@ -522,6 +526,8 @@ MATH_LIB = \
 	math_ceil.o \
 	math_cos.o \
 	math_cosh.o \
+	math_copysign.o \
+	math_copysignf.o \
 	math_exp.o \
 	math_fabs.o \
 	math_fabsf.o \
@@ -529,6 +535,7 @@ MATH_LIB = \
 	math_fmod.o \
 	math_fpclassify.o \
 	math_isfinite.o \
+	math_isunordered.o \
 	math_signbit.o \
 	math_frexp.o \
 	math_huge_val.o \
@@ -542,6 +549,8 @@ MATH_LIB = \
 	math_modf.o \
 	math_nan.o \
 	math_nanf.o \
+	math_nextafter.o \
+	math_nextafterf.o \
 	math_pow.o \
 	math_rint.o \
 	math_rintf.o \

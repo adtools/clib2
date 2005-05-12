@@ -1,5 +1,5 @@
 /*
- * $Id: stddef.h,v 1.4 2005-05-12 13:21:47 obarthel Exp $
+ * $Id: wchar_wcstoll.c,v 1.1 2005-05-12 13:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,41 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDDEF_H
-#define _STDDEF_H
+#ifndef _WCHAR_HEADERS_H
+#include "wchar_headers.h"
+#endif /* _WCHAR_HEADERS_H */
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#ifndef NULL
-#ifndef __cplusplus
-#define NULL ((void *)0L)
-#else
-#define NULL 0L
-#endif /* __cplusplus */
-#endif /* NULL */
-
-/****************************************************************************/
-
-typedef int ptrdiff_t;
-typedef unsigned int size_t;
-typedef unsigned short wchar_t;
-
-/****************************************************************************/
-
-#define offsetof(type, member) ((size_t)&((type *)0)->member)
-
-/****************************************************************************/
-
-#ifdef __cplusplus
+long long
+wcstoll(const wchar_t *str, wchar_t **ptr, int base)
+{
+	/* ZZZ unimplemented */
+	return(0);
 }
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#endif /* _STDDEF_H */

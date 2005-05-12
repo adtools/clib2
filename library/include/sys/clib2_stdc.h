@@ -1,5 +1,5 @@
 /*
- * $Id: limits.h,v 1.7 2005-05-12 13:21:47 obarthel Exp $
+ * $Id: clib2_stdc.h,v 1.1 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,70 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIMITS_H
-#define _LIMITS_H
+#ifndef	_SYS_CLIB2_STDC_H
+#define	_SYS_CLIB2_STDC_H
 
 /****************************************************************************/
 
-#define CHAR_BIT 8
-
-/****************************************************************************/
-
-#define SCHAR_MIN -128
-#define SCHAR_MAX 127
-#define UCHAR_MAX 255
-
-/****************************************************************************/
-
-/*
- * The following defines the range a 'char' can cover by checking a
- * preprocessor symbol; we support both SAS/C and GCC here.
- */
-
-#if (defined(__GNUC__) && defined(__CHAR_UNSIGNED__)) || (defined(__SASC) && defined(_UNSCHAR))
-
-#define CHAR_MIN 0
-#define CHAR_MAX 255
-
-#else
-
-#define CHAR_MIN -128
-#define CHAR_MAX 127
-
-#endif /* (__GNUC__ && __CHAR_UNSIGNED) || (__SASC && _UNSCHAR) */
-
-/****************************************************************************/
-
-#define SHRT_MIN	-32768
-#define SHRT_MAX	32767
-#define USHRT_MAX	65535
-
-/****************************************************************************/
-
-#define INT_MIN		(-2147483647L - 1)
-#define INT_MAX		2147483647L
-#define UINT_MAX	4294967295UL
-
-/****************************************************************************/
-
-#define LONG_MIN	(-2147483647L - 1)
-#define LONG_MAX	2147483647L
-#define ULONG_MAX	4294967295UL
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard, but it should
-   be part of ISO/IEC 9899:1999, also known as "C99". */
-
-/****************************************************************************/
-
-#define	LLONG_MIN	(-0x7fffffffffffffffLL-1)
-#define	LLONG_MAX	0x7fffffffffffffffLL
-#define	ULLONG_MAX	0xffffffffffffffffULL
-
-/****************************************************************************/
-
-#define MB_LEN_MAX 1
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
@@ -102,12 +46,18 @@
 
 /****************************************************************************/
 
-#define SSIZE_MAX 2147483647L
+/* Make the "restrict" qualifier work well with 'C' compilers that do
+   not support it. We do assume that __STDC__ is defined, though. */
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
+#define restrict
+#endif /* !__STDC_VERSION__ || __STDC_VERSION__ < 199901L */
 
 /****************************************************************************/
 
-#define PATH_MAX 1024
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
-#endif /* _LIMITS_H */
+#endif /* _SYS_CLIB2_STDC_H */

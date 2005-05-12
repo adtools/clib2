@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fflush.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_fflush.c,v 1.9 2005-05-12 13:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,71 +68,44 @@ fflush(FILE *stream)
 	   in the wrong order. */
 	flockfile(stream);
 
-	#if defined(UNIX_PATH_SEMANTICS)
-	{
-		/* Flush a particular stream? */
-		if(stream != NULL)
-		{
-			struct iob * file = (struct iob *)stream;
-
-			assert( __is_valid_iob(file) );
-
-			if(__iob_write_buffer_is_valid(file) && __flush_iob_write_buffer(file) < 0)
-				goto out;
-		}
-		else
-		{
-			int failed_iob = -1;
-			int i;
-
-			__stdio_lock();
-
-			/* Flush all streams which still have unwritten data in the buffer. */
-			for(i = 0 ; i < __num_iob ; i++)
-			{
-				if(__iob[i] != NULL &&
-				   FLAG_IS_SET(__iob[i]->iob_Flags,IOBF_IN_USE) &&
-				   FLAG_IS_SET(__iob[i]->iob_Flags,IOBF_WRITE) &&
-				   __iob_write_buffer_is_valid(__iob[i]))
-				{
-					if(__flush_iob_write_buffer(__iob[i]) < 0)
-					{
-						failed_iob = i;
-						break;
-					}
-				}
-			}
-
-			__stdio_unlock();
-
-			if(failed_iob >= 0)
-				goto out;
-		}
-	}
-	#else
+	/* Flush a particular stream? */
+	if(stream != NULL)
 	{
 		struct iob * file = (struct iob *)stream;
-
-		assert( stream != NULL );
-
-		#if defined(CHECK_FOR_NULL_POINTERS)
-		{
-			if(stream == NULL)
-			{
-				SHOWMSG("invalid file handle");
-
-				__set_errno(EFAULT);
-				goto out;
-			}
-		}
-		#endif /* CHECK_FOR_NULL_POINTERS */
 
 		assert( __is_valid_iob(file) );
 
 		if(__iob_write_buffer_is_valid(file) && __flush_iob_write_buffer(file) < 0)
 			goto out;
 	}
-	#endif /* UNIX_PATH_SEMANTICS */
+	else
+	{
+		int failed_iob = -1;
+		int i;
+
+		__stdio_lock();
+
+		/* Flush all streams which still have unwritten data in the buffer. */
+		for(i = 0 ; i < __num_iob ; i++)
+		{
+			if(__iob[i] != NULL &&
+			   FLAG_IS_SET(__iob[i]->iob_Flags,IOBF_IN_USE) &&
+			   FLAG_IS_SET(__iob[i]->iob_Flags,IOBF_WRITE) &&
+			   __iob_write_buffer_is_valid(__iob[i]))
+			{
+				if(__flush_iob_write_buffer(__iob[i]) < 0)
+				{
+					failed_iob = i;
+					break;
+				}
+			}
+		}
+
+		__stdio_unlock();
+
+		if(failed_iob >= 0)
+			goto out;
+	}
 
 	result = OK;
 

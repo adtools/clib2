@@ -1,5 +1,5 @@
 /*
- * $Id: stdbool.h,v 1.1 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: stdbool.h,v 1.2 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,9 +47,9 @@
 
 /****************************************************************************/
 
-#if (__STDC_VERSION__ + 0) < 199901L
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
 #warning C99 header file used by non-C99 compliant compiler.
-#endif /* __STDC_VERSION__ */
+#endif /* !__STDC_VERSION__ || __STDC_VERSION__ < 199901L */
 
 /****************************************************************************/
 

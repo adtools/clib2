@@ -1,5 +1,5 @@
 /*
- * $Id: stddef.h,v 1.4 2005-05-12 13:21:47 obarthel Exp $
+ * $Id: inttypes_headers.h,v 1.1 2005-05-12 13:21:43 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,41 +31,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDDEF_H
-#define _STDDEF_H
+#ifndef _INTTYPES_HEADERS_H
+#define _INTTYPES_HEADERS_H
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#ifndef NULL
-#ifndef __cplusplus
-#define NULL ((void *)0L)
-#else
-#define NULL 0L
-#endif /* __cplusplus */
-#endif /* NULL */
+#include <inttypes.h>
 
 /****************************************************************************/
 
-typedef int ptrdiff_t;
-typedef unsigned int size_t;
-typedef unsigned short wchar_t;
-
-/****************************************************************************/
-
-#define offsetof(type, member) ((size_t)&((type *)0)->member)
-
-/****************************************************************************/
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#endif /* _STDDEF_H */
+#endif /* _INTTYPES_HEADERS_H */

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.10 2005-05-07 13:21:49 obarthel Exp $
+ * $Id: stdlib.h,v 1.11 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,7 +49,7 @@ extern "C" {
 /****************************************************************************/
 
 /* Maximum number of bytes in a multibyte character */
-#define MB_CUR_MAX 4
+#define MB_CUR_MAX 2
 
 /****************************************************************************/
 
@@ -182,9 +182,7 @@ extern char * mkdtemp(char *name_template);
 
 /****************************************************************************/
 
-/* These functions and data structures are unavailable under SAS/C for lack
-   of a "long long" data type. */
-#if ! defined(__SASC)
+#if defined(__GNUC__) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
 
 /****************************************************************************/
 
@@ -203,7 +201,7 @@ extern lldiv_t lldiv(long long n,long long d);
 
 /****************************************************************************/
 
-#endif /* __SASC */
+#endif /* __GNUC__ || (__STDC_VERSION__ && __STDC_VERSION__ >= 199901L) */
 
 /****************************************************************************/
 

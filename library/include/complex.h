@@ -1,5 +1,5 @@
 /*
- * $Id: complex.h,v 1.2 2005-04-04 11:56:26 obarthel Exp $
+ * $Id: complex.h,v 1.3 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,21 +41,21 @@
 
 /****************************************************************************/
 
-#if defined(__cplusplus) && defined(__GNUC__)
-#warning C99 header used in C++.
-#endif /* __GNUC__ */
-
-/****************************************************************************/
-
-#if (__GNUC__ + 0) < 3 && (__STDC_VERSION__ + 0) < 199901L
-#error Complex numbers are not supported by/for this compiler.
-#endif /* __GNUC__ && __STDC_VERSION__ */
-
-/****************************************************************************/
-
 #ifndef	__GNUC__
 #error Unsupported compiler.
 #endif /* __GNUC__ */
+
+/****************************************************************************/
+
+#if defined(__cplusplus)
+#warning C99 header file used in C++.
+#endif /* __cplusplus */
+
+/****************************************************************************/
+
+#if !defined(__STDC_VERSION__) || (__GNUC__ < 3 && __STDC_VERSION__ < 199901L)
+#error Complex numbers are not supported by/for this compiler.
+#endif /* __GNUC__ && __STDC_VERSION__ */
 
 /****************************************************************************/
 

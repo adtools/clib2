@@ -1,5 +1,5 @@
 /*
- * $Id: wctype.h,v 1.2 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: wctype.h,v 1.3 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,6 +68,7 @@ extern int iswlower(wint_t c);
 extern int iswupper(wint_t c);
 
 extern int iswspace(wint_t c);
+extern int iswblank(wint_t c);
 
 extern wint_t towlower(wint_t c);
 extern wint_t towupper(wint_t c);

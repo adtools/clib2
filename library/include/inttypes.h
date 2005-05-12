@@ -1,5 +1,5 @@
 /*
- * $Id: inttypes.h,v 1.1 2005-02-04 15:03:13 obarthel Exp $
+ * $Id: inttypes.h,v 1.2 2005-05-12 13:21:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,6 +47,12 @@
 #ifndef	_STDINT_H
 #include <stdint.h>
 #endif /* _STDINT_H */
+
+/****************************************************************************/
+
+#ifndef _STDDEF_H
+#include <stddef.h>
+#endif /* _STDDEF_H */
 
 /****************************************************************************/
 
@@ -162,7 +168,7 @@
 
 /* intmax_t is 32 bits for SAS/C, 64-bits for GCC or if using a conforming C99 compiler. */
 
-#if defined(__GNUC__) || ((__STDC_VERSION__ +0) >= 199901L)
+#if defined(__GNUC__) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
 #define	PRIdMAX			"lld"
 #define	PRIiMAX			"lli"
 #define	PRIuMAX			"llu"
@@ -176,22 +182,22 @@
 #define	PRIxMAX			"lx"
 #define	PRIXMAX			"lX"
 #define	PRIoMAX			"lo"
-#endif
+#endif /* __GNUC__ || (__STDC_VERSION__ && __STDC_VERSION__ >= 199901L) */
 
 /* scanf() format specifiers. */
 
 /* "Decimal" */
-/* #define	SCNd8			"hhd" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNd8			"hhd"
 #define	SCNd16			"hd"
 #define	SCNd32			"d"
 #define	SCNd64			"lld"
 
-/* #define	SCNdLEAST8		"hhd" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNdLEAST8		"hhd"
 #define	SCNdLEAST16		"hd"
 #define	SCNdLEAST32		"d"
 #define	SCNdLEAST64		"lld"
 
-/* #define	SCNdFAST8		"hhd" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNdFAST8		"hhd"
 #define	SCNdFAST16		"d"
 #define	SCNdFAST32		"d"
 #define	SCNdFAST64		"lld"
@@ -199,17 +205,17 @@
 #define	SCNdPTR			"d"
 
 /* "Integer" */
-/* #define	SCNi8			"hhi" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNi8			"hhi"
 #define	SCNi16			"hi"
 #define	SCNi32			"i"
 #define	SCNi64			"lli"
 
-/* #define	SCNiLEAST8		"hhi" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNiLEAST8		"hhi"
 #define	SCNiLEAST16		"hi"
 #define	SCNiLEAST32		"i"
 #define	SCNiLEAST64		"lli"
 
-/* #define	SCNiFAST8		"hhi" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNiFAST8		"hhi"
 #define	SCNiFAST16		"i"
 #define	SCNiFAST32		"i"
 #define	SCNiFAST64		"lli"
@@ -217,17 +223,17 @@
 #define	SCNiPTR			"i"
 
 /* "Unsigned" */
-/* #define	SCNu8			"hhu" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNu8			"hhu"
 #define	SCNu16			"hu"
 #define	SCNu32			"u"
 #define	SCNu64			"llu"
 
-/* #define	SCNuLEAST8		"hhu" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNuLEAST8		"hhu"
 #define	SCNuLEAST16		"hu"
 #define	SCNuLEAST32		"u"
 #define	SCNuLEAST64		"llu"
 
-/* #define	SCNuFAST8		"hhu" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNuFAST8		"hhu"
 #define	SCNuFAST16		"u"
 #define	SCNuFAST32		"u"
 #define	SCNuFAST64		"llu"
@@ -235,17 +241,17 @@
 #define	SCNuPTR			"u"
 
 /* "Hexadecimal" */
-/* #define	SCNx8			"hhx" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNx8			"hhx"
 #define	SCNx16			"hx"
 #define	SCNx32			"x"
 #define	SCNx64			"llx"
 
-/* #define	SCNxLEAST8		"hhx" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNxLEAST8		"hhx"
 #define	SCNxLEAST16		"hx"
 #define	SCNxLEAST32		"x"
 #define	SCNxLEAST64		"llx"
 
-/* #define	SCNxFAST8		"hhx" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNxFAST8		"hhx"
 #define	SCNxFAST16		"x"
 #define	SCNxFAST32		"x"
 #define	SCNxFAST64		"llx"
@@ -253,24 +259,24 @@
 #define	SCNxPTR			"x"
 
 /* "Octal" */
-/* #define	SCNo8			"hho" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNo8			"hho"
 #define	SCNo16			"ho"
 #define	SCNo32			"o"
 #define	SCNo64			"llo"
 
-/* #define	SCNoLEAST8		"hho" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNoLEAST8		"hho"
 #define	SCNoLEAST16		"ho"
 #define	SCNoLEAST32		"o"
 #define	SCNoLEAST64		"llo"
 
-/* #define	SCNoFAST8		"hho" */	/* Missing. TODO: Add support for char conversions in scanf() */
+#define	SCNoFAST8		"hho"
 #define	SCNoFAST16		"o"
 #define	SCNoFAST32		"o"
 #define	SCNoFAST64		"llo"
 
 #define	SCNoPTR			"o"
 
-#if defined(__GNUC__) || ((__STDC_VERSION__ +0) >= 199901L)
+#if defined(__GNUC__) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
 #define	SCNdMAX			"lld"
 #define	SCNiMAX			"lli"
 #define	SCNuMAX			"llu"
@@ -282,14 +288,30 @@
 #define	SCNuMAX			"lu"
 #define	SCNxMAX			"lx"
 #define	SCNoMAX			"lo"
-#endif
+#endif /* __GNUC__ || (__STDC_VERSION__ && __STDC_VERSION__ >= 199901L) */
 
-/* TODO: Add the rest of inttypes.h here + in the library.  */
+/****************************************************************************/
 
-/*
- * Missing stuff is among other things atoll(), strtoll(), ...
- * Then there is the matter of wchar support - Zzzz.
- */
+#if defined(__GNUC__) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
+typedef struct { long long quot; long long rem; } imaxdiv_t;
+#else
+typedef struct { long quot; long rem; } imaxdiv_t;
+#endif /* __GNUC__ || (__STDC_VERSION__ && __STDC_VERSION__ >= 199901L) */
+
+/****************************************************************************/
+
+extern intmax_t imaxabs(intmax_t x);
+extern imaxdiv_t imaxdiv(intmax_t n,intmax_t d);
+
+/****************************************************************************/
+
+extern intmax_t strtoimax(const char *str, char **ptr, int base);
+extern uintmax_t strtoumax(const char *str, char **ptr, int base);
+
+/****************************************************************************/
+
+extern intmax_t wcstoimax(const wchar_t *str, char **ptr, int base);
+extern uintmax_t wcstoumax(const wchar_t *str, char **ptr, int base);
 
 /****************************************************************************/
 
