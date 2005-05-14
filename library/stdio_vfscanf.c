@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.14 2005-05-12 14:50:06 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.15 2005-05-14 10:52:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -599,8 +599,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 				   the characters back we read during scanning. */
 				if(maximum_field_width != 0)
 				{
-					const char infinity[] = "infinity";
-					const char nan[] = "nan";
+					const char infinity_string[] = "infinity";
+					const char infinity_nan[] = "nan";
 					char chars_read_so_far[80];
 					size_t num_chars_read_so_far = 0;
 					size_t infinity_match = 0;
@@ -610,7 +610,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						D(("c = '%lc'",c));
 
-						if(tolower(c) == infinity[infinity_match])
+						if(tolower(c) == infinity_string[infinity_match])
 						{
 							SHOWVALUE(infinity_match);
 
@@ -622,7 +622,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 
 							/* Did we match the complete word? */
 							infinity_match++;
-							if(infinity_match == sizeof(infinity)-1)
+							if(infinity_match == sizeof(infinity_string)-1)
 							{
 								SHOWMSG("we have a match for infinity");
 								break;
@@ -643,7 +643,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 							SHOWMSG("we have a match for inf");
 							break;
 						}
-						else if (tolower(c) == nan[nan_match])
+						else if (tolower(c) == infinity_nan[nan_match])
 						{
 							SHOWVALUE(nan_match);
 
@@ -655,7 +655,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 
 							/* Did we match the complete word? */
 							nan_match++;
-							if(nan_match == sizeof(nan)-1)
+							if(nan_match == sizeof(infinity_nan)-1)
 							{
 								SHOWMSG("we have a match for nan");
 
@@ -723,29 +723,17 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 
 					if(infinity_match >= 3)
 					{
-						union ieee_double x;
-
 						SHOWMSG("infinity");
 
-						/* Exponent = 2047 and fraction = 0.0 */
-						x.raw[0] = 0x7ff00000;
-						x.raw[1] = 0x00000000;
-
-						sum = x.value;
+						sum = __inf();
 
 						total_num_chars_read = num_chars_processed = infinity_match;
 					}
 					else if (nan_match >= 3)
 					{
-						union ieee_double x;
-
 						SHOWMSG("not a number");
 
-						/* Exponent = 2047 and fraction != 0.0 */
-						x.raw[0] = 0x7ff00000;
-						x.raw[1] = 0x00000001;
-
-						sum = x.value;
+						sum = nan(NULL);
 
 						total_num_chars_read = num_chars_processed = nan_match;
 					}

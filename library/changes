@@ -1,3 +1,19 @@
+- fpclassify() now returns FP_ZERO both for 0 and -0.
+
+- nan() and nanf() now return quiet NaNs.
+
+- Added internal __inf() and __inff() functions.
+
+- strtof() now calls nanf() and __inff(), respectively, to produce
+  the special floating point values for nan/inf/infinity.
+
+- strtod() now calls nan() and __inf(), respectively, to produce
+  the special floating point values for nan/inf/infinity.
+
+- The scanf() family now calls nan() and __inf(), respectively, to
+  produce the special floating point values for nan/inf/infinity.
+
+
 c.lib 1.192 (12.5.2005)
 
 - Changed how errors are detected, as returned by Write(), Read() and

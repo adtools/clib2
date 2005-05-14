@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtod.c,v 1.6 2005-05-08 11:27:26 obarthel Exp $
+ * $Id: stdlib_strtod.c,v 1.7 2005-05-14 10:52:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,22 +123,14 @@ strtod(const char *str, char ** ptr)
 	/* We begin by checking for the "inf" and "nan" strings. */
 	if(strcasecmp(str,"inf") == SAME || strcasecmp(str,"infinity") == SAME)
 	{
-		union ieee_double x;
-
 		SHOWMSG("infinity");
 
 		str += strlen(str);
 
-		/* Exponent = 2047 and fraction = 0.0 */
-		x.raw[0] = 0x7ff00000;
-		x.raw[1] = 0x00000000;
-
-		sum = x.value;
+		sum = __inf();
 	}
 	else if (strncasecmp(str,"nan",3) == SAME && (str[3] == '(' || str[3] == '\0'))
 	{
-		union ieee_double x;
-
 		SHOWMSG("not a number");
 
 		str += 3;
@@ -153,11 +145,7 @@ strtod(const char *str, char ** ptr)
 				str++;
 		}
 
-		/* Exponent = 2047 and fraction != 0.0 */
-		x.raw[0] = 0x7ff00000;
-		x.raw[1] = 0x00000001;
-
-		sum = x.value;
+		sum = nan(NULL);
 	}
 	else
 	{

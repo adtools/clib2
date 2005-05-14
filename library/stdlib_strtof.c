@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtof.c,v 1.4 2005-05-08 11:27:26 obarthel Exp $
+ * $Id: stdlib_strtof.c,v 1.5 2005-05-14 10:52:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,21 +123,14 @@ strtof(const char *str, char ** ptr)
 	/* We begin by checking for the "inf" and "nan" strings. */
 	if(strcasecmp(str,"inf") == SAME || strcasecmp(str,"infinity") == SAME)
 	{
-		union ieee_single x;
-
 		SHOWMSG("infinity");
 
 		str += strlen(str);
 
-		/* Exponent = 255 and fraction = 0.0 */
-		x.raw[0] = 0x7f800000;
-
-		sum = x.value;
+		sum = __inff();
 	}
 	else if (strncasecmp(str,"nan",3) == SAME && (str[3] == '(' || str[3] == '\0'))
 	{
-		union ieee_single x;
-
 		SHOWMSG("not a number");
 
 		str += 3;
@@ -152,10 +145,7 @@ strtof(const char *str, char ** ptr)
 				str++;
 		}
 
-		/* Exponent = 255 and fraction != 0.0 */
-		x.raw[0] = 0x7f800001;
-
-		sum = x.value;
+		sum = nanf(NULL);
 	}
 	else
 	{

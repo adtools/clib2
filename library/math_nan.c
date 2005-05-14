@@ -1,5 +1,5 @@
 /*
- * $Id: math_nan.c,v 1.1 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: math_nan.c,v 1.2 2005-05-14 10:52:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,8 +51,8 @@ nan(const char * UNUSED tagp)
 {
 	union ieee_double x;
 
-	/* Exponent = 2047 and fraction != 0.0 */
-	x.raw[0] = 0x7ff00000;
+	/* Exponent = 2047 and fraction != 0.0; this must be a quiet nan. */
+	x.raw[0] = 0x7ff80000;
 	x.raw[1] = 0x00000001;
 
 	return(x.value);

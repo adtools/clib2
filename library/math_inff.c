@@ -1,5 +1,5 @@
 /*
- * $Id: math_nanf.c,v 1.2 2005-05-14 10:52:31 obarthel Exp $
+ * $Id: math_inff.c,v 1.1 2005-05-14 10:52:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,18 +41,17 @@
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard, but it should
-   be part of ISO/IEC 9899:1999, also known as "C99". */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
 float
-nanf(const char * UNUSED tagp)
+__inff(void)
 {
 	union ieee_single x;
 
-	/* Exponent = 255 and fraction != 0.0; this must be a quiet nan. */
-	x.raw[0] = 0x7fc00001;
+	/* Exponent = 255 and fraction = 0.0 -> infinity */
+	x.raw[0] = 0x7f800000;
 
 	return(x.value);
 }

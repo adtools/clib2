@@ -1,5 +1,5 @@
 /*
- * $Id: math_fpclassify.c,v 1.2 2005-05-08 11:27:26 obarthel Exp $
+ * $Id: math_fpclassify.c,v 1.3 2005-05-14 10:52:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ __fpclassify_float(float number)
 		/* Exponent = 255 and fraction = 0.0 -> infinity */
 		result = FP_INFINITE;
 	}
-	else if (x.raw[0] == 0) /* ZZZ test against epsilon? */
+	else if ((x.raw[0] & 0x7fffffff) == 0)
 	{
 		SHOWMSG("zero");
 
@@ -122,7 +122,7 @@ __fpclassify_double(double number)
 		/* Exponent = 2047 and fraction = 0.0 -> infinity */
 		result = FP_INFINITE;
 	}
-	else if (x.raw[0] == 0 && x.raw[1] == 0) /* ZZZ test against epsilon? */
+	else if ((((x.raw[0] & 0x7fffffff) == 0) && (x.raw[1] == 0)))
 	{
 		SHOWMSG("zero");
 

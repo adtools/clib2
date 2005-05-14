@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.58 2005-05-12 15:07:22 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.59 2005-05-14 10:52:31 obarthel Exp $
 #
 # :ts=8
 #
@@ -534,6 +534,8 @@ MATH_LIB = \
 	math_floor.o \
 	math_fmod.o \
 	math_fpclassify.o \
+	math_inf.o \
+	math_inff.o \
 	math_isfinite.o \
 	math_isunordered.o \
 	math_signbit.o \

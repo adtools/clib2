@@ -1,5 +1,5 @@
 /*
- * $Id: math_fp_support.h,v 1.3 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: math_fp_support.h,v 1.4 2005-05-14 10:52:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,6 +77,11 @@ union ieee_single
 	float			value;
 	unsigned long	raw[1];
 };
+
+/****************************************************************************/
+
+extern float __inff(void);
+extern double __inf(void);
 
 /****************************************************************************/
 
