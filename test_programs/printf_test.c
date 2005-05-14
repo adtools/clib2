@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 double x;
@@ -204,6 +205,34 @@ main(void)
 	print_format_float("%g",0.678,-0.678);
 	print_format_float("%10g",0.678,-0.678);
 	print_format_float("%10.0g",0.678,-0.678);
+
+	printf("\n");
+
+	print_format_float("%10.2g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%010.2g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("% 010.2g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%+10.2G",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%+010.2G",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%-10.2g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%- 10.2g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%-+10.2g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%10g",strtod("infinity",NULL),strtod("-infinity",NULL));
+	print_format_float("%10.0g",strtod("infinity",NULL),strtod("-infinity",NULL));
+
+	printf("\n");
+
+	print_format_float("%10.2g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%010.2g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("% 010.2g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%+10.2G",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%+010.2G",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%-10.2g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%- 10.2g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%-+10.2g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%10g",strtod("nan",NULL),strtod("-nan",NULL));
+	print_format_float("%10.0g",strtod("nan",NULL),strtod("-nan",NULL));
 
 	return(0);
 }
