@@ -13,6 +13,8 @@
 - The scanf() family now calls nan() and __inf(), respectively, to
   produce the special floating point values for nan/inf/infinity.
 
+- Added %D, %e, %F, %g, %G and %h for strftime(); repaired %I.
+
 
 c.lib 1.192 (12.5.2005)
 

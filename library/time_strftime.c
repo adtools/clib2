@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.14 2005-05-09 13:47:24 obarthel Exp $
+ * $Id: time_strftime.c,v 1.15 2005-05-14 14:47:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -118,19 +118,29 @@ julian_day(int day,int month,int year)
 	return(result);
 }
 
-STATIC int
-iso8601_calendar_week(int day,int month,int year)
+STATIC void
+iso8601_calendar_week_and_year(int day,int month,int year,int * week_ptr,int * year_ptr)
 {
 	int J = julian_day(day,month,year);
-	int d1,d4,L,result;
+	int d1,d4,L;
+	int week;
 
 	d4 = (J + 31741 - (J % 7)) % 146097 % 36524 % 1461;
 	L = d4 / 1460;
 	d1 = ((d4 - L) % 365) + L;
 
-	result = (d1 / 7) + 1;
+	week = (d1 / 7) + 1;
 
-	return(result);
+	if (month == 1 && week > 51)
+		year--;
+	else if (month == 12 && week == 1)
+		year++;
+
+	if(week_ptr != NULL)
+		(*week_ptr) = week;
+
+	if(year_ptr != NULL)
+		(*year_ptr) = year;
 }
 
 /****************************************************************************/
@@ -140,6 +150,8 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 {
 	int gmt_offset;
 	int week_number;
+	int year_number;
+	int hour;
 	char buffer[40];
 	const char * str;
 	char c;
@@ -227,7 +239,7 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				format_date("%a %b %d %H:%M:%S %Y",tm,hook);
 				break;
 
-			/* The last two digits of a year (C99). */
+			/* The last two digits of a year ("00"; C99). */
 			case 'C':
 
 				__number_to_string((unsigned int)(tm->tm_year % 100),buffer,sizeof(buffer),2);
@@ -243,6 +255,60 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				store_string_via_hook(buffer,2,hook);
 				break;
 
+			/* Date ("12/31/00"; C99) */
+			case 'D':
+
+				format_date("%m/%d/%y",tm,hook);
+				break;
+
+			/* Month with a leading space rather than a zero (" 1"-"12"; C99). */
+			case 'e':
+
+				assert( 0 <= tm->tm_mon && tm->tm_mon <= 11 );
+
+				__number_to_string((unsigned int)tm->tm_mon+1,buffer,sizeof(buffer),2);
+				if(buffer[0] == '0')
+					buffer[0] = ' ';
+
+				store_string_via_hook(buffer,2,hook);
+				break;
+
+			/* ISO 8601 date format ("2005-05-14"; C99). */
+			case 'F':
+
+				format_date("%Y-%m-%d",tm,hook);
+				break;
+
+			/* The last two digits of the week-based year ("00"-"99"; C99). */
+			case 'g':
+
+				assert( 1 <= tm->tm_mday && tm->tm_mday <= 31 );
+				assert( 0 <= tm->tm_mon && tm->tm_mon <= 11 );
+				assert( 0 <= tm->tm_year );
+
+				iso8601_calendar_week_and_year(tm->tm_mday,tm->tm_mon+1,tm->tm_year + 1900,NULL,&year_number);
+				__number_to_string(year_number % 100,buffer,sizeof(buffer),2);
+				store_string_via_hook(buffer,2,hook);
+				break;
+
+			/* The number of the week-based year ("2005"; C99). */
+			case 'G':
+
+				assert( 1 <= tm->tm_mday && tm->tm_mday <= 31 );
+				assert( 0 <= tm->tm_mon && tm->tm_mon <= 11 );
+				assert( 0 <= tm->tm_year );
+
+				iso8601_calendar_week_and_year(tm->tm_mday,tm->tm_mon+1,tm->tm_year + 1900,NULL,&year_number);
+				__number_to_string(year_number,buffer,sizeof(buffer),0);
+				store_string_via_hook(buffer,-1,hook);
+				break;
+
+			/* Abbreviated month name ("Jan"; C99). */
+			case 'h':
+
+				format_date("%b",tm,hook);
+				break;
+
 			/* Hour ("00"-"23"). */
 			case 'H':
 
@@ -252,12 +318,16 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				store_string_via_hook(buffer,2,hook);
 				break;
 
-			/* Hour ("00"-"12"). */
+			/* Hour ("01"-"12"). */
 			case 'I':
 
 				assert( 0 <= tm->tm_hour && tm->tm_hour <= 23 );
 
-				__number_to_string((unsigned int)((tm->tm_hour > 12) ? (tm->tm_hour - 12) : tm->tm_hour),buffer,sizeof(buffer),2);
+				hour = tm->tm_hour % 12;
+				if(hour == 0)
+					hour = 12;
+
+				__number_to_string(hour,buffer,sizeof(buffer),2);
 				store_string_via_hook(buffer,2,hook);
 				break;
 
@@ -327,7 +397,7 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				store_string_via_hook("\t",1,hook);
 				break;
 
-			/* ISO 8601 time format (C99). */
+			/* ISO 8601 time format ("23:59:59"; C99). */
 			case 'T':
 
 				format_date("%H:%M:%S",tm,hook);
@@ -358,7 +428,7 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				assert( 0 <= tm->tm_mon && tm->tm_mon <= 11 );
 				assert( 0 <= tm->tm_year );
 
-				week_number = iso8601_calendar_week(tm->tm_mday,tm->tm_mon+1,tm->tm_year + 1900);
+				iso8601_calendar_week_and_year(tm->tm_mday,tm->tm_mon+1,tm->tm_year + 1900,&week_number,NULL);
 				__number_to_string(week_number,buffer,sizeof(buffer),2);
 				store_string_via_hook(buffer,2,hook);
 				break;
