@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.9 2005-05-15 12:32:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -524,8 +524,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 					name = replace;
 				}
 		
-				__strip_double_slash(name,len);
-				len = strlen(name);
+				len = __strip_double_slash(name,len);
 		
 				D(("name = '%s' (line %ld)",name,__LINE__));
 			}

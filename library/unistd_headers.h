@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_headers.h,v 1.7 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: unistd_headers.h,v 1.8 2005-05-15 12:32:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,7 +90,7 @@ extern BOOL NOCOMMON __unix_path_semantics;
 /****************************************************************************/
 
 extern int __set_current_path(const char * path_name);
-extern void __strip_double_slash(char * file_name,int len);
+extern int __strip_double_slash(char * file_name,int len);
 
 /****************************************************************************/
 

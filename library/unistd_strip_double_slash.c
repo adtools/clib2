@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_strip_double_slash.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_strip_double_slash.c,v 1.3 2005-05-15 12:32:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,48 +40,56 @@
 /* Remove '//' from an AmigaDOS path name. For example, "volume:one/two//three"
    is equivalent to "volume:one/three" and the following function removes the
    redundant part of the path. */
-void
+int
 __strip_double_slash(char * file_name,int len)
 {
-	int start,delta,position,i;
-
-	assert( file_name != NULL && len > 0 );
+	int position;
 
 	position = len;
 
 	while(len > 1)
 	{
 		position--;
+
+		/* Stop when we hit the volume name or the first character of the name. */
 		if((position == 0) || (file_name[position] == ':') || (file_name[position - 1] == ':'))
 			break;
 
-		if((position > 1) && (file_name[position] == '/') && (file_name[position - 1] == '/') && (file_name[position - 2] != ':') && (file_name[position - 2] != '/'))
+		/* Do we have a // embedded in the file_name? That // must stand alone
+		   between directory names and not in front of a volume name or
+		   yet another /. */
+		if((position > 1) && (file_name[position] == '/' && file_name[position - 1] == '/') && (file_name[position - 2] != ':' && file_name[position - 2] != '/'))
 		{
+			int start,delta;
+
 			start = position;
 
+			/* Back up behind the //. */
 			position -= 2;
 
+			/* Find the spot where the previous directory or volume
+			   name begins. */
 			while((position > 0) && (file_name[position] != ':') && (file_name[position] != '/'))
 				position--;
 
+			/* Don't move too far. */
 			if((file_name[position] == ':') || (file_name[position] == '/'))
 				position++;
 
-			i		= position;
-			delta	= start - position + 1;
+			/* Find out how long the directory name is that
+			   we are going to remove now. */
+			delta = start - position + 1;
 
+			/* Remove the file_name part; we copy one more byte than
+			   necessary to account for the NUL at the end. */
 			len -= delta;
 
-			while(i < len)
-			{
-				file_name[i] = file_name[i + delta];
+			memmove(&file_name[position],&file_name[position + delta],len - position + 1);
 
-				i++;
-			}
-
-			file_name[len] = '\0';
-
+			/* The string is shorter, and here we go again... */
 			position = len;
 		}
 	}
+
+	return(len);
 }

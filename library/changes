@@ -15,6 +15,13 @@
 
 - Added %D, %e, %F, %g, %G and %h for strftime(); repaired %I.
 
+- Documented __strip_double_slash() and plugged in a memmove()
+  in place of the copying loop.
+
+- Modified __translate_unix_to_amiga_path_name() and
+  __translate_amiga_to_unix_path_name() to not to call strlen()
+  on the results of __strip_double_slash().
+
 
 c.lib 1.192 (12.5.2005)
 
