@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.6 2005-05-08 16:27:25 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.7 2005-05-17 19:15:31 obarthel Exp $
 #
 # :ts=8
 #
@@ -31,12 +31,12 @@ WARNINGS = \
 
 INCLUDE = -I../library/include
 LIB = -L../library/lib
- OPTIONS = -DNDEBUG -fno-builtin -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT
+ OPTIONS = -DNDEBUG -fno-builtin -fwritable-strings -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT
 #OPTIONS = -D__MEM_DEBUG -fno-builtin
 #OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O
 #OPTIMIZE = -O2 -fomit-frame-pointer
-#DEBUG = -g2
+DEBUG = -ggdb
 
 CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDE) $(LIB)
 
@@ -46,12 +46,14 @@ LIBS = -lm -lc -lgcc
 
 ##############################################################################
 
-all: test fgets_test iotest sscanf_test printf_test sprintf_test stack_size_test \
-	translate_test strtok_test uname simple fstat_stdout_test
+all: test fgets_test iotest sscanf_test printf_test sprintf_test \
+	stack_size_test translate_test strtok_test uname simple \
+	fstat_stdout_test simple_sprintf
 
 clean:
-	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test sprintf_test \
-		stack_size_test translate_test strtok_test uname simple fstat_stdout_test
+	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test \
+		sprintf_test stack_size_test translate_test strtok_test uname \
+		simple fstat_stdout_test simple_sprintf
 
 ##############################################################################
 
@@ -102,6 +104,10 @@ simple : simple.o
 fstat_stdout_test : fstat_stdout_test.o
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) -o $@ fstat_stdout_test.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
+
+simple_sprintf : simple_sprintf.o
+	@echo "Linking $@"
+	$(CC) -nostdlib $(CFLAGS) -o $@ simple_sprintf.o -lc -Wl,--cref,-M,-Map=$@.map
 
 ##############################################################################
 

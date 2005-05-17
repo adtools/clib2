@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.6 2005-05-08 16:27:25 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.7 2005-05-17 19:15:32 obarthel Exp $
 #
 # :ts=8
 #
@@ -38,12 +38,14 @@ LIBS = -lm -lc
 
 ##############################################################################
 
-all: test fgets_test iotest sscanf_test printf_test sprintf_test stack_size_test \
-	translate_test strtok_test uname simple fstat_stdout_test
+all: test fgets_test iotest sscanf_test printf_test sprintf_test \
+	stack_size_test translate_test strtok_test uname simple \
+	fstat_stdout_test simple_sprintf
 
 clean:
-	$(DELETE) *.o *.map test fgets_test iotest sscanf_test printf_test sprintf_test \
-		stack_size_test translate_test strtok_test uname simple fstat_stdout_test
+	$(DELETE) *.o *.map test fgets_test iotest sscanf_test printf_test \
+		sprintf_test stack_size_test translate_test strtok_test \
+		uname simple fstat_stdout_test simple_sprintf
 
 ##############################################################################
 
@@ -94,3 +96,7 @@ simple : simple.o
 fstat_stdout_test : fstat_stdout_test.o
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) -o $@ fstat_stdout_test.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
+
+simple_sprintf : simple_sprintf.o
+	@echo "Linking $@"
+	$(CC) -nostdlib $(CFLAGS) -o $@ simple_sprintf.o -lc -Wl,--cref,-M,-Map=$@.map
