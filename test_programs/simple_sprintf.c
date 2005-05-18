@@ -1,5 +1,5 @@
 /*
- * $Id: simple_sprintf.c,v 1.1 2005-05-17 19:15:32 obarthel Exp $
+ * $Id: simple_sprintf.c,v 1.2 2005-05-18 07:22:52 obarthel Exp $
  *
  * :ts=4
  */
@@ -54,14 +54,18 @@ _start(void)
 
 	SysBase = *(struct Library **)4;
 
+	#if defined(__amigaos4__)
+	{
+		IExec = (struct ExecIFace *)((struct ExecBase *)SysBase)->MainInterface;
+	}
+	#endif /* __amigaos4__ */
+
 	DOSBase = OpenLibrary("dos.library",37);
 	if(DOSBase == NULL)
 		goto out;
 
 	#if defined(__amigaos4__)
 	{
-		IExec = (struct ExecIFace *)((struct ExecBase *)SysBase)->MainInterface;
-
 		IDOS = (struct DOSIFace *)GetInterface(DOSBase, "main", 1, 0);
 		if(IDOS == NULL)
 			goto out;
@@ -70,7 +74,7 @@ _start(void)
 
 	sprintf(string,"a %s c\n","b");
 
-	Write(Output(),string,strlen(string));
+	Write(Output(),string,(LONG)strlen(string));
 
  out:
 

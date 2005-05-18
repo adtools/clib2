@@ -1,10 +1,13 @@
 /*
- * $Id: test.c,v 1.4 2005-01-30 10:23:26 obarthel Exp $
+ * $Id: test.c,v 1.5 2005-05-18 07:22:52 obarthel Exp $
  *
  * :ts=4
  */
 
 /****************************************************************************/
+
+#define __USE_INLINE__
+#include <proto/exec.h>
 
 #include <time.h>
 #include <stdio.h>
@@ -49,6 +52,8 @@ destructor_test2(void)
 void __attribute__ ((destructor))
 destructor_test3(void)
 {
+	DebugPrintF("__iob = 0x%08lx\n",__iob);
+
 	fprintf(stderr,"destructor #3 called\n");
 }
 

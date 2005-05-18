@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.7 2005-05-17 19:15:32 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.8 2005-05-18 07:22:51 obarthel Exp $
 #
 # :ts=8
 #
@@ -21,20 +21,20 @@ WARNINGS = \
 	-Wall -W -Wshadow -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
 	-Wundef -Wbad-function-cast -Wmissing-declarations -Wconversion
 
-INCLUDE = -I../library/include -I$(V)/include
+INCLUDE = -I$(V)/include -I../library/include
 LIB = -L../library/lib
 #OPTIONS = -DNDEBUG -fno-builtin -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT
 #OPTIONS = -D__MEM_DEBUG -fno-builtin
-#OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
- OPTIMIZE = -O
+ OPTIONS = -DDEBUG -DNO_INLINE_STDARG -fno-builtin
+#OPTIMIZE = -O
 #OPTIMIZE = -O2 -fomit-frame-pointer
-#DEBUG = -g2
+DEBUG = -ggdb
 
 CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDE) $(LIB)
 
 ##############################################################################
 
-LIBS = -lm -lc
+LIBS = -lm -lc -ldebug -lgcc
 
 ##############################################################################
 
@@ -99,4 +99,4 @@ fstat_stdout_test : fstat_stdout_test.o
 
 simple_sprintf : simple_sprintf.o
 	@echo "Linking $@"
-	$(CC) -nostdlib $(CFLAGS) -o $@ simple_sprintf.o -lc -Wl,--cref,-M,-Map=$@.map
+	$(CC) -nostdlib $(CFLAGS) -o $@ simple_sprintf.o -lc -lgcc -Wl,--cref,-M,-Map=$@.map
