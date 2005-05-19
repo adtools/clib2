@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.9 2005-05-12 13:21:47 obarthel Exp $
+ * $Id: math.h,v 1.10 2005-05-19 13:57:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -210,7 +210,7 @@ extern int __isunordered_double(double x,double y);
 	(isunordered(x,y) ? 0 : (x) <= (y))
 
 #define islessgreater(x,y) \
-	(isunordered(x,y) ? 0 : (x) < (y) || (x) > (y))	/* ZZZ don't evaulate twice! */
+	(isunordered(x,y) ? 0 : (x) < (y) || (x) > (y))	/* ZZZ don't evaluate twice! */
 
 /****************************************************************************/
 

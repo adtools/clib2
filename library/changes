@@ -22,6 +22,9 @@
   __translate_amiga_to_unix_path_name() to not to call strlen()
   on the results of __strip_double_slash().
 
+- For %C strtime() should return the century number, not the
+  year number mod 100.
+
 
 c.lib 1.192 (12.5.2005)
 
