@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.19 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: macros.h,v 1.20 2005-05-27 13:19:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,7 +75,7 @@
    char array allocated. */
 #define D_S(type, name) \
 	char a_##name[sizeof(type)+3]; \
-	type *name = (type *)((LONG)(a_##name+3) & ~3)
+	type *name = (type *)((ULONG)(a_##name+3) & ~3)
 
 /****************************************************************************/
 

@@ -25,6 +25,12 @@
 - For %C strtime() should return the century number, not the
   year number mod 100.
 
+- The record locking code in fcntl() is no longer part of the
+  regular libc.a, but only of libunix.a.
+
+- Changed the definition of the D_S() macro to cast the pointer
+  address to an unsigned 32 bit integer.
+
 
 c.lib 1.192 (12.5.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.17 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.18 2005-05-27 13:19:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,6 +84,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 
 	switch(cmd)
 	{
+#if defined(UNIX_PATH_SEMANTICS)
 		case F_GETLK:
 		case F_SETLK:
 		case F_SETLKW:
@@ -133,6 +134,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			result = OK;
 
 			break;
+#endif /* UNIX_PATH_SEMANTICS */
 
 		case F_GETFL:
 
