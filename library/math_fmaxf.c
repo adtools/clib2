@@ -1,5 +1,5 @@
 /*
- * $Id: math_fmaxf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_fmaxf.c,v 1.2 2005-05-29 12:41:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,28 @@
 float
 fmaxf(float x,float y)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	float result;
+
+	if(isnan(x))
+	{
+		if(isnan(y))
+			result = nanf(NULL);
+		else
+			result = y;
+	}
+	else if (isnan(y))
+	{
+		result = x;
+	}
+	else
+	{
+		if(x > y)
+			result = x;
+		else
+			result = y;
+	}
+
+	return(result);
 }
 
 /****************************************************************************/

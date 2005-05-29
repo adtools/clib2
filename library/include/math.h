@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.11 2005-05-29 10:09:55 obarthel Exp $
+ * $Id: math.h,v 1.12 2005-05-29 12:41:04 obarthel Exp $
  *
  * :ts=4
  *
@@ -116,8 +116,8 @@ extern double hypot(double x,double y);
 /* Note that the comparison operations performed on the floating point
    data types ought to include float, double and long double. However,
    because the current (2005-06-12) compiler technology available on the
-   Amiga does not support the long double type yet, this library is restricted
-   to operations on float and double. */
+   Amiga does not support the long double type yet, this library is
+   restricted to operations on float and double. */
 
 /****************************************************************************/
 
@@ -134,8 +134,8 @@ extern float __nan;
 
 /****************************************************************************/
 
-#define INFINITY ((const float)__infinity)
-#define NAN ((const float)__nan)
+#define INFINITY	((const float)__infinity)
+#define NAN			((const float)__nan)
 
 /****************************************************************************/
 
@@ -238,8 +238,23 @@ extern double nextafter(double x,double y);
 
 /****************************************************************************/
 
-extern double copysign(double x, double y);
 extern float copysignf(float x, float y);
+extern double copysign(double x, double y);
+
+/****************************************************************************/
+
+extern float fdimf(float x,float y);
+extern double fdim(double x,double y);
+
+/****************************************************************************/
+
+extern float fminf(float x,float y);
+extern double fmin(double x,double y);
+
+/****************************************************************************/
+
+extern float fmaxf(float x,float y);
+extern double fmax(double x,double y);
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_fdimf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_fdimf.c,v 1.2 2005-05-29 12:41:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,14 @@
 float
 fdimf(float x,float y)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	float result;
+
+	if(x > y)
+		result = x - y;
+	else
+		result = 0;
+
+	return(result);
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: math_fmax.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_fmax.c,v 1.2 2005-05-29 12:41:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,28 @@
 double
 fmax(double x,double y)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	double result;
+
+	if(isnan(x))
+	{
+		if(isnan(y))
+			result = nan(NULL);
+		else
+			result = y;
+	}
+	else if (isnan(y))
+	{
+		result = x;
+	}
+	else
+	{
+		if(x > y)
+			result = x;
+		else
+			result = y;
+	}
+
+	return(result);
 }
 
 /****************************************************************************/

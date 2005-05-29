@@ -61,6 +61,8 @@
   tanhf(), tgamma(), tgammaf(), trunc() and truncf(), to be filled in
   later...
 
+- Implemented fmin()/fminf(), fmax()/fmaxf(), fdim()/fdimf() (C99).
+
 
 c.lib 1.192 (12.5.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_fdim.c,v 1.1 2005-05-29 11:19:00 obarthel Exp $
+ * $Id: math_fdim.c,v 1.2 2005-05-29 12:41:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,14 @@
 double
 fdim(double x,double y)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	double result;
+
+	if(x > y)
+		result = x - y;
+	else
+		result = 0;
+
+	return(result);
 }
 
 /****************************************************************************/
