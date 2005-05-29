@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fputc.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_fputc.c,v 1.7 2005-05-29 09:56:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -128,7 +128,7 @@ __fputc(int c,FILE *stream,int buffer_mode)
 	/* Clip everything but the least significant eight bits. This
 	   also takes care of the sign. Thus, a -1 (== EOF) always comes
 	   out as 255. */
-	result = (c & 0xff);
+	result = (c & 255);
 
  out:
 

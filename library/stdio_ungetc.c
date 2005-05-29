@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_ungetc.c,v 1.5 2005-02-27 18:09:11 obarthel Exp $
+ * $Id: stdio_ungetc.c,v 1.6 2005-05-29 09:56:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -107,10 +107,6 @@ ungetc(int c,FILE *stream)
 		goto out;
 	}
 
-	/* The following should never happen. */
-	if(c < 0)
-		D(("warning -- pushback of negative number %ld!",c));
-
 	/* Get rid of the write buffer, if it's still around. */
 	if(__iob_write_buffer_is_valid(file) > 0 && __flush_iob_write_buffer(file) < 0)
 	{
@@ -138,7 +134,8 @@ ungetc(int c,FILE *stream)
 	/* Replace the character just read. */
 	file->iob_Buffer[--file->iob_BufferPosition] = c;
 
-	result = c;
+	/* Clamp the result to an unsigned 8 bit value. */
+	result = (c & 255);
 
  out:
 

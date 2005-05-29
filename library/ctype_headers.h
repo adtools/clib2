@@ -1,5 +1,5 @@
 /*
- * $Id: ctype_headers.h,v 1.4 2005-03-30 19:37:26 obarthel Exp $
+ * $Id: ctype_headers.h,v 1.5 2005-05-29 09:56:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,6 +60,7 @@
 
 #include <locale.h>
 #include <assert.h>
+#include <limits.h>
 #include <ctype.h>
 
 /****************************************************************************/

@@ -31,6 +31,20 @@
 - Changed the definition of the D_S() macro to cast the pointer
   address to an unsigned 32 bit integer.
 
+- Modified the locale-aware isalnum(), isalpha(), iscntrl(),
+  isdigit(), isgraph(), islower(), isprint(), ispunct(), isspace(),
+  isupper(), isxdigit(), tolower() and toupper() functions
+  to clamp the input parameter to the "unsigned char" range before
+  it is submitted to the respective locale.library function. This
+  should be in sync with what the specs demand, which state that
+  if the input parameter is neither EOF nor in the range of an
+  "unsigned char" variable, then the results are undefined.
+
+- ungetc() now returns the input character, clamped to an unsigned
+  char value, upon success. Previously, if the input parameter was
+  negative and not EOF, the result was identical to the input, which
+  could have had negative side-effects.
+
 
 c.lib 1.192 (12.5.2005)
 

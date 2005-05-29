@@ -1,5 +1,5 @@
 /*
- * $Id: ctype_isalpha.c,v 1.3 2005-02-27 21:58:21 obarthel Exp $
+ * $Id: ctype_isalpha.c,v 1.4 2005-05-29 09:56:09 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,13 @@ isalpha(int c)
 	{
 		assert( LocaleBase != NULL );
 
-		result = IsAlpha(__locale_table[LC_CTYPE],(ULONG)c);
+		/* The parameter must be either EOF or in the range of an
+		   'unsigned char'. If it's not, then the behaviour is
+		   undefined. */
+		if(c != EOF && ((0 <= c && c <= UCHAR_MAX) || ((c + 256) <= UCHAR_MAX)))
+			result = IsAlpha(__locale_table[LC_CTYPE],(ULONG)(c & 255));
+		else
+			result = FALSE;
 	}
 	else
 	{
