@@ -1,5 +1,5 @@
 /*
- * $Id: math_init_exit.c,v 1.16 2005-05-07 17:03:55 obarthel Exp $
+ * $Id: math_init_exit.c,v 1.17 2005-05-29 10:09:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,6 +70,11 @@ struct Library * MathIeeeDoubBasBase;
 struct Library * MathIeeeDoubTransBase;
 
 #endif /* IEEE_FLOATING_POINT_SUPPORT */
+
+/****************************************************************************/
+
+float	__infinity;
+float	__nan;
 
 /****************************************************************************/
 
@@ -188,6 +193,13 @@ MATH_CONSTRUCTOR(math_init)
 		x->raw[2] = 0xffffffff;
 	}
 	#endif /* USE_LONG_DOUBLE */
+
+	/* Finally, fill in the constants behind INFINITY and NAN. */
+	single_x = (union ieee_single *)&__infinity;
+	single_x->raw[0] = 0x7f800000;
+
+	single_x = (union ieee_single *)&__nan;
+	single_x->raw[0] = 0x7fc00001;
 
 	success = TRUE;
 

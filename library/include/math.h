@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.10 2005-05-19 13:57:53 obarthel Exp $
+ * $Id: math.h,v 1.11 2005-05-29 10:09:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -129,6 +129,16 @@ extern float __huge_val_float;
 
 /****************************************************************************/
 
+extern float __infinity;
+extern float __nan;
+
+/****************************************************************************/
+
+#define INFINITY ((const float)__infinity)
+#define NAN ((const float)__nan)
+
+/****************************************************************************/
+
 #define FP_INFINITE		0	/* -/+ infinity */
 #define FP_NAN			1	/* not a number */
 #define FP_NORMAL		2	/* normalized floating point number */
@@ -230,6 +240,15 @@ extern double nextafter(double x,double y);
 
 extern double copysign(double x, double y);
 extern float copysignf(float x, float y);
+
+/****************************************************************************/
+
+#define FLT_EVAL_METHOD 0
+
+/****************************************************************************/
+
+typedef float	float_t;
+typedef double	double_t;
 
 /****************************************************************************/
 

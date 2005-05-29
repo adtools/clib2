@@ -45,6 +45,9 @@
   negative and not EOF, the result was identical to the input, which
   could have had negative side-effects.
 
+- Added NAN, INFINITY, FLT_EVAL_METHOD, float_t and double_t to
+  <math.h>.
+
 
 c.lib 1.192 (12.5.2005)
 
