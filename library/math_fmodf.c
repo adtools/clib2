@@ -1,5 +1,5 @@
 /*
- * $Id: math_fmodf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_fmodf.c,v 1.2 2005-05-29 14:45:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ *
+ *
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +53,39 @@
 
 /****************************************************************************/
 
+static const float one = 1.0;
+
 float
-fmodf(float x,float y)
+modff(float x, float *iptr)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	LONG i0,j_0;
+	ULONG i;
+	GET_FLOAT_WORD(i0,x);
+	j_0 = ((i0>>23)&0xff)-0x7f;	/* exponent of x */
+	if(j_0<23) {			/* integer part in x */
+	    if(j_0<0) {			/* |x|<1 */
+	        SET_FLOAT_WORD(*iptr,i0&0x80000000U);	/* *iptr = +-0 */
+		return x;
+	    } else {
+		i = (0x007fffff)>>j_0;
+		if((i0&i)==0) {			/* x is integral */
+		    ULONG ix;
+		    *iptr = x;
+		    GET_FLOAT_WORD(ix,x);
+		    SET_FLOAT_WORD(x,ix&0x80000000U);	/* return +-0 */
+		    return x;
+		} else {
+		    SET_FLOAT_WORD(*iptr,i0&(~i));
+		    return x - *iptr;
+		}
+	    }
+	} else {			/* no fraction part */
+	    ULONG ix;
+	    *iptr = x*one;
+	    GET_FLOAT_WORD(ix,x);
+	    SET_FLOAT_WORD(x,ix&0x80000000U);	/* return +-0 */
+	    return x;
+	}
 }
 
 /****************************************************************************/

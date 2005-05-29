@@ -61,7 +61,15 @@
   tanhf(), tgamma(), tgammaf(), trunc() and truncf(), to be filled in
   later...
 
-- Implemented fmin()/fminf(), fmax()/fmaxf(), fdim()/fdimf() (C99).
+- Implemented fmin()/fminf(), fmax()/fmaxf(), fdim()/fdimf() for C99.
+
+- Ported acosf(), asinf(), atan2f(), atanf(), ceilf(), expf(), floorf(),
+  fmodf(), frexpf(), ldexpf(), log10f(), logbf(), logf(), modff(), powf(), sqrtf(),
+  scalbn() and scalbnf() for C99.
+
+- Ported cbrt(), cbrtf(), erf(), erff(), erfc(), erfcf(), expm1(),
+  expm1f(), ilogb(), ilogbf(), log1p() and log1pf() for C99.
+
 
 
 c.lib 1.192 (12.5.2005)

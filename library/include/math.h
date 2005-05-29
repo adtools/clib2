@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.12 2005-05-29 12:41:04 obarthel Exp $
+ * $Id: math.h,v 1.13 2005-05-29 14:45:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -224,7 +224,25 @@ extern int __isunordered_double(double x,double y);
 
 /****************************************************************************/
 
+extern float acosf(float x);
+extern float asinf(float x);
+extern float atanf(float x);
+extern float atan2f(float y, float x);
+extern float ceilf(float x);
+
+
+extern float expf(float x);
 extern float fabsf(float x);
+extern float floorf(float x);
+extern float fmodf(float x, float y);
+extern float frexpf(float x, int *eptr);
+extern float ldexp(float x,int exp);
+extern float logf(float x);
+extern float log10f(float x);
+extern float logbf(float x);
+extern float modff(float x, float *iptr);
+extern float powf(float x, float y);
+extern float sqrtf(float x);
 
 /****************************************************************************/
 
@@ -255,6 +273,41 @@ extern double fmin(double x,double y);
 
 extern float fmaxf(float x,float y);
 extern double fmax(double x,double y);
+
+/****************************************************************************/
+
+extern float scalbnf (float x, int n);
+extern double scalbn (double x, int n);
+
+/****************************************************************************/
+
+extern float cbrtf(float x);
+extern double cbrt(double x);
+
+/****************************************************************************/
+
+extern float erff(float x);
+extern double erf(double x);
+
+/****************************************************************************/
+
+extern float erfcf(float x);
+extern double erfc(double x);
+
+/****************************************************************************/
+
+extern float expm1f(float x);
+extern double expm1(double x);
+
+/****************************************************************************/
+
+extern int ilogbf(float x);
+extern int ilogb(double x);
+
+/****************************************************************************/
+
+extern float log1pf(float x);
+extern double log1p(double x);
 
 /****************************************************************************/
 

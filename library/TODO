@@ -1,51 +1,43 @@
 C99 math functions:
 
 	("float"-versions of existing "double" functions)
-	acosf
-	asinf
-	atan2f
-	atanf
-	ceilf
 	cosf
-	expf
-	floorf
-	fmodf
-	frexpf
 	hypotf
-	ldexpf
-	log10f
-	logbf
-	logf
-	modff
-	powf
 	sinf
-	sqrtf
 	tanf
 
-	(functions generally missing, plus their "float" counterparts)
+	(functions generally missing, including their "float" counterparts)
 	acosh
+	acoshf
 	asinh
-	cbrt
-	erfc
+	asinhf
 	exp2
-	expm1
-	fdim
+	exp2f
 	fma
-	fmax
-	fmin
-	ilogb
+	fmaf
 	lgamma
-	log1p
+	lgammaf
 	log2
+	log2f
 	lrint
+	lrintf
 	lround
+	lroundf
 	nearbyint
+	nearbyintf
 	nexttoward
+	nexttowardf
 	remainder
+	remainderf
 	remquo
+	remquof
 	round
-	scalbn
+	roundf
 	sinh
+	sinhf
 	tanh
+	tanhf
 	tgamma
+	tgammaf
 	trunc
+	truncf

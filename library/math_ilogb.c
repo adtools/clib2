@@ -1,5 +1,5 @@
 /*
- * $Id: math_ilogb.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_ilogb.c,v 1.2 2005-05-29 14:45:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,15 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +50,26 @@
 
 /****************************************************************************/
 
-double
+int
 ilogb(double x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	LONG hx,lx,ix;
+
+	EXTRACT_WORDS(hx,lx,x);
+	hx &= 0x7fffffff;
+	if(hx<0x00100000) {
+	    if((hx|lx)==0) 
+		return - INT_MAX;	/* ilogb(0) = 0x80000001 */
+	    else			/* subnormal x */
+		if(hx==0) {
+		    for (ix = -1043; lx>0; lx<<=1) ix -=1;
+		} else {
+		    for (ix = -1022,hx<<=11; hx>0; hx<<=1) ix -=1;
+		}
+	    return ix;
+	}
+	else if (hx<0x7ff00000) return (hx>>20)-1023;
+	else return INT_MAX;
 }
 
 /****************************************************************************/

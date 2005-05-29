@@ -1,5 +1,5 @@
 /*
- * $Id: math_ilogbf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_ilogbf.c,v 1.2 2005-05-29 14:45:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ *
+ *
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +53,22 @@
 
 /****************************************************************************/
 
-float
+int
 ilogbf(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	LONG hx,ix;
+
+	GET_FLOAT_WORD(hx,x);
+	hx &= 0x7fffffff;
+	if(hx<0x00800000) {
+	    if(hx==0) 
+		return - INT_MAX;	/* ilogb(0) = 0x80000001 */
+	    else			/* subnormal x */
+	        for (ix = -126,hx<<=8; hx>0; hx<<=1) ix -=1;
+	    return ix;
+	}
+	else if (hx<0x7f800000) return (hx>>23)-127;
+	else return INT_MAX;
 }
 
 /****************************************************************************/

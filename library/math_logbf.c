@@ -1,5 +1,5 @@
 /*
- * $Id: math_logbf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_logbf.c,v 1.2 2005-05-29 14:45:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ *
+ *
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -44,8 +56,15 @@
 float
 logbf(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	LONG ix;
+	GET_FLOAT_WORD(ix,x);
+	ix &= 0x7fffffff;			/* high |x| */
+	if(ix==0) return (float)-1.0/fabsf(x);
+	if(ix>=0x7f800000) return x*x;
+	if((ix>>=23)==0) 			/* IEEE 754 logb */
+		return -126.0; 
+	else
+		return (float) (ix-127); 
 }
 
 /****************************************************************************/

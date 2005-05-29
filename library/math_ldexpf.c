@@ -1,5 +1,5 @@
 /*
- * $Id: math_ldexpf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_ldexpf.c,v 1.2 2005-05-29 14:45:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,21 @@
 float
 ldexpf(float x,int exp)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	float result;
+
+	if(isinf(x) || fpclassify(x) == FP_ZERO)
+	{
+		result = x;
+	}
+	else
+	{
+		result = scalbnf(x,exp);
+
+		if(isinf(result) || (result < FLT_MIN || result > -FLT_MIN))
+			__set_errno(ERANGE);
+	}
+
+	return(result);
 }
 
 /****************************************************************************/

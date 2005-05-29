@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.43 2005-05-14 10:52:31 obarthel Exp $
+# $Id: smakefile,v 1.44 2005-05-29 14:45:32 obarthel Exp $
 #
 # :ts=8
 #
@@ -180,45 +180,62 @@ LOCALE_OBJ = \
 
 MATH_OBJ = \
 	math_acos.o \
+	math_acosf.o \
 	math_asin.o \
+	math_asinf.o \
 	math_atan.o \
 	math_atan2.o \
+	math_atan2f.o \
+	math_atanf.o \
 	math_ceil.o \
-	math_cos.o \
-	math_cosh.o \
+	math_ceilf.o \
 	math_copysign.o \
 	math_copysignf.o \
+	math_cos.o \
+	math_cosh.o \
 	math_exp.o \
+	math_expf.o \
 	math_fabs.o \
 	math_fabsf.o \
 	math_floor.o \
+	math_floorf.o \
 	math_fmod.o \
+	math_fmodf.o \
 	math_fpclassify.o \
-	math_inf.o \
-	math_inff.o \
-	math_isfinite.o \
-	math_isunordered.o \
-	math_signbit.o \
 	math_frexp.o \
+	math_frexpf.o \
 	math_huge_val.o \
 	math_huge_valf.o \
 	math_hypot.o \
+	math_inf.o \
+	math_inff.o \
 	math_init_exit.o \
+	math_isfinite.o \
+	math_isunordered.o \
 	math_ldexp.o \
 	math_log.o \
 	math_log10.o \
+	math_log10f.o \
 	math_logb.o \
+	math_logbf.o \
+	math_logf.o \
 	math_modf.o \
+	math_modff.o \
 	math_nan.o \
 	math_nanf.o \
 	math_nextafter.o \
 	math_nextafterf.o \
 	math_pow.o \
+	math_powf.o \
 	math_rint.o \
 	math_rintf.o \
+	math_scalbn.o \
+	math_scalbnf.o \
+	math_signbit.o \
 	math_sin.o \
 	math_sinh.o \
 	math_sqrt.o \
+	math_sqrtf.o \
 	math_tan.o \
 	math_tanh.o
 
