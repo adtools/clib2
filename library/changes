@@ -46,7 +46,20 @@
   could have had negative side-effects.
 
 - Added NAN, INFINITY, FLT_EVAL_METHOD, float_t and double_t to
-  <math.h>.
+  <math.h> (C99).
+
+- Added skeleton code for acosf(), acosh(), acoshf(), asinf(), asinh(),
+  asinhf(), atan2f(), atanf(), atanh(), atanhf(), cbrt(), cbrtf(),
+  ceilf(), cosf(), coshf(), erf(), erfc(), erfcf(), erff(),
+  exp2(), exp2f(), expf(), expm1(), expm1f(), fdim(), fdimf(),
+  floorf(), fma(), fmaf(), fmax(), fmaxf(), fmin(), fminf(),
+  fmodf(), frexpf(), hypotf(), ilogb(), ilogbf(), ldexpf(), lgamma(),
+  lgammaf(), log10f(), log1p(), log1pf(), log2(), log2f(), logbf(),
+  logf(), lrint(), lrintf(), lround(), lroundf(), modff(), nearbyint(),
+  nearbyintf(), powf(), remainder(), remainderf(), remquo(), remquof(), round(),
+  roundf(), scalbn(), scalbnf(), sinf(), sinhf(), sqrtf(), tanf(),
+  tanhf(), tgamma(), tgammaf(), trunc() and truncf(), to be filled in
+  later...
 
 
 c.lib 1.192 (12.5.2005)

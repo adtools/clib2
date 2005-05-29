@@ -12,6 +12,7 @@ C99 math functions:
 	fmodf
 	frexpf
 	hypotf
+	ldexpf
 	log10f
 	logbf
 	logf
@@ -43,7 +44,6 @@ C99 math functions:
 	remainder
 	remquo
 	round
-	scabln
 	scalbn
 	sinh
 	tanh
