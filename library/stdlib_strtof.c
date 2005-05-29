@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtof.c,v 1.5 2005-05-14 10:52:31 obarthel Exp $
+ * $Id: stdlib_strtof.c,v 1.6 2005-05-29 08:19:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -326,7 +326,7 @@ strtof(const char *str, char ** ptr)
 					float divisor;
 
 					/* A negative exponent means division. */
-					divisor = pow(radix,(float)exponent);
+					divisor = pow((double)radix,(float)exponent);
 					if(divisor != 0.0)
 					{
 						new_sum = sum / divisor;
@@ -343,7 +343,7 @@ strtof(const char *str, char ** ptr)
 				else
 				{
 					/* A positive exponent means multiplication. */
-					new_sum = sum * pow(radix,(float)exponent);
+					new_sum = sum * pow((double)radix,(float)exponent);
 					if(new_sum < sum)
 						error = ERANGE;
 					else

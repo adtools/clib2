@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.17 2005-05-12 14:42:32 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.18 2005-05-29 08:19:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,7 +89,7 @@ get_num_leading_digits(__long_double_t v,int radix)
 		/* For some reason log() can crash on GCC 68k... */
 		#if (!defined(__GNUC__) || defined(__PPC__))
 		{
-			num_digits = 1 + floor(log(v) / log(radix));
+			num_digits = 1 + floor(log(v) / log((double)radix));
 		}
 		#else
 		{
@@ -866,11 +866,11 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 							roundoff_position = max_digits;
 
 						if(roundoff_position >= 0)
-							roundoff_fudge = pow(radix,(double)(roundoff_position + 1));
+							roundoff_fudge = pow((double)radix,(double)(roundoff_position + 1));
 					}
 					else
 					{
-						roundoff_fudge = pow(radix,(double)(precision + 1));
+						roundoff_fudge = pow((double)radix,(double)(precision + 1));
 					}
 
 					if(roundoff_fudge > 0.0)
@@ -936,7 +936,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 						   simply scale the value without any loss of
 						   precision (we just change the floating point
 						   exponent). */
-						v /= pow(radix,(double)num_leading_digits);
+						v /= pow((double)radix,(double)num_leading_digits);
 
 						for(i = 0 ; (max_digits != 0) && (i < num_leading_digits) && (output_buffer < buffer_stop) ; i++)
 						{
