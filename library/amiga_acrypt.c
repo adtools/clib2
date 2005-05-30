@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_acrypt.c,v 1.2 2005-01-02 09:07:06 obarthel Exp $
+ * $Id: amiga_acrypt.c,v 1.3 2005-05-30 14:01:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,9 +31,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define ACrypt __ACrypt
+
 #include <exec/types.h>
 #include <string.h>
 #include <clib/alib_protos.h>
+
+#undef ACrypt
 
 /****************************************************************************/
 
