@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.61 2005-05-30 08:10:37 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.62 2005-05-30 08:47:26 obarthel Exp $
 #
 # :ts=8
 #
@@ -519,13 +519,14 @@ MATH_LIB = \
 	complex_creal.o \
 	complex_crealf.o \
 	complex_creall.o \
-	math_coshf.o \
-	math_sinhf.o \
-	math_tanhf.o \
 	math_acos.o \
 	math_acosf.o \
+	math_acosh.o \
+	math_acoshf.o \
 	math_asin.o \
 	math_asinf.o \
+	math_asinh.o \
+	math_asinhf.o \
 	math_atan.o \
 	math_atan2.o \
 	math_atan2f.o \
@@ -539,6 +540,7 @@ MATH_LIB = \
 	math_cos.o \
 	math_cosf.o \
 	math_cosh.o \
+	math_coshf.o \
 	math_erf.o \
 	math_erfc.o \
 	math_erfcf.o \
@@ -578,6 +580,8 @@ MATH_LIB = \
 	math_kernel_tanf.o \
 	math_ldexp.o \
 	math_ldexpf.o \
+	math_lgamma.o \
+	math_lgammaf.o \
 	math_log.o \
 	math_log10.o \
 	math_log10f.o \
@@ -594,6 +598,8 @@ MATH_LIB = \
 	math_nextafterf.o \
 	math_pow.o \
 	math_powf.o \
+	math_remainder.o \
+	math_remainderf.o \
 	math_rem_pio2f.o \
 	math_rint.o \
 	math_rintf.o \
@@ -603,11 +609,13 @@ MATH_LIB = \
 	math_sin.o \
 	math_sinf.o \
 	math_sinh.o \
+	math_sinhf.o \
 	math_sqrt.o \
 	math_sqrtf.o \
 	math_tan.o \
 	math_tanf.o \
 	math_tanh.o \
+	math_tanhf.o \
 	stdio_asprintf.o \
 	stdio_flush.o \
 	stdio_flush_all_files.o \

@@ -1,16 +1,10 @@
 C99 math functions:
 
 	(functions generally missing, including their "float" counterparts)
-	acosh
-	acoshf
-	asinh
-	asinhf
 	exp2
 	exp2f
 	fma
 	fmaf
-	lgamma
-	lgammaf
 	log2
 	log2f
 	lrint
@@ -19,10 +13,6 @@ C99 math functions:
 	lroundf
 	nearbyint
 	nearbyintf
-	nexttoward
-	nexttowardf
-	remainder
-	remainderf
 	remquo
 	remquof
 	round

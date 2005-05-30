@@ -1,5 +1,5 @@
 /*
- * $Id: math_remainderf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_remainderf.c,v 1.2 2005-05-30 08:47:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ *
+ *
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +53,47 @@
 
 /****************************************************************************/
 
+static const float zero = 0.0;
+
 float
-remainderf(float x,float y)
+remainderf(float x, float p)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	LONG hx,hp;
+	ULONG sx;
+	float p_half;
+
+	GET_FLOAT_WORD(hx,x);
+	GET_FLOAT_WORD(hp,p);
+	sx = hx&0x80000000U;
+	hp &= 0x7fffffff;
+	hx &= 0x7fffffff;
+
+    /* purge off exception values */
+	if(hp==0) return (x*p)/(x*p);	 	/* p = 0 */
+	if((hx>=0x7f800000)||			/* x not finite */
+	  ((hp>0x7f800000)))			/* p is NaN */
+	    return (x*p)/(x*p);
+
+
+	if (hp<=0x7effffff) x = fmodf(x,p+p);	/* now x < 2p */
+	if ((hx-hp)==0) return zero*x;
+	x  = fabsf(x);
+	p  = fabsf(p);
+	if (hp<0x01000000) {
+	    if(x+x>p) {
+		x-=p;
+		if(x+x>=p) x -= p;
+	    }
+	} else {
+	    p_half = (float)0.5*p;
+	    if(x>p_half) {
+		x-=p;
+		if(x>=p_half) x -= p;
+	    }
+	}
+	GET_FLOAT_WORD(hx,x);
+	SET_FLOAT_WORD(x,hx^sx);
+	return x;
 }
 
 /****************************************************************************/

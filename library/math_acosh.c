@@ -1,5 +1,5 @@
 /*
- * $Id: math_acosh.c,v 1.1 2005-05-29 11:19:00 obarthel Exp $
+ * $Id: math_acosh.c,v 1.2 2005-05-30 08:47:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,15 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +50,33 @@
 
 /****************************************************************************/
 
+static const double 
+one	= 1.0,
+ln2	= 6.93147180559945286227e-01;  /* 0x3FE62E42, 0xFEFA39EF */
+
 double
 acosh(double x)
-{
-	/* ZZZ unimplemented */
-	return(0);
+{	
+	double t;
+	LONG hx;
+	ULONG lx;
+	EXTRACT_WORDS(hx,lx,x);
+	if(hx<0x3ff00000) {		/* x < 1 */
+	    return (x-x)/(x-x);
+	} else if(hx >=0x41b00000) {	/* x > 2**28 */
+	    if(hx >=0x7ff00000) {	/* x is inf of NaN */
+	        return x+x;
+	    } else 
+		return log(x)+ln2;	/* acosh(huge)=log(2x) */
+	} else if(((hx-0x3ff00000)|lx)==0) {
+	    return 0.0;			/* acosh(1) = 0 */
+	} else if (hx > 0x40000000) {	/* 2**28 > x > 2 */
+	    t=x*x;
+	    return log(2.0*x-one/(x+sqrt(t-one)));
+	} else {			/* 1<x<2 */
+	    t = x-one;
+	    return log1p(t+sqrt(2.0*t+t*t));
+	}
 }
 
 /****************************************************************************/

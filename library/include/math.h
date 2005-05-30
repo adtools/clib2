@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.14 2005-05-30 08:10:41 obarthel Exp $
+ * $Id: math.h,v 1.15 2005-05-30 08:47:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -242,53 +242,49 @@ extern float tanhf(float x);
 
 /****************************************************************************/
 
-extern float logbf(float x);
-extern double logb(double x);
-
-extern float hypotf(float x, float y);
-extern double hypot(double x,double y);
-
-extern float nanf(const char *tagp);
-extern double nan(const char *tagp);
-
-extern float nextafterf(float x,float y);
-extern double nextafter(double x,double y);
-
-extern float copysignf(float x, float y);
-extern double copysign(double x, double y);
-
-extern float fdimf(float x,float y);
-extern double fdim(double x,double y);
-
-extern float fminf(float x,float y);
-extern double fmin(double x,double y);
-
-extern float fmaxf(float x,float y);
-extern double fmax(double x,double y);
-
-extern float scalbnf (float x, int n);
-extern double scalbn (double x, int n);
-
+extern float acoshf(float x);
+extern float asinhf(float x);
 extern float cbrtf(float x);
-extern double cbrt(double x);
-
-extern float erff(float x);
-extern double erf(double x);
-
+extern float copysignf(float x, float y);
 extern float erfcf(float x);
-extern double erfc(double x);
-
+extern float erff(float x);
 extern float expm1f(float x);
-extern double expm1(double x);
-
-extern int ilogbf(float x);
-extern int ilogb(double x);
-
+extern float fdimf(float x,float y);
+extern float fmaxf(float x,float y);
+extern float fminf(float x,float y);
+extern float hypotf(float x, float y);
+extern float lgammaf(float x);
 extern float log1pf(float x);
-extern double log1p(double x);
-
+extern float logbf(float x);
+extern float nanf(const char *tagp);
+extern float nextafterf(float x,float y);
+extern float remainderf(float x, float p);
 extern float rintf(float x);
+extern float scalbnf (float x, int n);
+extern int ilogbf(float x);
+
+/****************************************************************************/
+
+extern double acosh(double x);
+extern double asinh(double x);
+extern double cbrt(double x);
+extern double copysign(double x, double y);
+extern double erf(double x);
+extern double erfc(double x);
+extern double expm1(double x);
+extern double fdim(double x,double y);
+extern double fmax(double x,double y);
+extern double fmin(double x,double y);
+extern double hypot(double x,double y);
+extern double lgamma(double x);
+extern double log1p(double x);
+extern double logb(double x);
+extern double nan(const char *tagp);
+extern double nextafter(double x,double y);
+extern double remainder(double x, double p);
 extern double rint(double x);
+extern double scalbn (double x, int n);
+extern int ilogb(double x);
 
 /****************************************************************************/
 

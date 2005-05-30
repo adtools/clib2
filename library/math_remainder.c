@@ -1,5 +1,5 @@
 /*
- * $Id: math_remainder.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_remainder.c,v 1.2 2005-05-30 08:47:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,15 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +50,48 @@
 
 /****************************************************************************/
 
+static const double zero = 0.0;
+
 double
-remainder(double x,double y)
+remainder(double x, double p)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	LONG hx,hp;
+	ULONG sx,lx,lp;
+	double p_half;
+
+	EXTRACT_WORDS(hx,lx,x);
+	EXTRACT_WORDS(hp,lp,p);
+	sx = hx&0x80000000U;
+	hp &= 0x7fffffff;
+	hx &= 0x7fffffff;
+
+    /* purge off exception values */
+	if((hp|lp)==0) return (x*p)/(x*p); 	/* p = 0 */
+	if((hx>=0x7ff00000)||			/* x not finite */
+	  ((hp>=0x7ff00000)&&			/* p is NaN */
+	  (((hp-0x7ff00000)|lp)!=0)))
+	    return (x*p)/(x*p);
+
+
+	if (hp<=0x7fdfffff) x = fmod(x,p+p);	/* now x < 2p */
+	if (((hx-hp)|(lx-lp))==0) return zero*x;
+	x  = fabs(x);
+	p  = fabs(p);
+	if (hp<0x00200000) {
+	    if(x+x>p) {
+		x-=p;
+		if(x+x>=p) x -= p;
+	    }
+	} else {
+	    p_half = 0.5*p;
+	    if(x>p_half) {
+		x-=p;
+		if(x>=p_half) x -= p;
+	    }
+	}
+	GET_HIGH_WORD(hx,x);
+	SET_HIGH_WORD(x,hx^sx);
+	return x;
 }
 
 /****************************************************************************/
