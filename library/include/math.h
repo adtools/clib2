@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.13 2005-05-29 14:45:33 obarthel Exp $
+ * $Id: math.h,v 1.14 2005-05-30 08:10:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,13 +98,6 @@ extern double tanh(double x);
 #define	M_2_SQRTPI	1.12837916709551257390
 #define	M_SQRT2		1.41421356237309504880
 #define	M_SQRT1_2	0.70710678118654752440
-
-/****************************************************************************/
-
-extern double rint(double x);
-extern float rintf(float x);
-extern double logb(double x);
-extern double hypot(double x,double y);
 
 /****************************************************************************/
 
@@ -229,85 +222,73 @@ extern float asinf(float x);
 extern float atanf(float x);
 extern float atan2f(float y, float x);
 extern float ceilf(float x);
-
-
+extern float cosf(float x);
+extern float coshf(float x);
 extern float expf(float x);
 extern float fabsf(float x);
 extern float floorf(float x);
 extern float fmodf(float x, float y);
 extern float frexpf(float x, int *eptr);
-extern float ldexp(float x,int exp);
+extern float ldexpf(float x,int exp);
 extern float logf(float x);
 extern float log10f(float x);
-extern float logbf(float x);
 extern float modff(float x, float *iptr);
 extern float powf(float x, float y);
+extern float sinf(float x);
+extern float sinhf(float x);
 extern float sqrtf(float x);
+extern float tanf(float x);
+extern float tanhf(float x);
 
 /****************************************************************************/
+
+extern float logbf(float x);
+extern double logb(double x);
+
+extern float hypotf(float x, float y);
+extern double hypot(double x,double y);
 
 extern float nanf(const char *tagp);
 extern double nan(const char *tagp);
 
-/****************************************************************************/
-
 extern float nextafterf(float x,float y);
 extern double nextafter(double x,double y);
-
-/****************************************************************************/
 
 extern float copysignf(float x, float y);
 extern double copysign(double x, double y);
 
-/****************************************************************************/
-
 extern float fdimf(float x,float y);
 extern double fdim(double x,double y);
-
-/****************************************************************************/
 
 extern float fminf(float x,float y);
 extern double fmin(double x,double y);
 
-/****************************************************************************/
-
 extern float fmaxf(float x,float y);
 extern double fmax(double x,double y);
-
-/****************************************************************************/
 
 extern float scalbnf (float x, int n);
 extern double scalbn (double x, int n);
 
-/****************************************************************************/
-
 extern float cbrtf(float x);
 extern double cbrt(double x);
-
-/****************************************************************************/
 
 extern float erff(float x);
 extern double erf(double x);
 
-/****************************************************************************/
-
 extern float erfcf(float x);
 extern double erfc(double x);
-
-/****************************************************************************/
 
 extern float expm1f(float x);
 extern double expm1(double x);
 
-/****************************************************************************/
-
 extern int ilogbf(float x);
 extern int ilogb(double x);
 
-/****************************************************************************/
-
 extern float log1pf(float x);
 extern double log1p(double x);
+
+extern float rintf(float x);
+extern double rint(double x);
 
 /****************************************************************************/
 

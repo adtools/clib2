@@ -1,5 +1,5 @@
 /*
- * $Id: math_cosf.c,v 1.1 2005-05-29 11:19:00 obarthel Exp $
+ * $Id: math_cosf.c,v 1.2 2005-05-30 08:10:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ *
+ *
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +53,34 @@
 
 /****************************************************************************/
 
+static const float one=1.0;
+
 float
 cosf(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	float y[2],z=0.0;
+	LONG n,ix;
+
+	GET_FLOAT_WORD(ix,x);
+
+    /* |x| ~< pi/4 */
+	ix &= 0x7fffffff;
+	if(ix <= 0x3f490fd8) return __kernel_cosf(x,z);
+
+    /* cos(Inf or NaN) is NaN */
+	else if (ix>=0x7f800000) return x-x;
+
+    /* argument reduction needed */
+	else {
+	    n = __rem_pio2f(x,y);
+	    switch(n&3) {
+		case 0: return  __kernel_cosf(y[0],y[1]);
+		case 1: return -__kernel_sinf(y[0],y[1],1);
+		case 2: return -__kernel_cosf(y[0],y[1]);
+		default:
+		        return  __kernel_sinf(y[0],y[1],1);
+	    }
+	}
 }
 
 /****************************************************************************/

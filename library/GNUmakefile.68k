@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.56 2005-05-29 14:45:28 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.57 2005-05-30 08:10:36 obarthel Exp $
 #
 # :ts=8
 #
@@ -519,6 +519,9 @@ MATH_LIB = \
 	complex_creal.o \
 	complex_crealf.o \
 	complex_creall.o \
+	math_coshf.o \
+	math_sinhf.o \
+	math_tanhf.o \
 	math_acos.o \
 	math_acosf.o \
 	math_asin.o \
@@ -534,6 +537,7 @@ MATH_LIB = \
 	math_copysign.o \
 	math_copysignf.o \
 	math_cos.o \
+	math_cosf.o \
 	math_cosh.o \
 	math_erf.o \
 	math_erfc.o \
@@ -555,6 +559,7 @@ MATH_LIB = \
 	math_huge_val.o \
 	math_huge_valf.o \
 	math_hypot.o \
+	math_hypotf.o \
 	math_ilogb.o \
 	math_ilogbf.o \
 	math_inf.o \
@@ -562,6 +567,9 @@ MATH_LIB = \
 	math_init_exit.o \
 	math_isfinite.o \
 	math_isunordered.o \
+	math_kernel_cosf.o \
+	math_kernel_sinf.o \
+	math_kernel_tanf.o \
 	math_ldexp.o \
 	math_ldexpf.o \
 	math_log.o \
@@ -580,16 +588,19 @@ MATH_LIB = \
 	math_nextafterf.o \
 	math_pow.o \
 	math_powf.o \
+	math_rem_pio2f.o \
 	math_rint.o \
 	math_rintf.o \
 	math_scalbn.o \
 	math_scalbnf.o \
 	math_signbit.o \
 	math_sin.o \
+	math_sinf.o \
 	math_sinh.o \
 	math_sqrt.o \
 	math_sqrtf.o \
 	math_tan.o \
+	math_tanf.o \
 	math_tanh.o \
 	stdio_asprintf.o \
 	stdio_flush.o \

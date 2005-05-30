@@ -1,11 +1,5 @@
 C99 math functions:
 
-	("float"-versions of existing "double" functions)
-	cosf
-	hypotf
-	sinf
-	tanf
-
 	(functions generally missing, including their "float" counterparts)
 	acosh
 	acoshf
@@ -33,10 +27,6 @@ C99 math functions:
 	remquof
 	round
 	roundf
-	sinh
-	sinhf
-	tanh
-	tanhf
 	tgamma
 	tgammaf
 	trunc

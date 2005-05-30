@@ -1,5 +1,5 @@
 /*
- * $Id: math_erf.c,v 1.2 2005-05-29 14:45:29 obarthel Exp $
+ * $Id: math_erf.c,v 1.3 2005-05-30 08:10:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -133,7 +133,7 @@ erf(double x)
 	GET_HIGH_WORD(hx,x);
 	ix = hx&0x7fffffff;
 	if(ix>=0x7ff00000) {		/* erf(nan)=nan */
-	    i = ((__uint32_t)hx>>31)<<1;
+	    i = ((ULONG)hx>>31)<<1;
 	    return (double)(1-i)+one/x;	/* erf(+-inf)=+-1 */
 	}
 

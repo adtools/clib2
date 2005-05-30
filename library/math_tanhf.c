@@ -1,5 +1,5 @@
 /*
- * $Id: math_tanhf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_tanhf.c,v 1.2 2005-05-30 08:10:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ *
+ *
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +53,39 @@
 
 /****************************************************************************/
 
+static const float one=1.0, two=2.0, tiny = 1.0e-30;
+
 float
 tanhf(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	float t,z;
+	LONG jx,ix;
+
+	GET_FLOAT_WORD(jx,x);
+	ix = jx&0x7fffffff;
+
+    /* x is INF or NaN */
+	if(ix>=0x7f800000) { 
+	    if (jx>=0) return one/x+one;    /* tanh(+-inf)=+-1 */
+	    else       return one/x-one;    /* tanh(NaN) = NaN */
+	}
+
+    /* |x| < 22 */
+	if (ix < 0x41b00000) {		/* |x|<22 */
+	    if (ix<0x24000000) 		/* |x|<2**-55 */
+		return x*(one+x);    	/* tanh(small) = small */
+	    if (ix>=0x3f800000) {	/* |x|>=1  */
+		t = expm1f(two*fabsf(x));
+		z = one - two/(t+two);
+	    } else {
+	        t = expm1f(-two*fabsf(x));
+	        z= -t/(t+two);
+	    }
+    /* |x| > 22, return +-1 */
+	} else {
+	    z = one - tiny;		/* raised inexact flag */
+	}
+	return (jx>=0)? z: -z;
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: math_atan2f.c,v 1.2 2005-05-29 14:45:29 obarthel Exp $
+ * $Id: math_atan2f.c,v 1.3 2005-05-30 08:10:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -125,7 +125,7 @@ atan2f(float y, float x)
 	switch (m) {
 	    case 0: return       z  ;	/* atan(+,+) */
 	    case 1: {
-	    	      __uint32_t zh;
+	    	      ULONG zh;
 		      GET_FLOAT_WORD(zh,z);
 		      SET_FLOAT_WORD(z,zh ^ 0x80000000U);
 		    }

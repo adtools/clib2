@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.10 2005-05-12 13:21:43 obarthel Exp $
+ * $Id: math_headers.h,v 1.11 2005-05-30 08:10:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -210,16 +210,16 @@ do {							\
   (d) = sf_u.value;				\
 } while (0)
 
-#if defined(PPC_FLOATING_POINT_SUPPORT)
-
 extern double __kernel_cos(double x, double y);
 extern double __kernel_sin(double x, double y, int iy);
 extern int __rem_pio2(double x, double *y);
 extern double __kernel_tan(double x, double y, int iy);
 extern double __expm1(double x);
 extern double __scalbn(double x, int n);
-
-#endif /* PPC_FLOATING_POINT_SUPPORT */
+extern float __kernel_cosf(float x, float y);
+extern float __kernel_sinf(float x, float y, int iy);
+extern LONG __rem_pio2f(float x, float *y);
+extern float __kernel_tanf(float x, float y, int iy);
 
 /****************************************************************************/
 

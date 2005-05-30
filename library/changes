@@ -70,6 +70,8 @@
 - Ported cbrt(), cbrtf(), erf(), erff(), erfc(), erfcf(), expm1(),
   expm1f(), ilogb(), ilogbf(), log1p() and log1pf() for C99.
 
+- Ported cosf(), coshf(), sinf(), sinhf(), tanf(), tanhf()
+  and hypotf() for C99.
 
 
 c.lib 1.192 (12.5.2005)

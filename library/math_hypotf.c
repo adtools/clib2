@@ -1,5 +1,5 @@
 /*
- * $Id: math_hypotf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_hypotf.c,v 1.2 2005-05-30 08:10:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ *
+ *
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -41,11 +53,42 @@
 
 /****************************************************************************/
 
+#define	SQRT_FLT_MAX	1.84467429742e+19  /* 0x5f7fffff */
+
 float
-hypotf(float x,float y)
+hypotf(float x, float y)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	float a=x,b=y,t1,t2,w;
+	LONG j,ha,hb;
+
+	if (isunordered(x,y))
+		return (x-x)/(y-y);
+	if (!isfinite(x) || !isfinite(y)) {
+		__set_errno(ERANGE);
+		return __get_huge_valf();
+	}
+
+	GET_FLOAT_WORD(ha,x);
+	ha &= 0x7fffffff;
+	GET_FLOAT_WORD(hb,y);
+	hb &= 0x7fffffff;
+	if(hb < ha) {a=y;b=x;j=ha; ha=hb;hb=j;} else {a=x;b=y;}
+	SET_FLOAT_WORD(a,ha);	/* a <- |a| */
+	SET_FLOAT_WORD(b,hb);	/* b <- |b| */
+	t1 = (a > 0) ? (a/b) : 0;
+	if ((t1 >= SQRT_FLT_MAX) && isfinite(x) && isfinite(y)) {
+		__set_errno(ERANGE);
+		return __get_huge_valf();
+	}
+	t1 *= t1;
+	t2 = sqrtf(++t1);
+	if ((t2 > 1) && (b >= FLT_MAX)) {
+		__set_errno(ERANGE);
+		return __get_huge_valf();
+	}
+	w = t2 * b;
+
+	       return w;
 }
 
 /****************************************************************************/
