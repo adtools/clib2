@@ -76,6 +76,9 @@
 - Ported acosh(), acoshf(), asinh(), asinhf(), lgamma(), lgammaf(),
   remainder() and remainderf() for C99.
 
+- The scanf() family now supports character ranges for the %[
+  conversion. Note that this is a non-standard feature!
+
 
 c.lib 1.192 (12.5.2005)
 

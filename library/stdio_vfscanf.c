@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.16 2005-05-29 08:19:36 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.17 2005-06-03 11:12:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -1752,6 +1752,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 		{
 			char * s_ptr;
 			char set[256];
+			const unsigned char * scanset;
+			size_t scanset_length,i;
 			int pick;
 
 			if(NOT assignment_suppressed)
@@ -1814,14 +1816,48 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 				format++;
 			}
 
-			/* Collect the other characters to form the range. */
-			while((c = (*(unsigned char *)format)) != '\0')
-			{
+			/* Figure out how many characters are in the scanset. */
+			scanset = (const unsigned char *)format;
+
+			for(scanset_length = 0 ; scanset[scanset_length] != '\0' && scanset[scanset_length] != ']' ; scanset_length++)
 				format++;
 
-				/* This would end the range. */
-				if(c == ']')
-					break;
+			/* We already skipped everything but the righ bracket. */
+			if((*format) == ']')
+				format++;
+
+			/* Now have a look at the specification. We support a non-standard
+			   scanf() family feature which permits you to specify ranges of
+			   characters rather than spelling out each character included in
+			   the range. */
+			for(i = 0 ; i < scanset_length ; i++)
+			{
+				c = scanset[i];
+
+				/* Could this be a range? It's not a range if it
+				   is the first or the last character in the
+				   specification. */
+				if(c == '-' && i != 0 && i != scanset_length - 1)
+				{
+					int first,last,j;
+
+					/* Pick the first and the last character in
+					   the range, e.g. for "[A-Z]" the first would
+					   be the 'A' and the 'Z' would be the last. */
+					first	= scanset[i-1];
+					last	= scanset[i+1];
+
+					/* Everything in the scanset now 
+					   goes into the set. */
+					for(j = first ; j <= last ; j++)
+						set[j] = pick;
+
+					/* Skip the character which marked the
+					   end of the range and resume scanning. */
+					i++;
+
+					continue;
+				}
 
 				assert( 0 <= c && c <= 255 );
 
