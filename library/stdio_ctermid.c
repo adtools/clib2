@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.5 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: stdio_ctermid.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,21 +37,15 @@
 
 /****************************************************************************/
 
-void
-__initialize_fd(
-	struct fd *					fd,
-	file_action_fd_t			action_function,
-	BPTR						default_file,
-	ULONG						flags,
-	struct SignalSemaphore *	lock)
+char *
+ctermid(char *buf)
 {
-	assert( fd != NULL && action_function != NULL );
+	static char cname[] = "CONSOLE:";
 
-	memset(fd,0,sizeof(*fd));
+	if(buf != NULL)
+		strcpy(buf,cname);
+	else
+		buf = cname;
 
-	fd->fd_DefaultFile	= default_file;
-	fd->fd_Flags		= flags;
-	fd->fd_Action		= action_function;
-	fd->fd_Lock			= lock;
-	fd->fd_Aux			= NULL;
+	return(buf);
 }

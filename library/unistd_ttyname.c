@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.5 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: unistd_ttyname.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,27 +31,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+#ifndef	_UNISTD_HEADERS_H
+#include "unistd_headers.h"
+#endif /* _UNISTD_HEADERS_H */
 
 /****************************************************************************/
 
-void
-__initialize_fd(
-	struct fd *					fd,
-	file_action_fd_t			action_function,
-	BPTR						default_file,
-	ULONG						flags,
-	struct SignalSemaphore *	lock)
+/*
+ * Just a quick kludge.
+ */
+
+char *
+ttyname(int file_descriptor)
 {
-	assert( fd != NULL && action_function != NULL );
+	char * result = NULL;
+	struct fd *fd;
 
-	memset(fd,0,sizeof(*fd));
+	ENTER();
 
-	fd->fd_DefaultFile	= default_file;
-	fd->fd_Flags		= flags;
-	fd->fd_Action		= action_function;
-	fd->fd_Lock			= lock;
-	fd->fd_Aux			= NULL;
+	SHOWVALUE(file_descriptor);
+
+	fd = __get_file_descriptor(file_descriptor);
+	if(fd == NULL)
+	{
+		__set_errno(EBADF);
+		goto out;
+	}
+
+	if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_INTERACTIVE))
+	{
+		__set_errno(ENOTTY);
+		goto out;
+	}
+
+	result = "CONSOLE:";
+
+ out:
+
+	RETURN(result);
+	return(result);
 }

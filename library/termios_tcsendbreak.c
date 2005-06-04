@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.5 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_tcsendbreak.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,27 +31,78 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+#ifndef	_TERMIOS_HEADERS_H
+#include "termios_headers.h"
+#endif /* _TERMIOS_HEADERS_H */
 
 /****************************************************************************/
 
-void
-__initialize_fd(
-	struct fd *					fd,
-	file_action_fd_t			action_function,
-	BPTR						default_file,
-	ULONG						flags,
-	struct SignalSemaphore *	lock)
+/*
+ * tcsendbreak() has a rather odd time specification.
+ * If duration is 0, it will send a BREAK for 0.25-0.5 seconds
+ * and if duration is non-zero...
+ * 	Linux asserts BREAK for N*duration where N is somewhere between 0.25 and 0.5 seconds.
+ * 	Solaris calls tcdrain() instead. (According to the manual)
+ * Let us try the Solaris way and see how it goes.
+ *
+ * If the file descriptor does not referr to a serial port, no action is needed.
+ */
+
+int
+tcsendbreak(int file_descriptor,int duration)
 {
-	assert( fd != NULL && action_function != NULL );
+	int result = ERROR;
+	struct fd *fd;
+	struct termios *tios;
 
-	memset(fd,0,sizeof(*fd));
+	ENTER();
 
-	fd->fd_DefaultFile	= default_file;
-	fd->fd_Flags		= flags;
-	fd->fd_Action		= action_function;
-	fd->fd_Lock			= lock;
-	fd->fd_Aux			= NULL;
+	SHOWVALUE(file_descriptor);
+	SHOWVALUE(duration);
+
+	if(__check_abort_enabled)
+		__check_abort();
+
+	fd = __get_file_descriptor(file_descriptor);
+	if(fd == NULL || FLAG_IS_CLEAR(fd->fd_Flags,FDF_TERMIOS))
+	{
+		__set_errno(EBADF);
+		goto out;
+	}
+
+	assert( fd->fd_Aux != NULL );
+
+	tios = fd->fd_Aux;
+
+	switch(tios->type)
+	{
+		case TIOST_CONSOLE:
+
+			result = OK;
+			break;
+
+		case TIOST_SERIAL:
+
+			if(duration == 0)
+			{
+				/* TODO */
+				result = OK;
+			}
+			else
+			{
+				result = tcdrain(file_descriptor);
+			}
+
+			break;
+
+		default:
+
+			SHOWMSG("Invalid tios type in tcsendbreak.");
+			goto out;
+	}
+
+ out:
+
+	RETURN(result);
+	return(result);
 }

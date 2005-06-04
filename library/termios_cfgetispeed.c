@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.5 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_cfgetispeed.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,27 +31,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+#ifndef	_TERMIOS_HEADERS_H
+#include "termios_headers.h"
+#endif /* _TERMIOS_HEADERS_H */
 
 /****************************************************************************/
 
-void
-__initialize_fd(
-	struct fd *					fd,
-	file_action_fd_t			action_function,
-	BPTR						default_file,
-	ULONG						flags,
-	struct SignalSemaphore *	lock)
+speed_t
+cfgetispeed(struct termios *tios)
 {
-	assert( fd != NULL && action_function != NULL );
+	speed_t result = ERROR;
 
-	memset(fd,0,sizeof(*fd));
+	ENTER();
 
-	fd->fd_DefaultFile	= default_file;
-	fd->fd_Flags		= flags;
-	fd->fd_Action		= action_function;
-	fd->fd_Lock			= lock;
-	fd->fd_Aux			= NULL;
+	SHOWPOINTER(tios);
+
+	if(tios == NULL)
+	{
+		__set_errno(EFAULT);
+		goto out;
+	}
+
+	result = tios->c_ispeed;
+
+ out:
+
+	RETURN(result);
+	return(result);
 }

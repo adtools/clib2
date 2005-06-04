@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.9 2005-02-04 15:03:14 obarthel Exp $
+ * $Id: unistd.h,v 1.10 2005-06-04 10:46:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -100,6 +100,9 @@ extern pid_t getpid(void);
 extern char *realpath(const char *file_name, char *resolved_name);
 extern int fsync(int file_descriptor);
 extern int fdatasync(int file_descriptor);
+extern char *ttyname(int);
+extern int ttyname_r(int file_descriptor,char *name,size_t buflen);
+extern int ttyname_t(int,char *,size_t);
 
 /****************************************************************************/
 

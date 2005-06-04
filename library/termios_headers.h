@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.5 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_headers.h,v 1.1 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,27 +31,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDIO_HEADERS_H
+#ifndef	_TERMIOS_HEADERS_H
+#define	_TERMIOS_HEADERS_H
+
+/****************************************************************************/
+
+#ifndef	_STDIO_HEADERS_H
 #include "stdio_headers.h"
 #endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
-void
-__initialize_fd(
-	struct fd *					fd,
-	file_action_fd_t			action_function,
-	BPTR						default_file,
-	ULONG						flags,
-	struct SignalSemaphore *	lock)
+#ifndef	_TERMIOS_H
+#include <termios.h>
+#endif /* _TERMIOS_H */
+
+/****************************************************************************/
+
+extern int __termios_console_hook(struct fd *,struct file_action_message *);
+extern int __termios_serial_hook(struct fd *,struct file_action_message *);
+extern struct termios *__get_termios(struct fd *);
+
+/****************************************************************************/
+
+enum	/* Termios types. */
 {
-	assert( fd != NULL && action_function != NULL );
+	TIOST_INVALID = 0,
+	TIOST_CONSOLE,
+	TIOST_SERIAL
+};
 
-	memset(fd,0,sizeof(*fd));
+enum
+{
+	TIOS_FLUSH_OUTPUT,
+	TIOS_FLUSH_SYNC,
+	TIOS_FLUSH_INPUT,
+	TIOS_FLUSH_IO
+};
 
-	fd->fd_DefaultFile	= default_file;
-	fd->fd_Flags		= flags;
-	fd->fd_Action		= action_function;
-	fd->fd_Lock			= lock;
-	fd->fd_Aux			= NULL;
-}
+/****************************************************************************/
+
+#endif /* _TERMIOS_HEADERS_H */

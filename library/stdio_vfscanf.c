@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.17 2005-06-03 11:12:12 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.18 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -1822,7 +1822,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 			for(scanset_length = 0 ; scanset[scanset_length] != '\0' && scanset[scanset_length] != ']' ; scanset_length++)
 				format++;
 
-			/* We already skipped everything but the righ bracket. */
+			/* We already skipped everything but the right bracket. */
 			if((*format) == ']')
 				format++;
 
@@ -1837,12 +1837,12 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 				/* Could this be a range? It's not a range if it
 				   is the first or the last character in the
 				   specification. */
-				if(c == '-' && i != 0 && i != scanset_length - 1)
+				if(c == '-' && 0 < i && i < scanset_length - 1)
 				{
 					int first,last,j;
 
 					/* Pick the first and the last character in
-					   the range, e.g. for "[A-Z]" the first would
+					   the range, e.g. for "%[A-Z]" the first would
 					   be the 'A' and the 'Z' would be the last. */
 					first	= scanset[i-1];
 					last	= scanset[i+1];

@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.45 2005-05-30 11:42:38 obarthel Exp $
+# $Id: smakefile,v 1.46 2005-06-04 10:46:21 obarthel Exp $
 #
 # :ts=8
 #
@@ -351,6 +351,7 @@ STAT_OBJ = \
 STDIO_OBJ = \
 	stdio_asprintf.o \
 	stdio_clearerr.o \
+	stdio_ctermid.o \
 	stdio_dropiobreadbuffer.o \
 	stdio_duplicate_fd.o \
 	stdio_examine_fh.o \
@@ -582,6 +583,20 @@ TIME_OBJ = \
 UNISTD_OBJ = \
 	ftw_ftw.o \
 	ftw_nftw.o \
+	termios_cfgetispeed.o \
+	termios_cfgetospeed.o \
+	termios_cfmakeraw.o \
+	termios_cfsetispeed.o \
+	termios_cfsetospeed.o \
+	termios_console_fdhookentry.o \
+	termios_headers.h
+	termios_openserial.o \
+	termios_tcdrain.o \
+	termios_tcflow.o \
+	termios_tcflush.o \
+	termios_tcgetattr.o \
+	termios_tcsendbreak.o \
+	termios_tcsetattr.o \
 	uio_readv.o \
 	uio_writev.o \
 	unistd_access.o \
@@ -618,6 +633,8 @@ UNISTD_OBJ = \
 	unistd_translaterel.o \
 	unistd_translateu2a.o \
 	unistd_truncate.o \
+	unistd_ttyname.o \
+	unistd_ttyname_r.o \
 	unistd_unix_path_semantics.o \
 	unistd_unlink.o \
 	unistd_usleep.o \

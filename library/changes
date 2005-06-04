@@ -1,3 +1,5 @@
+c.lib 1.193 (4.6.2005)
+
 - fpclassify() now returns FP_ZERO both for 0 and -0.
 
 - nan() and nanf() now return quiet NaNs.
@@ -78,6 +80,10 @@
 
 - The scanf() family now supports character ranges for the %[
   conversion. Note that this is a non-standard feature!
+
+- Integrated Peter Bengtsson's termios code. Thank you very much! I chose
+  to add it to libunix.a rather than keeping it in a separate libtermios.a
+  library.
 
 
 c.lib 1.192 (12.5.2005)

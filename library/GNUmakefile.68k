@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.58 2005-05-30 08:47:25 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.59 2005-06-04 10:46:21 obarthel Exp $
 #
 # :ts=8
 #
@@ -468,6 +468,7 @@ UNIX_LIB = \
 	stat_mkdir.o \
 	stat_rmdir.o \
 	stat_stat.o \
+	stdio_ctermid.o \
 	stdio_fdhookentry.o \
 	stdio_fflush.o \
 	stdio_fopen.o \
@@ -483,6 +484,18 @@ UNIX_LIB = \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
 	stdlib_system.o \
+	termios_cfgetispeed.o \
+	termios_cfgetospeed.o \
+	termios_cfmakeraw.o \
+	termios_cfsetispeed.o \
+	termios_cfsetospeed.o \
+	termios_console_fdhookentry.o \
+	termios_tcdrain.o \
+	termios_tcflow.o \
+	termios_tcflush.o \
+	termios_tcgetattr.o \
+	termios_tcsendbreak.o \
+	termios_tcsetattr.o \
 	uio_readv.o \
 	uio_writev.o \
 	unistd_access.o \
@@ -501,6 +514,8 @@ UNIX_LIB = \
 	unistd_translaterel.o \
 	unistd_translateu2a.o \
 	unistd_truncate.o \
+	unistd_ttyname.o \
+	unistd_ttyname_r.o \
 	unistd_unix_path_semantics.o \
 	unistd_unlink.o \
 	unistd_wildcard_expand.o \

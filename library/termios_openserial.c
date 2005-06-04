@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.5 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_openserial.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,27 +31,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+#ifndef	_TERMIOS_HEADERS_H
+#include "termios_headers.h"
+#endif /* _TERMIOS_HEADERS_H */
 
 /****************************************************************************/
 
-void
-__initialize_fd(
-	struct fd *					fd,
-	file_action_fd_t			action_function,
-	BPTR						default_file,
-	ULONG						flags,
-	struct SignalSemaphore *	lock)
+/*
+ * This is a clib2/Amiga specific function to obtain a file descriptor
+ * for a serial port. This is intended as an easy porting path for Unix
+ * code (which might e.g. open "/dev/ttyS0") and the same concept might
+ * be applied to other device types as well.
+ *
+ * TODO: Implement it. And a serial_fd_hook. And, well, everything else too....
+ */
+
+int
+openserial(const char *device_name,int unit,int mode)
 {
-	assert( fd != NULL && action_function != NULL );
+	__set_errno(EIO);
 
-	memset(fd,0,sizeof(*fd));
-
-	fd->fd_DefaultFile	= default_file;
-	fd->fd_Flags		= flags;
-	fd->fd_Action		= action_function;
-	fd->fd_Lock			= lock;
-	fd->fd_Aux			= NULL;
+	return(ERROR);
 }

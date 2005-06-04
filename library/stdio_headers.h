@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.23 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.24 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -360,7 +360,8 @@ struct iob
 											   something like it. */
 #define FDF_STDIO				(1UL<<12)	/* File is to be attached to one of the
 											   standard input/output/error streams. */
-
+#define FDF_TERMIOS				(1UL<<13)	/* File is under termios control.
+											   FDF_IS_INTERACTIVE should also be set. */
 /****************************************************************************/
 
 /* The file action function for unbuffered files. */
@@ -387,6 +388,9 @@ struct fd
 	fd_cleanup_t		fd_Cleanup;			/* Cleanup function, if any. */
 
 	struct SignalSemaphore * fd_Lock;		/* For thread locking */
+
+	void *				fd_Aux;				/* Auxilliary data for "special" files,
+											   e.g. termios support. */
 };
 
 /****************************************************************************/

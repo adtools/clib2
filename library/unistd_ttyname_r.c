@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.5 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: unistd_ttyname_r.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,27 +31,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDIO_HEADERS_H
-#include "stdio_headers.h"
-#endif /* _STDIO_HEADERS_H */
+#ifndef	_UNISTD_HEADERS_H
+#include "unistd_headers.h"
+#endif /* _UNISTD_HEADERS_H */
 
 /****************************************************************************/
 
-void
-__initialize_fd(
-	struct fd *					fd,
-	file_action_fd_t			action_function,
-	BPTR						default_file,
-	ULONG						flags,
-	struct SignalSemaphore *	lock)
+/*
+ * Just a quick kludge, really.
+ */
+
+int
+ttyname_r(int file_descriptor,char *name,size_t buflen)
 {
-	assert( fd != NULL && action_function != NULL );
+	struct fd *fd;
+	int result;
 
-	memset(fd,0,sizeof(*fd));
+	ENTER();
 
-	fd->fd_DefaultFile	= default_file;
-	fd->fd_Flags		= flags;
-	fd->fd_Action		= action_function;
-	fd->fd_Lock			= lock;
-	fd->fd_Aux			= NULL;
+	SHOWVALUE(file_descriptor);
+
+	fd = __get_file_descriptor(file_descriptor);
+	if(fd == NULL)
+	{
+		result = EBADF;
+		goto out;
+	}
+
+	if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_INTERACTIVE))
+	{
+		result = ENOTTY;
+		goto out;
+	}
+
+	if(buflen < _POSIX_TTY_NAME_MAX) /* XXX Should this be _POSIX_PATH_MAX? */
+	{
+		result = ERANGE;
+		goto out;
+	}
+
+	strcpy(name,"CONSOLE:"); /* The buffer is at least 9 bytes, so this is ok. */
+
+	result = OK;
+
+ out:
+
+	RETURN(result);
+	return(result);
 }
