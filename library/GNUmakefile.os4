@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.63 2005-06-04 10:46:21 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.64 2005-06-04 14:16:58 obarthel Exp $
 #
 # :ts=8
 #
@@ -489,7 +489,6 @@ UNIX_LIB = \
 	termios_cfsetispeed.o \
 	termios_cfsetospeed.o \
 	termios_console_fdhookentry.o \
-	termios_headers.h
 	termios_openserial.o \
 	termios_tcdrain.o \
 	termios_tcflow.o \
