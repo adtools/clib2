@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.64 2005-06-04 14:16:58 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.65 2005-06-14 15:26:29 tfrieden Exp $
 #
 # :ts=8
 #
@@ -459,6 +459,7 @@ UNIX_LIB = \
 	fcntl_fcntl.o \
 	fcntl_open.o \
 	fcntl_get_default_file.o \
+	getopt_getopt_long.o \
 	mount_convertinfo.o \
 	mount_statfs.o \
 	stat_chmod.o \
