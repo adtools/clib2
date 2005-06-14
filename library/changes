@@ -1,3 +1,9 @@
+c.lib 1.194()
+
+- Added getopt_long to libunix.a <tfrieden>
+
+
+
 c.lib 1.193 (4.6.2005)
 
 - fpclassify() now returns FP_ZERO both for 0 and -0.
@@ -671,7 +677,7 @@ c.lib 1.185 (2.1.2005)
   normal versions. Let's see how well this works out in the GCC
   version. SAS/C does not seem to like it...
 
-- Changed the definition of alloca() for GCC, which now defaults 
+- Changed the definition of alloca() for GCC, which now defaults
   to the built-in function.
 
 - Updated the stdio.h, stdlib.h, string.h and unistd.h header files
@@ -1757,7 +1763,7 @@ c.lib 1.117 (26.5.2004)
 - The size of the physical memory allocation chunks is now taken into
   account when making memory allocations. This means that allocations
   are rounded up to multiples of 8 bytes each.
-  
+
 
 c.lib 1.116 (26.5.2004)
 
@@ -1846,7 +1852,7 @@ c.lib 1.110 (10.4.2004)
 
 c.lib 1.109 (9.4.2004)
 
-- Fixed a bug in the PPC version of setjmp that would trash floating 
+- Fixed a bug in the PPC version of setjmp that would trash floating
   point registers.
 
 - Fixed a bug in dup2: If the second fd didn't exist, it would return -1,
@@ -2444,7 +2450,7 @@ c.lib 1.60 (5.10.2003)
 - Renamed the source code files which implement the strtod(), strtol(),
   strtoul(), atof(), atoi() and atol() functions.
 
-- Moved main() out of libc.a and made it into a startup object file 
+- Moved main() out of libc.a and made it into a startup object file
   which needs to be added to the GCC specs file in the "*startfile"
   section, right at the end of the list. This solves practically all
   linking problems I encountered so far. Which means that -lunix
@@ -2604,7 +2610,7 @@ c.lib 1.47 (31.7.2003)
 - Fixed vfscanf() and strtol() again to accept very small negative
   integers (-2147483648). The previous check to avoid overflows
   was too strict.
-  
+
 
 c.lib 1.46 (31.7.2003)
 
