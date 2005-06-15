@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.65 2005-06-14 15:26:29 tfrieden Exp $
+# $Id: GNUmakefile.os4,v 1.66 2005-06-15 14:59:15 tfrieden Exp $
 #
 # :ts=8
 #
@@ -38,6 +38,7 @@ LIBM_OBJS		= libm_objs
 LIBNET_OBJS		= libnet_objs
 LIBDEBUG_OBJS		= libdebug_objs
 LIBAMIGA_OBJS		= libamiga_objs
+LIBPROFILE_OBJS		= libprofile_objs
 else
 LIBC_OBJS		= $(TYPE)/libc_objs
 LIBUNIX_OBJS		= $(TYPE)/libunix_objs
@@ -45,6 +46,7 @@ LIBM_OBJS		= $(TYPE)/libm_objs
 LIBNET_OBJS		= $(TYPE)/libnet_objs
 LIBDEBUG_OBJS		= $(TYPE)/libdebug_objs
 LIBAMIGA_OBJS		= $(TYPE)/libamiga_objs
+LIBPROFILE_OBJS		= $(TYPE)/libprofile_objs
 endif
 
 ##############################################################################
@@ -77,6 +79,16 @@ $(LIBDEBUG_OBJS)/%.o : %.c
 $(LIBAMIGA_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):amiga]"
 	@$(CC) -o $(LIBAMIGA_OBJS)/$*.o -c $(CFLAGS) $<
+
+$(LIBPROFILE_OBJS)/%.o : %.c
+	@echo "Compiling $< [$(TYPE):profile]"
+	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o  -c $(CFLAGS) $<
+
+$(LIBPROFILE_OBJS)/%.o : %.S
+	@echo "Assembling $< [$(TYPE):profile]"
+	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o -Wa,-mregnames -c $(CFLAGS) $<
+
+
 
 ##############################################################################
 
@@ -167,6 +179,7 @@ C_LIB = \
 	mount_convertinfo.o \
 	mount_fstatfs.o \
 	mount_statfs.o \
+	profile_profil.o \
 	signal_checkabort.o \
 	signal_data.o \
 	signal_kill.o \
@@ -808,6 +821,11 @@ MEMDEBUG_LIB = \
 	string_strdup_debug.o \
 	unistd_getcwd_debug.o
 
+PROFILE_LIB = \
+	profile__mcount.o \
+	profile_gmon.o \
+	profile_mcount.o
+
 ##############################################################################
 
 # The libraries to be built, prefixed by the respective path names
@@ -817,7 +835,8 @@ LIBS := \
 	$(LIBDEBUG_OBJS)/libdebug.a \
 	$(LIBAMIGA_OBJS)/libamiga.a \
 	$(LIBM_OBJS)/libm.a \
-	$(LIBNET_OBJS)/libnet.a
+	$(LIBNET_OBJS)/libnet.a \
+	$(LIBPROFILE_OBJS)/libprofile.a
 
 ##############################################################################
 
@@ -868,6 +887,7 @@ version:
 	cp c.lib_rev.rev net.lib_rev.rev
 	cp c.lib_rev.rev stack.lib_rev.rev
 	cp c.lib_rev.rev unix.lib_rev.rev
+	cp c.lib_rev.rev profile.lib_rev.rev
 	bumprev 1 amiga.lib
 	bumprev 1 c.lib
 	bumprev 1 debug.lib
@@ -876,6 +896,7 @@ version:
 	bumprev 1 net.lib
 	bumprev 1 stack.lib
 	bumprev 1 unix.lib
+	bumprev 1 profile.lib
 
 ##############################################################################
 
@@ -1016,6 +1037,8 @@ $(LIBDEBUG_OBJS)/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
 
 $(LIBAMIGA_OBJS)/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
 
+$(LIBPROFILE_OBJS)/profile.lib_rev.o : profile.lib_rev.c profile.lib_rev.h
+
 ##############################################################################
 
 # Build rules for the debug version of the library which has special
@@ -1147,6 +1170,17 @@ $(LIBAMIGA_OBJS) :
 $(LIBAMIGA_OBJS)/libamiga.a : $(LIBAMIGA_OBJS) $(foreach file,$(AMIGA_LIB),$(LIBAMIGA_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(AMIGA_LIB),$(LIBAMIGA_OBJS)/$(file))
+	$(RANLIB) $@
+
+##############################################################################
+
+# Individual build rules for libprofile.a
+$(LIBPROFILE_OBJS) :
+	$(MAKEDIR) $@
+
+$(LIBPROFILE_OBJS)/libprofile.a : $(LIBPROFILE_OBJS) $(foreach file,$(PROFILE_LIB),$(LIBPROFILE_OBJS)/$(file))
+	-$(DELETE) $@
+	@$(AR) $@ $(foreach file,$(PROFILE_LIB),$(LIBPROFILE_OBJS)/$(file))
 	$(RANLIB) $@
 
 ##############################################################################
