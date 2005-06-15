@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.10 2005-06-04 10:46:23 obarthel Exp $
+ * $Id: unistd.h,v 1.11 2005-06-15 15:00:28 tfrieden Exp $
  *
  * :ts=4
  *
@@ -103,6 +103,8 @@ extern int fdatasync(int file_descriptor);
 extern char *ttyname(int);
 extern int ttyname_r(int file_descriptor,char *name,size_t buflen);
 extern int ttyname_t(int,char *,size_t);
+
+extern int profil(unsigned short *buffer, size_t bufSize, size_t offset, unsigned int scale);
 
 /****************************************************************************/
 
