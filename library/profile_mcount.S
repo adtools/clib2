@@ -14,7 +14,7 @@ _mcount:
 	mflr	r4
 	stw	    r4,48(r1)
 	lwz	    r3,68(r1)
-	
+
 	bl	    __mcount
 	lwz	    r3,68(r1)
 	mtlr	r3
@@ -33,3 +33,4 @@ _mcount:
 	bctr
 _mcount_end:
 	.size	_mcount,_mcount_end-_mcount
+

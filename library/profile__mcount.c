@@ -3,21 +3,24 @@
 #include <proto/exec.h>
 #include <stddef.h>
 
+
+void __mcount(uint32 frompc, uint32 selfpc);
+
 void
 __mcount(uint32 frompc, uint32 selfpc)
 {
 	uint16 *frompcindex;
 	struct tostruct *top, *prevtop;
 	struct gmonparam *p;
-	
+
 	int32 toindex;
-	
+
 	p = &_gmonparam;
-	
+
 	if (p->state != kGmonProfOn) return;
-	
+
 	p->state = kGmonProfBusy;
-	
+
 	/*
 	 * Check if the PC is inside our text segment.
 	 * Really should be...
@@ -29,18 +32,18 @@ __mcount(uint32 frompc, uint32 selfpc)
 #if (HASHFRACTION & (HASHFRACTION-1)) == 0
 	if (p->hashfraction == HASHFRACTION)
 	{
-		frompcindex = &p->froms[(size_t)(frompc / (HASHFRACTION * 
+		frompcindex = &p->froms[(size_t)(frompc / (HASHFRACTION *
 			sizeof(*p->froms)))];
 	}
 	else
 #endif
 	{
-		frompcindex = &p->froms[(size_t)(frompc / (p->hashfraction * 
+		frompcindex = &p->froms[(size_t)(frompc / (p->hashfraction *
 			sizeof(*p->froms)))];
 	}
-	
+
 	toindex = *frompcindex;
-	
+
 	if (toindex == 0)
 	{
 		/* first time down this arc */
@@ -48,7 +51,7 @@ __mcount(uint32 frompc, uint32 selfpc)
 		if (toindex >= p->tolimit)
 			/* Ouch! Overflow */
 			goto overflow;
-		
+
 		*frompcindex = (uint16)toindex;
 		top = &p->tos[toindex];
 		top->selfpc = selfpc;
@@ -56,7 +59,7 @@ __mcount(uint32 frompc, uint32 selfpc)
 		top->link = 0;
 		goto done;
 	}
-	
+
 	top = &p->tos[toindex];
 	if (top->selfpc == selfpc)
 	{
@@ -64,15 +67,15 @@ __mcount(uint32 frompc, uint32 selfpc)
 		top->count++;
 		goto done;
 	}
-	
-	for (;;) 
+
+	for (;;)
 	{
 		if (top->link == 0)
 		{
 			toindex = ++p->tos[0].link;
-			if (toindex >= p->tolimit) 
+			if (toindex >= p->tolimit)
 				goto overflow;
-			
+
 			top = &p->tos[toindex];
 			top->selfpc = selfpc;
 			top->count = 1;
@@ -92,11 +95,11 @@ __mcount(uint32 frompc, uint32 selfpc)
 			goto done;
 		}
 	}
-	
+
 done:
 	p->state = kGmonProfOn;
 	return;
-	
+
 overflow:
 	p->state = kGmonProfError;
 	return;
