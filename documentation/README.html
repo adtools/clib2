@@ -172,7 +172,34 @@ file descriptors <tt>STDIN_FILENO</tt>/<tt>STDOUT_FILENO</tt>/<tt>STDERR_FILENO<
 It is therefore strongly recommended to use the thread-safe library only for applications
 which can cope with the limitations described above.</p>
 
+<h3>5.3 Using gmon (PowerPC only)</h3>
 
+<p>To use profiling, two steps are required. First of all, your program must be compiled with
+the gcc command line option <tt>-pg</tt>. This instructs the compiler to generate special
+profiling code in the prologue and epilogue of each function. Additionally, the program
+must be linked with <tt>libprofile.a</tt>. To do this, either manually add
+<tt>-lprofile</tt> to the linker command line, or modify the specs file as follows.
+Find the lines that look like this (it may actually differ silghtily from your specs file,
+but the important thing is that the line before the line to be modified reads <tt>lib:</tt>):
+<pre>
+lib:
+--start-group -lc --end-group
+</pre>
+You will have to modify this to look like this:
+<pre>
+lib:
+%{pg: -lprofile} --start-group -lc --end-group
+</pre>
+Normally, the specs file is located at the compilers installation directory. For cross-compilers,
+this is <tt>/usr/local/amiga/lib/gcc/ppc-amigaos/<i>compiler-version</i>/specs</tt>. For a native compiler,
+it's in <tt>gcc:lib/gcc/ppc-amigaos/<i>compiler-version</i>/specs</tt>. Most likely, your compiler will already have this added to it's specs file.</p>
+
+<p>Profiling makes use of a special PowerPC facility called the Performance Monitor. It
+allows to "mark" tasks and count only during while a marked task is running. This allows
+performance analysis to be made independant of the actual system load. The Performace Monitor
+is available on all PowerPC models supported by AmigaOS 4 except for the <tt>603e</tt>, and
+embedded versions of the PowerPC like the <tt>405</tt> and <tt>440</tt> series. Consult the manual
+of the appropriate chip for more information.</p>
 
 <h2>6. Conventions and design issues</h2>
 
