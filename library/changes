@@ -1,10 +1,11 @@
-c.lib 1.194()
-
 - Added getopt_long to libunix.a <tfrieden>
 
 - Added new libprofile.a which implements gprof gmon.out output <tfrieden>
 
-- Added the function profil to libc.a <tfrieden>
+- Added the function profil() to libc.a <tfrieden>
+
+- Added ftello() and fseeko() which both merely call the equivalent (at
+  least for clib2) ftell() and fseek() functions, respectively.
 
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: getopt_getopt_long.c,v 1.1 2005-06-14 15:22:51 tfrieden Exp $
+ * $Id: getopt_getopt_long.c,v 1.2 2005-06-18 07:23:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -246,13 +246,13 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 	if (*optstring == '+')
 	{
 		flags |= GETOPTF_POSIX;
-		*optstring++;
+		optstring++;
 	}
 		
 	if (*optstring == '-')
 	{
 		flags |= GETOPTF_ONE_ARG;
-		*optstring++;
+		optstring++;
 	}
 	
 	/* Check for reset */

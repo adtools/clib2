@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.15 2005-06-04 10:46:23 obarthel Exp $
+ * $Id: stdio.h,v 1.16 2005-06-18 07:23:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,6 +49,10 @@ extern "C" {
 #ifndef _STDARG_H
 #include <stdarg.h>
 #endif /* _STDARG_H */
+
+#ifndef _SYS_TYPES_H
+#include <sys/types.h>
+#endif /* _SYS_TYPES_H */
 
 /****************************************************************************/
 
@@ -388,6 +392,8 @@ extern int asprintf(char **ret, const char *format, ...);
 extern int vsnprintf(char *s,size_t size,const char *format,va_list arg);
 extern int pclose(FILE *stream);
 extern FILE * popen(const char *command, const char *type);
+extern int fseeko(FILE *stream, off_t offset, int wherefrom);
+extern off_t ftello(FILE *stream);
 
 /****************************************************************************/
 

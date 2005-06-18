@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.46 2005-06-04 10:46:21 obarthel Exp $
+# $Id: smakefile,v 1.47 2005-06-18 07:23:16 obarthel Exp $
 #
 # :ts=8
 #
@@ -378,8 +378,10 @@ STDIO_OBJ = \
 	stdio_freopen.o \
 	stdio_fscanf.o \
 	stdio_fseek.o \
+	stdio_fseeko.o \
 	stdio_fsetpos.o \
 	stdio_ftell.o \
+	stdio_ftello.o \
 	stdio_ftrylockfile.o \
 	stdio_funlockfile.o \
 	stdio_fwrite.o \

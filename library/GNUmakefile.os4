@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.66 2005-06-15 14:59:15 tfrieden Exp $
+# $Id: GNUmakefile.os4,v 1.67 2005-06-18 07:23:16 obarthel Exp $
 #
 # :ts=8
 #
@@ -228,8 +228,10 @@ C_LIB = \
 	stdio_freopen.o \
 	stdio_fscanf.o \
 	stdio_fseek.o \
+	stdio_fseeko.o \
 	stdio_fsetpos.o \
 	stdio_ftell.o \
+	stdio_ftello.o \
 	stdio_ftrylockfile.o \
 	stdio_funlockfile.o \
 	stdio_fwrite.o \
