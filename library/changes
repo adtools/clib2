@@ -7,6 +7,9 @@
 - Added ftello() and fseeko() which both merely call the equivalent (at
   least for clib2) ftell() and fseek() functions, respectively.
 
+- statfs() never stated that a disk was mounted for read-only access
+  because the wrong InfoData structure member was tested. Fixed.
+
 
 
 c.lib 1.193 (4.6.2005)

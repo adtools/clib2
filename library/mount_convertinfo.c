@@ -1,5 +1,5 @@
 /*
- * $Id: mount_convertinfo.c,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+ * $Id: mount_convertinfo.c,v 1.3 2005-06-19 13:06:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -86,7 +86,7 @@ __convert_info_to_statfs(struct InfoData * id,struct statfs * f)
 	f->f_ffree	= LONG_MAX;
 	f->f_flags	= MNT_NOATIME|MNT_SYMPERM|MNT_LOCAL;
 
-	if(id->id_DiskType != ID_VALIDATED)
+	if(id->id_DiskState != ID_VALIDATED)
 		SET_FLAG(f->f_flags,MNT_RDONLY);
 
 	SHOWVALUE(f->f_bsize);
