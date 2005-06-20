@@ -1,5 +1,5 @@
 /*
- * $Id: socket_gethostbyaddr.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: socket_gethostbyaddr.c,v 1.4 2005-06-20 07:43:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 struct hostent *
-gethostbyaddr(const char *addr, int len, int type)
+gethostbyaddr(const char *addr, socklen_t len, int type)
 {
 	struct hostent *result = NULL;
 

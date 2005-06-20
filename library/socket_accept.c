@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.11 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: socket_accept.c,v 1.12 2005-06-20 07:43:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-accept(int sockfd,struct sockaddr *cliaddr,int *addrlen)
+accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 {
 	struct SignalSemaphore * lock = NULL;
 	struct fd * fd = NULL;

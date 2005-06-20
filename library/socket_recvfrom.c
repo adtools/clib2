@@ -1,5 +1,5 @@
 /*
- * $Id: socket_recvfrom.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: socket_recvfrom.c,v 1.6 2005-06-20 07:43:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-recvfrom(int sockfd,void *buff,int len,int flags,struct sockaddr *from,int *fromlen)
+recvfrom(int sockfd,void *buff,int len,int flags,struct sockaddr *from,socklen_t *fromlen)
 {
 	struct fd * fd;
 	int result = ERROR;

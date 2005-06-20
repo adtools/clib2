@@ -1,5 +1,5 @@
 /*
- * $Id: socket_sendto.c,v 1.7 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: socket_sendto.c,v 1.8 2005-06-20 07:43:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-sendto(int sockfd,const void *buff,int len,int flags,struct sockaddr *to,int tolen)
+sendto(int sockfd,const void *buff,int len,int flags,struct sockaddr *to,socklen_t tolen)
 {
 	struct fd * fd;
 	int result = ERROR;

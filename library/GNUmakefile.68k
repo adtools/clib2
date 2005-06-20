@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.61 2005-06-18 07:23:16 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.62 2005-06-20 07:43:59 obarthel Exp $
 #
 # :ts=8
 #
@@ -483,6 +483,7 @@ UNIX_LIB = \
 	stdio_record_locking.o \
 	stdio_remove.o \
 	stdio_rename.o \
+	stdlib_main.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
