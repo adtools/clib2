@@ -10,6 +10,8 @@
 - statfs() never stated that a disk was mounted for read-only access
   because the wrong InfoData structure member was tested. Fixed.
 
+- lstat would overwrite the name parameter via ReadLink(..., name, ...)
+  instead of ReadLink(..., new_name, ...) <tfrieden>
 
 
 c.lib 1.193 (4.6.2005)
