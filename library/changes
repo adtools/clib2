@@ -26,6 +26,8 @@
   enabled if you link against libunix.a, without libc.a standing a chance to
   accidentally override it.
 
+- Fixed a bug in vfprintf that would surface when the buffer was enlarged
+  if the pattern was too large to fit the static internal buffer <tfrieden>
 
 
 c.lib 1.193 (4.6.2005)
