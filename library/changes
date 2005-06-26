@@ -29,6 +29,8 @@
 - Fixed a bug in vfprintf that would surface when the buffer was enlarged
   if the pattern was too large to fit the static internal buffer <tfrieden>
 
+- Added file system names to statfx <tfrieden>
+
 
 c.lib 1.193 (4.6.2005)
 
