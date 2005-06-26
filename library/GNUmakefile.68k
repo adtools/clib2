@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.62 2005-06-20 07:43:59 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.63 2005-06-26 09:06:09 obarthel Exp $
 #
 # :ts=8
 #
@@ -566,6 +566,8 @@ MATH_LIB = \
 	math_erff.o \
 	math_exp.o \
 	math_expf.o \
+	math_exp2.o \
+	math_exp2f.o \
 	math_expm1.o \
 	math_expm1f.o \
 	math_fabs.o \
@@ -596,6 +598,8 @@ MATH_LIB = \
 	math_lgamma.o \
 	math_lgammaf.o \
 	math_log.o \
+	math_log2.o \
+	math_log2f.o \
 	math_log10.o \
 	math_log10f.o \
 	math_log1p.o \

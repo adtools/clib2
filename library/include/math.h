@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.15 2005-05-30 08:47:41 obarthel Exp $
+ * $Id: math.h,v 1.16 2005-06-26 09:06:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -285,6 +285,14 @@ extern double remainder(double x, double p);
 extern double rint(double x);
 extern double scalbn (double x, int n);
 extern int ilogb(double x);
+
+/****************************************************************************/
+
+extern float exp2f(float x);
+extern double exp2(double x);
+
+extern double log2(double x);
+extern float log2f(float x);
 
 /****************************************************************************/
 

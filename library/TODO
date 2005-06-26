@@ -1,12 +1,8 @@
 C99 math functions:
 
 	(functions generally missing, including their "float" counterparts)
-	exp2
-	exp2f
 	fma
 	fmaf
-	log2
-	log2f
 	lrint
 	lrintf
 	lround

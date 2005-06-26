@@ -13,6 +13,10 @@
 - lstat would overwrite the name parameter via ReadLink(..., name, ...)
   instead of ReadLink(..., new_name, ...) <tfrieden>
 
+- Implemented exp2()/exp2f() and log2()/log2f() as suggested by
+  Henning Nielsen Lund. Thank you very much!
+
+
 
 c.lib 1.193 (4.6.2005)
 

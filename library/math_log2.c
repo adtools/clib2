@@ -1,5 +1,5 @@
 /*
- * $Id: math_log2.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_log2.c,v 1.2 2005-06-26 09:06:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,7 @@
 double
 log2(double x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	return(log(x) / log(2.0));
 }
 
 /****************************************************************************/

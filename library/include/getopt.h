@@ -1,5 +1,5 @@
 /*
- * $Id: getopt.h,v 1.1 2005-06-14 15:22:56 tfrieden Exp $
+ * $Id: getopt.h,v 1.2 2005-06-26 09:06:12 obarthel Exp $
  *
  * :ts=4
  *

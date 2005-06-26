@@ -1,5 +1,5 @@
 /*
- * $Id: math_exp2f.c,v 1.1 2005-05-29 11:19:00 obarthel Exp $
+ * $Id: math_exp2f.c,v 1.2 2005-06-26 09:06:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,7 @@
 float
 exp2f(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	return(powf(2.0, x));
 }
 
 /****************************************************************************/
