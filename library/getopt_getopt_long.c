@@ -1,5 +1,5 @@
 /*
- * $Id: getopt_getopt_long.c,v 1.2 2005-06-18 07:23:16 obarthel Exp $
+ * $Id: getopt_getopt_long.c,v 1.3 2005-06-26 12:01:50 tfrieden Exp $
  *
  * :ts=4
  *
@@ -62,7 +62,7 @@ int optreset = 0;
 
 static int getopt_long_internal(int argc, const char **argv, const char *optstring,
 		const struct option *longopts, int *longindex, int flags);
-		
+
 
 int getopt_long(int argc, const char **argv, const char *optstring,
 		const struct option *longopts, int *longindex)
@@ -74,7 +74,7 @@ int getopt_long(int argc, const char **argv, const char *optstring,
 int getopt_long_only(int argc, const char **argv, const char *optstring,
 		const struct option *longopts, int *longindex)
 {
-	return getopt_long_internal(argc, argv, optstring, longopts, longindex, 
+	return getopt_long_internal(argc, argv, optstring, longopts, longindex,
 		GETOPTF_LONG_ONLY);
 }
 #endif
@@ -89,11 +89,11 @@ static int parse_long_option(int argc, char **argv, const struct option *longopt
 	int i;
 	int idx = -1;
 	int result = '?';
-	
+
 	(void)flags;
-	
+
 	optind ++;
-	
+
 	/* If there's an equals sign in the option, the actual word to check is
 	 * between the -- and = characters. Otherwise, it's the length of the
 	 * remainder (without --)
@@ -107,7 +107,7 @@ static int parse_long_option(int argc, char **argv, const struct option *longopt
 	}
 	else
 		keylen = strlen(current);
-		
+
 	for (i = 0; longopts[i].name; i++)
 	{
 		if (strncmp(longopts[i].name, current, keylen))
@@ -119,8 +119,8 @@ static int parse_long_option(int argc, char **argv, const struct option *longopt
 			idx = i;
 			break;
 		}
-		
-		/* Partial match. Check if we already found another partial match, in 
+
+		/* Partial match. Check if we already found another partial match, in
 		 * which case the match is ambigous.
 		 */
 		if (idx == -1)
@@ -133,9 +133,9 @@ static int parse_long_option(int argc, char **argv, const struct option *longopt
 			return '?';
 		}
 	}
-	
+
 	*longindex = idx;
-	
+
 	if (idx != -1)
 	{
 		/* Found a match. Check if it needs an argument */
@@ -148,7 +148,7 @@ static int parse_long_option(int argc, char **argv, const struct option *longopt
 				optarg = argument;
 			else
 				optarg = 0;
-		} 
+		}
 		else if (longopts[idx].has_arg == required_argument)
 		{
 			/* Either argument was given as --foo=bar, or the next argv element
@@ -168,28 +168,28 @@ static int parse_long_option(int argc, char **argv, const struct option *longopt
 					if (opterr)
 						fprintf(stderr, "%s: option requires an argument -- %s\n",
 							argv[0], longopts[idx].name);
-					
+
 					optarg = 0;
-					
+
 					return '?';
 				}
 			}
-		} 
+		}
 		else
 		{
 			/* No argument */
 			optarg = 0;
-						
+
 			if (argument)
 			{
 				if (opterr)
 					fprintf(stderr, "%s: option does not take an argument -- %s\n",
 						argv[0], longopts[idx].name);
-				
+
 				return '?';
 			}
-		} 
-	
+		}
+
 		if (longopts[idx].flag)
 		{
 			*longopts[idx].flag = longopts[idx].val;
@@ -200,16 +200,16 @@ static int parse_long_option(int argc, char **argv, const struct option *longopt
 		{
 			result = optopt = longopts[idx].val;
 		}
-		
+
 		return result;
 	}
 
 	optopt = 0;
-	
+
 	return '?';
-}			
-			
-		
+}
+
+
 
 /* Note: This implementation currently does not permute argv vectors, and will
  * stop parsing input on the first non-option argument
@@ -231,10 +231,10 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 	SHOWPOINTER(longopts);
 	SHOWPOINTER(longindex);
 	SHOWVALUE(flags);
-	
+
 	if(__check_abort_enabled)
 		__check_abort();
-	
+
 	if (NULL == optstring)
 		goto out;
 
@@ -248,13 +248,13 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 		flags |= GETOPTF_POSIX;
 		optstring++;
 	}
-		
+
 	if (*optstring == '-')
 	{
 		flags |= GETOPTF_ONE_ARG;
 		optstring++;
 	}
-	
+
 	/* Check for reset */
 	if (optreset || optind == 0)
 	{
@@ -262,27 +262,27 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 		optreset = 0;
 		nextchar = 0;
 	}
-	
+
 	if (optind >= argc)
 		goto out;
-		
+
 	/* Begin or continue scanning
 	 * First off, check for a short option and set nextchar, if present.
 	 * if nextchar is not 0, there's a compound option waiting or just begun.
 	 */
 	if (!nextchar
-		&& argv[optind][0] == '-' 
-		&& argv[optind][1] != '\0' 
+		&& argv[optind][0] == '-'
+		&& argv[optind][1] != '\0'
 		&& argv[optind][1] != '-')
 	{
 		/* It's a short option. */
 		nextchar = (char *)&argv[optind][1];
 	}
-	
+
 	if (nextchar)
 	{
 		c = *nextchar ++;
-		
+
 		/* Advancing nextchar. If it points to a 0 character now, it's reached
 		 * the end of the current argv string, so set it to 0 and advance optind
 		 * to the next argv element.
@@ -292,21 +292,21 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 			nextchar = 0;
 			optind ++;
 		}
-		
+
 		optp = strchr(optstring, c);
-		
-		/* We never find a long option in a compound option */ 
-		*longindex = 0;		
-		
+
+		/* We never find a long option in a compound option */
+		*longindex = 0;
+
 		/* Check if it's legal */
 		if (c == ':' || (optp == NULL))
 		{
 			/* Illegal option */
 			if (opterr)
 				fprintf(stderr, "%s: illegal option -- %c\n", argv[0], c);
-			
+
 			result = '?';
-							
+
 			goto out;
 		}
 		else
@@ -330,7 +330,7 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 				if (optp[2] == ':')
 				{
 					/* Optional argument. nextchar is 0 if there's no further
-					 * stuff following, which means the option is without 
+					 * stuff following, which means the option is without
 					 * argument
 					 */
 					if (nextchar)
@@ -348,20 +348,24 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 					 * of this argv element, or we use the next argv element
 					 */
 					if (nextchar)
+					{
 						optarg = nextchar;
+						nextchar = 0;
+						optind++;
+					}
 					else
 					{
-						if (++optind >= argc)
+						if (optind >= argc)
 						{
 							if (opterr)
-								fprintf(stderr, "%s: option requires an argument -- %c\n", 
+								fprintf(stderr, "%s: option requires an argument -- %c\n",
 									argv[0], c);
-							
+
 							result = '?';
-							
+
 							goto out;
 						}
-						
+
 						optarg = (char *)argv[optind++];
 					}
 				}
@@ -371,7 +375,7 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 			}
 		}
 	} /* if (nextchar) */
-							
+
 	/* Start checking an argv element for an option.
 	 * There are different possibilities here:
 	 * 1. We ran out of argv elements
@@ -379,14 +383,14 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 	 * 3. We have an argv element that's just "--"
 	 * 4. we habe a long option (--xxx pr -W xxx)
 	 */
-	 
+
 	/* Check case 3 and 1*/
 	if ((strcmp(argv[optind], "--") == 0) || optind >= argc)
 	{
 		result = EOF;
 		goto out;
 	}
-	
+
 	/* Check case 4 */
 	if (argv[optind][0] == '-' && argv[optind][1] == '-' && longopts)
 	{
@@ -394,9 +398,9 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 		result = parse_long_option(argc, (char **)argv, longopts, longindex, flags);
 		goto out;
 	}
-	
+
 	/* Case 2 */
-	
+
 
  out:
  	RETURN(result);
