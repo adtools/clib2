@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.13 2005-06-26 09:57:52 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.14 2005-06-26 10:23:05 obarthel Exp $
  *
  * :ts=4
  *
@@ -173,7 +173,7 @@ __wildcard_expand_init(void)
 	old_window_pointer = __set_process_window((APTR)-1);
 
 	/* No work to be done? */
-	if(quote_vector == NULL || __argc == 0 || __argv == NULL)
+	if(__argc == 0 || __argv == NULL)
 	{
 		error = OK;
 		goto out;
@@ -230,7 +230,7 @@ __wildcard_expand_init(void)
 		match_made = FALSE;
 
 		/* Check if the string is quoted. Quoted strings are never expanded. */
-		if(i > 0 && (quote_vector[i / 8] & (1 << (7 - (i % 8)))) == 0)
+		if(i > 0 && (quote_vector == NULL || (quote_vector[i / 8] & (1 << (7 - (i % 8)))) == 0))
 		{
 			size_t arg_len,star_count,j;
 			char last_c;
@@ -505,8 +505,11 @@ __wildcard_expand_init(void)
 	if(replacement_arg != NULL)
 		free(replacement_arg);
 
-	free(quote_vector);
-	quote_vector = NULL;
+	if(quote_vector != NULL)
+	{
+		free(quote_vector);
+		quote_vector = NULL;
+	}
 
 	quote_vector_size = 0;
 

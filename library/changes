@@ -21,6 +21,11 @@
   it with a backtick ("`"), which is the wildcard pattern escape character
   used on AmigaOS.
 
+- Repaired the pattern matching code which expands command line arguments:
+  it no longer requires that any parameters are quoted and it is automatically
+  enabled if you link against libunix.a, without libc.a standing a chance to
+  accidentally override it.
+
 
 
 c.lib 1.193 (4.6.2005)
