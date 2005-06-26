@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.12 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.13 2005-06-26 09:57:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -95,7 +95,7 @@ __wildcard_quote_parameter(unsigned int parameter)
 	assert( quote_vector != NULL );
 	assert( num_bytes < quote_vector_size );
 
-	quote_vector[parameter / 8] |= 1 << (7 - (parameter & 7));
+	quote_vector[parameter / 8] |= 1 << (7 - (parameter % 8));
 
 	result = OK;
 
@@ -144,11 +144,7 @@ struct name_node
 STATIC int
 compare(const char **a,const char **b)
 {
-	DECLARE_UTILITYBASE();
-
-	assert( UtilityBase != NULL );
-
-	return(Stricmp((STRPTR)(*a),(STRPTR)(*b)));
+	return(strcmp((*a),(*b)));
 }
 
 /****************************************************************************/
@@ -162,6 +158,7 @@ __wildcard_expand_init(void)
 	size_t argument_list_size;
 	BOOL found_pattern = FALSE;
 	BOOL match_made;
+	char * replacement_arg = NULL;
 	struct name_node * node;
 	int argc;
 	char ** argv;
@@ -232,79 +229,143 @@ __wildcard_expand_init(void)
 	{
 		match_made = FALSE;
 
-		/* Does this string contain a wildcard pattern? We also check if the
-		   string is quoted. Quoted strings are never expanded. */
-		if(i > 0 && (quote_vector[i / 8] & (1 << (7 - (i & 7)))) == 0 && ParsePatternNoCase(argv[i],ap->ap_Buf,2 * MAXPATHLEN) > 0)
+		/* Check if the string is quoted. Quoted strings are never expanded. */
+		if(i > 0 && (quote_vector[i / 8] & (1 << (7 - (i % 8)))) == 0)
 		{
-			BOOL is_first = TRUE;
-			LONG rc;
+			size_t arg_len,star_count,j;
+			char last_c;
+			char * arg;
 
-			rc = MatchFirst(argv[i],ap);
+			arg = argv[i];
 
-			while(TRUE)
+			/* Check if there are any asterisks in the argument string.
+			   These will be replaced by "#?", if possible. If a backtick
+			   precedes the '*' then it is assumed to be an escaped
+			   wildcard pattern character which has to be used "as is". */
+			arg_len = strlen(arg);
+
+			star_count = 0;
+			last_c = '\0';
+
+			for(j = 0 ; j < arg_len ; j++)
 			{
-				/* Got a break signal? */
-				if(rc == ERROR_BREAK)
-				{
-					__set_process_window(old_window_pointer);
+				if(arg[j] == '*' && last_c != '`')
+					star_count++;
 
-					SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
-					__check_abort();
+				last_c = arg[j];
+			}
 
-					old_window_pointer = __set_process_window((APTR)-1);
+			/* Should we try to create a replacement string? */
+			if(star_count > 0)
+			{
+				size_t k;
 
-					/* If we ever arrive here, retry the previous match. */
-					if(is_first)
-					{
-						MatchEnd(ap);
+				if(replacement_arg != NULL)
+					free(replacement_arg);
 
-						rc = MatchFirst(argv[i],ap);
-					}
-					else
-					{
-						rc = MatchNext(ap);
-					}
-
-					continue;
-				}
-				else if (rc == ERROR_NO_MORE_ENTRIES)
-				{
-					/* End of the line. */
-					break;
-				}
-				else if (rc != OK)
-				{
-					/* Some error occured. */
-					error = EIO;
-					break;
-				}
-
-				/* Allocate another node for the expanded parameter. */
-				node = malloc(sizeof(*node) + strlen(ap->ap_Buf) + 1);
-				if(node == NULL)
+				replacement_arg = malloc(arg_len + star_count + 1);
+				if(replacement_arg == NULL)
 				{
 					error = ENOMEM;
 					goto out;
 				}
 
-				/* Remember that this name ended up here due to pattern matching. */
-				node->nn_name = (char *)(node + 1);
-				node->nn_wild = TRUE;
+				last_c = '\0';
 
-				strcpy(node->nn_name,ap->ap_Buf);
+				/* Replace each "*" with "#?". */
+				for(j = k = 0 ; j < arg_len ; j++)
+				{
+					if(arg[j] == '*' && last_c != '`')
+					{
+						replacement_arg[k++] = '#';
+						replacement_arg[k++] = '?';
+					}
+					else
+					{
+						replacement_arg[k++] = arg[j];
+					}
 
-				AddTail((struct List *)&argument_list,(struct Node *)node);
-				argument_list_size++;
+					last_c = arg[j];
+				}
 
-				rc = MatchNext(ap);
+				replacement_arg[k] = '\0';
 
-				is_first = FALSE;
-
-				/* Remember that we found a wildcard pattern among the arguments. */
-				match_made = found_pattern = TRUE;
+				arg = replacement_arg;
 			}
 
-			MatchEnd(ap);
+			/* Does this string contain a wildcard pattern? */
+			if(ParsePatternNoCase(arg,ap->ap_Buf,2 * MAXPATHLEN) > 0)
+			{
+				BOOL is_first = TRUE;
+				LONG rc;
+
+				rc = MatchFirst(arg,ap);
+
+				while(TRUE)
+				{
+					/* Got a break signal? */
+					if(rc == ERROR_BREAK)
+					{
+						__set_process_window(old_window_pointer);
+
+						SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
+						__check_abort();
+
+						old_window_pointer = __set_process_window((APTR)-1);
+
+						/* If we ever arrive here, retry the previous match. */
+						if(is_first)
+						{
+							MatchEnd(ap);
+
+							rc = MatchFirst(arg,ap);
+						}
+						else
+						{
+							rc = MatchNext(ap);
+						}
+
+						continue;
+					}
+					else if (rc == ERROR_NO_MORE_ENTRIES)
+					{
+						/* End of the line. */
+						break;
+					}
+					else if (rc != OK)
+					{
+						/* Some error occured. */
+						error = EIO;
+						break;
+					}
+
+					/* Allocate another node for the expanded parameter. */
+					node = malloc(sizeof(*node) + strlen(ap->ap_Buf) + 1);
+					if(node == NULL)
+					{
+						error = ENOMEM;
+						goto out;
+					}
+
+					/* Remember that this name ended up here due to pattern matching. */
+					node->nn_name = (char *)(node + 1);
+					node->nn_wild = TRUE;
+
+					strcpy(node->nn_name,ap->ap_Buf);
+
+					AddTail((struct List *)&argument_list,(struct Node *)node);
+					argument_list_size++;
+
+					rc = MatchNext(ap);
+
+					is_first = FALSE;
+
+					/* Remember that we found a wildcard pattern among the arguments. */
+					match_made = found_pattern = TRUE;
+				}
+
+				MatchEnd(ap);
+			}
 		}
 
 		if(NOT match_made)
@@ -440,6 +501,9 @@ __wildcard_expand_init(void)
 		perror(__argv[0]);
 		abort();
 	}
+
+	if(replacement_arg != NULL)
+		free(replacement_arg);
 
 	free(quote_vector);
 	quote_vector = NULL;

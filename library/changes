@@ -16,6 +16,11 @@
 - Implemented exp2()/exp2f() and log2()/log2f() as suggested by
   Henning Nielsen Lund. Thank you very much!
 
+- The pattern matching code which expands command line arguments, as part
+  of libunix.a, now translates the "*" wildcard into "#?" unless you prefix
+  it with a backtick ("`"), which is the wildcard pattern escape character
+  used on AmigaOS.
+
 
 
 c.lib 1.193 (4.6.2005)
