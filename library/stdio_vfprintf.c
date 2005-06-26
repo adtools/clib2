@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.18 2005-05-29 08:19:36 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.19 2005-06-26 11:57:26 tfrieden Exp $
  *
  * :ts=4
  *
@@ -30,7 +30,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 #ifndef _STDLIB_NULL_POINTER_CHECK_H
 #include "stdlib_null_pointer_check.h"
 #endif /* _STDLIB_NULL_POINTER_CHECK_H */
@@ -927,6 +926,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 						buffer_start	= internal_buffer;
 						buffer_stop		= &internal_buffer[internal_buffer_size - 1];
+						output_buffer   = buffer_start;
 					}
 
 					if(v >= 1.0)
@@ -1528,6 +1528,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 			if(prefix != NULL)
 			{
+
 				for(i = 0 ; prefix[i] != '\0' ; i++)
 				{
 					/* One less character to fill the output with. */
@@ -1615,7 +1616,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 				minimum_field_width -= num_trailing_zeroes + trail_string_len;
 			}
 			#endif /* FLOATING_POINT_SUPPORT */
-
+			
 			for(i = output_len ; i < minimum_field_width ; i++)
 			{
 				if(__putc(fill_character,stream,buffer_mode) == EOF)
@@ -1635,6 +1636,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					len++;
 				}
 			}
+
 
 			for(i = 0 ; i < output_len ; i++)
 			{
