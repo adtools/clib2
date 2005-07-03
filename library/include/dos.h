@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.9 2005-03-06 09:04:44 obarthel Exp $
+ * $Id: dos.h,v 1.10 2005-07-03 10:36:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,10 @@ extern "C" {
 #endif /* _STDIO_H */
 
 /****************************************************************************/
+
+#ifndef EXEC_LIBRARIES_H
+#include <exec/libraries.h>
+#endif /* EXEC_LIBRARIES_H */
 
 #ifndef WORKBENCH_STARTUP_H
 #include <workbench/startup.h>
@@ -325,6 +329,38 @@ extern void __restore_path_name(char const ** name_ptr,struct name_translation_i
 extern int __translate_amiga_to_unix_path_name(char const ** name_ptr,struct name_translation_info * nti);
 extern int __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translation_info * nti);
 extern int __translate_io_error_to_errno(LONG io_error);
+
+/****************************************************************************/
+
+/*
+ * Routines for use with shared libraries: invoke __lib_init() in your own
+ * shared library initialization function and __lib_exit() in your shared
+ * library cleanup function.
+ *
+ * __lib_init() will initialize the global SysBase/DOSBase variables
+ * (and the IExec/IDOS variables for OS4) and invoke the constructor
+ * functions required by your library code. It returns FALSE upon
+ * failure and TRUE otherwise. Make this the very first function you
+ * call in your shared library initialization function. The __lib_init()
+ * function expects to be called with a pointer to the exec.library
+ * base, which is normally passed to your shared library as part of the
+ * library startup code initialization performed by the operating
+ * system.
+ *
+ * __lib_exit() will undo all the initializations performed by the
+ * __lib_init() function, but leave the global SysBase variable
+ * (and the IExec variable for OS4) intact. Make this the very last
+ * function you call in your shared library cleanup function.
+ *
+ * Note that neither __lib_init() nor __lib_exit() are reentrant. You must
+ * make sure that while you are calling them no other library user can
+ * call them by accident.
+ *
+ * Both functions are only available as part of the thread-safe clib2
+ * linker library.
+ */
+extern VOID __lib_exit(VOID);
+extern BOOL __lib_init(struct Library * SysBase);
 
 /****************************************************************************/
 

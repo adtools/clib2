@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_init_exit.c,v 1.31 2005-03-27 10:02:50 obarthel Exp $
+ * $Id: stdio_init_exit.c,v 1.32 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,14 +54,14 @@
 /****************************************************************************/
 
 /* The file handle table. */
-struct iob **	__iob;
-int				__num_iob;
+struct iob **	NOCOMMON __iob;
+int				NOCOMMON __num_iob;
 
 /****************************************************************************/
 
 /* The file descriptor table. */
-struct fd **	__fd;
-int				__num_fd;
+struct fd **	NOCOMMON __fd;
+int				NOCOMMON __num_fd;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stat_umask.c,v 1.5 2005-04-24 14:04:36 obarthel Exp $
+ * $Id: stat_umask.c,v 1.6 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,7 +41,7 @@
 
 /****************************************************************************/
 
-mode_t __current_umask = S_IWGRP | S_IWOTH;
+mode_t NOCOMMON __current_umask = S_IWGRP | S_IWOTH;
 
 /****************************************************************************/
 

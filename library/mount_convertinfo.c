@@ -1,5 +1,5 @@
 /*
- * $Id: mount_convertinfo.c,v 1.4 2005-06-26 11:59:37 tfrieden Exp $
+ * $Id: mount_convertinfo.c,v 1.5 2005-07-03 10:36:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,50 +90,62 @@ __convert_info_to_statfs(struct InfoData * id,struct statfs * f)
 	if(id->id_DiskState != ID_VALIDATED)
 		SET_FLAG(f->f_flags,MNT_RDONLY);
 
-
 	switch (id->id_DiskType)
 	{
 		case ID_NO_DISK_PRESENT:
 			strcpy(f->f_fstypename, "None");
 			break;
+
 		case ID_UNREADABLE_DISK:
 			strcpy(f->f_fstypename, "NDOS");
 			break;
+
 		case ID_BUSY_DISK:
 			strcpy(f->f_fstypename, "Busy");
 			break;
+
 		case ID_DOS_DISK:
 			strcpy(f->f_fstypename, "DOS\\0");
 			break;
+
 		case ID_FFS_DISK:
 			strcpy(f->f_fstypename, "DOS\\1");
 			break;
+
 		case ID_INTER_DOS_DISK:
 			strcpy(f->f_fstypename, "DOS\\2");
 			break;
+
 		case ID_INTER_FFS_DISK:
 			strcpy(f->f_fstypename, "DOS\\3");
 			break;
+
 		case ID_FASTDIR_DOS_DISK:
 			strcpy(f->f_fstypename, "DOS\\4");
 			break;
+
 		case ID_FASTDIR_FFS_DISK:
 			strcpy(f->f_fstypename, "DOS\\5");
 			break;
+
 		case ID_LONGNAME_DOS_DISK:
 			strcpy(f->f_fstypename, "DOS\\6");
 			break;
+
 		case ID_LONGNAME_FFS_DISK:
 			strcpy(f->f_fstypename, "DOS\\7");
 			break;
+
 		case 0x53465300:
 			strcpy(f->f_fstypename, "SFS\\0");
 			break;
+
 		case ID_NOT_REALLY_DOS:
 			strcpy(f->f_fstypename, "NDOS");
 			break;
+
 		default:
-			strcpy(f->f_fstypename, "Unkown");
+			strcpy(f->f_fstypename, "Unknown");
 			break;
 	}
 

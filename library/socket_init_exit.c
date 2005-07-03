@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.19 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.20 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -80,17 +80,17 @@ struct DaemonMessage
 
 /****************************************************************************/
 
-struct Library * __SocketBase;
+struct Library * NOCOMMON __SocketBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-struct SocketIFace *__ISocket;
+struct SocketIFace * NOCOMMON __ISocket;
 #endif /* __amigaos4__ */
 
 /****************************************************************************/
 
-int h_errno;
+int NOCOMMON h_errno;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_init_exit.c,v 1.10 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: usergroup_init_exit.c,v 1.11 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,12 +52,12 @@
 
 /****************************************************************************/
 
-struct Library * __UserGroupBase;
+struct Library * NOCOMMON __UserGroupBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
-struct UserGroupIFace * __IUserGroup;
+struct UserGroupIFace * NOCOMMON __IUserGroup;
 #endif /* __amigaos4__ */
 
 /****************************************************************************/

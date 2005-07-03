@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.12 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.13 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,6 +43,12 @@
 
 /****************************************************************************/
 
+#ifndef _STDLIB_CONSTRUCTOR_H
+#include "stdlib_constructor.h"
+#endif /* _STDLIB_CONSTRUCTOR_H */
+
+/****************************************************************************/
+
 #undef malloc
 #undef __malloc
 
@@ -50,21 +56,21 @@
 
 #ifdef __MEM_DEBUG
 
-unsigned long __maximum_memory_allocated;
-unsigned long __current_memory_allocated;
-unsigned long __maximum_num_memory_chunks_allocated;
-unsigned long __current_num_memory_chunks_allocated;
+unsigned long NOCOMMON __maximum_memory_allocated;
+unsigned long NOCOMMON __current_memory_allocated;
+unsigned long NOCOMMON __maximum_num_memory_chunks_allocated;
+unsigned long NOCOMMON __current_num_memory_chunks_allocated;
 
 #if defined(__USE_MEM_TREES)
-struct MemoryTree __memory_tree;
+struct MemoryTree NOCOMMON __memory_tree;
 #endif /* __USE_MEM_TREES */
 
 #endif /* __MEM_DEBUG */
 
 /****************************************************************************/
 
-APTR			__memory_pool;
-struct MinList	__memory_list;
+APTR			NOCOMMON __memory_pool;
+struct MinList	NOCOMMON __memory_list;
 
 /****************************************************************************/
 
@@ -296,8 +302,7 @@ __memory_unlock(void)
 
 /****************************************************************************/
 
-void
-__memory_exit(void)
+STDLIB_DESTRUCTOR(stdlib_memory_exit)
 {
 	ENTER();
 
@@ -368,10 +373,9 @@ __memory_exit(void)
 
 /****************************************************************************/
 
-int
-__memory_init(void)
+STDLIB_CONSTRUCTOR(stdlib_memory_init)
 {
-	int result = ERROR;
+	BOOL success = FALSE;
 
 	ENTER();
 
@@ -402,10 +406,15 @@ __memory_init(void)
 	}
 	#endif /* __amigaos4__ */
 
-	result = OK;
+	success = TRUE;
 
  out:
 
-	RETURN(result);
-	return(result);
+	SHOWVALUE(success);
+	LEAVE();
+
+	if(success)
+		CONSTRUCTOR_SUCCEED();
+	else
+		CONSTRUCTOR_FAIL();
 }

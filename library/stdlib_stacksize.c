@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stacksize.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: stdlib_stacksize.c,v 1.4 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,10 @@
 #ifndef _STDLIB_GCC_HELP_H
 #include "stdlib_gcc_help.h"
 #endif /* _STDLIB_GCC_HELP_H */
+
+/****************************************************************************/
+
+#include "macros.h"
 
 /****************************************************************************/
 
@@ -73,7 +77,7 @@ unsigned int __stack_size = 200000;
 
 /******************************************************************************/
 
-unsigned int __stack_size;
+unsigned int NOCOMMON __stack_size;
 
 /******************************************************************************/
 

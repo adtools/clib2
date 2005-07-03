@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_sysbase.c,v 1.3 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: stdlib_sysbase.c,v 1.4 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,12 +39,16 @@
 
 /****************************************************************************/
 
-struct ExecBase * SysBase;
+#include "macros.h"
+
+/****************************************************************************/
+
+struct ExecBase * NOCOMMON SysBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
 
-struct ExecIFace * IExec;
+struct ExecIFace * NOCOMMON IExec;
 
 #endif /* __amigaos4__ */

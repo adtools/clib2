@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_nostdio.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_nostdio.c,v 1.3 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,4 +37,4 @@
 
 /****************************************************************************/
 
-BOOL __no_standard_io;
+BOOL NOCOMMON __no_standard_io;

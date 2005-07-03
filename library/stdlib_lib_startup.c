@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_data.c,v 1.4 2005-07-03 10:36:47 obarthel Exp $
+ * $Id: stdlib_lib_startup.c,v 1.1 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,21 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(USERGROUP_SUPPORT)
+#ifndef EXEC_TYPES_H
+#include <exec/types.h>
+#endif /* EXEC_TYPES_H */
 
 /****************************************************************************/
 
-#ifndef _USERGROUP_HEADERS_H
-#include "usergroup_headers.h"
-#endif /* _USERGROUP_HEADERS_H */
+#include "macros.h"
 
 /****************************************************************************/
 
-int NOCOMMON __root_uid;
-int NOCOMMON __root_gid;
-int NOCOMMON __root_euid;
-int NOCOMMON __root_egid;
-
-/****************************************************************************/
-
-#endif /* USERGROUP_SUPPORT */
+BOOL NOCOMMON __lib_startup;

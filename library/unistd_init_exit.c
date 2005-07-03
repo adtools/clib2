@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_init_exit.c,v 1.11 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: unistd_init_exit.c,v 1.12 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,7 +44,7 @@
 /****************************************************************************/
 
 /* Names of files and directories to delete when shutting down. */
-struct MinList __unlink_list;
+struct MinList NOCOMMON __unlink_list;
 
 /****************************************************************************/
 

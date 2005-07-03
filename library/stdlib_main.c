@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.24 2005-04-24 14:04:36 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.25 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ extern int main(int arg_c,char ** arg_v);
 /****************************************************************************/
 
 /* This will be set to TRUE in case a stack overflow was detected. */
-BOOL __stack_overflow;
+BOOL NOCOMMON __stack_overflow;
 
 /****************************************************************************/
 

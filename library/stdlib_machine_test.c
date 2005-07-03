@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_machine_test.c,v 1.6 2005-03-20 17:14:58 obarthel Exp $
+ * $Id: stdlib_machine_test.c,v 1.7 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -43,6 +43,7 @@
 
 /****************************************************************************/
 
+/* ZZZ this function should be called somewhere, but where from? */
 int
 __machine_test(void)
 {

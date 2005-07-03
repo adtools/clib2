@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.11 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.12 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -135,10 +135,19 @@ __show_error(const char * message)
 	struct DOSIFace *		IDOS		= NULL;
 	#endif /* __amigaos4__ */
 
-	struct Library * IntuitionBase;
-	struct Library * DOSBase;
+	struct Library * IntuitionBase = NULL;
+	struct Library * DOSBase = NULL;
 
 	PROFILE_OFF();
+
+	/* Don't show anything if this is the thread-safe library and
+	   we were invoked indirectly by shared library startup code. */
+	#if defined(__THREAD_SAFE)
+	{
+		if(__lib_startup)
+			goto out;
+	}
+	#endif /* __THREAD_SAFE */
 
 	DOSBase			= OpenLibrary("dos.library",0);
 	IntuitionBase	= OpenLibrary("intuition.library",0);

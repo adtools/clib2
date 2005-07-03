@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.14 2005-03-20 11:18:06 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.15 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -134,8 +134,6 @@ extern int __arg_init(void);
 /****************************************************************************/
 
 /* stdlib_malloc.c */
-extern int __memory_init(void);
-extern void __memory_exit(void);
 extern size_t __get_allocation_size(size_t size);
 extern void * __allocate_memory(size_t size,BOOL never_free,const char * file,int line);
 

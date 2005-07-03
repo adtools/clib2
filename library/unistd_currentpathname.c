@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_currentpathname.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: unistd_currentpathname.c,v 1.3 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,4 +37,4 @@
 
 /****************************************************************************/
 
-char __current_path_name[MAXPATHLEN];
+char NOCOMMON __current_path_name[MAXPATHLEN];

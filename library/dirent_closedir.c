@@ -1,5 +1,5 @@
 /*
- * $Id: dirent_closedir.c,v 1.13 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: dirent_closedir.c,v 1.14 2005-07-03 10:36:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@
 /****************************************************************************/
 
 /* Directories being scanned whose locks need to be freed when shutting down. */
-struct MinList __directory_list;
+struct MinList NOCOMMON __directory_list;
 
 /****************************************************************************/
 

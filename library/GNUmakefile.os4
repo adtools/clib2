@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.71 2005-06-26 11:46:21 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.72 2005-07-03 10:36:46 obarthel Exp $
 #
 # :ts=8
 #
@@ -317,12 +317,13 @@ C_LIB = \
 	stdlib_getenv.o \
 	stdlib_getsp.o \
 	stdlib_get_errno.o \
-	stdlib_init_exit.o \
 	stdlib_isresident.o \
 	stdlib_labs.o \
 	stdlib_llabs.o \
 	stdlib_ldiv.o \
 	stdlib_lldiv.o \
+	stdlib_lib_main.o \
+	stdlib_lib_startup.o \
 	stdlib_machine_test.o \
 	stdlib_main.o \
 	stdlib_malloc.o \
@@ -337,6 +338,7 @@ C_LIB = \
 	stdlib_oslibversion.o \
 	stdlib_priority.o \
 	stdlib_process_name.o \
+	stdlib_program_name.o \
 	stdlib_putenv.o \
 	stdlib_qsort.o \
 	stdlib_rand.o \
@@ -1056,8 +1058,6 @@ $(LIBC_OBJS)/stdlib_alloca.o : stdlib_alloca.c stdlib_memory.h
 $(LIBC_OBJS)/stdlib_calloc.o : stdlib_calloc.c stdlib_memory.h
 
 $(LIBC_OBJS)/stdlib_free.o : stdlib_free.c stdlib_memory.h
-
-$(LIBC_OBJS)/stdlib_init_exit.o : stdlib_init_exit.c stdlib_memory.h
 
 $(LIBC_OBJS)/stdlib_malloc.o : stdlib_malloc.c stdlib_memory.h
 

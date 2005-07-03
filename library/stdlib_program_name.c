@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_init_exit.c,v 1.11 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_program_name.c,v 1.1 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,15 +53,13 @@ static BOOL free_program_name;
 
 /****************************************************************************/
 
-char * __program_name;
+char * NOCOMMON __program_name;
 
 /****************************************************************************/
 
-STDLIB_DESTRUCTOR(stdlib_exit)
+STDLIB_DESTRUCTOR(stdlib_program_name_exit)
 {
 	ENTER();
-
-	__memory_exit();
 
 	if(free_program_name && __program_name != NULL)
 	{
@@ -74,14 +72,11 @@ STDLIB_DESTRUCTOR(stdlib_exit)
 
 /****************************************************************************/
 
-STDLIB_CONSTRUCTOR(stdlib_init)
+STDLIB_CONSTRUCTOR(stdlib_program_name_init)
 {
 	BOOL success = FALSE;
 
 	ENTER();
-
-	if(__machine_test() < 0)
-		goto out;
 
 	if(__WBenchMsg == NULL)
 	{
@@ -101,9 +96,6 @@ STDLIB_CONSTRUCTOR(stdlib_init)
 	{
 		__program_name = (char *)__WBenchMsg->sm_ArgList[0].wa_Name;
 	}
-
-	if(__memory_init() < 0)
-		goto out;
 
 	success = TRUE;
 

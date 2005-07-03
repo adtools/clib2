@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_default_puddle_size.c,v 1.2 2005-01-02 09:07:18 obarthel Exp $
+ * $Id: stdlib_default_puddle_size.c,v 1.3 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,4 +37,4 @@
 
 /****************************************************************************/
 
-int __default_puddle_size = 4096;
+int NOCOMMON __default_puddle_size = 4096;

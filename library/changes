@@ -31,6 +31,20 @@
 
 - Added file system names to statfx <tfrieden>
 
+- Moved all the constructor code out of "stdlib_init_exit.c" and into the
+  files which initialize global data, such as the new "stdlib_program_name.c"
+  and "stdlib_malloc.c".
+
+- Until I can find a way to invoke it from within the library, the
+  __machine_test() function is no longer invoked.
+
+- Tagged global data with NOCOMMON attributes.
+
+- Added the __lib_init() and __lib_exit() functions, which are part of the
+  thread-safe library and which can be used to hook up clib2 with standard
+  Amiga shared library/device code. Some documentation on how to use them
+  can be found in the <dos.h> header file.
+
 
 c.lib 1.193 (4.6.2005)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_utilitybase.c,v 1.1 2005-03-30 19:37:47 obarthel Exp $
+ * $Id: stdlib_utilitybase.c,v 1.2 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,12 +39,16 @@
 
 /****************************************************************************/
 
-struct Library * __UtilityBase;
+#include "macros.h"
+
+/****************************************************************************/
+
+struct Library * NOCOMMON __UtilityBase;
 
 /****************************************************************************/
 
 #if defined(__amigaos4__)
 
-struct UtilityIFace * __IUtility;
+struct UtilityIFace * NOCOMMON __IUtility;
 
 #endif /* __amigaos4__ */

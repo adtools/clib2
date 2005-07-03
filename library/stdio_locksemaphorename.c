@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_locksemaphorename.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: stdio_locksemaphorename.c,v 1.3 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,4 +37,4 @@
 
 /****************************************************************************/
 
-char * __file_lock_semaphore_name = "Advisory File Locking";
+char * NOCOMMON __file_lock_semaphore_name = "Advisory File Locking";

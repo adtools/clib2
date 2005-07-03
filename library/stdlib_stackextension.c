@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stackextension.c,v 1.11 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: stdlib_stackextension.c,v 1.12 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,8 +77,8 @@ static struct stackframe *	__stk_spare;			/* spare stackframes */
 
 /****************************************************************************/
 
-ULONG __stk_extensions;	/* number of stack extensions performed */
-ULONG __stk_maxsize;	/* maximum amount of memory allocated for stack extension */	
+ULONG NOCOMMON __stk_extensions;	/* number of stack extensions performed */
+ULONG NOCOMMON __stk_maxsize;	/* maximum amount of memory allocated for stack extension */	
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: time_data.c,v 1.3 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: time_data.c,v 1.4 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,7 +37,7 @@
 
 /****************************************************************************/
 
-const char * const __abbreviated_week_day_names[7] =
+const char * const NOCOMMON __abbreviated_week_day_names[7] =
 {
 	"Sun",
 	"Mon",
@@ -48,7 +48,7 @@ const char * const __abbreviated_week_day_names[7] =
 	"Sat"
 };
 
-const char * const __week_day_names[7] =
+const char * const NOCOMMON __week_day_names[7] =
 {
 	"Sunday",
 	"Monday",
@@ -59,7 +59,7 @@ const char * const __week_day_names[7] =
 	"Saturday"
 };
 
-const char * const __abbreviated_month_names[12] =
+const char * const NOCOMMON __abbreviated_month_names[12] =
 {
 	"Jan",
 	"Feb",
@@ -75,7 +75,7 @@ const char * const __abbreviated_month_names[12] =
 	"Dec"
 };
 
-const char * const __month_names[12] =
+const char * const NOCOMMON __month_names[12] =
 {
 	"January",
 	"February",

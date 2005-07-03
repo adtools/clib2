@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chdir_exit.c,v 1.5 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: unistd_chdir_exit.c,v 1.6 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,9 +49,9 @@
 
 /* If the program's current directory was changed, here is where
    we find out about it. */
-BPTR __original_current_directory;
-BOOL __current_directory_changed;
-BOOL __unlock_current_directory;
+BPTR NOCOMMON __original_current_directory;
+BOOL NOCOMMON __current_directory_changed;
+BOOL NOCOMMON __unlock_current_directory;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: signal_raise.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: signal_raise.c,v 1.9 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,7 +38,7 @@
 /****************************************************************************/
 
 /* This table holds pointers to all signal handlers configured at a time. */
-signal_handler_t __signal_handler_table[NUM_SIGNALS] =
+signal_handler_t NOCOMMON __signal_handler_table[NUM_SIGNALS] =
 {
 	SIG_DFL,	/* SIGABRT */
 	SIG_DFL,	/* SIGFPE */
@@ -53,7 +53,7 @@ signal_handler_t __signal_handler_table[NUM_SIGNALS] =
 /* This holds a mask of all signals whose delivery is currently blocked.
    The sigaddset(), sigblock(), sigprocmask() and sigsetmask() functions
    modify or query it. */
-int __signals_blocked;
+int NOCOMMON __signals_blocked;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.17 2005-03-30 19:37:27 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.18 2005-07-03 10:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -150,6 +150,7 @@ extern unsigned int NOCOMMON __random_seed;
 
 extern jmp_buf NOCOMMON	__exit_jmp_buf;
 extern int NOCOMMON		__exit_value;
+extern BOOL	NOCOMMON	__exit_blocked;
 
 /****************************************************************************/
 
@@ -185,6 +186,10 @@ extern UBYTE NOCOMMON __shell_escape_character;
 
 extern char ** NOCOMMON	__argv;
 extern int NOCOMMON		__argc;
+
+/****************************************************************************/
+
+extern BOOL NOCOMMON __lib_startup;
 
 /****************************************************************************/
 
