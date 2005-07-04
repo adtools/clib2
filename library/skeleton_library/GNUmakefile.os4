@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.1 2005-07-04 10:25:33 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.2 2005-07-04 11:06:20 obarthel Exp $
 #
 # :ts=4
 #
@@ -43,12 +43,12 @@ DEBUG = -ggdb
 
 ###############################################################################
 
-CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(CPU) $(OPTIONS) -I. -I/V/include
+CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(CPU) $(OPTIONS) -I/V/include -I. -Iinclude
 
 ###############################################################################
 
 OBJS = \
-	lib_base.o lib_user.o usergroup_68k.o
+	lib_base.o lib_user.o skeleton_68k.o
 
 ###############################################################################
 
@@ -56,12 +56,21 @@ LIBS = -lc -lamiga
 
 ###############################################################################
 
-all: skeleton.library
+all: skeleton_68k.c skeleton.library
+
+###############################################################################
 
 skeleton.library: $(OBJS)
 	$(CC) -o $@.debug $(OBJS) $(CFLAGS) -Wl,--cref,-M,-Map=$@.map \
 		-nostartfiles -nostdlib $(LIBS)
 	ppc-amigaos-strip -R.comment -o $@ $@.debug
+
+###############################################################################
+
+# This will rebuild the library header files and stub code when necessary
+skeleton_68k.c : skeleton_lib.sfd skeleton.xml
+	idltool --proto --interface --inline skeleton.xml
+	fdtrans --c68k skeleton_lib.sfd
 
 ###############################################################################
 

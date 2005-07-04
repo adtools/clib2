@@ -1,5 +1,5 @@
 /*
- * $Id: lib_user.h,v 1.2 2005-07-04 10:25:33 obarthel Exp $
+ * $Id: lib_user.h,v 1.3 2005-07-04 11:06:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,20 +46,26 @@
 
 /****************************************************************************/
 
+struct SkeletonBase;
+
+/****************************************************************************/
+
 struct UserData
 {
-	struct Library *	ud_SysBase;
+	struct Library *		ud_SysBase;
 
 	#if defined(__amigaos4__)
-	struct ExecIFace *	ud_IExec;
+	struct ExecIFace *		ud_IExec;
 	#endif /* __amigaos4__ */
 
-	ULONG				ud_UseCount;
+	struct SkeletonBase *	ud_SkeletonBase;
+
+	ULONG					ud_UseCount;
 };
 
 /****************************************************************************/
 
-BOOL UserLibInit(struct Library *SysBase,struct UserData *ud);
+BOOL UserLibInit(struct Library *SysBase,struct SkeletonBase *sb,struct UserData *ud);
 BOOL UserLibOpen(struct UserData *ud);
 VOID UserLibClose(struct UserData *ud);
 VOID UserLibExpunge(struct UserData *ud);

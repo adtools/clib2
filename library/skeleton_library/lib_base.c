@@ -1,5 +1,5 @@
 /*
- * $Id: lib_base.c,v 1.2 2005-07-04 10:25:33 obarthel Exp $
+ * $Id: lib_base.c,v 1.3 2005-07-04 11:06:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,8 +41,16 @@
 /****************************************************************************/
 
 #define __NOLIBBASE__
+#define __NOGLOBALIFACE__
 #define __USE_INLINE__
+
+/****************************************************************************/
+
 #include <proto/exec.h>
+
+#if defined(__amigaos4__)
+#include <proto/skeleton.h>
+#endif /* __amigaos4__ */
 
 /****************************************************************************/
 
@@ -166,7 +174,7 @@ lib_init(
 		goto out;
 
 	/* Now try the user-supplied library initialization function. */
-	if(UserLibInit(SysBase,sb->sb_UserData) == FALSE)
+	if(UserLibInit(SysBase,sb,sb->sb_UserData) == FALSE)
 		goto out;
 
 	result = sb;
@@ -456,11 +464,11 @@ STATIC CONST UBYTE version_string[] = "$VER: " VSTRING;
 
 /****************************************************************************/
 
-CONST struct Resident LibTag[] =
+CONST struct Resident LibTag =
 {
 	RTC_MATCHWORD,
-	(struct Resident *)&LibTag[0],
-	(struct Resident *)&LibTag[1],
+	(struct Resident *)&LibTag,
+	(struct Resident *)&LibTag+1,
 	RTF_AUTOINIT|RTF_NATIVE,
 	VERSION,
 	NT_LIBRARY,
@@ -529,11 +537,11 @@ STATIC CONST struct LibraryInitTable lib_init_table =
 /* The library loader looks for this marker in the memory
    the library code and data will occupy. It is responsible
    setting up the Library base data structure. */
-struct Resident LibTag[] =
+struct Resident LibTag =
 {
 	RTC_MATCHWORD,					/* Marker value. */
-	(struct Resident *)&LibTag[0],	/* This points back to itself. */
-	(struct Resident *)&LibTag[1],	/* This points behind this marker. */
+	(struct Resident *)&LibTag,		/* This points back to itself. */
+	(struct Resident *)&LibTag+1,	/* This points behind this marker. */
 	RTF_AUTOINIT,					/* The Library should be set up according to the given table. */
 	VERSION,						/* The version of this Library. */
 	NT_LIBRARY,						/* This defines this module as a Library. */

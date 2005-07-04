@@ -1,5 +1,5 @@
 /*
- * $Id: lib_user.c,v 1.2 2005-07-04 10:25:33 obarthel Exp $
+ * $Id: lib_user.c,v 1.3 2005-07-04 11:06:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,7 +46,10 @@
    By the time this function is invoked the library base has already been
    initialized. It has to return TRUE for success and FALSE otherwise. */
 BOOL
-UserLibInit(struct Library * SysBase,struct UserData * ud)
+UserLibInit(
+	struct Library *		SysBase,
+	struct SkeletonBase *	sb,
+	struct UserData *		ud)
 {
 	BOOL result;
 
@@ -64,6 +67,12 @@ UserLibInit(struct Library * SysBase,struct UserData * ud)
 		ud->ud_IExec = (struct ExecIFace *)((struct ExecBase *)SysBase)->MainInterface;
 	}
 	#endif /* __amigaos4__ */
+
+	/* The library base pointer may come in handy if library
+	   functions are to call other library functions. These
+	   calls should go through the normal library calling
+	   mechanism rather than invoke these functions directly. */
+	ud->ud_SkeletonBase = sb;
 
 	result = TRUE;
 
