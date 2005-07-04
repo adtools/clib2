@@ -1,0 +1,21 @@
+This is a simple shared library example which consists of a set of mandatory
+library functions (in "lib_base.c") and a set of user-defined functions (in
+"lib_user.c"). Neither implement a really useful shared Amiga library: no
+user-callable functions are included, only what you need as the absolute
+minimum to make a library respond correctly to OpenLibrary() and
+CloseLibrary() function calls. The code is intended to serve both as a
+demonstration how to write an Amiga shared library and how such a library
+could make use of clib2 library functions that are part of the 'C' standard
+runtime library, but not necessarily reentrant. The term "reentrant" refers to
+a property of certain library functions which allows several callers to invoke
+them at the same time without any ill effects. Only few such functions exist,
+such as strcpy(), strlen() or time(). Then there are others such as
+localtime() or strtok() which by design are not reentrant. The thread-safe
+variant of the clib2 runtime library tries to provide thread-safe (and
+therefore reentrant) functions which could be used in an Amiga shared library.
+But it can only go so far. The environment for which thread-safety is defined
+(POSIX.1) covers application software, such as shell commands, but it does not
+cover the peculiarities of Amiga shared libraries. You therefore need to
+exercise caution when building a library which references code from the 'C'
+runtime library. For example, you cannot safely call assert() or exit() from
+within an Amiga shared library.
