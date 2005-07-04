@@ -1,5 +1,5 @@
 /*
- * $Id: lib_user.c,v 1.4 2005-07-04 11:21:14 obarthel Exp $
+ * $Id: lib_user.c,v 1.5 2005-07-04 11:22:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -152,8 +152,8 @@ UserLibClose(struct UserData * ud)
 	#if defined(__amigaos4__) && defined(__THREAD_SAFE)
 	{
 		/* Note that the clib2 library cleanup code is
-		   called exactly once, when the first client
-		   opens this library. */
+		   called exactly once, when the last client
+		   closes this library. */
 		if(ud->ud_UseCount == 0)
 			__lib_exit();
 	}
