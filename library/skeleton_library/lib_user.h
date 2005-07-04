@@ -1,5 +1,5 @@
 /*
- * $Id: lib_user.h,v 1.1 2005-07-04 09:39:00 obarthel Exp $
+ * $Id: lib_user.h,v 1.2 2005-07-04 10:25:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,6 +36,10 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_EXECBASE_H
+#include <exec/execbase.h>
+#endif /* EXEC_EXECBASE_H */
+
 #ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
 #endif /* EXEC_LIBRARIES_H */
@@ -45,6 +49,11 @@
 struct UserData
 {
 	struct Library *	ud_SysBase;
+
+	#if defined(__amigaos4__)
+	struct ExecIFace *	ud_IExec;
+	#endif /* __amigaos4__ */
+
 	ULONG				ud_UseCount;
 };
 

@@ -1,5 +1,5 @@
 /*
- * $Id: lib_base.c,v 1.1 2005-07-04 09:39:00 obarthel Exp $
+ * $Id: lib_base.c,v 1.2 2005-07-04 10:25:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,6 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <exec/execbase.h>
 #include <exec/resident.h>
 #include <exec/libraries.h>
 #include <exec/memory.h>
@@ -39,7 +40,8 @@
 
 /****************************************************************************/
 
-#ifndef __NOLIBBASE__
+#define __NOLIBBASE__
+#define __USE_INLINE__
 #include <proto/exec.h>
 
 /****************************************************************************/
@@ -57,11 +59,23 @@ LONG _start(VOID);
 
 /****************************************************************************/
 
-STATIC struct SkeletonBase *ASM LibInit(REG (d0, struct SkeletonBase *sb ), REG (a0, BPTR segment_list ), REG (a6, struct Library *sys_base ));
-STATIC struct SkeletonBase *ASM LibOpen(REG (a6, struct SkeletonBase *sb ));
-STATIC BPTR ASM LibExpunge(REG (a6, struct SkeletonBase *sb ));
-STATIC BPTR ASM LibClose(REG (a6, struct SkeletonBase *sb ));
-STATIC LONG LibReserved(VOID);
+STATIC struct SkeletonBase *ASM lib_init(REG (d0, struct SkeletonBase *sb ), REG (a0, BPTR segment_list ), REG (a6, APTR whatever ));
+STATIC struct SkeletonBase *ASM lib_open(REG (a6, APTR base ));
+STATIC BPTR ASM lib_expunge(REG (a6, APTR base ));
+STATIC BPTR ASM lib_close(REG (a6, APTR base ));
+
+/****************************************************************************/
+
+#if defined(__amigaos4__)
+
+STATIC ULONG lib_default_obtain(struct Interface *self);
+STATIC ULONG lib_default_release(struct Interface *self);
+
+#else
+
+STATIC LONG lib_reserved(VOID);
+
+#endif /* __amigaos4__ */
 
 /****************************************************************************/
 
@@ -83,9 +97,7 @@ _start(VOID)
    the exception of the lib_Revision field, i.e. everything that
    could be gained from the Resident structure is now in the
    Library structure. Earlier operating system releases would leave
-   the entire Library structure uninitialized. For this example
-   we assume that Kickstart 2.0 is around as it must be possible
-   to open dos.library V37.
+   the entire Library structure uninitialized.
 
    The library initialization is single threaded, i.e. the operating
    system processes library initialization in a queue. The longer it
@@ -101,15 +113,28 @@ _start(VOID)
    This routine must return the Library base pointer if it succeeds.
    Failure is indicated by returning NULL instead. */
 STATIC struct SkeletonBase * ASM
-LibInit(
+lib_init(
 	REG(d0,struct SkeletonBase *	sb),
 	REG(a0,BPTR						segment_list),
-	REG(a6,struct Library *			sys_base))
+	REG(a6,APTR						whatever))
 {
 	struct SkeletonBase * result = NULL;
 	struct Library * SysBase;
+	#if defined(__amigaos4__)
+	struct ExecIFace * IExec;
+	#endif /* __amigaos4__ */
 
-	SysBase = sys_base;
+	#if defined(__amigaos4__)
+	{
+		IExec = (struct ExecIFace *)whatever;
+
+		SysBase = (struct Library *)IExec->Data.LibBase;
+	}
+	#else
+	{
+		SysBase = (struct Library *)whatever;
+	}
+	#endif /* __amigaos4__ */
 
 	/* This library implementation requires Kickstart 2.04 or
 	   better to work. */
@@ -120,6 +145,12 @@ LibInit(
 	}
 
 	sb->sb_SysBase = SysBase;
+
+	#if defined(__amigaos4__)
+	{
+		sb->sb_IExec = IExec;
+	}
+	#endif /* __amigaos4__ */
 
 	InitSemaphore(&sb->sb_Semaphore);
 
@@ -153,8 +184,16 @@ LibInit(
 		   of type RTF_AUTOINIT (see the "struct Resident" rt_Flags
 		   initialization value for the LibTag declaration at the end of
 		   this file). */
-		FreeMem(((BYTE *)sb) - sb->sb_Library.lib_NegSize,
-			(ULONG)(sb->sb_Library.lib_NegSize + sb->sb_Library.lib_PosSize));
+		#if defined(__amigaos4__)
+		{
+			DeleteLibrary((struct Library *)sb);
+		}
+		#else
+		{
+			FreeMem(((BYTE *)sb) - sb->sb_Library.lib_NegSize,
+				(ULONG)(sb->sb_Library.lib_NegSize + sb->sb_Library.lib_PosSize));
+		}
+		#endif /* __amigaos4__ */
 	}
 
 	return(result);
@@ -178,8 +217,9 @@ LibInit(
    This routine must return the Library base pointer if it succeeds.
    Failure is indicated by returning NULL instead. */
 STATIC struct SkeletonBase * ASM
-LibOpen(REG(a6,struct SkeletonBase * sb))
+lib_open(REG(a6,APTR base))
 {
+	USE_LIBBASE(base);
 	USE_EXEC(sb);
 
 	struct SkeletonBase * result = NULL;
@@ -232,8 +272,9 @@ LibOpen(REG(a6,struct SkeletonBase * sb))
    the life cycle of the library. It is called while Task
    switching is disabled. */
 STATIC BPTR ASM
-LibExpunge(REG(a6,struct SkeletonBase * sb))
+lib_expunge(REG(a6,APTR base))
 {
+	USE_LIBBASE(base);
 	USE_EXEC(sb);
 
 	BPTR result = ZERO;
@@ -264,8 +305,16 @@ LibExpunge(REG(a6,struct SkeletonBase * sb))
 
 		/* Finally, free the data allocated for the
 		   base data structure. */
-		FreeMem(((BYTE *)sb) - sb->sb_Library.lib_NegSize,
-			(ULONG)(sb->sb_Library.lib_NegSize + sb->sb_Library.lib_PosSize));
+		#if defined(__amigaos4__)
+		{
+			DeleteLibrary((struct Library *)sb);
+		}
+		#else
+		{
+			FreeMem(((BYTE *)sb) - sb->sb_Library.lib_NegSize,
+				(ULONG)(sb->sb_Library.lib_NegSize + sb->sb_Library.lib_PosSize));
+		}
+		#endif /* __amigaos4__ */
 	}
 
 	return(result);
@@ -278,8 +327,9 @@ LibExpunge(REG(a6,struct SkeletonBase * sb))
    Task switching is disabled and has to return the result
    code of the library expunge routine when the time is right. */
 STATIC BPTR ASM
-LibClose(REG(a6,struct SkeletonBase * sb))
+lib_close(REG(a6,APTR base))
 {
+	USE_LIBBASE(base);
 	USE_EXEC(sb);
 
 	BPTR result = ZERO;
@@ -298,17 +348,138 @@ LibClose(REG(a6,struct SkeletonBase * sb))
 
 	/* Trigger the library expunge function, if desired. */
 	if(sb->sb_Library.lib_OpenCnt == 0 && (sb->sb_Library.lib_Flags & LIBF_DELEXP) != 0)
-		result = LibExpunge(sb);
+		result = lib_expunge(base);
 
 	return(result);
 }
 
 /****************************************************************************/
 
+#if defined(__amigaos4__)
+
+/****************************************************************************/
+
+STATIC ULONG
+lib_default_obtain(struct Interface * self)
+{
+	return(self->Data.RefCount++);
+}
+
+STATIC ULONG
+lib_default_release(struct Interface * self)
+{
+	return(self->Data.RefCount--);
+}
+
+/****************************************************************************/
+
+STATIC CONST APTR manager_vectors[] =
+{
+	lib_default_obtain,
+	lib_default_release,
+	NULL,
+	NULL,
+	lib_open,
+	lib_close,
+	lib_expunge,
+	NULL,
+
+	(APTR)-1,
+};
+
+STATIC CONST struct TagItem manager_tags[] =
+{
+	{ MIT_Name,			(ULONG)"__library" },
+	{ MIT_VectorTable,	(ULONG)manager_vectors },
+	{ MIT_Version,		1 },
+	{ TAG_DONE,			0 }
+};
+
+/****************************************************************************/
+
+STATIC CONST APTR main_vectors[]=
+{
+	lib_default_obtain,
+	lib_default_release,
+	NULL,
+	NULL,
+
+	(APTR)-1
+};
+
+STATIC CONST struct TagItem main_tags[] =
+{
+	{ MIT_Name,			(ULONG)"main" },
+	{ MIT_VectorTable,	(ULONG)main_vectors },
+	{ MIT_Version,		1 },
+	{ TAG_DONE,			0 }
+};
+
+/****************************************************************************/
+
+STATIC CONST APTR lib_interfaces[] =
+{
+	(CONST APTR)manager_tags,
+	(CONST APTR)main_tags,
+
+	NULL
+};
+
+/****************************************************************************/
+
+extern ULONG VecTable68K[];
+
+/****************************************************************************/
+
+CONST struct TagItem lib_create_tags[] =
+{
+	{ CLT_DataSize,		sizeof(struct SkeletonBase) },
+	{ CLT_Vector68K,	(ULONG)VecTable68K },
+	{ CLT_Interfaces,	(ULONG)lib_interfaces },
+	{ CLT_InitFunc,		(ULONG)lib_init },
+	{ TAG_DONE,			0 }
+};
+
+/****************************************************************************/
+
+CONST struct TagItem local_lib_create_tags[] =
+{
+	{ CLT_DataSize,		sizeof(struct SkeletonBase) },
+	{ CLT_Vector68K,	(ULONG)VecTable68K },
+	{ CLT_Interfaces,	(ULONG)lib_interfaces },
+	{ TAG_DONE,			0 }
+};
+
+/****************************************************************************/
+
+STATIC CONST UBYTE version_string[] = "$VER: " VSTRING;
+
+/****************************************************************************/
+
+CONST struct Resident LibTag[] =
+{
+	RTC_MATCHWORD,
+	(struct Resident *)&LibTag[0],
+	(struct Resident *)&LibTag[1],
+	RTF_AUTOINIT|RTF_NATIVE,
+	VERSION,
+	NT_LIBRARY,
+	0,
+	"skeleton.library",
+	(STRPTR)&version_string[6],
+	(struct TagItem *)lib_create_tags
+};
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
 /* This is the reserved library entry point. It always
    has to return 0. */
 STATIC LONG
-LibReserved(VOID)
+lib_reserved(VOID)
 {
 	return(0);
 }
@@ -331,12 +502,12 @@ struct LibraryInitTable
 /* This is the table of functions that make up the library. The first
    four are mandatory, everything following it are user callable
    routines. The table is terminated by the value -1. */
-STATIC CONST APTR LibVectors[] =
+STATIC CONST APTR lib_vectors[] =
 {
-	LibOpen,
-	LibClose,
-	LibExpunge,
-	LibReserved,
+	lib_open,
+	lib_close,
+	lib_expunge,
+	lib_reserved,
 
 	(APTR) -1
 };
@@ -345,12 +516,12 @@ STATIC CONST APTR LibVectors[] =
 
 /* This finally sets up the library base data structure and the
    function vector. */
-STATIC CONST struct LibraryInitTable LibInitTable =
+STATIC CONST struct LibraryInitTable lib_init_table =
 {
 	sizeof(struct SkeletonBase),
-	LibVectors,
+	(APTR *)lib_vectors,
 	NULL,
-	LibInit
+	lib_init
 };
 
 /****************************************************************************/
@@ -360,14 +531,18 @@ STATIC CONST struct LibraryInitTable LibInitTable =
    setting up the Library base data structure. */
 struct Resident LibTag[] =
 {
-	RTC_MATCHWORD,		/* Marker value. */
-	&LibTag[0],			/* This points back to itself. */
-	&LibTag[1],			/* This points behind this marker. */
-	RTF_AUTOINIT,		/* The Library should be set up according to the given table. */
-	VERSION,			/* The version of this Library. */
-	NT_LIBRARY,			/* This defines this module as a Library. */
-	0,					/* Initialization priority of this Library; unused. */
-	"skeleton.library",	/* Points to the name of the Library. */
-	VSTRING,			/* The identification string of this Library. */
-	&LibInitTable		/* This table is for initializing the Library. */
+	RTC_MATCHWORD,					/* Marker value. */
+	(struct Resident *)&LibTag[0],	/* This points back to itself. */
+	(struct Resident *)&LibTag[1],	/* This points behind this marker. */
+	RTF_AUTOINIT,					/* The Library should be set up according to the given table. */
+	VERSION,						/* The version of this Library. */
+	NT_LIBRARY,						/* This defines this module as a Library. */
+	0,								/* Initialization priority of this Library; unused. */
+	"skeleton.library",				/* Points to the name of the Library. */
+	VSTRING,						/* The identification string of this Library. */
+	(APTR)&lib_init_table			/* This table is for initializing the Library. */
 };
+
+/****************************************************************************/
+
+#endif /* __amigaos4__ */

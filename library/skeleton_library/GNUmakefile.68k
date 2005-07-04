@@ -1,7 +1,7 @@
 #
-# $Id: smakefile,v 1.2 2005-07-04 10:25:33 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.1 2005-07-04 10:25:33 obarthel Exp $
 #
-# :ts=8
+# :ts=4
 #
 # Amiga shared library skeleton example
 # Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
@@ -31,76 +31,39 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-#############################################################################
-#
-# Library version
-#
-#############################################################################
+WARNINGS = \
+	-Wall -W -Wshadow -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
+	-Wundef -Wbad-function-cast -Wmissing-declarations -Wconversion
 
-VERSION = 1
-
-###############################################################################
-
-OPTIMIZE =	optimize optsize optinline optinlocal
- CPU =		any
-#CPU =		060
- DEBUG =	line
-#DEBUG =	symbolflush noopt
+CC = gcc
+CPU = -m68000
+OPTIONS = -DNDEBUG
+OPTIMIZE = -O
+DEBUG = -g
 
 ###############################################################################
 
-CFLAGS =	idlen=64 comnest strmerge nostkchk \
-		strsect=code $(OPTIMIZE) cpu=$(CPU) debug=$(DEBUG) \
-		params=register data=faronly commentnest idir=V:include
-LFLAGS =	smallcode noicons
+CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(CPU) $(OPTIONS) -I. -I/V/include
 
 ###############################################################################
 
-OBJS = lib_base.o lib_user.o
+OBJS = \
+	lib_base.o lib_user.o
 
 ###############################################################################
 
-LIBS = lib:scnb.lib lib:amiga.lib lib:debug.lib
+LIBS = -lc -lamiga
 
 ###############################################################################
 
 all: skeleton.library
 
 skeleton.library: $(OBJS)
-	slink $(OBJS) to $@.debug lib $(LIBS) $(LFLAGS) \
-		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
-	slink $@.debug to $@ noicons nodebug
+	$(CC) -o $@.debug $(OBJS) $(CFLAGS) -Wl,--cref,-M,-Map=$@.map \
+		-nostartfiles -nostdlib $(LIBS)
+	strip --strip-all -o $@ $@.debug
 
 ###############################################################################
 
 clean:
-	-delete \#?.o skeleton.library(%|.debug)
-
-realclean: clean
-	-delete tags tagfiles \#?.map all
-
-###############################################################################
-
-install: skeleton.library
-	copy skeleton.library libs:
-
-###############################################################################
-
-mkid:
-	mkid -v \#?.(c|h|a|asm|i)
-
-update:
-	mkid -v -u
-
-version:
-	bumprev $(VERSION) skeleton.library
-
-###############################################################################
-
-cvs-tag:
-	cvs -q tag LIB_V$(VERSION)_`type skeleton.library_rev.rev`
-
-###############################################################################
-
-lib_base.o : lib_base.c lib_base.h lib_user.h skeleton.library_rev.h
-lib_user.o : lib_user.c lib_user.h lib_base.h
+	-rm -f *.o *.debug *.map skeleton.library

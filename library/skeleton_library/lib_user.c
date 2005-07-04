@@ -1,5 +1,5 @@
 /*
- * $Id: lib_user.c,v 1.1 2005-07-04 09:39:00 obarthel Exp $
+ * $Id: lib_user.c,v 1.2 2005-07-04 10:25:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,7 +31,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "lib_base.h"
 #include "lib_user.h"
 
 /****************************************************************************/
@@ -59,6 +58,12 @@ UserLibInit(struct Library * SysBase,struct UserData * ud)
 
 	/* Also remember the SysBase pointer. */
 	ud->ud_SysBase = SysBase;
+
+	#if defined(__amigaos4__)
+	{
+		ud->ud_IExec = (struct ExecIFace *)((struct ExecBase *)SysBase)->MainInterface;
+	}
+	#endif /* __amigaos4__ */
 
 	result = TRUE;
 

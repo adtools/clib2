@@ -1,0 +1,8 @@
+==id $Id: skeleton_lib.sfd,v 1.1 2005-07-04 10:25:33 obarthel Exp $
+* "skeleton.library"
+==base _SkeletonBase
+==bias 30
+==public
+==include <exec/types.h>
+*
+==end

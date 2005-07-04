@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE library SYSTEM "library.dtd">
+<library name="skeleton" basename="SkeletonBase" openname="skeleton.library">
+	<include>exec/types.h</include>
+	<interface name="main" version="1.0" struct="SkeletonIFace" prefix="_Skeleton_" asmprefix="ISkeleton" global="ISkeleton">
+		<method name="Obtain" result="ULONG"/>
+		<method name="Release" result="ULONG"/>
+		<method name="Expunge" result="void" status="unimplemented"/>
+		<method name="Clone" result="struct Interface *" status="unimplemented"/>
+	</interface>
+</library>

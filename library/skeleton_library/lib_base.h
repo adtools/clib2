@@ -1,5 +1,5 @@
 /*
- * $Id: lib_base.h,v 1.1 2005-07-04 09:39:00 obarthel Exp $
+ * $Id: lib_base.h,v 1.2 2005-07-04 10:25:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -36,6 +36,10 @@
 
 /****************************************************************************/
 
+#ifndef EXEC_EXECBASE_H
+#include <exec/execbase.h>
+#endif /* EXEC_EXECBASE_H */
+
 #ifndef EXEC_LIBRARIES_H
 #include <exec/libraries.h>
 #endif /* EXEC_LIBRARIES_H */
@@ -56,19 +60,54 @@
 
 /****************************************************************************/
 
+#if defined(USE_EXEC)
+#undef USE_EXEC
+#endif /* USE_EXEC */
+
+/****************************************************************************/
+
+#if defined(__amigaos4__)
+
+/****************************************************************************/
+
+#define USE_EXEC(sb) \
+	struct ExecIFace * IExec = (sb)->sb_IExec
+
+#define USE_LIBBASE(base) \
+	struct SkeletonIFace * ISkeleton = (struct SkeletonIFace *)(base); \
+	struct SkeletonBase * sb = (struct SkeletonBase *)ISkeleton->Data.LibBase
+
+/****************************************************************************/
+
+#else
+
+/****************************************************************************/
+
+#define USE_EXEC(sb) \
+	struct Library * SysBase = (sb)->sb_SysBase
+
+#define USE_LIBBASE(base) \
+	struct SkeletonBase * sb = (struct SkeletonBase *)(base)
+
+/****************************************************************************/
+
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
 struct SkeletonBase
 {
 	struct Library			sb_Library;
 	struct SignalSemaphore	sb_Semaphore;
 	BPTR					sb_SegmentList;
 	struct Library *		sb_SysBase;
+
+	#if defined(__amigaos4__)
+	struct ExecIFace *		sb_IExec;
+	#endif /* __amigaos4__ */
+
 	struct UserData *		sb_UserData;
 };
-
-/****************************************************************************/
-
-#define USE_EXEC(sb) \
-	struct Library * SysBase = (sb)->sb_SysBase
 
 /****************************************************************************/
 
