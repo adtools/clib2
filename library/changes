@@ -45,6 +45,12 @@
   Amiga shared library/device code. Some documentation on how to use them
   can be found in the <dos.h> header file.
 
+- Added a complete shared library skeleton example to demonstrate how the
+  clib2 shared library initialization/cleanup functions should be used.
+  This is a dual-build library which will both work with the plain 68k
+  AmigaOS and the PowerPC native AmigaOS4. The example source code can be
+  found in the "skeleton_library" subdirectory.
+
 
 c.lib 1.193 (4.6.2005)
 
