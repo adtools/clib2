@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcsendbreak.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_tcsendbreak.c,v 1.2 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -63,12 +63,16 @@ tcsendbreak(int file_descriptor,int duration)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	__stdio_lock();
+
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL || FLAG_IS_CLEAR(fd->fd_Flags,FDF_TERMIOS))
 	{
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	assert( fd->fd_Aux != NULL );
 
@@ -102,6 +106,10 @@ tcsendbreak(int file_descriptor,int duration)
 	}
 
  out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

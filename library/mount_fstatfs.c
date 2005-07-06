@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.11 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: mount_fstatfs.c,v 1.12 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,8 @@ fstatfs(int file_descriptor, struct statfs *buf)
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	__stdio_lock();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -134,6 +136,8 @@ fstatfs(int file_descriptor, struct statfs *buf)
  out:
 
 	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	UnLock(parent_dir);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.12 2005-04-24 09:53:12 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.13 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,8 @@ ftruncate(int file_descriptor, off_t length)
 		__check_abort();
 
 	PROFILE_OFF();
+
+	__stdio_lock();
 
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
@@ -199,6 +201,8 @@ ftruncate(int file_descriptor, off_t length)
 		Seek(fd->fd_DefaultFile,initial_position,OFFSET_CURRENT);
 
 	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	PROFILE_ON();
 

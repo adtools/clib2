@@ -1,5 +1,5 @@
 /*
- * $Id: uio_readv.c,v 1.3 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: uio_readv.c,v 1.4 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,8 @@ readv(int file_descriptor,const struct iovec *iov,int vec_count)
 	SHOWPOINTER(iov);
 	SHOWVALUE(vec_count);
 
+	__stdio_lock();
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
 		if(iov == NULL)
@@ -97,6 +99,8 @@ readv(int file_descriptor,const struct iovec *iov,int vec_count)
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	total_num_bytes_read = 0;
 	part_num_bytes_read = 0;
@@ -142,7 +146,11 @@ readv(int file_descriptor,const struct iovec *iov,int vec_count)
 
 	result = total_num_bytes_read;
 
-out:
+ out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

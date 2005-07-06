@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcflow.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_tcflow.c,v 1.2 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,17 +48,25 @@ tcflow(int file_descriptor,int UNUSED action)
 	SHOWVALUE(file_descriptor);
 	SHOWVALUE(action);
 
-	fd=__get_file_descriptor(file_descriptor);
+	__stdio_lock();
+
+	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
 		__set_errno(EBADF);
 		goto out;
 	}
 
+	__fd_lock(fd);
+
 	/* XXX TODO */
 	result = OK;
 
  out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

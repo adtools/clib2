@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcsetattr.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_tcsetattr.c,v 1.2 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,6 +42,7 @@ set_console_termios(struct fd *fd,struct termios *new_tios)
 {
 	struct termios *old_tios;
 	int result = ERROR;
+	BPTR file;
 
 	/* TODO: Check for some "impossible" combinations here? */
 
@@ -52,15 +53,68 @@ set_console_termios(struct fd *fd,struct termios *new_tios)
 	if(old_tios->type != TIOST_CONSOLE)
 		goto out;
 
+	file = fd->fd_DefaultFile;
+
+	#if defined(__THREAD_SAFE)
+	{
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+		{
+			switch(fd->fd_DefaultFile)
+			{
+				case STDIN_FILENO:
+
+					file = Input();
+					break;
+
+				case STDOUT_FILENO:
+
+					file = Output();
+					break;
+
+				case STDERR_FILENO:
+
+					#if defined(__amigaos4__)
+					{
+						file = ErrorOutput();
+					}
+					#else
+					{
+						struct Process * this_process = (struct Process *)FindTask(NULL);
+
+						file = this_process->pr_CES;
+					}
+					#endif /* __amigaos4__ */
+
+					/* The following is rather controversial; if the standard error stream
+					   is unavailable, we default to reuse the standard output stream. This
+					   is problematic if the standard output stream was redirected and should
+					   not be the same as the standard error output stream. */
+					if(file == ZERO)
+						file = Output();
+
+					break;
+
+				default:
+
+					file = ZERO;
+					break;
+			}
+		}
+	}
+	#endif /* __THREAD_SAFE */
+
+	if(file == ZERO)
+		goto out;
+
 	if(FLAG_IS_CLEAR(new_tios->c_lflag,ICANON))
 	{
-		SetMode(fd->fd_DefaultFile,DOSTRUE); /* Set Raw = Non-Canonical mode. */
+		SetMode(file,DOSTRUE); /* Set Raw = Non-Canonical mode. */
 
 		SET_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 	}
 	else
 	{
-		SetMode(fd->fd_DefaultFile,DOSFALSE); /* Set Cooked = Canonical mode. */
+		SetMode(file,DOSFALSE); /* Set Cooked = Canonical mode. */
 
 		CLEAR_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 	}
@@ -81,9 +135,11 @@ int
 tcsetattr(int file_descriptor,int how,struct termios *tios)
 {
 	int result = ERROR;
-	struct fd *fd_Term;
+	struct fd *fd;
 	struct termios new_tios;
 	int type;
+
+	__stdio_lock();
 
 	if(tios == NULL)
 	{
@@ -91,14 +147,16 @@ tcsetattr(int file_descriptor,int how,struct termios *tios)
 		goto out;
 	}
 
-	fd_Term = __get_file_descriptor(file_descriptor);
-	if(fd_Term == NULL)
+	fd = __get_file_descriptor(file_descriptor);
+	if(fd == NULL)
 	{
 		SHOWMSG("tcsetattr() was not called with a file descriptor.\n");
 
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	/* The following is in case the termios structure was manually constructed. (it should have been zero:ed in that case)  */
 	if(tios->type == TIOST_INVALID)
@@ -136,7 +194,7 @@ tcsetattr(int file_descriptor,int how,struct termios *tios)
 				goto out;
 		}
 
-		if(set_console_termios(fd_Term,tios) != OK)
+		if(set_console_termios(fd,tios) != OK)
 		{
 			__set_errno(EIO);
 			goto out;
@@ -150,7 +208,11 @@ tcsetattr(int file_descriptor,int how,struct termios *tios)
 
 	result = OK;
 
-out:
+ out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	return(result);
 }

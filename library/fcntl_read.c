@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_read.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: fcntl_read.c,v 1.9 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,8 +51,8 @@ ssize_t
 read(int file_descriptor, void * buffer, size_t num_bytes)
 {
 	ssize_t num_bytes_read;
+	struct fd * fd = NULL;
 	ssize_t result = EOF;
-	struct fd * fd;
 
 	ENTER();
 
@@ -65,6 +65,8 @@ read(int file_descriptor, void * buffer, size_t num_bytes)
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	__stdio_lock();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -88,6 +90,8 @@ read(int file_descriptor, void * buffer, size_t num_bytes)
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_READ))
 	{
@@ -124,6 +128,10 @@ read(int file_descriptor, void * buffer, size_t num_bytes)
 	result = num_bytes_read;
 
  out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

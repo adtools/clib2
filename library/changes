@@ -29,7 +29,7 @@
 - Fixed a bug in vfprintf that would surface when the buffer was enlarged
   if the pattern was too large to fit the static internal buffer <tfrieden>
 
-- Added file system names to statfx <tfrieden>
+- Added file system names to statfs <tfrieden>
 
 - Moved all the constructor code out of "stdlib_init_exit.c" and into the
   files which initialize global data, such as the new "stdlib_program_name.c"
@@ -50,6 +50,11 @@
   This is a dual-build library which will both work with the plain 68k
   AmigaOS and the PowerPC native AmigaOS4. The example source code can be
   found in the "skeleton_library" subdirectory.
+
+- The thread-safe version of isatty() should now work for stdio
+  file descriptors, too.
+
+- Retrofitted thread-safety into the termios code.
 
 
 c.lib 1.193 (4.6.2005)

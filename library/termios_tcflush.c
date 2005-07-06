@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcflush.c,v 1.2 2005-06-04 13:57:08 obarthel Exp $
+ * $Id: termios_tcflush.c,v 1.3 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,6 +52,7 @@ tcflush(int file_descriptor,int queue)
 	struct fd *fd;
 	char buf[64];
 	struct termios *tios;
+	BPTR file;
 
 	ENTER();
 
@@ -60,12 +61,16 @@ tcflush(int file_descriptor,int queue)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	__stdio_lock();
+
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL || FLAG_IS_CLEAR(fd->fd_Flags,FDF_TERMIOS))
 	{
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	if(queue < TCIFLUSH || queue > TCIOFLUSH)
 	{
@@ -75,27 +80,83 @@ tcflush(int file_descriptor,int queue)
 		goto out;
 	}
 
+	file = fd->fd_DefaultFile;
+
+	#if defined(__THREAD_SAFE)
+	{
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+		{
+			switch(fd->fd_DefaultFile)
+			{
+				case STDIN_FILENO:
+
+					file = Input();
+					break;
+
+				case STDOUT_FILENO:
+
+					file = Output();
+					break;
+
+				case STDERR_FILENO:
+
+					#if defined(__amigaos4__)
+					{
+						file = ErrorOutput();
+					}
+					#else
+					{
+						struct Process * this_process = (struct Process *)FindTask(NULL);
+
+						file = this_process->pr_CES;
+					}
+					#endif /* __amigaos4__ */
+
+					/* The following is rather controversial; if the standard error stream
+					   is unavailable, we default to reuse the standard output stream. This
+					   is problematic if the standard output stream was redirected and should
+					   not be the same as the standard error output stream. */
+					if(file == ZERO)
+						file = Output();
+
+					break;
+
+				default:
+
+					file = ZERO;
+					break;
+			}
+		}
+	}
+	#endif /* __THREAD_SAFE */
+
 	tios = fd->fd_Aux;
 
 	if(queue == TCIFLUSH || queue == TCIOFLUSH)
 	{
 		LONG num_bytes_read;
 
+		if(file == ZERO)
+		{
+			__set_errno(EBADF);
+			goto out;
+		}
+
 		/* Set raw mode so we can read without blocking. */
 		if(FLAG_IS_SET(tios->c_lflag,ICANON))
 		{
-			SetMode(fd->fd_DefaultFile,DOSTRUE);
+			SetMode(file,DOSTRUE);
 
 			SET_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 		}
 
-		while(WaitForChar(fd->fd_DefaultFile,1) != DOSFALSE)
+		while(WaitForChar(file,1) != DOSFALSE)
 		{
 			if(__check_abort_enabled)
 				__check_abort();
 
 			/* Read away available data. (upto 8k) */
-			num_bytes_read = Read(fd->fd_DefaultFile,buf,64);
+			num_bytes_read = Read(file,buf,64);
 			if(num_bytes_read == ERROR || num_bytes_read == 0)
 				break;
 		}
@@ -103,7 +164,7 @@ tcflush(int file_descriptor,int queue)
 		/* Restore the Raw/Cooked mode. */
 		if(FLAG_IS_SET(tios->c_lflag,ICANON))
 		{
-			SetMode(fd->fd_DefaultFile,DOSFALSE); /* Set Cooked = Canonical mode. */
+			SetMode(file,DOSFALSE); /* Set Cooked = Canonical mode. */
 
 			CLEAR_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 		}
@@ -119,6 +180,10 @@ tcflush(int file_descriptor,int queue)
 	}
 
  out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

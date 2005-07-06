@@ -1,5 +1,5 @@
 /*
- * $Id: stat_fchmod.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stat_fchmod.c,v 1.11 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,8 @@ fchmod(int file_descriptor, mode_t mode)
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	__stdio_lock();
 
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
@@ -168,6 +170,8 @@ fchmod(int file_descriptor, mode_t mode)
  out:
 
 	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	if(current_dir_changed)
 		CurrentDir(old_current_dir);

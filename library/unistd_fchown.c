@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fchown.c,v 1.10 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: unistd_fchown.c,v 1.11 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,8 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 
 	if(__check_abort_enabled)
 		__check_abort();
+
+	__stdio_lock();
 
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
@@ -181,6 +183,8 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 		CurrentDir(old_current_dir);
 
 	PROFILE_ON();
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

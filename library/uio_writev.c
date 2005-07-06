@@ -1,5 +1,5 @@
 /*
- * $Id: uio_writev.c,v 1.3 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: uio_writev.c,v 1.4 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ writev(int file_descriptor,const struct iovec *iov,int vec_count)
 	struct file_action_message msg;
 	ssize_t total_num_bytes_written;
 	char * buffer = NULL;
-	struct fd * fd;
+	struct fd * fd = NULL;
 	int i;
 
 	ENTER();
@@ -62,6 +62,8 @@ writev(int file_descriptor,const struct iovec *iov,int vec_count)
 	SHOWVALUE(file_descriptor);
 	SHOWPOINTER(iov);
 	SHOWVALUE(vec_count);
+
+	__stdio_lock();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -97,6 +99,8 @@ writev(int file_descriptor,const struct iovec *iov,int vec_count)
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	buffer = malloc(total_num_bytes_written);
 	if(buffer != NULL)
@@ -143,10 +147,14 @@ writev(int file_descriptor,const struct iovec *iov,int vec_count)
 
 	result = total_num_bytes_written;
 
-out:
+ out:
 
 	if(buffer != NULL)
 		free(buffer);
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcdrain.c,v 1.1 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_tcdrain.c,v 1.2 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,6 +49,7 @@ tcdrain(int file_descriptor)
 	int result = ERROR;
 	struct fd *fd;
 	struct termios *tios;
+	BPTR file;
 
 	ENTER();
 
@@ -57,12 +58,66 @@ tcdrain(int file_descriptor)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	__stdio_lock();
+
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
+
+	file = fd->fd_DefaultFile;
+
+	#if defined(__THREAD_SAFE)
+	{
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+		{
+			switch(fd->fd_DefaultFile)
+			{
+				case STDIN_FILENO:
+
+					file = Input();
+					break;
+
+				case STDOUT_FILENO:
+
+					file = Output();
+					break;
+
+				case STDERR_FILENO:
+
+					#if defined(__amigaos4__)
+					{
+						file = ErrorOutput();
+					}
+					#else
+					{
+						struct Process * this_process = (struct Process *)FindTask(NULL);
+
+						file = this_process->pr_CES;
+					}
+					#endif /* __amigaos4__ */
+
+					/* The following is rather controversial; if the standard error stream
+					   is unavailable, we default to reuse the standard output stream. This
+					   is problematic if the standard output stream was redirected and should
+					   not be the same as the standard error output stream. */
+					if(file == ZERO)
+						file = Output();
+
+					break;
+
+				default:
+
+					file = ZERO;
+					break;
+			}
+		}
+	}
+	#endif /* __THREAD_SAFE */
 
 	if(FLAG_IS_SET(fd->fd_Flags,FDF_TERMIOS))
 	{
@@ -72,10 +127,16 @@ tcdrain(int file_descriptor)
 		{
 			case TIOST_CONSOLE:
 
+				if(file == ZERO)
+				{
+					__set_errno(EBADF);
+					goto out;
+				}
+
 				/* This also discards any buffered input, but it does
 				   not appear possible to drain the output buffer
 				   otherwise. (?) */
-				if(CANNOT Flush(fd->fd_DefaultFile))
+				if(CANNOT Flush(file))
 					goto out;
 
 				break;
@@ -94,6 +155,10 @@ tcdrain(int file_descriptor)
 	}
 
  out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

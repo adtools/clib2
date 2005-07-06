@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_lseek.c,v 1.9 2005-04-24 09:53:11 obarthel Exp $
+ * $Id: fcntl_lseek.c,v 1.10 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,8 +46,8 @@ lseek(int file_descriptor, off_t offset, int mode)
 {
 	struct file_action_message fam;
 	off_t result = SEEK_ERROR;
+	struct fd * fd = NULL;
 	off_t position;
-	struct fd * fd;
 
 	ENTER();
 
@@ -62,12 +62,16 @@ lseek(int file_descriptor, off_t offset, int mode)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	__stdio_lock();
+
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
 		__set_errno(EBADF);
 		goto out;
 	}
+
+	__fd_lock(fd);
 
 	if(mode < SEEK_SET || mode > SEEK_END)
 	{
@@ -103,6 +107,10 @@ lseek(int file_descriptor, off_t offset, int mode)
 	result = position;
 
  out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_isatty.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: unistd_isatty.c,v 1.7 2005-07-06 18:48:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,6 +58,8 @@ isatty(int file_descriptor)
 	if(__check_abort_enabled)
 		__check_abort();
 
+	__stdio_lock();
+
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
@@ -65,12 +67,82 @@ isatty(int file_descriptor)
 		goto out;
 	}
 
-	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-		result = 1;
-	else
-		result = 0;
+	__fd_lock(fd);
+
+	#if defined(__THREAD_SAFE)
+	{
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+		{
+			BPTR file;
+
+			switch(fd->fd_DefaultFile)
+			{
+				case STDIN_FILENO:
+
+					file = Input();
+					break;
+
+				case STDOUT_FILENO:
+
+					file = Output();
+					break;
+
+				case STDERR_FILENO:
+
+					#if defined(__amigaos4__)
+					{
+						file = ErrorOutput();
+					}
+					#else
+					{
+						struct Process * this_process = (struct Process *)FindTask(NULL);
+
+						file = this_process->pr_CES;
+					}
+					#endif /* __amigaos4__ */
+
+					/* The following is rather controversial; if the standard error stream
+					   is unavailable, we default to reuse the standard output stream. This
+					   is problematic if the standard output stream was redirected and should
+					   not be the same as the standard error output stream. */
+					if(file == ZERO)
+						file = Output();
+
+					break;
+
+				default:
+
+					file = ZERO;
+					break;
+			}
+
+			if(file != ZERO && IsInteractive(file))
+				result = 1;
+			else
+				result = 0;
+		}
+		else
+		{
+			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+				result = 1;
+			else
+				result = 0;
+		}
+	}
+	#else
+	{
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+			result = 1;
+		else
+			result = 0;
+	}
+	#endif /* __THREAD_SAFE */
 
  out:
+
+	__fd_unlock(fd);
+
+	__stdio_unlock();
 
 	RETURN(result);
 	return(result);
