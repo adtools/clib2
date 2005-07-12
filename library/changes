@@ -56,6 +56,15 @@
 
 - Retrofitted thread-safety into the termios code.
 
+- The socket/usergroup API function and data type definitions that used to
+  be defined in <unistd.h> have been moved into a separate header file
+  <sys/clib2_net.h> which, for backwards compatibility, can be include
+  from within <unistd.h> if the preprocessor symbol __USE_CLIB2_NETLIB
+  is defined early on. Eventually, <sys/clib2_net.h> should be removed
+  from the general header files and become a local library build header
+  file altogether. Note that in this case you would have to build your
+  own software using common TCP/IP SDK header files.
+
 
 c.lib 1.193 (4.6.2005)
 

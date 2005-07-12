@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.48 2005-07-03 10:36:47 obarthel Exp $
+# $Id: smakefile,v 1.49 2005-07-12 13:35:53 obarthel Exp $
 #
 # :ts=8
 #
@@ -36,7 +36,7 @@ INCLUDE_DIR = V:include
  CPU		= cpu=060
 MATH		= define=IEEE_FLOATING_POINT_SUPPORT math=IEEE
 SUPPORT		= define=UNIX_PATH_SEMANTICS define=SOCKET_SUPPORT define=USERGROUP_SUPPORT \
-		  define=__C_MACROS__ define=__THREAD_SAFE
+		  define=__C_MACROS__ define=__THREAD_SAFE define=__USE_CLIB2_NETLIB
 
 ##############################################################################
 
