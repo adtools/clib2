@@ -65,6 +65,8 @@
   file altogether. Note that in this case you would have to build your
   own software using common TCP/IP SDK header files.
 
+- <sys/types.h> now also includes <time.h> and <stddef.h>.
+
 
 c.lib 1.193 (4.6.2005)
 
