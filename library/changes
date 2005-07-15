@@ -1,3 +1,5 @@
+c.lib 1.194 (15.7.2005)
+
 - Added getopt_long to libunix.a <tfrieden>
 
 - Added new libprofile.a which implements gprof gmon.out output <tfrieden>
