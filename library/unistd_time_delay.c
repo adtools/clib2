@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_time_delay.c,v 1.5 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: unistd_time_delay.c,v 1.6 2005-08-02 10:18:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,7 +106,7 @@ __time_delay(unsigned long seconds,unsigned long microseconds)
 			{
 				ULONG seconds_now;
 
-				if(CheckIO((struct IORequest *)__timer_request))
+				if(CheckIO((struct IORequest *)__timer_request) == BUSY)
 					AbortIO((struct IORequest *)__timer_request);
 
 				WaitIO((struct IORequest *)__timer_request);

@@ -1,3 +1,7 @@
+- In __time_delay() the CheckIO() test was wrong and should have
+  tested for a request still in progress. Fixed.
+
+
 c.lib 1.194 (15.7.2005)
 
 - Added getopt_long to libunix.a <tfrieden>

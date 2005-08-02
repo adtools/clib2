@@ -1,5 +1,5 @@
 /*
- * $Id: macros.h,v 1.20 2005-05-27 13:19:30 obarthel Exp $
+ * $Id: macros.h,v 1.21 2005-08-02 10:18:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,6 +42,7 @@
 
 /****************************************************************************/
 
+#define BUSY ((struct IORequest *)NULL)
 #define CANNOT !
 #define DO_NOTHING ((void)0)
 #define NO !
