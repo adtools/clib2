@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.12 2005-08-15 10:17:47 obarthel Exp $
+ * $Id: socket_select.c,v 1.13 2005-08-15 10:43:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -329,6 +329,14 @@ map_descriptor_sets(
 					if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
 					{
 						SHOWMSG("file is unusable; we cannot examine the file.");
+						continue;
+					}
+
+					/* If we can't make assumptions about the file position, then
+					   this better be a pipe. */
+					if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_CACHE_POSITION) && fib->fib_DirEntryType != ST_PIPEFILE)
+					{
+						SHOWMSG("file is unusable; it is not a file system and not a pipe.");
 						continue;
 					}
 				}
