@@ -1,6 +1,18 @@
 - In __time_delay() the CheckIO() test was wrong and should have
   tested for a request still in progress. Fixed.
 
+- Modified select() to support plain files, too. The new code now
+  compares the current file position against the current file size,
+  if that file is on a file system, or simply checks if there is
+  any data in the file (which works for the default PIPE: device).
+
+- The raw file descriptor structure member fd_Position is now
+  always updated, regardless of whether the file supports random
+  access or not.
+
+- The wildcard escape character used in __wildcard_expand_init() was
+  wrong. It should have been "'" but it was "`". Fixed.
+
 
 c.lib 1.194 (15.7.2005)
 
@@ -24,7 +36,7 @@ c.lib 1.194 (15.7.2005)
 
 - The pattern matching code which expands command line arguments, as part
   of libunix.a, now translates the "*" wildcard into "#?" unless you prefix
-  it with a backtick ("`"), which is the wildcard pattern escape character
+  it with a backtick ("'"), which is the wildcard pattern escape character
   used on AmigaOS.
 
 - Repaired the pattern matching code which expands command line arguments:

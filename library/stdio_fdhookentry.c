@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.30 2005-04-24 09:53:11 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.31 2005-08-15 10:17:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -172,8 +172,7 @@ __fd_hook_entry(
 				goto out;
 			}
 
-			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-				fd->fd_Position += (ULONG)result;
+			fd->fd_Position += (ULONG)result;
 
 			break;
 
@@ -197,10 +196,7 @@ __fd_hook_entry(
 				   overflow. */
 				position = Seek(file,0,OFFSET_END);
 				if(position != SEEK_ERROR || IoErr() == OK)
-				{
-					if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-						fd->fd_Position = Seek(file,0,OFFSET_CURRENT);
-				}
+					fd->fd_Position = Seek(file,0,OFFSET_CURRENT);
 
 				PROFILE_ON();
 
@@ -229,8 +225,7 @@ __fd_hook_entry(
 				goto out;
 			}
 
-			if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-				fd->fd_Position += (ULONG)result;
+			fd->fd_Position += (ULONG)result;
 
 			break;
 
@@ -537,8 +532,7 @@ __fd_hook_entry(
 					#endif /* UNIX_PATH_SEMANTICS */
 				}
 
-				if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
-					fd->fd_Position = new_position;
+				fd->fd_Position = new_position;
 			}
 
 			result = new_position;

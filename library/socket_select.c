@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select.c,v 1.11 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: socket_select.c,v 1.12 2005-08-15 10:17:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -308,14 +308,30 @@ map_descriptor_sets(
 			}
 			else
 			{
-				/* We only watch files bound to console streams. */
-				if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_INTERACTIVE) || FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+				/* We watch files bound to console streams and disk
+				   files which may have data stored in them. */
+				if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
 				{
 					SHOWMSG("this is a file, or otherwise unsuitable");
 					continue;
 				}
 
-				SHOWMSG("this is an interactive stream");
+				if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+				{
+					SHOWMSG("this is an interactive stream");
+				}
+				else
+				{
+					D_S(struct FileInfoBlock,fib);
+
+					/* Let's see if we can examine the file. Some file systems
+					   may not support this. */
+					if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
+					{
+						SHOWMSG("file is unusable; we cannot examine the file.");
+						continue;
+					}
+				}
 
 				if(file_fds != NULL && file_fd < num_file_fds)
 				{
@@ -766,8 +782,35 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 								/* Does this one have input? */
 								PROFILE_OFF();
 
-								if(WaitForChar(fd->fd_DefaultFile,1))
-									got_input = TRUE;
+								if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+								{
+									/* For an interactive stream, we simply ask. */
+									if(WaitForChar(fd->fd_DefaultFile,1))
+										got_input = TRUE;
+								}
+								else
+								{
+									D_S(struct FileInfoBlock,fib);
+
+									/* For a file we check how much data is now in the file and
+									   compare it against the current file position. If there's
+									   unread data in the file, we will be able to read from it.
+									   For pipes, any data reported to be in the "file" indicates
+									   that there is something worth reading available. */
+									if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+									{
+										if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
+										{
+											if((ULONG)fib->fib_FileSize > fd->fd_Position)
+												got_input = TRUE;
+										}
+										else
+										{
+											if(fib->fib_FileSize != 0)
+												got_input = TRUE;
+										}
+									}
+								}
 
 								PROFILE_ON();
 							}
@@ -925,8 +968,29 @@ select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct 
 
 								PROFILE_OFF();
 
-								if(WaitForChar(fd->fd_DefaultFile,1))
-									got_input = TRUE;
+								if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+								{
+									if(WaitForChar(fd->fd_DefaultFile,1))
+										got_input = TRUE;
+								}
+								else
+								{
+									D_S(struct FileInfoBlock,fib);
+
+									if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+									{
+										if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
+										{
+											if((ULONG)fib->fib_FileSize > fd->fd_Position)
+												got_input = TRUE;
+										}
+										else
+										{
+											if(fib->fib_FileSize != 0)
+												got_input = TRUE;
+										}
+									}
+								}
 
 								PROFILE_ON();
 							}
