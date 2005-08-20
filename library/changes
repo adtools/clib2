@@ -13,6 +13,9 @@
 - The wildcard escape character used in __wildcard_expand_init() was
   wrong. It should have been "'" but it was "`". Fixed.
 
+- The startup code now references the linker symbol generated for
+  the user-supplied main() function.
+
 
 c.lib 1.194 (15.7.2005)
 

@@ -1,5 +1,5 @@
 |
-|	$Id: nrcrt0.S,v 1.2 2005-01-02 09:07:07 obarthel Exp $
+|	$Id: nrcrt0.S,v 1.3 2005-08-20 14:25:20 obarthel Exp $
 |
 |	:ts=4
 |
@@ -56,6 +56,7 @@ MEMF_CLEAR = 65536
 
 	.text
 
+	.globl  _main
 	.globl	__main
 	.globl	___is_resident
 

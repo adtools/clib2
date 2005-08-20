@@ -1,11 +1,12 @@
 //
-//	$Id: crt0.S,v 1.3 2005-06-26 12:02:56 tfrieden Exp $
+//	$Id: crt0.S,v 1.4 2005-08-20 14:25:20 obarthel Exp $
 //
 //	:ts=4
 //
 
 	.text
 
+	.globl  main
 	.globl  _main
 	.globl  _start
 
