@@ -1,5 +1,5 @@
 /*
- * $Id: test.c,v 1.5 2005-05-18 07:22:52 obarthel Exp $
+ * $Id: test.c,v 1.6 2005-08-26 12:21:51 obarthel Exp $
  *
  * :ts=4
  */
@@ -52,7 +52,7 @@ destructor_test2(void)
 void __attribute__ ((destructor))
 destructor_test3(void)
 {
-	DebugPrintF("__iob = 0x%08lx\n",__iob);
+	/*DebugPrintF("__iob = 0x%08lx\n",__iob);*/
 
 	fprintf(stderr,"destructor #3 called\n");
 }
