@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_rename.c,v 1.8 2005-04-24 09:53:12 obarthel Exp $
+ * $Id: stdio_rename.c,v 1.9 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,6 +81,14 @@ rename(const char *oldname,const char *newname)
 	{
 		if(__unix_path_semantics)
 		{
+			if(oldname[0] == '\0' || newname[0] == '\0')
+			{
+				SHOWMSG("no name given");
+
+				__set_errno(ENOENT);
+				goto out;
+			}
+
 			if(__translate_unix_to_amiga_path_name(&oldname,&old_nti) != 0)
 				goto out;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: math_log.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_log.c,v 1.7 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -252,8 +252,7 @@ log(double x)
 	{
 		__set_errno(ERANGE);
 
-		/* This should really be minus infinity. */
-		result = (-__get_huge_val());
+		result = -__inf();
 	}
 
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: math_logb.c,v 1.6 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: math_logb.c,v 1.7 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,7 +101,7 @@ logb(double x)
 
 	if(x == 0.0)
 	{
-		result = -__get_huge_val();
+		result = -__inf();
 		goto out;
 	}
 

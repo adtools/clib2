@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_realpath.c,v 1.5 2005-02-28 10:07:32 obarthel Exp $
+ * $Id: unistd_realpath.c,v 1.6 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -82,8 +82,19 @@ realpath(const char * path_name, char * buffer)
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
-		if(__unix_path_semantics && __translate_unix_to_amiga_path_name(&path_name,&path_name_nti) != 0)
-			goto out;
+		if(__unix_path_semantics)
+		{
+			if(path_name[0] == '\0')
+			{
+				SHOWMSG("no name given");
+
+				__set_errno(ENOENT);
+				goto out;
+			}
+
+			if(__translate_unix_to_amiga_path_name(&path_name,&path_name_nti) != 0)
+				goto out;
+		}
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 

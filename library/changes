@@ -16,6 +16,22 @@
 - The startup code now references the linker symbol generated for
   the user-supplied main() function.
 
+- log(+/-0), logb(+/-0), log10(+/-0) now return -infinity.
+
+- getcwd() now considers a buffer size of 0 an error, and it sets
+  the errno code to ERANGE if the buffer is too small.
+
+- With Unix path semantics enabled, rename() now fails if either
+  the old or the new name are empty strings. Same thing for
+  opendir(), utime(), unlink(), chown(), link(), readlink(),
+  realpath(), chdir(), access(), stat(), rmdir(), lstat(),
+  chmod(), statfs() and open()/fopen().
+
+- Fixed several issues with the formatted output of strftime()
+  for the "C" locale: "%p" could return " PM", "%c" is now
+  equivalent to "%a %b %e %T %Y", "%x" is equivalent to "%m/%d/%y"
+  and "%X" is now equivalent to "%T".
+
 
 c.lib 1.194 (15.7.2005)
 

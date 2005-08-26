@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_link.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: unistd_link.c,v 1.7 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,6 +84,14 @@ link(const char * existing_path,const char * new_path)
 	{
 		if(__unix_path_semantics)
 		{
+			if(existing_path[0] == '\0' || new_path[0] == '\0')
+			{
+				SHOWMSG("no name given");
+
+				__set_errno(ENOENT);
+				goto out;
+			}
+
 			if(__translate_unix_to_amiga_path_name(&existing_path,&existing_path_name_nti) != 0)
 				goto out;
 

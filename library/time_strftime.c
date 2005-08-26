@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.16 2005-05-19 13:57:52 obarthel Exp $
+ * $Id: time_strftime.c,v 1.17 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -233,10 +233,10 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				store_string_via_hook(str,-1,hook);
 				break;
 
-			/* Locale specific date and time ("%a %b %d %H:%M:%S %Y"). */
+			/* Locale specific date and time ("%a %b %e %T %Y"). */
 			case 'c':
 
-				format_date("%a %b %d %H:%M:%S %Y",tm,hook);
+				format_date("%a %b %e %T %Y",tm,hook);
 				break;
 
 			/* The century number ("00"-"99"; C99). */
@@ -367,7 +367,7 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 
 				assert( 0 <= tm->tm_hour && tm->tm_hour <= 23 );
 
-				store_string_via_hook((tm->tm_hour < 12) ? "AM" :" PM",2,hook);
+				store_string_via_hook((tm->tm_hour < 12) ? "AM" : "PM",2,hook);
 				break;
 
 			/* 12 hour clock time (C99). */
@@ -451,16 +451,16 @@ format_date(const char *format,const struct tm *tm,struct Hook * hook)
 				store_string_via_hook(buffer,2,hook);
 				break;
 
-			/* Locale-specific date ("%a %b %d, %Y"). */
+			/* Locale-specific date ("%m/%d/%y"). */
 			case 'x':
 
-				format_date("%a %b %d, %Y",tm,hook);
+				format_date("%m/%d/%y",tm,hook);
 				break;
 
-			/* Locale-specific time ("%H:%M:%S"). */
+			/* Locale-specific time ("%T"). */
 			case 'X':
 
-				format_date("%H:%M:%S",tm,hook);
+				format_date("%T",tm,hook);
 				break;
 
 			/* Year without century ("00"-"99"). */

@@ -1,5 +1,5 @@
 /*
- * $Id: stat_stat.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: stat_stat.c,v 1.9 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -93,6 +93,14 @@ stat(const char * path_name, struct stat * st)
 	{
 		if(__unix_path_semantics)
 		{
+			if(path_name[0] == '\0')
+			{
+				SHOWMSG("no name given");
+
+				__set_errno(ENOENT);
+				goto out;
+			}
+
 			if(__translate_unix_to_amiga_path_name(&path_name,&path_name_nti) != 0)
 				goto out;
 

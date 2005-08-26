@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_getcwd.c,v 1.8 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: unistd_getcwd.c,v 1.9 2005-08-26 12:39:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,14 +77,22 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 	SHOWVALUE(buffer_size);
 
 	assert( buffer != NULL );
-	assert( (int)buffer_size >= 0 );
+	assert( (int)buffer_size > 0 );
 
 	if(__check_abort_enabled)
 		__check_abort();
 
+	if(buffer_size == 0)
+	{
+		SHOWMSG("invalid buffer size");
+
+		__set_errno(EINVAL);
+		goto out;
+	}
+
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		if(buffer == NULL || buffer_size == 0)
+		if(buffer == NULL)
 		{
 			SHOWMSG("invalid buffer parameter");
 
@@ -111,10 +119,6 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 	   a custom buffer for the result to be returned. */
 	if(buffer == NULL)
 	{
-		/* If the buffer size is not given, use the maximum we support. */
-		if(buffer_size == 0)
-			buffer_size = MAXPATHLEN;
-
 		buffer_allocated = __malloc(buffer_size,file,line);
 		if(buffer_allocated == NULL)
 		{
@@ -131,16 +135,15 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 	{
 		if(__current_path_name[0] != '\0')
 		{
-			if(buffer_size == 0)
+			if(buffer_size < strlen(__current_path_name) + 1)
 			{
-				__set_errno(ENOMEM);
+				SHOWMSG("buffer is too small");
+
+				__set_errno(ERANGE);
 				goto out;
 			}
 
-			assert( (int)buffer_size > 0 );
-
-			memmove(buffer,__current_path_name,buffer_size-1);
-			buffer[buffer_size-1] = '\0';
+			strcpy(buffer,__current_path_name);
 
 			D(("returning absolute path name '%s'",buffer));
 
@@ -159,9 +162,20 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 
 		if(status == DOSFALSE)
 		{
+			int errno_code;
+			LONG io_error;
+
 			SHOWMSG("could not get name from lock");
 
-			__set_errno(__translate_io_error_to_errno(IoErr()));
+			io_error = IoErr();
+
+			/* Was the buffer too small? */
+			if(io_error == ERROR_LINE_TOO_LONG)
+				errno_code = ERANGE;
+			else
+				errno_code = __translate_io_error_to_errno(io_error);
+
+			__set_errno(errno_code);
 			goto out;
 		}
 
@@ -172,23 +186,18 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 				const char * path_name = buffer;
 				size_t len;
 
-				if(buffer_size == 0)
-				{
-					__set_errno(ENOMEM);
-					goto out;
-				}
-
-				assert( (int)buffer_size > 0 );
-
 				if(__translate_amiga_to_unix_path_name(&path_name,&buffer_nti) != 0)
 					goto out;
 
-				len = strlen(path_name);
-				if(len > buffer_size-1)
-					len = buffer_size-1;
+				if(buffer_size < strlen(path_name) + 1)
+				{
+					SHOWMSG("buffer is too small");
 
-				memmove(buffer,path_name,len);
-				buffer[len] = '\0';
+					__set_errno(ERANGE);
+					goto out;
+				}
+
+				strcpy(buffer,path_name);
 			}
 		}
 		#endif /* UNIX_PATH_SEMANTICS */

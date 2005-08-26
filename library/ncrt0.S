@@ -1,5 +1,5 @@
 |
-|	$Id: ncrt0.S,v 1.3 2005-08-20 14:25:20 obarthel Exp $
+|	$Id: ncrt0.S,v 1.4 2005-08-26 12:39:33 obarthel Exp $
 |
 |	:ts=4
 |
@@ -35,7 +35,7 @@
 
 	.text
 
-	.globl  _main
+	.globl  _main	| This enforces linkage against the main() function
 	.globl	__main
 
 |-----------------------------------------------------------------------------
