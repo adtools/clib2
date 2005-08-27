@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.9 2005-08-26 12:21:51 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.10 2005-08-27 12:52:26 obarthel Exp $
 #
 # :ts=8
 #
@@ -40,12 +40,13 @@ LIBS = -lm -lc -ldebug -lgcc
 
 all: test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
-	fstat_stdout_test simple_sprintf date_test
+	fstat_stdout_test simple_sprintf date_test sscanf_64
 
 clean:
 	$(DELETE) *.o *.map test fgets_test iotest sscanf_test printf_test \
 		sprintf_test stack_size_test translate_test strtok_test \
-		uname simple fstat_stdout_test simple_sprintf date_test
+		uname simple fstat_stdout_test simple_sprintf date_test \
+		sscanf_64
 
 ##############################################################################
 
@@ -104,3 +105,7 @@ fstat_stdout_test : fstat_stdout_test.o
 simple_sprintf : simple_sprintf.o
 	@echo "Linking $@"
 	$(CC) -nostdlib $(CFLAGS) -o $@ simple_sprintf.o -lc -lgcc -Wl,--cref,-M,-Map=$@.map
+
+sscanf_64 : sscanf_64.o
+	@echo "Linking $@"
+	$(CC) -nostdlib $(CFLAGS) -o $@ sscanf_64.o -lc -lgcc -Wl,--cref,-M,-Map=$@.map
