@@ -32,6 +32,13 @@
   equivalent to "%a %b %e %T %Y", "%x" is equivalent to "%m/%d/%y"
   and "%X" is now equivalent to "%T".
 
+- The 68020/030/040/060 versions of the library now include the
+  64 bit integer conversion code. The plain 68000 version does not.
+
+- The 64 bit integer conversion code used in by the scanf() family
+  was broken due to a misplaced overflow check, which had the cruel
+  effect of triggering for 32 bit integers as well. Fixed.
+
 
 c.lib 1.194 (15.7.2005)
 

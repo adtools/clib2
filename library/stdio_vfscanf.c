@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.18 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.19 2005-08-27 12:57:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -30,6 +30,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+/*#define DEBUG*/
 
 #ifndef _STDLIB_NULL_POINTER_CHECK_H
 #include "stdlib_null_pointer_check.h"
@@ -259,33 +261,51 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 		{
 			/* Parameter is a short integer. */
 			parameter_size = parameter_size_short;
+
+			SHOWMSG("short integer");
+
 			format++;
 		}
 		else if (c == 'j')
 		{
 			parameter_size = parameter_size_intmax_t;
+
+			SHOWMSG("largest integer");
+
 			format++;
 		}
 		else if (c == 'l')
 		{
 			/* Parameter is a long integer or a double precision floating point value. */
 			parameter_size = parameter_size_long;
+
+			SHOWMSG("long integer");
+
 			format++;
 		}
 		else if (c == 'L')
 		{
 			/* Parameter is a long double floating point value. */
 			parameter_size = parameter_size_long_double;
+
+			SHOWMSG("long double");
+
 			format++;
 		}
 		else if (c == 't')
 		{
 			parameter_size = parameter_size_ptrdiff_t;
+
+			SHOWMSG("pointer difference");
+
 			format++;
 		}
 		else if (c == 'z')
 		{
 			parameter_size = parameter_size_size_t;
+
+			SHOWMSG("size");
+
 			format++;
 		}
 		else if (c == '\0')
@@ -297,6 +317,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 		{
 			/* Parameter is a long integer or a single precision floating point value. */
 			parameter_size = parameter_size_default;
+
+			SHOWMSG("default");
 		}
 
 		/* Now for the conversion type. */
@@ -306,9 +328,13 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 
 		#if defined(USE_64_BIT_INTS) && defined(__GNUC__)
 		{
+			D(("c = '%lc'",c));
+
 			/* Check for long long parameters. */
 			if(parameter_size == parameter_size_long && c == 'l')
 			{
+				SHOWMSG("this is a long long parameter");
+
 				parameter_size = parameter_size_long_long;
 
 				format++;
@@ -325,6 +351,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 		if(parameter_size == parameter_size_short && c == 'h')
 		{
 			parameter_size = parameter_size_byte;
+
+			SHOWMSG("byte-sized integer");
 
 			format++;
 
@@ -1426,6 +1454,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 					/* Is this a valid digit? */
 					if(digit >= radix)
 					{
+						SHOWMSG("digit is larger than radix");
+
 						if(ungetc(c,stream) == EOF)
 							goto out;
 
@@ -1436,16 +1466,23 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 
 					#if defined(USE_64_BIT_INTS) && defined(__GNUC__)
 					{
-						if((parameter_size == parameter_size_long_long || parameter_size == parameter_size_intmax_t) && (unsigned long long)next_sum < (unsigned long long)sum) /* overflow? */
+						if(parameter_size == parameter_size_long_long || parameter_size == parameter_size_intmax_t)
 						{
-							/* Put this back. */
-							if(ungetc(c,stream) == EOF)
-								goto out;
+							if((unsigned long long)next_sum < (unsigned long long)sum) /* overflow? */
+							{
+								SHOWMSG("overflow!");
 
-							break;
+								/* Put this back. */
+								if(ungetc(c,stream) == EOF)
+									goto out;
+
+								break;
+							}
 						}
 						else if ((unsigned int)next_sum < (unsigned int)sum) /* overflow? */
 						{
+							SHOWMSG("overflow!");
+
 							/* Put this back. */
 							if(ungetc(c,stream) == EOF)
 								goto out;
@@ -1457,6 +1494,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 					{
 						if((unsigned int)next_sum < (unsigned int)sum) /* overflow? */
 						{
+							SHOWMSG("overflow!");
+
 							/* Put this back. */
 							if(ungetc(c,stream) == EOF)
 								goto out;
