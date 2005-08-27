@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.66 2005-07-12 13:35:52 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.67 2005-08-27 12:12:50 obarthel Exp $
 #
 # :ts=8
 #
@@ -78,7 +78,7 @@ $(LIBAMIGA_OBJS)/%.o : %.c
 
 ifeq (small_data_020,$(TYPE))
 CODE_TYPE	:= -m68020-60
-CODE_FLAGS	:= -fbaserel -DSMALL_DATA -DM68020
+CODE_FLAGS	:= -fbaserel -DSMALL_DATA -DM68020 -DUSE_64_BIT_INTS
 endif
 
 ifeq (small_data,$(TYPE))
@@ -88,12 +88,12 @@ endif
 
 ifeq (small_data32,$(TYPE))
 CODE_TYPE	:= -m68020-60
-CODE_FLAGS	:= -fbaserel32 -DSMALL_DATA32 -DM68020
+CODE_FLAGS	:= -fbaserel32 -DSMALL_DATA32 -DM68020 -DUSE_64_BIT_INTS
 endif
 
 ifeq (large_data_020,$(TYPE))
 CODE_TYPE	:= -m68020-60
-CODE_FLAGS	:= -DM68020
+CODE_FLAGS	:= -DM68020 -DUSE_64_BIT_INTS
 endif
 
 ifeq (large_data,$(TYPE))
