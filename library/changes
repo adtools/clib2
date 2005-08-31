@@ -39,6 +39,8 @@
   was broken due to a misplaced overflow check, which had the cruel
   effect of triggering for 32 bit integers as well. Fixed.
 
+- DoTimer() did not allocate the local MsgPort correctly. Fixed.
+
 
 c.lib 1.194 (15.7.2005)
 
