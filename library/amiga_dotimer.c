@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_dotimer.c,v 1.5 2005-08-31 07:26:13 obarthel Exp $
+ * $Id: amiga_dotimer.c,v 1.6 2005-09-03 14:45:14 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,7 +68,7 @@ DoTimer(struct timeval *tv,LONG unit,LONG command)
 	{
 		mp = AllocSysObjectTags(ASOT_PORT,
 			ASOPORT_Action,			PA_SIGNAL,
-			ASOPORT_AllocSignal,	FALSE,
+			ASOPORT_AllocSig,	FALSE,
 			ASOPORT_Signal,			SIGB_SINGLE,
 			ASOPORT_Target,			FindTask(NULL),
 		TAG_DONE);
