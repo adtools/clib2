@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.16 2005-06-18 07:23:17 obarthel Exp $
+ * $Id: stdio.h,v 1.17 2005-09-04 11:28:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -154,7 +154,7 @@ typedef struct
 #define L_tmpnam 10
 
 /* Maximum number of unique file names tmpnam() can generate */
-#define TMP_MAX 0x3ffff
+#define TMP_MAX 0x40000
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_tmpnam.c,v 1.4 2005-02-03 16:56:16 obarthel Exp $
+ * $Id: stdio_tmpnam.c,v 1.5 2005-09-04 11:27:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,9 +45,10 @@ char *
 tmpnam(char *buf)
 {
 	static char local_buffer[L_tmpnam];
-	static unsigned short counter;
+	static unsigned long counter;
+
 	APTR old_window_pointer;
-	unsigned short c;
+	unsigned long c;
 	char * result = NULL; /* ZZZ compiler claims that this assignment is unnecessary. */
 	BPTR lock;
 	int i;
@@ -66,20 +67,23 @@ tmpnam(char *buf)
 		if(__check_abort_enabled)
 			__check_abort();
 
-		c = (counter++);
+		c = counter;
+
+		counter = (counter + 1) % TMP_MAX;
 
 		/* Build another temporary file name, which begins with the
-		 * letters 'tmp' followed by an octal number.
-		 */
+		   letters 'tmp' followed by an octal number. */
 		strcpy(buf,"tmp");
 
-		for(i = 0 ; i < 10 ; i++)
+		/* There's room for L_tmpnam - 4 digits, which for
+		   L_tmpnam == 10 leaves room for 6 * 3 bits. */
+		for(i = 3 ; i < L_tmpnam-1 ; i++)
 		{
-			buf[3 + 10 - (i+1)] = '0' + (c % 8);
+			buf[i] = '0' + (c % 8);
 			c = (c / 8);
 		}
 
-		buf[3 + 10] = '\0';
+		buf[i] = '\0';
 
 		D(("checking if '%s' exists",buf));
 
@@ -97,8 +101,7 @@ tmpnam(char *buf)
 		if(lock == ZERO)
 		{
 			/* If the object does not exist yet then we
-			 * are finished.
-			 */
+			   are finished. */
 			if(IoErr() == ERROR_OBJECT_NOT_FOUND)
 				result = buf;
 			else

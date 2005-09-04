@@ -1,6 +1,9 @@
 - Following detection of a stack overflow, the startup code eventually
   called _exit(). It should have called exit() instead.
 
+- tmpnam() wrote more than L_tmpnam bytes to the name buffer. Also, the
+  TMP_MAX value was off by one.
+
 
 c.lib 1.195 (3.9.2005)
 
