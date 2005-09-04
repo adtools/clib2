@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.25 2005-07-03 10:36:47 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.26 2005-09-04 07:38:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -136,9 +136,9 @@ call_main(void)
 
 	/* If we end up here with the __stack_overflow variable
 	   set then the stack overflow handler dropped into
-	   longjmp() and _exit() did not get called. This
+	   longjmp() and exit() did not get called. This
 	   means that we will have to show the error message
-	   and invoke _exit() all on our own. */
+	   and invoke exit() all on our own. */
 	if(__stack_overflow)
 	{
 		SHOWMSG("we have a stack overflow");
@@ -149,7 +149,7 @@ call_main(void)
 		__show_error("Stack overflow detected");
 
 		if(setjmp(__exit_jmp_buf) == 0)
-			_exit(RETURN_FAIL);
+			exit(RETURN_FAIL);
 	}
 
 	/* If necessary, print stack size usage information. */

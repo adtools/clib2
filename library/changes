@@ -1,3 +1,7 @@
+- Following detection of a stack overflow, the startup code eventually
+  called _exit(). It should have called exit() instead.
+
+
 c.lib 1.195 (3.9.2005)
 
 - In __time_delay() the CheckIO() test was wrong and should have
