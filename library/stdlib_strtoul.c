@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtoul.c,v 1.4 2005-09-28 09:28:39 obarthel Exp $
+ * $Id: stdlib_strtoul.c,v 1.5 2005-09-28 09:51:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -178,10 +178,7 @@ strtoul(const char *str, char **ptr, int base)
 
 	/* Did we convert anything? */
 	if(num_digits_converted == 0)
-	{
-		__set_errno(ERANGE);
 		goto out;
-	}
 
 	if(is_negative)
 		result = (-sum);

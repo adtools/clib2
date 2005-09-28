@@ -1,9 +1,8 @@
 - strtoimax(), strtoumax(), strtod(), strtof(), strtol(), strtoll(),
   strtoul() and strtoull() now count how many digits were converted.
   If that number is zero, then the conversion is considered to have
-  failed: 0 is returned, errno is set to ERANGE and the 'ptr' parameter
-  reference is initialized with a pointer to the string to be converted.
-  This has two consequences:
+  failed: 0 is returned and the 'ptr' parameter reference is initialized
+  with a pointer to the string to be converted. This has two consequences:
 
      1) A floating point number that has no digits in the significand
         is no longer converted to zero. For example ".e10" can no longer

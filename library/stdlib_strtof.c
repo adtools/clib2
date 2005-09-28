@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtof.c,v 1.9 2005-09-28 09:28:39 obarthel Exp $
+ * $Id: stdlib_strtof.c,v 1.10 2005-09-28 09:51:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -364,8 +364,6 @@ strtof(const char *str, char ** ptr)
 
 		if(num_digits_converted == 0)
 		{
-			__set_errno(ERANGE);
-
 			sum = 0;
 		}
 		else
