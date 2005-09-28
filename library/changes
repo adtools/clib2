@@ -1,3 +1,10 @@
+- When the main() function returns directly or indirectly by way of
+  calling exit(), the IoErr() value set at this time will now be
+  preserved until the program really returns control to the shell.
+  This turned out to be easier to implement than I had originally
+  thought, thanks to the fact that the atexit() functions are all
+  invoked straight after the exit() call.
+
 - strtoimax(), strtoumax(), strtod(), strtof(), strtol(), strtoll(),
   strtoul() and strtoull() now count how many digits were converted.
   If that number is zero, then the conversion is considered to have
