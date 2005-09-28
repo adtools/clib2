@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtof.c,v 1.8 2005-05-30 18:28:45 obarthel Exp $
+ * $Id: stdlib_strtof.c,v 1.9 2005-09-28 09:28:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,6 +66,7 @@
 float
 strtof(const char *str, char ** ptr)
 {
+	const char * stop = str;
 	float sum = 0.0;
 	float result;
 	int is_negative;
@@ -128,6 +129,8 @@ strtof(const char *str, char ** ptr)
 		str += strlen(str);
 
 		sum = __inff();
+
+		stop = str;
 	}
 	else if (strncasecmp(str,"nan",3) == SAME && (str[3] == '(' || str[3] == '\0'))
 	{
@@ -146,9 +149,12 @@ strtof(const char *str, char ** ptr)
 		}
 
 		sum = nanf(NULL);
+
+		stop = str;
 	}
 	else
 	{
+		size_t num_digits_converted = 0;
 		int decimal_point_matches;
 		float new_sum;
 		int error = 0;
@@ -182,6 +188,8 @@ strtof(const char *str, char ** ptr)
 				break;
 
 			str++;
+
+			num_digits_converted++;
 
 			if(error == 0)
 			{
@@ -247,6 +255,8 @@ strtof(const char *str, char ** ptr)
 					break;
 
 				str++;
+
+				num_digits_converted++;
 
 				if(error == 0 && divisor != 0.0)
 				{
@@ -352,11 +362,22 @@ strtof(const char *str, char ** ptr)
 			}
 		}
 
-		if(error != 0)
+		if(num_digits_converted == 0)
 		{
-			__set_errno(error);
+			__set_errno(ERANGE);
 
-			sum = __get_huge_valf();
+			sum = 0;
+		}
+		else
+		{
+			stop = str;
+
+			if(error != 0)
+			{
+				__set_errno(error);
+
+				sum = __get_huge_valf();
+			}
 		}
 	}
 
@@ -365,12 +386,12 @@ strtof(const char *str, char ** ptr)
 
 	result = sum;
 
+ out:
+
 	/* If desired, remember where we stopped reading the
 	   number from the buffer. */
 	if(ptr != NULL)
-		(*ptr) = (char *)str;
-
- out:
+		(*ptr) = (char *)stop;
 
 	RETURN(result);
 	return(result);

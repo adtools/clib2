@@ -1,5 +1,5 @@
 /*
- * $Id: inttypes_strtoimax.c,v 1.1 2005-05-12 13:21:43 obarthel Exp $
+ * $Id: inttypes_strtoimax.c,v 1.2 2005-09-28 09:28:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,6 +46,8 @@
 intmax_t
 strtoimax(const char *str, char **ptr, int base)
 {
+	const char * stop = str;
+	size_t num_digits_converted = 0;
 	BOOL is_negative;
 	intmax_t result = 0;
 	intmax_t new_sum;
@@ -172,7 +174,16 @@ strtoimax(const char *str, char **ptr, int base)
 			str++;
 
 			c = (*str);
+
+			num_digits_converted++;
 		}
+	}
+
+	/* Did we convert anything? */
+	if(num_digits_converted == 0)
+	{
+		__set_errno(ERANGE);
+		goto out;
 	}
 
 	if(is_negative)
@@ -180,12 +191,14 @@ strtoimax(const char *str, char **ptr, int base)
 	else
 		result = sum;
 
+	stop = str;
+
  out:
 
 	/* If desired, remember where we stopped reading the
 	   number from the buffer. */
 	if(ptr != NULL)
-		(*ptr) = (char *)str;
+		(*ptr) = (char *)stop;
 
 	RETURN(result);
 	return(result);

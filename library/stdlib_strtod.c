@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtod.c,v 1.8 2005-05-29 08:19:36 obarthel Exp $
+ * $Id: stdlib_strtod.c,v 1.9 2005-09-28 09:28:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,6 +66,7 @@
 double
 strtod(const char *str, char ** ptr)
 {
+	const char * stop = str;
 	double sum = 0.0;
 	double result;
 	int is_negative;
@@ -128,6 +129,8 @@ strtod(const char *str, char ** ptr)
 		str += strlen(str);
 
 		sum = __inf();
+
+		stop = str;
 	}
 	else if (strncasecmp(str,"nan",3) == SAME && (str[3] == '(' || str[3] == '\0'))
 	{
@@ -146,9 +149,12 @@ strtod(const char *str, char ** ptr)
 		}
 
 		sum = nan(NULL);
+
+		stop = str;
 	}
 	else
 	{
+		size_t num_digits_converted = 0;
 		int decimal_point_matches;
 		double new_sum;
 		int error = 0;
@@ -191,6 +197,8 @@ strtod(const char *str, char ** ptr)
 				else
 					sum = new_sum;
 			}
+
+			num_digits_converted++;
 		}
 
 		/* Did we find the decimal point? We accept both the
@@ -258,6 +266,8 @@ strtod(const char *str, char ** ptr)
 
 					divisor = divisor / radix;
 				}
+
+				num_digits_converted++;
 			}
 		}
 
@@ -352,11 +362,22 @@ strtod(const char *str, char ** ptr)
 			}
 		}
 
-		if(error != 0)
+		if(num_digits_converted == 0)
 		{
-			__set_errno(error);
+			__set_errno(ERANGE);
 
-			sum = __get_huge_val();
+			sum = 0;
+		}
+		else
+		{
+			if(error != 0)
+			{
+				__set_errno(error);
+
+				sum = __get_huge_val();
+			}
+
+			stop = str;
 		}
 	}
 
@@ -365,12 +386,12 @@ strtod(const char *str, char ** ptr)
 
 	result = sum;
 
+ out:
+
 	/* If desired, remember where we stopped reading the
 	   number from the buffer. */
 	if(ptr != NULL)
-		(*ptr) = (char *)str;
-
- out:
+		(*ptr) = (char *)stop;
 
 	RETURN(result);
 	return(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtol.c,v 1.3 2005-02-03 16:56:17 obarthel Exp $
+ * $Id: stdlib_strtol.c,v 1.4 2005-09-28 09:28:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -46,6 +46,8 @@
 long
 strtol(const char *str, char **ptr, int base)
 {
+	const char * stop = str;
+	size_t num_digits_converted = 0;
 	BOOL is_negative;
 	long result = 0;
 	long new_sum;
@@ -103,8 +105,7 @@ strtol(const char *str, char **ptr, int base)
 		is_negative = FALSE;
 
 		/* But there may be a sign we will choose to
-		 * ignore.
-		 */
+		   ignore. */
 		if(c == '+')
 			str++;
 	}
@@ -112,8 +113,7 @@ strtol(const char *str, char **ptr, int base)
 	c = (*str);
 
 	/* There may be a leading '0x' to indicate that what
-	 * follows is a hexadecimal number.
-	 */
+	   follows is a hexadecimal number. */
 	if(base == 0 || base == 16)
 	{
 		if((c == '0') && (str[1] == 'x' || str[1] == 'X'))
@@ -127,9 +127,8 @@ strtol(const char *str, char **ptr, int base)
 	}
 
 	/* If we still don't know what base to use and the
-	 * next letter to follow is a zero then this is
-	 * probably a number in octal notation.
-	 */
+	   next letter to follow is a zero then this is
+	   probably a number in octal notation. */
 	if(base == 0)
 	{
 		if(c == '0')
@@ -175,7 +174,16 @@ strtol(const char *str, char **ptr, int base)
 			str++;
 
 			c = (*str);
+
+			num_digits_converted++;
 		}
+	}
+
+	/* Did we convert anything? */
+	if(num_digits_converted == 0)
+	{
+		__set_errno(ERANGE);
+		goto out;
 	}
 
 	if(is_negative)
@@ -183,13 +191,14 @@ strtol(const char *str, char **ptr, int base)
 	else
 		result = sum;
 
+	stop = str;
+
  out:
 
 	/* If desired, remember where we stopped reading the
-	 * number from the buffer.
-	 */
+	   number from the buffer. */
 	if(ptr != NULL)
-		(*ptr) = (char *)str;
+		(*ptr) = (char *)stop;
 
 	RETURN(result);
 	return(result);

@@ -1,3 +1,25 @@
+- strtoimax(), strtoumax(), strtod(), strtof(), strtol(), strtoll(),
+  strtoul() and strtoull() now count how many digits were converted.
+  If that number is zero, then the conversion is considered to have
+  failed: 0 is returned, errno is set to ERANGE and the 'ptr' parameter
+  reference is initialized with a pointer to the string to be converted.
+  This has two consequences:
+
+     1) A floating point number that has no digits in the significand
+        is no longer converted to zero. For example ".e10" can no longer
+        result in a successful conversion.
+
+     2) You can detect if a conversion is successful by comparing pointers
+        after the conversion function has returned:
+
+           char * str;
+           char * ptr;
+           long n;
+
+           n = strtol(str,&ptr,10);
+           if(n == 0 && str == ptr)
+              printf("conversion has failed");
+
 - Following detection of a stack overflow, the startup code eventually
   called _exit(). It should have called exit() instead.
 
