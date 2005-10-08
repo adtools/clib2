@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.12 2005-06-20 07:43:59 obarthel Exp $
+ * $Id: socket_accept.c,v 1.13 2005-10-08 15:59:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,9 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 	struct fd * new_fd;
 	int new_fd_slot_number;
 	int result = ERROR;
-	LONG new_socket_fd;
+	LONG new_socket_fd = -1;
+	BOOL stdio_locked = FALSE;
+	BOOL fd_locked = FALSE;
 
 	ENTER();
 
@@ -65,8 +67,6 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 
 	assert( cliaddr != NULL && addrlen != NULL );
 	assert(__SocketBase != NULL);
-
-	__stdio_lock();
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -85,11 +85,27 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IN_USE) );
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IS_SOCKET) );
 
+	/* Wait for the accept() to complete, then hook up the socket
+	   with a file descriptor. */
+	PROFILE_OFF();
+	new_socket_fd = __accept((LONG)fd->fd_DefaultFile,cliaddr,(LONG *)addrlen);
+	PROFILE_ON();
+
+	if(new_socket_fd < 0)
+	{
+		SHOWMSG("could not accept connection");
+		goto out;
+	}
+
+	__stdio_lock();
+	stdio_locked = TRUE;
+
 	fd = __get_file_descriptor_socket(sockfd);
 	if(fd == NULL)
 		goto out;
 
 	__fd_lock(fd);
+	fd_locked = TRUE;
 
 	new_fd_slot_number = __find_vacant_fd_entry();
 	if(new_fd_slot_number < 0)
@@ -115,16 +131,6 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 	}
 	#endif /* __THREAD_SAFE */
 
-	PROFILE_OFF();
-	new_socket_fd = __accept((LONG)fd->fd_DefaultFile,cliaddr,(LONG *)addrlen);
-	PROFILE_ON();
-
-	if(new_socket_fd < 0)
-	{
-		SHOWMSG("could not accept connection");
-		goto out;
-	}
-
 	new_fd = __fd[new_fd_slot_number];
 
 	__initialize_fd(new_fd,__socket_hook_entry,(BPTR)new_socket_fd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE,lock);
@@ -133,11 +139,24 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 
 	result = new_fd_slot_number;
 
+	new_socket_fd = -1;
+
  out:
 
-	__fd_unlock(fd);
+	if(new_socket_fd != -1)
+	{
+		PROFILE_OFF();
 
-	__stdio_unlock();
+		__CloseSocket(new_socket_fd);
+
+		PROFILE_ON();
+	}
+
+	if(fd_locked)
+		__fd_unlock(fd);
+
+	if(stdio_locked)
+		__stdio_unlock();
 
 	#if defined(__THREAD_SAFE)
 	{
