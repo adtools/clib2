@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.74 2005-09-03 14:45:14 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.75 2005-10-09 12:32:18 obarthel Exp $
 #
 # :ts=8
 #
@@ -581,15 +581,17 @@ MATH_LIB = \
 	math_erfcf.o \
 	math_erff.o \
 	math_exp.o \
-	math_expf.o \
 	math_exp2.o \
 	math_exp2f.o \
+	math_expf.o \
 	math_expm1.o \
 	math_expm1f.o \
 	math_fabs.o \
 	math_fabsf.o \
 	math_floor.o \
 	math_floorf.o \
+	math_fma.o \
+	math_fmaf.o \
 	math_fmod.o \
 	math_fmodf.o \
 	math_fpclassify.o \
@@ -620,28 +622,36 @@ MATH_LIB = \
 	math_lgamma.o \
 	math_lgammaf.o \
 	math_log.o \
-	math_log2.o \
-	math_log2f.o \
 	math_log10.o \
 	math_log10f.o \
 	math_log1p.o \
 	math_log1pf.o \
+	math_log2.o \
+	math_log2f.o \
 	math_logb.o \
 	math_logbf.o \
 	math_logf.o \
+	math_lround.o \
+	math_lroundf.o \
 	math_modf.o \
 	math_modff.o \
 	math_nan.o \
 	math_nanf.o \
+	math_nearbyint.o \
+	math_nearbyintf.o \
 	math_nextafter.o \
 	math_nextafterf.o \
 	math_pow.o \
 	math_powf.o \
 	math_remainder.o \
 	math_remainderf.o \
+	math_remquo.o \
+	math_remquof.o \
 	math_rem_pio2f.o \
 	math_rint.o \
 	math_rintf.o \
+	math_round.o \
+	math_roundf.o \
 	math_scalbn.o \
 	math_scalbnf.o \
 	math_signbit.o \
@@ -655,6 +665,10 @@ MATH_LIB = \
 	math_tanf.o \
 	math_tanh.o \
 	math_tanhf.o \
+	math_tgamma.o \
+	math_tgammaf.o \
+	math_trunc.o \
+	math_truncf.o \
 	stdio_asprintf.o \
 	stdio_flush.o \
 	stdio_flush_all_files.o \

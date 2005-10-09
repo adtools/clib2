@@ -1,5 +1,5 @@
 /*
- * $Id: grp.h,v 1.3 2005-01-02 09:07:21 obarthel Exp $
+ * $Id: grp.h,v 1.4 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,15 +40,25 @@
 
 /****************************************************************************/
 
+#ifndef _SYS_TYPES_H
+#include <sys/types.h>
+#endif /* _SYS_TYPES_H */
+
+/****************************************************************************/
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 /****************************************************************************/
 
-#ifndef _SYS_TYPES_H
-#include <sys/types.h>
-#endif /* _SYS_TYPES_H */
+#ifdef __GNUC__
+ #ifdef __PPC__
+  #pragma pack(2)
+ #endif
+#elif defined(__VBCC__)
+ #pragma amiga-align
+#endif
 
 /****************************************************************************/
 
@@ -59,6 +69,33 @@ struct group
 	gid_t	gr_gid;		/* group id */
 	char **	gr_mem;		/* group members */
 };
+
+/****************************************************************************/
+
+/*
+ * The following prototypes may clash with the bsdsocket.library or
+ * usergroup.library API definitions.
+ */
+
+#ifndef __NO_NET_API
+
+extern void endgrent(void);
+extern struct group *getgrent(void);
+extern struct group *getgrgid(gid_t gid);
+extern struct group *getgrnam(const char *name);
+extern void setgrent(void);
+
+#endif /* __NO_NET_API */
+
+/****************************************************************************/
+
+#ifdef __GNUC__
+ #ifdef __PPC__
+  #pragma pack()
+ #endif
+#elif defined(__VBCC__)
+ #pragma default-align
+#endif
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stat.h,v 1.5 2005-04-02 13:25:55 obarthel Exp $
+ * $Id: stat.h,v 1.6 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,12 +40,6 @@
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
 #ifndef _SYS_TYPES_H
 #include <sys/types.h>
 #endif /* _SYS_TYPES_H */
@@ -57,6 +51,12 @@ extern "C" {
 #ifndef _TIME_H
 #include <time.h>
 #endif /* _TIME_H */
+
+/****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
@@ -134,7 +134,17 @@ extern int chmod(const char * path_name, mode_t mode);
 extern int fchmod(int file_descriptor, mode_t mode);
 extern int mkdir(const char * path_name, mode_t mode);
 extern int rmdir(const char * path_name);
+
+/*
+ * The following prototypes may clash with the bsdsocket.library or
+ * usergroup.library API definitions.
+ */
+
+#ifndef __NO_NET_API
+
 extern mode_t umask(mode_t new_mask);
+
+#endif /* __NO_NET_API */
 
 /****************************************************************************/
 

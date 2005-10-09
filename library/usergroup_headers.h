@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_headers.h,v 1.6 2005-03-18 12:38:25 obarthel Exp $
+ * $Id: usergroup_headers.h,v 1.7 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,16 @@
 #ifndef _STDLIB_PROFILE_H
 #include "stdlib_profile.h"
 #endif /* _STDLIB_PROFILE_H */
+
+/****************************************************************************/
+
+#ifndef _PWD_H
+#include <pwd.h>
+#endif /* _PWD_H */
+
+#ifndef _GRP_H
+#include <grp.h>
+#endif /* _GRP_H */
 
 /****************************************************************************/
 

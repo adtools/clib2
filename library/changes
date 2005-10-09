@@ -1,3 +1,15 @@
+- Removed the various workarounds associated with <unistd.h>, required
+  for building code that references the networking API. It is now possible,
+  provided you build your code with an existing TCP/IP API header file
+  set (such as from the "Roadshow" SDK) without running into data type
+  or function prototype declaration conflicts. I have added local versions
+  of <arpa/inet.h>, <netinet/in.h>, <netdb.h>, <sys/filio.h>, <sys/ioccom.h>,
+  <sys/ioctl.h>, <sys/select.h> and <sys/socket.h> and updated <unistd.h>,
+  <pwd.h> and <grp.h> accordingly. Note that some of the function prototypes
+  will conflict with the bsdsocket.library/usergroup.library API, which is
+  why you can disable the declarations through the __NO_NET_API preprocessor
+  symbol: if defined, none of the function prototypes will be defined.
+
 - Implemented lrintf(), lrint(), lroundf(), lround(), nearbyintf(),
   nearbyint(), remquof(), remquo(), roundf(), round(), tgammaf(),
   tgamma(), truncf(), trunc(). Sort of implemented fmaf() and fma(),

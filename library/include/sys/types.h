@@ -1,5 +1,5 @@
 /*
- * $Id: types.h,v 1.5 2005-07-15 14:31:37 obarthel Exp $
+ * $Id: types.h,v 1.6 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,6 +40,18 @@
 
 /****************************************************************************/
 
+#ifndef _TIME_H
+#include <time.h>
+#endif /* _TIME_H */
+
+/****************************************************************************/
+
+#ifndef _STDDEF_H
+#include <stddef.h>
+#endif /* _STDDEF_H */
+
+/****************************************************************************/
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -58,18 +70,6 @@ typedef int pid_t;
 typedef unsigned int rlim_t;
 typedef int ssize_t;
 typedef unsigned int uid_t;
-
-/****************************************************************************/
-
-#ifndef _TIME_H
-#include <time.h>
-#endif /* _TIME_H */
-
-/****************************************************************************/
-
-#ifndef _STDDEF_H
-#include <stddef.h>
-#endif /* _STDDEF_H */
 
 /****************************************************************************/
 

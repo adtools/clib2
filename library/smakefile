@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.49 2005-07-12 13:35:53 obarthel Exp $
+# $Id: smakefile,v 1.50 2005-10-09 12:32:18 obarthel Exp $
 #
 # :ts=8
 #
@@ -215,6 +215,8 @@ MATH_OBJ = \
 	math_fdimf.o \
 	math_floor.o \
 	math_floorf.o \
+	math_fma.o \
+	math_fmaf.o \
 	math_fmax.o \
 	math_fmaxf.o \
 	math_fmin.o \
@@ -250,19 +252,29 @@ MATH_OBJ = \
 	math_logb.o \
 	math_logbf.o \
 	math_logf.o \
+	math_lrint.o \
+	math_lrintf.o \
+	math_lround.o \
+	math_lroundf.o \
 	math_modf.o \
 	math_modff.o \
 	math_nan.o \
 	math_nanf.o \
+	math_nearbyint.o \
+	math_nearbyintf.o \
 	math_nextafter.o \
 	math_nextafterf.o \
 	math_pow.o \
 	math_powf.o \
 	math_remainder.o \
 	math_remainderf.o \
+	math_remquo.o \
+	math_remquof.o \
 	math_rem_pio2f.o \
 	math_rint.o \
 	math_rintf.o \
+	math_round.o \
+	math_roundf.o \
 	math_scalbn.o \
 	math_scalbnf.o \
 	math_signbit.o \
@@ -275,7 +287,11 @@ MATH_OBJ = \
 	math_tan.o \
 	math_tanf.o \
 	math_tanh.o \
-	math_tanhf.o
+	math_tanhf.o \
+	math_tgamma.o \
+	math_tgammaf.o \
+	math_trunc.o \
+	math_truncf.o
 
 MOUNT_OBJ = \
 	mount_convertinfo.o \

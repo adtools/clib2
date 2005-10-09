@@ -1,5 +1,5 @@
 /*
- * $Id: socket_inet_netof.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_inet_netof.c,v 1.3 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,10 +41,10 @@
 
 /****************************************************************************/
 
-unsigned long
+in_addr_t
 inet_netof(struct in_addr in)
 {
-	unsigned long result;
+	in_addr_t result;
 
 	ENTER();
 

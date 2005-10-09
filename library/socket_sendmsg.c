@@ -1,5 +1,5 @@
 /*
- * $Id: socket_sendmsg.c,v 1.5 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: socket_sendmsg.c,v 1.6 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-sendmsg(int sockfd,struct msghdr *msg,int flags)
+sendmsg(int sockfd,const struct msghdr *msg,int flags)
 {
 	struct fd * fd;
 	int result = ERROR;
@@ -84,7 +84,7 @@ sendmsg(int sockfd,struct msghdr *msg,int flags)
 		goto out;
 
 	PROFILE_OFF();
-	result = __sendmsg((LONG)fd->fd_DefaultFile,msg,flags);
+	result = __sendmsg((LONG)fd->fd_DefaultFile,(struct msghdr *)msg,flags);
 	PROFILE_ON();
 
  out:

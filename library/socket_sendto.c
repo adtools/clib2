@@ -1,5 +1,5 @@
 /*
- * $Id: socket_sendto.c,v 1.8 2005-06-20 07:43:59 obarthel Exp $
+ * $Id: socket_sendto.c,v 1.9 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-sendto(int sockfd,const void *buff,int len,int flags,struct sockaddr *to,socklen_t tolen)
+sendto(int sockfd,const void *buff,size_t len,int flags,const struct sockaddr *to,socklen_t tolen)
 {
 	struct fd * fd;
 	int result = ERROR;
@@ -87,7 +87,7 @@ sendto(int sockfd,const void *buff,int len,int flags,struct sockaddr *to,socklen
 		goto out;
 
 	PROFILE_OFF();
-	result = __sendto((LONG)fd->fd_DefaultFile,(void *)buff,len,flags,to,tolen);
+	result = __sendto((LONG)fd->fd_DefaultFile,(void *)buff,len,flags,(struct sockaddr *)to,tolen);
 	PROFILE_ON();
 
  out:

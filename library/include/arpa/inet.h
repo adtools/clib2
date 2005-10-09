@@ -1,5 +1,5 @@
 /*
- * $Id: socket_inet_makeaddr.c,v 1.3 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: inet.h,v 1.1 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,36 +31,50 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(SOCKET_SUPPORT)
+#ifndef	_ARPA_INET_H
+#define	_ARPA_INET_H
 
 /****************************************************************************/
 
-#ifndef _SOCKET_HEADERS_H
-#include "socket_headers.h"
-#endif /* _SOCKET_HEADERS_H */
+#ifndef _NETINET_IN_H
+#include <netinet/in.h>
+#endif /* _NETINET_IN_H */
 
 /****************************************************************************/
 
-struct in_addr
-inet_makeaddr(in_addr_t net,in_addr_t host)
-{
-	struct in_addr result;
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-	ENTER();
+/****************************************************************************/
 
-	assert(__SocketBase != NULL);
+/* The following is not part of the ISO 'C' (1994) standard. */
 
-	PROFILE_OFF();
-	result.s_addr = __Inet_MakeAddr((ULONG)net,(ULONG)host);
-	PROFILE_ON();
+/****************************************************************************/
 
-	if(__check_abort_enabled)
-		__check_abort();
+/*
+ * The following prototypes may clash with the bsdsocket.library or
+ * usergroup.library API definitions.
+ */
 
-	RETURN(result.s_addr);
-	return(result);
+#ifndef __NO_NET_API
+
+extern in_addr_t inet_addr(const char *cp);
+extern int inet_aton(const char *cp, struct in_addr *pin);
+extern in_addr_t inet_lnaof(struct in_addr in);
+extern struct in_addr inet_makeaddr(in_addr_t net, in_addr_t lna);
+extern in_addr_t inet_netof(struct in_addr in);
+extern in_addr_t inet_network(const char *cp);
+extern char *inet_ntoa(struct in_addr in);
+
+#endif /* __NO_NET_API */
+
+/****************************************************************************/
+
+#ifdef __cplusplus
 }
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
-#endif /* SOCKET_SUPPORT */
+#endif /* _ARPA_INET_H */

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_inet_makeaddr.c,v 1.3 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: ioccom.h,v 1.1 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,36 +31,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(SOCKET_SUPPORT)
+#ifndef _SYS_IOCCOM_H
+#define _SYS_IOCCOM_H
 
 /****************************************************************************/
 
-#ifndef _SOCKET_HEADERS_H
-#include "socket_headers.h"
-#endif /* _SOCKET_HEADERS_H */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
-struct in_addr
-inet_makeaddr(in_addr_t net,in_addr_t host)
-{
-	struct in_addr result;
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-	ENTER();
+/****************************************************************************/
 
-	assert(__SocketBase != NULL);
+#define	IOCPARM_MASK	0x1fff		/* parameter length, at most 13 bits */
+#define	IOCPARM_LEN(x)	(((x) >> 16) & IOCPARM_MASK)
+#define	IOCBASECMD(x)	((x) & ~(IOCPARM_MASK << 16))
+#define	IOCGROUP(x)		(((x) >> 8) & 0xff)
 
-	PROFILE_OFF();
-	result.s_addr = __Inet_MakeAddr((ULONG)net,(ULONG)host);
-	PROFILE_ON();
+#define	IOCPARM_MAX	NBPG	/* max size of ioctl args, mult. of NBPG */
 
-	if(__check_abort_enabled)
-		__check_abort();
+#define	IOC_VOID	(0x20000000UL)		/* no parameters */
+#define	IOC_OUT		(0x40000000UL)		/* copy parameters out */
+#define	IOC_IN		(0x80000000UL)		/* copy parameters in */
+#define	IOC_INOUT	(IOC_IN|IOC_OUT)	/* copy paramters in and out */
+#define	IOC_DIRMASK	(0xe0000000UL)		/* mask for IN/OUT/VOID */
 
-	RETURN(result.s_addr);
-	return(result);
+#define	_IOC(inout,group,num,len) \
+	(inout | ((len & IOCPARM_MASK) << 16) | ((group) << 8) | (num))
+
+#define	_IO(g,n)		_IOC(IOC_VOID,	(g), (n), 0)
+#define	_IOR(g,n,t)		_IOC(IOC_OUT,	(g), (n), sizeof(t))
+#define	_IOW(g,n,t)		_IOC(IOC_IN,	(g), (n), sizeof(t))
+#define	_IOWR(g,n,t)	_IOC(IOC_INOUT,	(g), (n), sizeof(t))
+
+/****************************************************************************/
+
+#ifdef __cplusplus
 }
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
-#endif /* SOCKET_SUPPORT */
+#endif /* _SYS_IOCCOM_H */

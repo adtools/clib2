@@ -1,5 +1,5 @@
 /*
- * $Id: socket_gethostname.c,v 1.4 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: socket_gethostname.c,v 1.5 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-gethostname(const char *hostname,int size)
+gethostname(const char *hostname,size_t size)
 {
 	int result = ERROR;
 

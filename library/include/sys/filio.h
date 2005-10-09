@@ -1,5 +1,5 @@
 /*
- * $Id: socket_inet_makeaddr.c,v 1.3 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: filio.h,v 1.1 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,36 +31,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(SOCKET_SUPPORT)
+#ifndef _SYS_FILIO_H
+#define _SYS_FILIO_H
 
 /****************************************************************************/
 
-#ifndef _SOCKET_HEADERS_H
-#include "socket_headers.h"
-#endif /* _SOCKET_HEADERS_H */
+#ifndef	_SYS_IOCCOM_H
+#include <sys/ioccom.h>
+#endif /* _SYS_IOCCOM_H */
 
 /****************************************************************************/
 
-struct in_addr
-inet_makeaddr(in_addr_t net,in_addr_t host)
-{
-	struct in_addr result;
+/* The following is not part of the ISO 'C' (1994) standard. */
 
-	ENTER();
+/****************************************************************************/
 
-	assert(__SocketBase != NULL);
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-	PROFILE_OFF();
-	result.s_addr = __Inet_MakeAddr((ULONG)net,(ULONG)host);
-	PROFILE_ON();
+/****************************************************************************/
 
-	if(__check_abort_enabled)
-		__check_abort();
+/* Generic file-descriptor ioctl's. */
+#define	FIOCLEX		 _IO('f', 1)		/* set close on exec on fd */
+#define	FIONCLEX	 _IO('f', 2)		/* remove close on exec */
+#define	FIONREAD	_IOR('f', 127, int)	/* get # bytes to read */
+#define	FIONBIO		_IOW('f', 126, int)	/* set/clear non-blocking i/o */
+#define	FIOASYNC	_IOW('f', 125, int)	/* set/clear async i/o */
+#define	FIOSETOWN	_IOW('f', 124, int)	/* set owner */
+#define	FIOGETOWN	_IOR('f', 123, int)	/* get owner */
 
-	RETURN(result.s_addr);
-	return(result);
+/****************************************************************************/
+
+#ifdef __cplusplus
 }
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
-#endif /* SOCKET_SUPPORT */
+#endif /* _SYS_FILIO_H */

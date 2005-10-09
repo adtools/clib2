@@ -1,5 +1,5 @@
 /*
- * $Id: socket_connect.c,v 1.6 2005-06-20 07:43:59 obarthel Exp $
+ * $Id: socket_connect.c,v 1.7 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 int
-connect(int sockfd,struct sockaddr *name,socklen_t namelen)
+connect(int sockfd,const struct sockaddr *name,socklen_t namelen)
 {
 	struct fd * fd;
 	int result = ERROR;
@@ -84,7 +84,7 @@ connect(int sockfd,struct sockaddr *name,socklen_t namelen)
 		goto out;
 
 	PROFILE_OFF();
-	result = __connect((LONG)fd->fd_DefaultFile,name,namelen);
+	result = __connect((LONG)fd->fd_DefaultFile,(struct sockaddr *)name,namelen);
 	PROFILE_ON();
 
  out:

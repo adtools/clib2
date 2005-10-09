@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_setsid.c,v 1.2 2005-01-02 09:07:19 obarthel Exp $
+ * $Id: usergroup_setsid.c,v 1.3 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,7 +41,7 @@
 
 /****************************************************************************/
 
-long
+pid_t
 setsid(void)
 {
 	long result;

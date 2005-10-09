@@ -1,5 +1,5 @@
 /*
- * $Id: termios.h,v 1.1 2005-06-04 10:46:23 obarthel Exp $
+ * $Id: termios.h,v 1.2 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,13 +31,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _TERMIOS_H
+#define _TERMIOS_H
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+/****************************************************************************/
 
 /*
  * Almost-but-not-quite termios.
  */
-
-#ifndef _TERMIOS_H
-#define _TERMIOS_H
 
 typedef unsigned int	tcflag_t;
 typedef unsigned char	cc_t;
@@ -186,4 +197,11 @@ extern speed_t cfgetospeed(struct termios *tios_p);
 extern int cfsetispeed(struct termios *tios_p,speed_t input_speed);
 extern int cfsetospeed(struct termios *tios_p,speed_t output_speed);
 
+/****************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+/****************************************************************************/
 #endif /* _TERMIOS_H */

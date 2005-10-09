@@ -1,5 +1,5 @@
 /*
- * $Id: socket_inet_network.c,v 1.3 2005-02-03 16:56:15 obarthel Exp $
+ * $Id: socket_inet_network.c,v 1.4 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,10 +47,10 @@
 
 /****************************************************************************/
 
-unsigned long
+in_addr_t
 inet_network(const char *cp)
 {
-	unsigned long result = ~0UL;
+	in_addr_t result = ~0UL;
 
 	ENTER();
 

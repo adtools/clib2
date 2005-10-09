@@ -1,5 +1,5 @@
 /*
- * $Id: socket_ioctl.c,v 1.8 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: socket_ioctl.c,v 1.9 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@
 /****************************************************************************/
 
 int
-ioctl(int sockfd,unsigned long request, ... /* char *arg */)
+ioctl(int sockfd,int request, ... /* char *arg */)
 {
 	va_list arg;
 	char * param;

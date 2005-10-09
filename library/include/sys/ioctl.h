@@ -1,5 +1,5 @@
 /*
- * $Id: socket_inet_makeaddr.c,v 1.3 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: ioctl.h,v 1.1 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,36 +31,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(SOCKET_SUPPORT)
+#ifndef _SYS_IOTCL_H
+#define _SYS_IOTCL_H
 
 /****************************************************************************/
 
-#ifndef _SOCKET_HEADERS_H
-#include "socket_headers.h"
-#endif /* _SOCKET_HEADERS_H */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
-struct in_addr
-inet_makeaddr(in_addr_t net,in_addr_t host)
-{
-	struct in_addr result;
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-	ENTER();
+/****************************************************************************/
 
-	assert(__SocketBase != NULL);
+/*
+ * The following prototypes may clash with the bsdsocket.library or
+ * usergroup.library API definitions.
+ */
 
-	PROFILE_OFF();
-	result.s_addr = __Inet_MakeAddr((ULONG)net,(ULONG)host);
-	PROFILE_ON();
+#ifndef __NO_NET_API
 
-	if(__check_abort_enabled)
-		__check_abort();
+extern int ioctl(int fildes, int request, ... /* arg */);
 
-	RETURN(result.s_addr);
-	return(result);
+#endif /* __NO_NET_API */
+
+/****************************************************************************/
+
+#ifdef __cplusplus
 }
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
-#endif /* SOCKET_SUPPORT */
+#endif /* _SYS_IOTCL_H */

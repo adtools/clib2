@@ -1,5 +1,5 @@
 /*
- * $Id: socket_headers.h,v 1.8 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: socket_headers.h,v 1.9 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,6 +39,22 @@
 #ifndef _NETINET_IN_H
 #include <netinet/in.h>
 #endif /* _NETINET_IN_H */
+
+#ifndef _SYS_SOCKET_H
+#include <sys/socket.h>
+#endif /* _SYS_SOCKET_H */
+
+#ifndef _SYS_FILIO_H
+#include <sys/filio.h>
+#endif /* _SYS_FILIO_H */
+
+#ifndef _ARPA_INET_H
+#include <arpa/inet.h>
+#endif /* _ARPA_INET_H */
+
+#ifndef _NETDB_H
+#include <netdb.h>
+#endif /* _NETDB_H */
 
 /****************************************************************************/
 

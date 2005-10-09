@@ -1,5 +1,5 @@
 /*
- * $Id: inttypes.h,v 1.2 2005-05-12 13:21:47 obarthel Exp $
+ * $Id: inttypes.h,v 1.3 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,6 +53,12 @@
 #ifndef _STDDEF_H
 #include <stddef.h>
 #endif /* _STDDEF_H */
+
+/****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
@@ -312,6 +318,12 @@ extern uintmax_t strtoumax(const char *str, char **ptr, int base);
 
 extern intmax_t wcstoimax(const wchar_t *str, char **ptr, int base);
 extern uintmax_t wcstoumax(const wchar_t *str, char **ptr, int base);
+
+/****************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.13 2005-07-12 13:35:58 obarthel Exp $
+ * $Id: unistd.h,v 1.14 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,15 +40,19 @@
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
 #ifndef _FCNTL_H
 #include <fcntl.h>
 #endif /* _FCNTL_H */
+
+#if !defined(__NO_NET_API) && !defined(_SYS_SELECT_H)
+#include <sys/select.h>
+#endif /* __NO_NET_API && _SYS_SELECT_H */
+
+/****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 /****************************************************************************/
 
@@ -118,11 +122,33 @@ extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int lin
 
 /****************************************************************************/
 
-/* If desired, also include the networking API, as integrated into
-   the clib2 libnet.a library. */
-#if defined(__USE_CLIB2_NETLIB) && !defined(_SYS_CLIB2_NET_H)
-#include <sys/clib2_net.h>
-#endif /* __USE_CLIB2_NETLIB && !_SYS_CLIB2_NET_H */
+/*
+ * The following prototypes may clash with the bsdsocket.library or
+ * usergroup.library API definitions.
+ */
+
+#ifndef __NO_NET_API
+
+extern long gethostid(void);
+extern int gethostname(const char *name, size_t namelen);
+extern char *crypt(const char *key, const char *salt);
+extern gid_t getegid(void);
+extern uid_t geteuid(void);
+extern gid_t getgid(void);
+extern int getgroups(int gidsetsize, gid_t grouplist[]);
+extern char * getpass(const char *prompt);
+extern uid_t getuid(void);
+extern int initgroups(const char *name, gid_t basegid);
+extern int setegid(gid_t gid);
+extern int seteuid(uid_t uid);
+extern int setgid(gid_t gid);
+extern int setgroups(int ngroups, const gid_t *gidset);
+extern int setregid(gid_t rgid, gid_t egid);
+extern int setreuid(uid_t ruid, uid_t euid);
+extern pid_t setsid(void);
+extern int setuid(uid_t uid);
+
+#endif /* __NO_NET_API */
 
 /****************************************************************************/
 

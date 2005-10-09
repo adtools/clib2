@@ -1,5 +1,5 @@
 /*
- * $Id: socket_getnetbyaddr.c,v 1.2 2005-01-02 09:07:08 obarthel Exp $
+ * $Id: socket_getnetbyaddr.c,v 1.3 2005-10-09 12:32:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,7 +42,7 @@
 /****************************************************************************/
 
 struct netent *
-getnetbyaddr(long net,int type)
+getnetbyaddr(in_addr_t net,int type)
 {
 	struct netent *result = NULL;
 
