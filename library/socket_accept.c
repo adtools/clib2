@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.14 2005-10-09 09:05:27 obarthel Exp $
+ * $Id: socket_accept.c,v 1.15 2005-10-09 14:48:19 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,7 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 	struct fd * new_fd;
 	int new_fd_slot_number;
 	int result = ERROR;
+	LONG socket_fd;
 	LONG new_socket_fd = -1;
 	BOOL stdio_locked = FALSE;
 
@@ -93,17 +94,18 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 	if(fd == NULL)
 		goto out;
 
+	/* Remember the socket number for later. */
+	socket_fd = (LONG)fd->fd_DefaultFile;
+
 	/* Now let go of the stdio lock, so that the only locking performed
-	   will be done inside the accept() call. Note that this makes the
-	   accept() stub vulnerable: a different Process might be able to
-	   close the socket accept() will wait upon! */
+	   will be done inside the accept() call. */
 	__stdio_unlock();
 	stdio_locked = FALSE;
 
 	/* Wait for the accept() to complete, then hook up the socket
 	   with a file descriptor. */
 	PROFILE_OFF();
-	new_socket_fd = __accept((LONG)fd->fd_DefaultFile,cliaddr,(LONG *)addrlen);
+	new_socket_fd = __accept(socket_fd,cliaddr,(LONG *)addrlen);
 	PROFILE_ON();
 
 	if(new_socket_fd < 0)
