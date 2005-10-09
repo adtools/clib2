@@ -1,5 +1,5 @@
 /*
- * $Id: math_round.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_round.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,15 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -44,8 +53,64 @@
 double
 round(double x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+  /* Most significant word, least significant word. */
+  LONG msw, exponent_less_1023;
+  ULONG lsw;
+
+  EXTRACT_WORDS(msw, lsw, x);
+
+  /* Extract exponent field. */
+  exponent_less_1023 = ((msw & 0x7ff00000) >> 20) - 1023;
+
+  if (exponent_less_1023 < 20)
+    {
+      if (exponent_less_1023 < 0)
+        {
+          msw &= 0x80000000;
+          if (exponent_less_1023 == -1)
+            /* Result is +1.0 or -1.0. */
+            msw |= (1023 << 20);
+          lsw = 0;
+        }
+      else
+        {
+          ULONG exponent_mask = 0x000fffff >> exponent_less_1023;
+          if ((msw & exponent_mask) == 0 && lsw == 0)
+            /* x in an integral value. */
+            return x;
+
+          msw += 0x00080000 >> exponent_less_1023;
+          msw &= ~exponent_mask;
+          lsw = 0;
+        }
+    }
+  else if (exponent_less_1023 > 51)
+    {
+      if (exponent_less_1023 == 1024)
+        /* x is NaN or infinite. */
+        return x + x;
+      else
+        return x;
+    }
+  else
+    {
+      ULONG exponent_mask = 0xffffffff >> (exponent_less_1023 - 20);
+      ULONG tmp;
+
+      if ((lsw & exponent_mask) == 0)
+        /* x is an integral value. */
+        return x;
+
+      tmp = lsw + (1 << (51 - exponent_less_1023));
+      if (tmp < lsw)
+        msw += 1;
+      lsw = tmp;
+
+      lsw &= ~exponent_mask;
+    }
+  INSERT_WORDS(x, msw, lsw);
+
+  return x;
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: math_truncf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_truncf.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,15 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -44,8 +53,37 @@
 float
 truncf(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+  LONG signbit, w, exponent_less_127;
+
+  GET_FLOAT_WORD(w,x);
+
+  /* Extract sign bit. */
+  signbit = w & 0x80000000;
+
+  /* Extract exponent field. */
+  exponent_less_127 = ((w & 0x7f800000) >> 23) - 127;
+
+  if (exponent_less_127 < 23)
+    {
+      if (exponent_less_127 < 0)
+        {
+          /* -1 < x < 1, so result is +0 or -0. */
+          SET_FLOAT_WORD(x, signbit);
+        }
+      else
+        {
+          SET_FLOAT_WORD(x, signbit | (w & ~(0x007fffff >> exponent_less_127)));
+        }
+    }
+  else
+    {
+      if (exponent_less_127 == 255)
+        /* x is NaN or infinite. */
+        return x + x;
+
+      /* All bits in the fraction field are relevant. */
+    }
+  return x;
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: math_remquof.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_remquof.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,12 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * Copyright (C) 2002 by  Red Hat, Incorporated. All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software
+ * is freely granted, provided that this notice is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -44,8 +50,24 @@
 float
 remquof(float x,float y,int * quo)
 {
-	/* ZZZ unimplemented */
-	return(0);
+  int signx, signy, signres;
+  int wx;
+  int wy;
+  float x_over_y;
+
+  GET_FLOAT_WORD(wx, x);
+  GET_FLOAT_WORD(wy, y);
+
+  signx = (wx & 0x80000000) >> 31;
+  signy = (wy & 0x80000000) >> 31;
+
+  signres = (signx ^ signy) ? -1 : 1;
+
+  x_over_y = fabsf(x / y);
+
+  *quo = signres * (lrintf(x_over_y) & 0x7f);
+
+  return remainderf(x,y);
 }
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: math_lroundf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_lroundf.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,15 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -44,8 +53,33 @@
 long int
 lroundf(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+  LONG exponent_less_127;
+  ULONG w;
+  long int result;
+  LONG sign;
+
+  GET_FLOAT_WORD (w, x);
+  exponent_less_127 = ((w & 0x7f800000) >> 23) - 127;
+  sign = (w & 0x80000000) != 0 ? -1 : 1;
+  w &= 0x7fffff;
+  w |= 0x800000;
+
+  if (exponent_less_127 < (8 * sizeof (long int)) - 1)
+    {
+      if (exponent_less_127 < 0)
+        return exponent_less_127 < -1 ? 0 : sign;
+      else if (exponent_less_127 >= 23)
+        result = (long int) w << (exponent_less_127 - 23);
+      else
+        {
+          w += 0x400000 >> exponent_less_127;
+          result = w >> (23 - exponent_less_127);
+        }
+    }
+  else
+      return (long int) x;
+
+  return sign * result;
 }
 
 /****************************************************************************/

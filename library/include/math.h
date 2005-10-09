@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.16 2005-06-26 09:06:12 obarthel Exp $
+ * $Id: math.h,v 1.17 2005-10-09 10:38:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -250,17 +250,25 @@ extern float erfcf(float x);
 extern float erff(float x);
 extern float expm1f(float x);
 extern float fdimf(float x,float y);
+extern float fmaf(float x,float y,float z);
 extern float fmaxf(float x,float y);
 extern float fminf(float x,float y);
 extern float hypotf(float x, float y);
 extern float lgammaf(float x);
 extern float log1pf(float x);
 extern float logbf(float x);
+extern long int lrintf(float x);
+extern long int lroundf(float x);
 extern float nanf(const char *tagp);
+extern float nearbyintf(float x);
 extern float nextafterf(float x,float y);
 extern float remainderf(float x, float p);
+extern float remquof(float x,float y,int * quo);
 extern float rintf(float x);
+extern float roundf(float x);
 extern float scalbnf (float x, int n);
+extern float tgammaf(float x);
+extern float truncf(float x);
 extern int ilogbf(float x);
 
 /****************************************************************************/
@@ -273,17 +281,25 @@ extern double erf(double x);
 extern double erfc(double x);
 extern double expm1(double x);
 extern double fdim(double x,double y);
+extern double fma(double x,double y,double z);
 extern double fmax(double x,double y);
 extern double fmin(double x,double y);
 extern double hypot(double x,double y);
 extern double lgamma(double x);
 extern double log1p(double x);
 extern double logb(double x);
+extern long int lrint(double x);
+extern long int lround(double x);
 extern double nan(const char *tagp);
+extern double nearbyint(double x);
 extern double nextafter(double x,double y);
 extern double remainder(double x, double p);
+extern double remquo(double x,double y,int * quo);
 extern double rint(double x);
+extern double round(double x);
 extern double scalbn (double x, int n);
+extern double tgamma(double x);
+extern double trunc(double x);
 extern int ilogb(double x);
 
 /****************************************************************************/

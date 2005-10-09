@@ -1,5 +1,5 @@
 /*
- * $Id: math_nearbyintf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_nearbyintf.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,8 @@
 float
 nearbyintf(float x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	/* ZZZ is this such a good idea? */
+	return(rintf(x));
 }
 
 /****************************************************************************/

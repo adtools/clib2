@@ -1,19 +1,5 @@
 C99 math functions:
 
-	(functions generally missing, including their "float" counterparts)
-	fma
-	fmaf
-	lrint
-	lrintf
-	lround
-	lroundf
-	nearbyint
-	nearbyintf
-	remquo
-	remquof
-	round
-	roundf
-	tgamma
-	tgammaf
-	trunc
-	truncf
+	fma() and fmaf() should be implemented as a true "fused" multiply
+	and add function rather than the sequential operation implied in the
+	current implementation.

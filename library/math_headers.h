@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.11 2005-05-30 08:10:37 obarthel Exp $
+ * $Id: math_headers.h,v 1.12 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -220,6 +220,8 @@ extern float __kernel_cosf(float x, float y);
 extern float __kernel_sinf(float x, float y, int iy);
 extern LONG __rem_pio2f(float x, float *y);
 extern float __kernel_tanf(float x, float y, int iy);
+extern double __lgamma(double x,int * gamma_sign_ptr);
+extern float __lgammaf(float x,int * gamma_sign_ptr);
 
 /****************************************************************************/
 

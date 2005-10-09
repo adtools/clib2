@@ -1,3 +1,12 @@
+- Implemented lrintf(), lrint(), lroundf(), lround(), nearbyintf(),
+  nearbyint(), remquof(), remquo(), roundf(), round(), tgammaf(),
+  tgamma(), truncf(), trunc(). Sort of implemented fmaf() and fma(),
+  which really ought to be done in "SIMD" fashion.
+
+  This completes the "real" floating point math library (ignoring
+  for a moment that the floating point environment code is still
+  not implemented).
+
 - accept() now calls the bsdsocket.library accept() function first
   and then hooks up the socket with the clib2 data structures. This
   makes it possible to have several Processes calling the accept()

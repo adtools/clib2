@@ -1,5 +1,5 @@
 /*
- * $Id: math_fmaf.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_fmaf.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,9 @@
 float
 fmaf(float x,float y,float z)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	/* ZZZ this should be a *fused* multiply & add, and
+	   not a sequential operation as declared below! */
+	return((x * y) + z);
 }
 
 /****************************************************************************/

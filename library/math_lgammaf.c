@@ -1,5 +1,5 @@
 /*
- * $Id: math_lgammaf.c,v 1.2 2005-05-30 08:47:26 obarthel Exp $
+ * $Id: math_lgammaf.c,v 1.3 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -170,7 +170,7 @@ sin_pif(float x)
 
 
 float
-lgammaf(float x)
+__lgammaf(float x,int * gamma_sign_ptr)
 {
 	float t,y,z,nadj=0.0,p,p1,p2,p3,q,r,w;
 	LONG i,hx,ix;
@@ -178,11 +178,13 @@ lgammaf(float x)
 	GET_FLOAT_WORD(hx,x);
 
     /* purge off +-inf, NaN, +-0, and negative arguments */
+    (*gamma_sign_ptr) = 1;
 	ix = hx&0x7fffffff;
 	if(ix>=0x7f800000) return x*x;
 	if(ix==0) return one/zero;
 	if(ix<0x1c800000) {	/* |x|<2**-70, return -log(|x|) */
 	    if(hx<0) {
+	        (*gamma_sign_ptr) = -1;
 	        return -logf(-x);
 	    } else return -logf(x);
 	}
@@ -192,6 +194,8 @@ lgammaf(float x)
 	    t = sin_pif(x);
 	    if(t==zero) return one/zero; /* -integer */
 	    nadj = logf(pi/fabsf(t*x));
+	    if(t<zero)
+	      (*gamma_sign_ptr) = -1;
 	    x = -x;
 	}
 
@@ -259,6 +263,19 @@ lgammaf(float x)
 	    r =  x*(logf(x)-one);
 	if(hx<0) r = nadj - r;
 	return r;
+}
+
+/****************************************************************************/
+
+float
+lgammaf(float x)
+{
+  int gamma_sign;
+  float result;
+
+  result = __lgammaf(x,&gamma_sign);
+
+  return(result);
 }
 
 /****************************************************************************/

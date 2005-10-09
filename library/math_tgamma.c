@@ -1,5 +1,5 @@
 /*
- * $Id: math_tgamma.c,v 1.1 2005-05-29 11:19:01 obarthel Exp $
+ * $Id: math_tgamma.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,15 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PowerPC math library based in part on work by Sun Microsystems
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
  */
 
 #ifndef _MATH_HEADERS_H
@@ -44,8 +53,14 @@
 double
 tgamma(double x)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	int gamma_sign;
+    double y;
+
+	y = __lgamma(x,&gamma_sign);
+	if (gamma_sign < 0)
+		y = -y;
+
+	return y;
 }
 
 /****************************************************************************/
