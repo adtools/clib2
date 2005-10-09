@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.13 2005-10-08 15:59:56 obarthel Exp $
+ * $Id: socket_accept.c,v 1.14 2005-10-09 09:05:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -57,7 +57,6 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 	int result = ERROR;
 	LONG new_socket_fd = -1;
 	BOOL stdio_locked = FALSE;
-	BOOL fd_locked = FALSE;
 
 	ENTER();
 
@@ -85,6 +84,22 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IN_USE) );
 	assert( FLAG_IS_SET(__fd[sockfd]->fd_Flags,FDF_IS_SOCKET) );
 
+	/* We need to know which parameter to submit to the accept()
+	   call first. */
+	__stdio_lock();
+	stdio_locked = TRUE;
+
+	fd = __get_file_descriptor_socket(sockfd);
+	if(fd == NULL)
+		goto out;
+
+	/* Now let go of the stdio lock, so that the only locking performed
+	   will be done inside the accept() call. Note that this makes the
+	   accept() stub vulnerable: a different Process might be able to
+	   close the socket accept() will wait upon! */
+	__stdio_unlock();
+	stdio_locked = FALSE;
+
 	/* Wait for the accept() to complete, then hook up the socket
 	   with a file descriptor. */
 	PROFILE_OFF();
@@ -97,15 +112,10 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 		goto out;
 	}
 
+	/* OK, back to work: we'll need to manipulate the file
+	   descriptor tables. */
 	__stdio_lock();
 	stdio_locked = TRUE;
-
-	fd = __get_file_descriptor_socket(sockfd);
-	if(fd == NULL)
-		goto out;
-
-	__fd_lock(fd);
-	fd_locked = TRUE;
 
 	new_fd_slot_number = __find_vacant_fd_entry();
 	if(new_fd_slot_number < 0)
@@ -151,9 +161,6 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 
 		PROFILE_ON();
 	}
-
-	if(fd_locked)
-		__fd_unlock(fd);
 
 	if(stdio_locked)
 		__stdio_unlock();
