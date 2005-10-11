@@ -1,3 +1,11 @@
+- Updated math_hypot.c to a newer (e_hypot.c 1.3 95/01/18) version from
+  fdlibm which uses macros for manipulating the high and low words of a
+  double, like the rest of fdlibm functions in clib2. The previous version
+  would give bogus results when compiled with -O3 in clib2 which lead to
+  "interesting" results (and lots of fun while searching for the problem)
+  in Ghostscript. Wish I managed to track this down yesterday for 1.196
+  release... <aantonijevic>
+
 c.lib 1.196 (11.10.2005)
 
 - Removed the various workarounds associated with <unistd.h>, required
