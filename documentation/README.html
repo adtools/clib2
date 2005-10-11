@@ -64,13 +64,33 @@ preprocesssor symbold defined. Note that 'thread-safe' does <em>not</em> mean
 'reentrant'. Multiple callers for certain library functions are permitted, but
 not for all of them. For example, <tt>mkdtemp()</tt> is not thread-safe, and neither is
 <tt>rand()</tt> or <tt>localtime()</tt>. But as per <b>POSIX 1003.1c-1995</b> there are thread-safe
-variants of <tt>rand()</tt> and <tt>localtime()</tt> called <tt>rand_r()</tt>, <tt>localtime_r()</tt>, and others.
-The use of the socket I/O functions is still problematic because the
-underlying <tt>bsdsocket.library</tt> API is not supposed to be used by any process
-other than the one that opened it. Also yet unsolved is the issue of reading
-error codes from the <tt>errno</tt> variable which currently always contains the
-error code left by the last caller.</p>
+variants of <tt>rand()</tt> and <tt>localtime()</tt> called <tt>rand_r()</tt>, <tt>localtime_r()</tt>, and others.</p>
 
+<p>The use of the socket I/O functions is still problematic because the
+underlying <tt>bsdsocket.library</tt> API is not supposed to be used by any process
+other than the one that opened it. While one TCP/IP stack (my own "Roadshow") allows you
+to share the library base among different processes, if so configured, it is the
+exception. No other TCP/IP stack available for the Amiga robustly supports a similar
+feature. Any attempt to enable it by default would introduce incompatibilities which
+might be difficult to support.</p>
+
+<p>Also yet unsolved is the issue of reading
+error codes from the <tt>errno</tt> variable which currently always contains the
+error code left by the last caller. This is also the case for the global <tt>h_errno</tt>
+variable, which the socket I/O name resolution functions may change.</p>
+
+<p>A much more serious problem resides with the <tt>exit()</tt>, <tt>abort()</tt>,
+<tt>assert()</tt> and <tt>raise()</tt> functions, and the how <tt>SIGINT</tt> signal is
+processed. In the thread-safe library only the <tt>main()</tt> function may directly
+or indirectly call the <tt>exit()</tt> function. No child process may do so, since this
+would wreck its stack context, crashing it instantly; the main program would be very
+likely to crash, too, because <tt>exit()</tt> will clean up after all memory allocations
+and files currently in use. Functions such as <tt>abort()</tt> and <tt>raise()</tt> may
+call the <tt>exit()</tt> function indirectly. And the <tt>raise()</tt> function may
+be invoked as part of the <tt>Control+C</tt> checking. You should make sure that the
+signal handling does not affect any child processes. This can be done by replacing the
+<tt>__check_abort()</tt> function or by disabling <tt>SIGINT</tt> processing altogether,
+such as through a <tt>signal(SIGINT,SIG_IGN)</tt> call.</p>
 
 <h2>3. What does it not do?</h2>
 
@@ -299,6 +319,6 @@ can reach me at:</p>
 
 <p>Or via e-mail:</p>
 
-<p>olsen@sourcery.han.de</p>
+<p>olsen&#64;sourcery&#46;han&#46;de</p>
 </body>
 </html>
