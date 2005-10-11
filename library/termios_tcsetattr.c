@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcsetattr.c,v 1.2 2005-07-06 18:48:53 obarthel Exp $
+ * $Id: termios_tcsetattr.c,v 1.3 2005-10-11 09:28:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -135,7 +135,7 @@ int
 tcsetattr(int file_descriptor,int how,struct termios *tios)
 {
 	int result = ERROR;
-	struct fd *fd;
+	struct fd *fd = NULL;
 	struct termios new_tios;
 	int type;
 

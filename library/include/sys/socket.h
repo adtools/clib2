@@ -1,5 +1,5 @@
 /*
- * $Id: socket.h,v 1.1 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: socket.h,v 1.2 2005-10-11 09:28:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif #endif /* __cplusplus */
+#endif /* __cplusplus */
 
 /****************************************************************************/
 

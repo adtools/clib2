@@ -1,5 +1,5 @@
 /*
- * $Id: uio_readv.c,v 1.4 2005-07-06 18:48:53 obarthel Exp $
+ * $Id: uio_readv.c,v 1.5 2005-10-11 09:28:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ readv(int file_descriptor,const struct iovec *iov,int vec_count)
 	ssize_t total_num_bytes_read;
 	ssize_t part_num_bytes_read;
 	ssize_t num_bytes_read;
-	struct fd * fd;
+	struct fd * fd = NULL;
 	int i;
 
 	ENTER();

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.75 2005-10-09 12:32:18 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.76 2005-10-11 09:28:29 obarthel Exp $
 #
 # :ts=8
 #
@@ -54,41 +54,39 @@ endif
 # General build rules for all object files and the individual libraries
 %.o : %.c
 	@echo "Compiling $<"
-	@$(CC) -c $(CFLAGS) $<
+	@$(CC) -c $(CFLAGS) $< 2>&1 | tee -a compiler.log
 
 $(LIBC_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):c]"
-	@$(CC) -o $(LIBC_OBJS)/$*.o -c $(CFLAGS) $<
+	@$(CC) -o $(LIBC_OBJS)/$*.o -c $(CFLAGS) $< 2>&1 | tee -a compiler.log
 
 $(LIBUNIX_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):unix]"
-	@$(CC) -o $(LIBUNIX_OBJS)/$*.o -c $(CFLAGS) -DUNIX_PATH_SEMANTICS $<
+	@$(CC) -o $(LIBUNIX_OBJS)/$*.o -c $(CFLAGS) -DUNIX_PATH_SEMANTICS $< 2>&1 | tee -a compiler.log
 
 $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
-	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) $(FLOAT_TYPE) $<
+	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) $(FLOAT_TYPE) $< 2>&1 | tee -a compiler.log
 
 $(LIBNET_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):net]"
-	@$(CC) -o $(LIBNET_OBJS)/$*.o -c $(CFLAGS) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT $<
+	@$(CC) -o $(LIBNET_OBJS)/$*.o -c $(CFLAGS) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT $< 2>&1 | tee -a compiler.log
 
 $(LIBDEBUG_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):debug]"
-	@$(CC) -o $(LIBDEBUG_OBJS)/$*.o -c $(CFLAGS) $<
+	@$(CC) -o $(LIBDEBUG_OBJS)/$*.o -c $(CFLAGS) $< 2>&1 | tee -a compiler.log
 
 $(LIBAMIGA_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):amiga]"
-	@$(CC) -o $(LIBAMIGA_OBJS)/$*.o -c $(CFLAGS) $<
+	@$(CC) -o $(LIBAMIGA_OBJS)/$*.o -c $(CFLAGS) $< 2>&1 | tee -a compiler.log
 
 $(LIBPROFILE_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):profile]"
-	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o  -c $(CFLAGS) $<
+	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o  -c $(CFLAGS) $< 2>&1 | tee -a compiler.log
 
 $(LIBPROFILE_OBJS)/%.o : %.S
 	@echo "Assembling $< [$(TYPE):profile]"
-	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o -Wa,-mregnames -c $(CFLAGS) $<
-
-
+	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o -Wa,-mregnames -c $(CFLAGS) $< 2>&1 | tee -a compiler.log
 
 ##############################################################################
 
@@ -1234,4 +1232,3 @@ baserel/crtbegin.o : crtbegin.c
 baserel/crtend.o : crtend.c
 	@echo "Assembling $<"
 	@$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c
-

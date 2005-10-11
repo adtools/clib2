@@ -1,12 +1,12 @@
 //
-//	$Id: crt0.S,v 1.5 2005-08-26 12:39:33 obarthel Exp $
+//	$Id: crt0.S,v 1.6 2005-10-11 09:28:29 obarthel Exp $
 //
 //	:ts=4
 //
 
 	.text
 
-	.globl  main	| This enforces linkage against the main() function
+	.globl  main	/* This enforces linkage against the main() function */
 	.globl  _main
 	.globl  _start
 
