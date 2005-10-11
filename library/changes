@@ -1,3 +1,5 @@
+c.lib 1.196 (11.10.2005)
+
 - Removed the various workarounds associated with <unistd.h>, required
   for building code that references the networking API. It is now possible,
   provided you build your code with an existing TCP/IP API header file
