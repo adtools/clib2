@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.68 2005-10-09 12:32:18 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.69 2005-10-11 11:24:53 obarthel Exp $
 #
 # :ts=8
 #
@@ -110,10 +110,10 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -Inetinclude
-#OPTIONS = -fno-builtin -fno-common -D__USE_CLIB2_NETLIB -DDEBUG
- OPTIONS = -fno-builtin -fno-common -D__USE_CLIB2_NETLIB -DNDEBUG
-#OPTIONS = -fno-builtin -fno-common -D__USE_CLIB2_NETLIB -D__MEM_DEBUG
-#OPTIONS = -fno-builtin -fno-common -D__USE_CLIB2_NETLIB -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG
+#OPTIONS = -fno-builtin -fno-common -DDEBUG
+ OPTIONS = -fno-builtin -fno-common -DNDEBUG
+#OPTIONS = -fno-builtin -fno-common -D__MEM_DEBUG
+#OPTIONS = -fno-builtin -fno-common -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG
  OPTIMIZE = -O -fomit-frame-pointer -fstrength-reduce -finline-functions
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g

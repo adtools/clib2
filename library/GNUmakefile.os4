@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.77 2005-10-11 09:37:27 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.78 2005-10-11 11:24:53 obarthel Exp $
 #
 # :ts=8
 #
@@ -122,8 +122,8 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -I$(SDK_INCLUDE)
- OPTIONS = -D__THREAD_SAFE -D__USE_CLIB2_NETLIB -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
-#OPTIONS =                 -D__USE_CLIB2_NETLIB -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+ OPTIONS = -D__THREAD_SAFE -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+#OPTIONS =                 -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
 OPTIMIZE = -O3
 #DEBUG = -ggdb
 
