@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.69 2005-10-11 11:24:53 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.70 2005-10-16 09:14:28 obarthel Exp $
 #
 # :ts=8
 #
@@ -554,6 +554,8 @@ MATH_LIB = \
 	math_atan2.o \
 	math_atan2f.o \
 	math_atanf.o \
+	math_atanh.o \
+	math_atanhf.o \
 	math_cbrt.o \
 	math_cbrtf.o \
 	math_ceil.o \
