@@ -1,5 +1,5 @@
 /*
- * $Id: math_ldexp.c,v 1.4 2005-10-16 09:05:02 obarthel Exp $
+ * $Id: math_ldexp.c,v 1.5 2005-10-16 09:17:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,7 +51,7 @@
 /****************************************************************************/
 
 double
-ldexp(double value, int exp)
+ldexp(double x, int exp)
 {
 	double result;
 
