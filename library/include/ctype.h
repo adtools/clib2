@@ -1,5 +1,5 @@
 /*
- * $Id: ctype.h,v 1.6 2005-05-11 20:15:28 obarthel Exp $
+ * $Id: ctype.h,v 1.7 2005-10-16 08:34:52 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _CYTPE_H
-#define _CYTPE_H
+#ifndef _CTYPE_H
+#define _CTYPE_H
 
 /****************************************************************************/
 
@@ -120,4 +120,4 @@ extern const unsigned char __ctype_table[];
 
 /****************************************************************************/
 
-#endif /* _CYTPE_H */
+#endif /* _CTYPE_H */
