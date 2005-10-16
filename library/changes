@@ -6,6 +6,12 @@
   in Ghostscript. Wish I managed to track this down yesterday for 1.196
   release... <aantonijevic>
 
+- Implemented atanh() and atanhf() which were not listed in the TODO
+  file but were still unimplemented up until now.
+
+- Replaced ldexp() and modf().
+
+
 c.lib 1.196 (11.10.2005)
 
 - Removed the various workarounds associated with <unistd.h>, required

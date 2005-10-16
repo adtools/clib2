@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.17 2005-10-09 10:38:56 obarthel Exp $
+ * $Id: math.h,v 1.18 2005-10-16 09:05:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -244,6 +244,7 @@ extern float tanhf(float x);
 
 extern float acoshf(float x);
 extern float asinhf(float x);
+extern float atanhf(float x);
 extern float cbrtf(float x);
 extern float copysignf(float x, float y);
 extern float erfcf(float x);
@@ -275,6 +276,7 @@ extern int ilogbf(float x);
 
 extern double acosh(double x);
 extern double asinh(double x);
+extern double atanh(double x);
 extern double cbrt(double x);
 extern double copysign(double x, double y);
 extern double erf(double x);

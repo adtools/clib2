@@ -1,5 +1,5 @@
 /*
- * $Id: math_modf.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_modf.c,v 1.6 2005-10-16 09:05:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -56,37 +56,9 @@
 
 /****************************************************************************/
 
-#if defined(IEEE_FLOATING_POINT_SUPPORT)
-
-INLINE STATIC const double
-__modf(double x,double *nptr)
-{
-	double int_n;
-	double result;
-
-	if(x < 0.0)
-	{
-		int_n = ceil(x);
-
-		result = int_n - x;
-	}
-	else
-	{
-		int_n = floor(x);
-
-		result = x - int_n;
-	}
-
-	(*nptr) = int_n;
-
-	return(result);
-}
-
-#endif /* IEEE_FLOATING_POINT_SUPPORT */
+#if defined(M68881_FLOATING_POINT_SUPPORT)
 
 /****************************************************************************/
-
-#if defined(M68881_FLOATING_POINT_SUPPORT)
 
 INLINE STATIC const double
 __modf(double x,double *nptr)
@@ -105,37 +77,62 @@ __modf(double x,double *nptr)
 	return(result);
 }
 
-#endif /* M68881_FLOATING_POINT_SUPPORT */
+/****************************************************************************/
+
+#else
 
 /****************************************************************************/
 
-#if defined(__PPC__)
+static const double one = 1.0;
 
-INLINE STATIC const double
-__modf(double x,double *nptr)
+INLINE STATIC double
+__modf(double x, double *iptr)
 {
-	double int_n;
-	double result;
-
-	if(x < 0.0)
-	{
-		int_n = ceil(x);
-
-		result = int_n - x;
+	LONG i0,i1,j0;
+	ULONG i;
+	EXTRACT_WORDS(i0,i1,x);
+	j0 = ((i0>>20)&0x7ff)-0x3ff;	/* exponent of x */
+	if(j0<20) {			/* integer part in high x */
+	    if(j0<0) {			/* |x|<1 */
+	        INSERT_WORDS(*iptr,i0&0x80000000,0);	/* *iptr = +-0 */
+		return x;
+	    } else {
+		i = (0x000fffff)>>j0;
+		if(((i0&i)|i1)==0) {		/* x is integral */
+		    ULONG high;
+		    *iptr = x;
+		    GET_HIGH_WORD(high,x);
+		    INSERT_WORDS(x,high&0x80000000,0);	/* return +-0 */
+		    return x;
+		} else {
+		    INSERT_WORDS(*iptr,i0&(~i),0);
+		    return x - *iptr;
+		}
+	    }
+	} else if (j0>51) {		/* no fraction part */
+	    ULONG high;
+	    *iptr = x*one;
+	    GET_HIGH_WORD(high,x);
+	    INSERT_WORDS(x,high&0x80000000,0);	/* return +-0 */
+	    return x;
+	} else {			/* fraction part in low x */
+	    i = ((ULONG)(0xffffffff))>>(j0-20);
+	    if((i1&i)==0) { 		/* x is integral */
+	        ULONG high;
+		*iptr = x;
+		GET_HIGH_WORD(high,x);
+		INSERT_WORDS(x,high&0x80000000,0);	/* return +-0 */
+		return x;
+	    } else {
+	        INSERT_WORDS(*iptr,i0,i1&(~i));
+		return x - *iptr;
+	    }
 	}
-	else
-	{
-		int_n = floor(x);
-
-		result = x - int_n;
-	}
-
-	(*nptr) = int_n;
-
-	return(result);
 }
 
-#endif /* PPC_FLOATING_POINT_SUPPORT */
+/****************************************************************************/
+
+#endif /* M68881_FLOATING_POINT_SUPPORT */
 
 /****************************************************************************/
 

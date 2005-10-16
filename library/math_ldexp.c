@@ -1,5 +1,5 @@
 /*
- * $Id: math_ldexp.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_ldexp.c,v 1.4 2005-10-16 09:05:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,122 +50,22 @@
 
 /****************************************************************************/
 
-#if defined(IEEE_FLOATING_POINT_SUPPORT)
-
-#define MANT_MASK	0x800FFFFF	/* Mantissa extraction mask */
-#define ZPOS_MASK	0x3FF00000	/* Positive # mask for exp = 0 */
-#define ZNEG_MASK	0x3FF00000	/* Negative # mask for exp = 0 */
-
-#define EXP_MASK	0x7FF00000	/* Mask for exponent */
-#define EXP_SHIFTS	20			/* Shifts to get into LSB's */
-#define EXP_BIAS	1023		/* Exponent bias */
-
-union dtol
-{
-	double	dval;
-	long	ival[2];
-};
-
-INLINE STATIC const double
-__ldexp(double x,int n)
-{
-	union dtol number;
-	long *iptr, cn;
-
-	number.dval = x;
-
-	iptr = &number.ival[0];
-
-	cn = (((*iptr) & EXP_MASK) >> EXP_SHIFTS) - EXP_BIAS;
-
-	(*iptr) &= ~EXP_MASK;
-
-	n += EXP_BIAS;
-
-	/* ZZZ we can't just muck with the exponent, we
-	 * have to check for underflow and overflow, too!
-	 */
-	(*iptr) |= ((n + cn) << EXP_SHIFTS) & EXP_MASK;
-
-	return(number.dval);
-}
-
-#endif /* IEEE_FLOATING_POINT_SUPPORT */
-
-/****************************************************************************/
-
-#if defined(M68881_FLOATING_POINT_SUPPORT)
-
-INLINE STATIC const double
-__ldexp(double x,int n)
-{
-	double result;
-
-	__asm ("fscale%.l %2,%0"
-	       : "=f" (result)
-	       : "0" (x),
-	       "dmi" (n));
-
-	return(result);
-}
-
-#endif /* M68881_FLOATING_POINT_SUPPORT */
-
-/****************************************************************************/
-
-#if defined(PPC_FLOATING_POINT_SUPPORT)
-
-#define MANT_MASK	0x800FFFFF	/* Mantissa extraction mask */
-#define ZPOS_MASK	0x3FF00000	/* Positive # mask for exp = 0 */
-#define ZNEG_MASK	0x3FF00000	/* Negative # mask for exp = 0 */
-
-#define EXP_MASK	0x7FF00000	/* Mask for exponent */
-#define EXP_SHIFTS	20			/* Shifts to get into LSB's */
-#define EXP_BIAS	1023		/* Exponent bias */
-
-union dtol
-{
-	double	dval;
-	long	ival[2];
-};
-
-INLINE STATIC const double
-__ldexp(double x,int n)
-{
-	union dtol number;
-	long *iptr, cn;
-
-	number.dval = x;
-
-	iptr = &number.ival[0];
-
-	cn = (((*iptr) & EXP_MASK) >> EXP_SHIFTS) - EXP_BIAS;
-
-	(*iptr) &= ~EXP_MASK;
-
-	n += EXP_BIAS;
-
-	/* ZZZ we can't just muck with the exponent, we
-	 * have to check for underflow and overflow, too!
-	 */
-	(*iptr) |= ((n + cn) << EXP_SHIFTS) & EXP_MASK;
-
-	return(number.dval);
-}
-
-#endif /* PPC_FLOATING_POINT_SUPPORT */
-
-/****************************************************************************/
-
 double
-ldexp(double x,int n)
+ldexp(double value, int exp)
 {
 	double result;
 
-	if(x != 0.0)
-		result = __ldexp(x,n);
+	if(isinf(x) || fpclassify(x) == FP_ZERO)
+	{
+		result = x;
+	}
 	else
-		result = 0.0;
+	{
+		result = scalbn(x,exp);
+
+		if(isinf(result) || (result < DBL_MIN || result > -DBL_MIN))
+			__set_errno(ERANGE);
+	}
 
 	return(result);
 }
