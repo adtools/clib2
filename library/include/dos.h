@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.11 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: dos.h,v 1.12 2005-10-17 13:54:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -361,6 +361,32 @@ extern int __translate_io_error_to_errno(LONG io_error);
  */
 extern VOID __lib_exit(VOID);
 extern BOOL __lib_init(struct Library * SysBase);
+
+/****************************************************************************/
+
+/*
+ * The following variables are part of libnet.a, which provides for
+ * a BSD-Unix-like socket networking API. Traditionally, only one process
+ * at a time may use the underlying bsdsocket.library base, but with a
+ * multithreaded application you may want all of them to share the same
+ * library base. As of this writing there is one single TCP/IP stack which
+ * supports this feature (Roadshow) and it must be enabled early on. If
+ * this worked out well you can test through the following variable which
+ * will be set to TRUE:
+ */
+extern BOOL __can_share_socket_library_base;
+
+/*
+ * The next global variable is also part of the thread-safe libnet.a and
+ * indicates that the TCP/IP stack will call the functions __set_errno()
+ * and __set_h_errno() when it modifies the global errno and h_errno
+ * variables, respectively. If you want to save the error codes for each
+ * of the Processes in your multithreaded application then you should
+ * override these functions with your. The following variable will be
+ * set to TRUE if the __set_errno() and __set_h_errno() functions will
+ * be used to change the corresponding variables:
+ */
+extern BOOL __thread_safe_errno_h_errno;
 
 /****************************************************************************/
 

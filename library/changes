@@ -11,6 +11,18 @@
 
 - Replaced ldexp() and modf().
 
+- Added __set_h_errno() and __get_h_errno() functions.
+
+- The thread-safe library now tries to enable bsdsocket.library base
+  sharing and attempts to make the TCP/IP stack call the local
+  __set_errno() and __set_h_errno(), so that any Process calling
+  the library functions will get a chance to see proper error
+  codes. Whether any of these features could be enabled can be tested
+  through two global variables __can_share_socket_library_base and
+  __thread_safe_errno_h_errno which are defined in <dos.h>. Note that
+  for both features to work you will need the Roadshow bsdsocket.library
+  version 4.275 or higher.
+
 
 c.lib 1.196 (11.10.2005)
 

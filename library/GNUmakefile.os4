@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.79 2005-10-16 09:14:28 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.80 2005-10-17 13:54:25 obarthel Exp $
 #
 # :ts=8
 #
@@ -737,6 +737,8 @@ NET_LIB = \
 	socket_socket.o \
 	socket_hook_entry.o \
 	socket_hstrerror.o \
+	socket_get_h_errno.o \
+	socket_set_h_errno.o \
 	stat_umask.o \
 	usergroup_crypt.o \
 	usergroup_data.o \

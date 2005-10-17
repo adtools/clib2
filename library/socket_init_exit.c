@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.20 2005-07-03 10:36:47 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.21 2005-10-17 13:54:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,10 +60,30 @@
 #define SBTM_SETVAL(code) (TAG_USER | (((code) & SBTS_CODE) << SBTB_CODE) | 1)
 #endif /* SBTM_SETVAL */
 
-#define SBTC_BREAKMASK		1	/* Interrupt signal mask */
-#define SBTC_LOGTAGPTR		11	/* Under which name log entries are filed */
-#define SBTC_ERRNOLONGPTR	24	/* Pointer to errno, length == sizeof(errno) */
-#define SBTC_HERRNOLONGPTR	25	/* 'h_errno' pointer (with sizeof(h_errno) == sizeof(long)) */
+#define SBTC_BREAKMASK					1	/* Interrupt signal mask */
+#define SBTC_LOGTAGPTR					11	/* Under which name log entries are filed */
+#define SBTC_ERRNOLONGPTR				24	/* Pointer to errno, length == sizeof(errno) */
+#define SBTC_HERRNOLONGPTR				25	/* 'h_errno' pointer (with sizeof(h_errno) == sizeof(long)) */
+#define SBTC_CAN_SHARE_LIBRARY_BASES	51	/* Enable library base sharing among Processes */
+#define SBTC_ERROR_HOOK					68	/* Error hook pointer */
+
+/****************************************************************************/
+
+/* Call-back hook for use with SBTC_ERROR_HOOK */
+struct ErrorHookMsg
+{
+	ULONG	ehm_Size;	/* Size of this data structure; this
+						   must be >= 12 */
+	ULONG	ehm_Action;	/* See below for a list of definitions */
+
+	LONG	ehm_Code;	/* The error code to use */
+};
+
+/* Which action the hook is to perform */
+#define EHMA_Set_errno		1	/* Set the local 'errno' to what is
+								   found in ehm_Code */
+#define EHMA_Set_h_errno	2	/* Set the local 'h_errno' to what is
+								   found in ehm_Code */
 
 /****************************************************************************/
 
@@ -91,6 +111,48 @@ struct SocketIFace * NOCOMMON __ISocket;
 /****************************************************************************/
 
 int NOCOMMON h_errno;
+
+/****************************************************************************/
+
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
+BOOL NOCOMMON __can_share_socket_library_base;
+BOOL NOCOMMON __thread_safe_errno_h_errno;
+
+/****************************************************************************/
+
+STATIC LONG ASM
+error_hook_function(
+	REG(a0, struct Hook *			unused_hook),
+	REG(a2, APTR					unused_reserved),
+	REG(a1, struct ErrorHookMsg *	ehm))
+{
+	if(ehm != NULL && ehm->ehm_Size >= 12)
+	{
+		if (ehm->ehm_Action == EHMA_Set_errno)
+			__set_errno(ehm->ehm_Code);
+		else if (ehm->ehm_Action == EHMA_Set_h_errno)
+			__set_h_errno(ehm->ehm_Code);
+	}
+
+	return(0);
+}
+
+/****************************************************************************/
+
+STATIC struct Hook error_hook =
+{
+	{ NULL, NULL },
+	(HOOKFUNC)error_hook_function,
+	(HOOKFUNC)NULL,
+	NULL
+};
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */
 
 /****************************************************************************/
 
@@ -212,14 +274,14 @@ SOCKET_CONSTRUCTOR(socket_init)
 		goto out;
 	}
 
-	/* If this library is built with the Roadshow SDK header files, and
-	 * it should be thread-safe, then we'll try to allow multiple
-	 * concurred processes to share the bsdsocket.library base opened
-	 * above. This only works for Roadshow, though, and has the
-	 * drawback that error reporting through 'errno' and 'h_errno'
-	 * is no longer safe.
-	 */
-	#if defined(__THREAD_SAFE) && defined(SBTC_CAN_SHARE_LIBRARY_BASES)
+	/* In the thread-safe library we try to enable two features which so
+	   far only the Roadshow TCP/IP stack supports: allow more than one
+	   Process to use the same bsdsocket.library base and to propagate
+	   changes to the errno and h_errno variable through a call-back
+	   hook. If either of these features are supported can be checked
+	   by looking at the global __can_share_socket_library_base and
+	   __thread_safe_errno_h_errno variables. */
+	#if defined(__THREAD_SAFE)
 	{
 		if(__SocketBase->lib_Version >= 4)
 		{
@@ -229,11 +291,29 @@ SOCKET_CONSTRUCTOR(socket_init)
 			tags[1].ti_Tag	= TAG_END;
 
 			PROFILE_OFF();
-			__SocketBaseTagList(tags);
+
+			if(__SocketBaseTagList(tags) == 0)
+				__can_share_socket_library_base = TRUE;
+
 			PROFILE_ON();
+
+			if(__can_share_socket_library_base)
+			{
+				tags[0].ti_Tag	= SBTM_SETVAL(SBTC_ERROR_HOOK);
+				tags[0].ti_Data	= (ULONG)&error_hook;
+
+				tags[1].ti_Tag	= TAG_END;
+
+				PROFILE_OFF();
+
+				if(__SocketBaseTagList(tags) == 0)
+					__thread_safe_errno_h_errno = TRUE;
+
+				PROFILE_ON();
+			}
 		}
 	}
-	#endif /* __THREAD_SAFE && SBTC_CAN_SHARE_LIBRARY_BASES */
+	#endif /* __THREAD_SAFE */
 
 	/* Check if this program was launched as a server by the Internet
 	 * superserver.
