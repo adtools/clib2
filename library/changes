@@ -23,6 +23,10 @@
   for both features to work you will need the Roadshow bsdsocket.library
   version 4.275 or higher.
 
+- In <stdbool.h> the preprocessor definition should read
+  "__bool_true_false_are_defined" rather than "__bool_true_and_false_are_defined".
+  Thanks go to Peter Bengtsson for finding and fixing it.
+
 
 c.lib 1.196 (11.10.2005)
 
