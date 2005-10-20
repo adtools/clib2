@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.53 2005-10-17 13:54:25 obarthel Exp $
+# $Id: smakefile,v 1.54 2005-10-20 06:50:32 obarthel Exp $
 #
 # :ts=8
 #
@@ -317,6 +317,7 @@ SOCKET_OBJ = \
 	socket_accept.o \
 	socket_bind.o \
 	socket_connect.o \
+	socket_check_daemon.o \
 	socket_gethostbyaddr.o \
 	socket_gethostbyname.o \
 	socket_gethostid.o \

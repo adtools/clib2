@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.12 2005-10-17 13:54:25 obarthel Exp $
+ * $Id: dos.h,v 1.13 2005-10-20 06:50:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -149,8 +149,23 @@ extern int __get_default_file(int file_descriptor,long * file_ptr);
 /****************************************************************************/
 
 /*
+ * If your program is intended to be launched by the Internet superserver
+ * (inetd) to run as a daemon, receiving and sending data through a network
+ * connection set up for it, declare the following variable in your program
+ * and set it to TRUE. This will make the program's network startup code
+ * link the stdin/stdout/stderr streams with the daemon socket passed to it.
+ * Whether or not your program is running as a daemon can be tested by
+ * checking the global __is_daemon variable described below.
+ */
+extern BOOL __check_daemon_startup;
+
+/****************************************************************************/
+
+/*
  * This will be set to TRUE if the current program was launched from
- * the internet superserver ('inetd') or an equivalent facility.
+ * the internet superserver ('inetd') or an equivalent facility. Note
+ * that you need to have set __check_daemon_startup to TRUE before
+ * you can rely upon __is_daemon to be initialized correctly.
  */
 extern BOOL __is_daemon;
 

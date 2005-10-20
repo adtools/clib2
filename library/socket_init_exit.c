@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.21 2005-10-17 13:54:25 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.22 2005-10-20 06:50:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -174,7 +174,8 @@ SOCKET_DESTRUCTOR(socket_exit)
 		PROFILE_ON();
 	}
 
-	/* Careful: if this function is ever invoked, it must make sure that
+	/*
+	 * Careful: if this function is ever invoked, it must make sure that
 	 *          the socket file descriptors are invalidated. If that
 	 *          does not happen, the stdio cleanup function will
 	 *          crash (with bells on).
@@ -213,8 +214,7 @@ SOCKET_CONSTRUCTOR(socket_init)
 	PROFILE_OFF();
 
 	/* bsdsocket.library V3 is sufficient for all the tasks we
-	 * may have to perform.
-	 */
+	   may have to perform. */
 	__SocketBase = OpenLibrary("bsdsocket.library",3);
 
 	#if defined(__amigaos4__)
@@ -316,15 +316,13 @@ SOCKET_CONSTRUCTOR(socket_init)
 	#endif /* __THREAD_SAFE */
 
 	/* Check if this program was launched as a server by the Internet
-	 * superserver.
-	 */
-	if(Cli() != NULL && NOT __detach)
+	   superserver. */
+	if(Cli() != NULL && NOT __detach && __check_daemon_startup)
 	{
 		struct DaemonMessage * dm;
 
 		/* The socket the superserver may have launched this program
-		 * with is attached to the exit data entry of the process.
-		 */
+		   with is attached to the exit data entry of the process. */
 		#if defined(__amigaos4__)
 		{
 			dm = (struct DaemonMessage *)GetExitData();
@@ -348,8 +346,7 @@ SOCKET_CONSTRUCTOR(socket_init)
 			SHOWMSG("we have a daemon message; this is a server");
 
 			/* Try to grab that socket and attach is to the three
-			 * standard I/O streams.
-			 */
+			   standard I/O streams. */
 
 			PROFILE_OFF();
 			daemon_socket = __ObtainSocket(dm->dm_ID,dm->dm_Family,dm->dm_Type,0);

@@ -27,6 +27,11 @@
   "__bool_true_false_are_defined" rather than "__bool_true_and_false_are_defined".
   Thanks go to Peter Bengtsson for finding and fixing it.
 
+- The network startup code no longer checks for the presence of a possible
+  daemon startup message by default. You now have to enable this feature
+  by declaring a global variable called "__check_daemon_startup" which is
+  described in <dos.h>.
+
 
 c.lib 1.196 (11.10.2005)
 
