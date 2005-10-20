@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.22 2005-10-20 06:50:32 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.23 2005-10-20 07:19:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -317,107 +317,8 @@ SOCKET_CONSTRUCTOR(socket_init)
 
 	/* Check if this program was launched as a server by the Internet
 	   superserver. */
-	if(Cli() != NULL && NOT __detach && __check_daemon_startup)
-	{
-		struct DaemonMessage * dm;
-
-		/* The socket the superserver may have launched this program
-		   with is attached to the exit data entry of the process. */
-		#if defined(__amigaos4__)
-		{
-			dm = (struct DaemonMessage *)GetExitData();
-		}
-		#else
-		{
-			struct Process * this_process = (struct Process *)FindTask(NULL);
-
-			dm = (struct DaemonMessage *)this_process->pr_ExitData;
-		}
-		#endif /* __amigaos4__ */
-
-		if(TypeOfMem(dm) != 0 && TypeOfMem(((char *)dm) + sizeof(*dm)-1) != 0)
-		{
-			struct SignalSemaphore * lock;
-			int daemon_socket;
-			struct fd * fd;
-			int sockfd;
-			int i;
-
-			SHOWMSG("we have a daemon message; this is a server");
-
-			/* Try to grab that socket and attach is to the three
-			   standard I/O streams. */
-
-			PROFILE_OFF();
-			daemon_socket = __ObtainSocket(dm->dm_ID,dm->dm_Family,dm->dm_Type,0);
-			PROFILE_ON();
-
-			if(daemon_socket == -1)
-			{
-				__show_error("Network server streams could not be initialized.");
-				goto out;
-			}
-
-			SHOWVALUE(daemon_socket);
-
-			/* Shut down the three standard I/O streams. */
-			for(i = STDIN_FILENO ; i <= STDERR_FILENO ; i++)
-				close(i);
-
-			/* The standard I/O streams are no longer attached to a console. */
-			__no_standard_io = TRUE;
-
-			/* Put the socket into the three standard I/O streams. */
-			for(i = STDIN_FILENO ; i <= STDERR_FILENO ; i++)
-			{
-				#if defined(__THREAD_SAFE)
-				{
-					lock = __create_semaphore();
-					if(lock == NULL)
-						goto out;
-				}
-				#else
-				{
-					lock = NULL;
-				}
-				#endif /* __THREAD_SAFE */
-
-				fd = __fd[i];
-
-				assert( fd != NULL && FLAG_IS_CLEAR(fd->fd_Flags,FDF_IN_USE) );
-
-				if(i == STDIN_FILENO)
-				{
-					sockfd = daemon_socket;
-				}
-				else
-				{
-					PROFILE_OFF();
-					sockfd = __Dup2Socket(daemon_socket,-1);
-					PROFILE_ON();
-
-					if(sockfd == -1)
-					{
-						SHOWMSG("could not duplicate daemon socket");
-
-						#if defined(__THREAD_SAFE)
-						{
-							__delete_semaphore(lock);
-						}
-						#endif /* __THREAD_SAFE */
-
-						__show_error("Network server streams could not be initialized.");
-						goto out;
-					}
-				}
-
-				__initialize_fd(fd,__socket_hook_entry,(BPTR)sockfd,FDF_IN_USE | FDF_IS_SOCKET | FDF_READ | FDF_WRITE,lock);
-			}
-
-			/* This program now runs as an internet superserver client (daemon). */
-			__is_daemon = TRUE;
-		}
-	}
+	if(CANNOT __obtain_daemon_message())
+		goto out;
 
 	success = TRUE;
 

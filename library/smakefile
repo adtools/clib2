@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.54 2005-10-20 06:50:32 obarthel Exp $
+# $Id: smakefile,v 1.55 2005-10-20 07:19:15 obarthel Exp $
 #
 # :ts=8
 #
@@ -343,6 +343,7 @@ SOCKET_OBJ = \
 	socket_ioctl.o \
 	socket_isdaemon.o \
 	socket_listen.o \
+	socket_obtain_daemon.o \
 	socket_recv.o \
 	socket_recvfrom.o \
 	socket_recvmsg.o \

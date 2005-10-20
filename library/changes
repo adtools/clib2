@@ -32,6 +32,9 @@
   by declaring a global variable called "__check_daemon_startup" which is
   described in <dos.h>.
 
+- Moved the code which rebinds the standard I/O streams to the server
+  socket into a separate function which can be overridden by user code.
+
 
 c.lib 1.196 (11.10.2005)
 

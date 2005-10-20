@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.72 2005-10-20 06:50:32 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.73 2005-10-20 07:19:15 obarthel Exp $
 #
 # :ts=8
 #
@@ -755,6 +755,7 @@ NET_LIB = \
 	socket_ioctl.o \
 	socket_isdaemon.o \
 	socket_listen.o \
+	socket_obtain_daemon.o \
 	socket_recv.o \
 	socket_recvfrom.o \
 	socket_recvmsg.o \
