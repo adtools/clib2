@@ -1,5 +1,5 @@
 /*
- * $Id: socket_headers.h,v 1.11 2005-10-20 07:19:15 obarthel Exp $
+ * $Id: socket_headers.h,v 1.12 2005-10-23 09:53:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,6 +73,36 @@
 #ifndef _STDLIB_PROFILE_H
 #include "stdlib_profile.h"
 #endif /* _STDLIB_PROFILE_H */
+
+/****************************************************************************/
+
+/* Code value. */
+#define SBTB_CODE 1
+#define SBTS_CODE 0x3FFF
+
+/* Argument passed by reference or by value. */
+#define SBTF_VAL 0x0000
+#define SBTF_REF 0x8000
+
+/* Get/Set (read/write) selection. */
+#define SBTF_GET 0
+#define SBTF_SET 1
+
+/* Set a parameter, passing it by value. */
+#define SBTM_SETVAL(code) (TAG_USER | SBTF_VAL | (((code) & SBTS_CODE) << SBTB_CODE) | SBTF_SET)
+
+/* Get a parameter, passing it by reference. */
+#define SBTM_GETREF(code) (TAG_USER | SBTF_REF | (((code) & SBTS_CODE) << SBTB_CODE) | SBTF_GET)
+
+/****************************************************************************/
+
+#define SBTC_BREAKMASK					1	/* Interrupt signal mask */
+#define SBTC_LOGTAGPTR					11	/* Under which name log entries are filed */
+#define SBTC_ERRNOLONGPTR				24	/* Pointer to errno, length == sizeof(errno) */
+#define SBTC_HERRNOLONGPTR				25	/* 'h_errno' pointer (with sizeof(h_errno) == sizeof(long)) */
+#define SBTC_CAN_SHARE_LIBRARY_BASES	51	/* Enable library base sharing among Processes */
+#define SBTC_HAVE_SERVER_API			63	/* Whether or not the server API is supported. */
+#define SBTC_ERROR_HOOK					68	/* Error hook pointer */
 
 /****************************************************************************/
 
@@ -154,6 +184,7 @@ extern BOOL __obtain_daemon_message(VOID);
 #define __gethostid() __ISocket->gethostid() 
 #define __SocketBaseTagList(tags) __ISocket->SocketBaseTagList(tags) 
 #define __SocketBaseTags(tag1...) __ISocket->SocketBaseTags(## tag1) 
+#define __ProcessIsServer(pr) __ISocket->ProcessIsServer(pr) 
 
 #else
 
@@ -993,6 +1024,22 @@ extern BOOL __obtain_daemon_message(VOID);
   _SocketBaseTagList__re; \
 })
 
+#define __ProcessIsServer(pr) ({ \
+  struct Process * _ProcessIsServer_pr = (pr); \
+  BOOL _ProcessIsServer__re = \
+  ({ \
+  register struct Library * const __ProcessIsServer__bn __asm("a6") = (struct Library *) (__SocketBase);\
+  register BOOL __ProcessIsServer__re __asm("d0"); \
+  register struct Process * __ProcessIsServer_pr __asm("a0") = (_ProcessIsServer_pr); \
+  __asm volatile ("jsr a6@(-690:W)" \
+  : "=r"(__ProcessIsServer__re) \
+  : "r"(__ProcessIsServer__bn), "r"(__ProcessIsServer_pr) \
+  : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
+  __ProcessIsServer__re; \
+  }); \
+  _ProcessIsServer__re; \
+})
+
 #endif /* __amigaos4__ */
 
 #endif /* __GNUC__ */
@@ -1046,6 +1093,7 @@ LONG __recvmsg(LONG sock,struct msghdr *msg,LONG flags);
 LONG __gethostname(STRPTR name,LONG namelen);
 ULONG __gethostid(VOID);
 LONG __SocketBaseTagList(struct TagItem *tags);
+BOOL __ProcessIsServer( struct Process *pr );
 
 #pragma libcall __SocketBase __socket              01e 21003
 #pragma libcall __SocketBase __bind                024 18003
@@ -1092,6 +1140,7 @@ LONG __SocketBaseTagList(struct TagItem *tags);
 #pragma libcall __SocketBase __gethostname         11a 0802
 #pragma libcall __SocketBase __gethostid           120 00
 #pragma libcall __SocketBase __SocketBaseTagList   126 801
+#pragma libcall __SocketBase __ProcessIsServer     2b2 801
 
 #endif /* __SASC */
 

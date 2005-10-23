@@ -1,5 +1,5 @@
 /*
- * $Id: socket_obtain_daemon.c,v 1.1 2005-10-20 07:19:16 obarthel Exp $
+ * $Id: socket_obtain_daemon.c,v 1.2 2005-10-23 09:53:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,7 +41,9 @@
 
 /****************************************************************************/
 
-struct DaemonMessage
+/* This data structure is attached to the server's Process->pr_ExitData field
+   if the server was launched by the inetd Internet super-server. */
+struct _DaemonMessage
 {
 	struct Message	dm_Message;
 	ULONG			dm_Pad1;
@@ -67,23 +69,49 @@ __obtain_daemon_message(VOID)
 
 	if(Cli() != NULL && NOT __detach && __check_daemon_startup)
 	{
-		struct DaemonMessage * dm;
+		struct _DaemonMessage * dm;
 
 		/* The socket the superserver may have launched this program
 		   with is attached to the exit data entry of the process. */
 		#if defined(__amigaos4__)
 		{
-			dm = (struct DaemonMessage *)GetExitData();
+			dm = (struct _DaemonMessage *)GetExitData();
 		}
 		#else
 		{
 			struct Process * this_process = (struct Process *)FindTask(NULL);
 
-			dm = (struct DaemonMessage *)this_process->pr_ExitData;
+			dm = (struct _DaemonMessage *)this_process->pr_ExitData;
 		}
 		#endif /* __amigaos4__ */
 
-		if(TypeOfMem(dm) != 0 && TypeOfMem(((char *)dm) + sizeof(*dm)-1) != 0)
+		/* For extra safety, ask if what could be a "struct DaemonMessage"
+		   pointer was really placed there by the Internet super-server. */
+		if(__SocketBase->lib_Version >= 4)
+		{
+			LONG have_server_api = FALSE;
+			struct TagItem tags[2];
+
+			/* Check if it is safe to call the IsServerProcess() function. */
+			tags[0].ti_Tag	= SBTM_GETREF(SBTC_BREAKMASK);
+			tags[0].ti_Data	= (ULONG)&have_server_api;
+			tags[1].ti_Tag	= TAG_END;
+
+			PROFILE_OFF();
+
+			if(__SocketBaseTagList(tags) != 0)
+				have_server_api = FALSE;
+
+			PROFILE_ON();
+
+			/* If it's safe to call IsServerProcess(), ask if the
+			   "struct DaemonMessage" pointer is valid. If it's not,
+			   set the message pointer to NULL, ignoring it altogether. */
+			if(have_server_api && NOT IsServerProcess())
+				dm = NULL;
+		}
+
+		if(dm != NULL && TypeOfMem(dm) != 0 && TypeOfMem(((char *)dm) + sizeof(*dm)-1) != 0)
 		{
 			struct SignalSemaphore * lock;
 			int daemon_socket;

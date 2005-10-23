@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.23 2005-10-20 07:19:15 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.24 2005-10-23 09:53:39 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,55 +51,6 @@
 
 /****************************************************************************/
 
-/* Code value. */
-#define SBTB_CODE 1
-#define SBTS_CODE 0x3FFF
-
-/* Set a parameter, passing it by value. */
-#ifndef SBTM_SETVAL
-#define SBTM_SETVAL(code) (TAG_USER | (((code) & SBTS_CODE) << SBTB_CODE) | 1)
-#endif /* SBTM_SETVAL */
-
-#define SBTC_BREAKMASK					1	/* Interrupt signal mask */
-#define SBTC_LOGTAGPTR					11	/* Under which name log entries are filed */
-#define SBTC_ERRNOLONGPTR				24	/* Pointer to errno, length == sizeof(errno) */
-#define SBTC_HERRNOLONGPTR				25	/* 'h_errno' pointer (with sizeof(h_errno) == sizeof(long)) */
-#define SBTC_CAN_SHARE_LIBRARY_BASES	51	/* Enable library base sharing among Processes */
-#define SBTC_ERROR_HOOK					68	/* Error hook pointer */
-
-/****************************************************************************/
-
-/* Call-back hook for use with SBTC_ERROR_HOOK */
-struct ErrorHookMsg
-{
-	ULONG	ehm_Size;	/* Size of this data structure; this
-						   must be >= 12 */
-	ULONG	ehm_Action;	/* See below for a list of definitions */
-
-	LONG	ehm_Code;	/* The error code to use */
-};
-
-/* Which action the hook is to perform */
-#define EHMA_Set_errno		1	/* Set the local 'errno' to what is
-								   found in ehm_Code */
-#define EHMA_Set_h_errno	2	/* Set the local 'h_errno' to what is
-								   found in ehm_Code */
-
-/****************************************************************************/
-
-struct DaemonMessage
-{
-	struct Message	dm_Message;
-	ULONG			dm_Pad1;
-	ULONG			dm_Pad2;
-	LONG			dm_ID;
-	ULONG			dm_Pad3;
-	UBYTE			dm_Family;
-	UBYTE			dm_Type;
-};
-
-/****************************************************************************/
-
 struct Library * NOCOMMON __SocketBase;
 
 /****************************************************************************/
@@ -118,16 +69,40 @@ int NOCOMMON h_errno;
 
 /****************************************************************************/
 
+/* Call-back hook for use with SBTC_ERROR_HOOK */
+struct _ErrorHookMsg
+{
+	ULONG	ehm_Size;	/* Size of this data structure; this
+						   must be >= 12 */
+	ULONG	ehm_Action;	/* See below for a list of definitions */
+
+	LONG	ehm_Code;	/* The error code to use */
+};
+
+/* Which action the hook is to perform */
+#define EHMA_Set_errno		1	/* Set the local 'errno' to what is
+								   found in ehm_Code */
+#define EHMA_Set_h_errno	2	/* Set the local 'h_errno' to what is
+								   found in ehm_Code */
+
+/****************************************************************************/
+
 BOOL NOCOMMON __can_share_socket_library_base;
 BOOL NOCOMMON __thread_safe_errno_h_errno;
 
 /****************************************************************************/
 
+/* This hook function is called whenever either the errno or h_errno
+   variable is to be changed by the bsdsocket.library code. It is invoked
+   on the context of the caller, which means that the Process which called
+   the library will also be the one will eventually call the hook function.
+   You can key off this in your own __set_errno() or __set_h_errno()
+   functions, setting a Process-specific set of variables. */
 STATIC LONG ASM
 error_hook_function(
 	REG(a0, struct Hook *			unused_hook),
 	REG(a2, APTR					unused_reserved),
-	REG(a1, struct ErrorHookMsg *	ehm))
+	REG(a1, struct _ErrorHookMsg *	ehm))
 {
 	if(ehm != NULL && ehm->ehm_Size >= 12)
 	{

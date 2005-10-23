@@ -35,6 +35,10 @@
 - Moved the code which rebinds the standard I/O streams to the server
   socket into a separate function which can be overridden by user code.
 
+- Updated the new __obtain_daemon_message() function to call a
+  bsdsocket.library API function to determine if what appears to be
+  a valid daemon startup message is sound.
+
 
 c.lib 1.196 (11.10.2005)
 
