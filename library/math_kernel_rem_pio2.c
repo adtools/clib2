@@ -1,5 +1,5 @@
 /*
- * $Id: math_kernel_rem_pio2.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_kernel_rem_pio2.c,v 1.4 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -329,6 +329,8 @@ int __rem_pio2(double x, double *y)
 	if(ix>=0x7ff00000) {		/* x is inf or NaN */
 	    y[0]=y[1]=x-x; return 0;
 	}
+	/* keep the compiler happy */
+	z = 0;
     /* set z = __scalbn(|x|,ilogb(x)-23) */
 	GET_LOW_WORD(low,x);
 	SET_LOW_WORD(z,low);

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.27 2005-09-28 10:28:38 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.28 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -501,7 +501,7 @@ _main(void)
 		tags[i].	ti_Tag	= NP_StackSize;
 		tags[i++].	ti_Data	= stack_size;
 		tags[i].	ti_Tag	= NP_Name;
-		tags[i++].	ti_Data	= (ULONG)(__process_name != NULL ? (UBYTE *)__process_name : FilePart(program_name));
+		tags[i++].	ti_Data	= (ULONG)(__process_name != NULL ? __process_name : FilePart(program_name));
 		tags[i].	ti_Tag	= NP_CommandName;
 		tags[i++].	ti_Data	= (ULONG)FilePart(program_name);
 		tags[i].	ti_Tag	= NP_Cli;

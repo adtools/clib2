@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.83 2005-10-27 08:26:17 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.84 2005-10-27 08:58:41 obarthel Exp $
 #
 # :ts=8
 #
@@ -26,6 +26,7 @@ COPY = cp -a
 DELETE = rm -rf
 MAKEDIR = mkdir -p
 MAKE_OPTS =
+LOG_COMMAND = 2>&1 | tee -a compiler.log
 
 # The following are for the native OS4 compiler
 #SDK_INCLUDE = /SDK/Include/include_h
@@ -37,6 +38,7 @@ MAKE_OPTS =
 #DELETE = delete all quiet
 #MAKEDIR = makedir all
 #MAKE_OPTS = --jobs=2
+#LOG_COMMAND =
 
 MAKE = $(MAKE_COMMAND) -f GNUmakefile.os4 $(MAKE_OPTS)
 
@@ -65,39 +67,39 @@ endif
 # General build rules for all object files and the individual libraries
 %.o : %.c
 	@echo "Compiling $<"
-	@$(CC) -c $(CFLAGS) $<
+	@$(CC) -c $(CFLAGS) $< $(LOG_COMMAND)
 
 $(LIBC_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):c]"
-	@$(CC) -o $(LIBC_OBJS)/$*.o -c $(CFLAGS) $<
+	@$(CC) -o $(LIBC_OBJS)/$*.o -c $(CFLAGS) $< $(LOG_COMMAND)
 
 $(LIBUNIX_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):unix]"
-	@$(CC) -o $(LIBUNIX_OBJS)/$*.o -c $(CFLAGS) -DUNIX_PATH_SEMANTICS $<
+	@$(CC) -o $(LIBUNIX_OBJS)/$*.o -c $(CFLAGS) -DUNIX_PATH_SEMANTICS $< $(LOG_COMMAND)
 
 $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
-	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) $(FLOAT_TYPE) $<
+	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) $(FLOAT_TYPE) $< $(LOG_COMMAND)
 
 $(LIBNET_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):net]"
-	@$(CC) -o $(LIBNET_OBJS)/$*.o -c $(CFLAGS) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT $<
+	@$(CC) -o $(LIBNET_OBJS)/$*.o -c $(CFLAGS) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT $< $(LOG_COMMAND)
 
 $(LIBDEBUG_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):debug]"
-	@$(CC) -o $(LIBDEBUG_OBJS)/$*.o -c $(CFLAGS) $<
+	@$(CC) -o $(LIBDEBUG_OBJS)/$*.o -c $(CFLAGS) $< $(LOG_COMMAND)
 
 $(LIBAMIGA_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):amiga]"
-	@$(CC) -o $(LIBAMIGA_OBJS)/$*.o -c $(CFLAGS) $<
+	@$(CC) -o $(LIBAMIGA_OBJS)/$*.o -c $(CFLAGS) $< $(LOG_COMMAND)
 
 $(LIBPROFILE_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):profile]"
-	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o  -c $(CFLAGS) $<
+	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o  -c $(CFLAGS) $< $(LOG_COMMAND)
 
 $(LIBPROFILE_OBJS)/%.o : %.S
 	@echo "Assembling $< [$(TYPE):profile]"
-	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o -Wa,-mregnames -c $(CFLAGS) $<
+	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o -Wa,-mregnames -c $(CFLAGS) $< $(LOG_COMMAND)
 
 ##############################################################################
 
@@ -912,7 +914,9 @@ all: \
 
 # Delete all object files and libraries
 clean:
-	-$(DELETE) $(STARTUPS) lib small_data large_data large_data_softfloat baserel
+	-$(DELETE) $(STARTUPS) lib \
+		small_data large_data large_data_softfloat baserel \
+		compiler.log
 
 ##############################################################################
 
@@ -1118,47 +1122,47 @@ $(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_memory.h
 # or at least those which use memory allocation functionality.
 $(LIBC_OBJS)/stdlib_alloca_debug.o : stdlib_alloca.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/stdlib_alloca_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_alloca.c
+	@$(CC) -o $(LIBC_OBJS)/stdlib_alloca_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_alloca.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/stdlib_calloc_debug.o : stdlib_calloc.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/stdlib_calloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_calloc.c
+	@$(CC) -o $(LIBC_OBJS)/stdlib_calloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_calloc.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/stdlib_free_debug.o : stdlib_free.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/stdlib_free_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_free.c
+	@$(CC) -o $(LIBC_OBJS)/stdlib_free_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_free.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/stdlib_malloc_debug.o : stdlib_malloc.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/stdlib_malloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_malloc.c
+	@$(CC) -o $(LIBC_OBJS)/stdlib_malloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_malloc.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/stdlib_realloc_debug.o : stdlib_realloc.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/stdlib_realloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_realloc.c
+	@$(CC) -o $(LIBC_OBJS)/stdlib_realloc_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdlib_realloc.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/stdio_vasprintf_hook_entry_debug.o : stdio_vasprintf_hook_entry.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/stdio_vasprintf_hook_entry_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdio_vasprintf_hook_entry.c
+	@$(CC) -o $(LIBC_OBJS)/stdio_vasprintf_hook_entry_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdio_vasprintf_hook_entry.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/stdio_vasprintf_debug.o : stdio_vasprintf.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/stdio_vasprintf_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdio_vasprintf.c
+	@$(CC) -o $(LIBC_OBJS)/stdio_vasprintf_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG stdio_vasprintf.c $(LOG_COMMAND)
 
 $(LIBM_OBJS)/stdio_vasprintf_debug.o : stdio_vasprintf.c
 	@echo "Compiling $< [$(TYPE):m debug]"
-	@$(CC) -o $(LIBM_OBJS)/stdio_vasprintf_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG $(FLOAT_TYPE) stdio_vasprintf.c
+	@$(CC) -o $(LIBM_OBJS)/stdio_vasprintf_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG $(FLOAT_TYPE) stdio_vasprintf.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/string_strdup_debug.o : string_strdup.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/string_strdup_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG string_strdup.c
+	@$(CC) -o $(LIBC_OBJS)/string_strdup_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG string_strdup.c $(LOG_COMMAND)
 
 $(LIBC_OBJS)/unistd_getcwd_debug.o : unistd_getcwd.c
 	@echo "Compiling $< [$(TYPE):c debug]"
-	@$(CC) -o $(LIBC_OBJS)/unistd_getcwd_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG unistd_getcwd.c
+	@$(CC) -o $(LIBC_OBJS)/unistd_getcwd_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG unistd_getcwd.c $(LOG_COMMAND)
 
 $(LIBUNIX_OBJS)/unistd_getcwd_debug.o : unistd_getcwd.c
 	@echo "Compiling $< [$(TYPE):unix debug]"
-	@$(CC) -o $(LIBUNIX_OBJS)/unistd_getcwd_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG -DUNIX_PATH_SEMANTICS unistd_getcwd.c
+	@$(CC) -o $(LIBUNIX_OBJS)/unistd_getcwd_debug.o -c $(CFLAGS) -D__USE_MEM_TREES -D__MEM_DEBUG -DUNIX_PATH_SEMANTICS unistd_getcwd.c $(LOG_COMMAND)
 
 ##############################################################################
 
@@ -1242,28 +1246,28 @@ $(LIBPROFILE_OBJS)/libprofile.a : $(LIBPROFILE_OBJS) $(foreach file,$(PROFILE_LI
 # Individual build rules for the startup code.
 crt0.o : crt0.S
 	@echo "Assembling $<"
-	@$(CC) -Wa,-mregnames -o crt0.o -c crt0.S
+	@$(CC) -Wa,-mregnames -o crt0.o -c crt0.S $(LOG_COMMAND)
 
 small_data/crt0.o : crt0.S
 	@echo "Assembling $<"
-	@$(CC) -DSMALL_DATA -Wa,-mregnames -o small_data/crt0.o -c crt0.S
+	@$(CC) -DSMALL_DATA -Wa,-mregnames -o small_data/crt0.o -c crt0.S $(LOG_COMMAND)
 
 small_data/crtbegin.o : crtbegin.c
 	@echo "Assembling $<"
-	@$(CC) -o small_data/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c
+	@$(CC) -o small_data/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtbegin.c $(LOG_COMMAND)
 
 small_data/crtend.o : crtend.c
 	@echo "Assembling $<"
-	@$(CC) -o small_data/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c
+	@$(CC) -o small_data/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -msdata=sysv -DSMALL_DATA crtend.c $(LOG_COMMAND)
 
 baserel/crt0.o : crt0.S
 	@echo "Assembling $<"
-	@$(CC) -Wa,-mregnames -o baserel/crt0.o -mbaserel -DBASEREL_DATA -c crt0.S
+	@$(CC) -Wa,-mregnames -o baserel/crt0.o -mbaserel -DBASEREL_DATA -c crt0.S $(LOG_COMMAND)
 
 baserel/crtbegin.o : crtbegin.c
 	@echo "Assembling $<"
-	@$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c
+	@$(CC) -o baserel/crtbegin.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtbegin.c $(LOG_COMMAND)
 
 baserel/crtend.o : crtend.c
 	@echo "Assembling $<"
-	@$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c
+	@$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c $(LOG_COMMAND)

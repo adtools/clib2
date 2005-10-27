@@ -1,5 +1,5 @@
 /*
- * $Id: math_cosh.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_cosh.c,v 1.4 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,7 +139,7 @@ __cosh(double x)
 
 static const double one = 1.0, half=0.5, huge = 1.0e300;
 
-INLINE STATIC const double
+INLINE STATIC double
 __cosh(double x)
 {	
 	double t,w;

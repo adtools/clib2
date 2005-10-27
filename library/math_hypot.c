@@ -1,5 +1,5 @@
 /*
- * $Id: math_hypot.c,v 1.4 2005-10-11 19:05:18 theantony Exp $
+ * $Id: math_hypot.c,v 1.5 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -85,7 +85,7 @@ __hypot(double x,double y)
 
 static const double one = 1.0;
 
-INLINE STATIC const double
+INLINE STATIC double
 __hypot(double x,double y)
 {
 	double a=x,b=y,t1,t2,y1,y2,w;

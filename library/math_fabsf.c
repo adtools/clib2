@@ -1,5 +1,5 @@
 /*
- * $Id: math_fabsf.c,v 1.1 2005-05-08 08:51:29 obarthel Exp $
+ * $Id: math_fabsf.c,v 1.2 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -108,7 +108,7 @@ __fabsf(float x)
 
 /****************************************************************************/
 
-INLINE STATIC const float
+INLINE STATIC float
 __fabsf(float number)
 {
 	union ieee_single x;

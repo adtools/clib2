@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_argarrayinit.c,v 1.2 2005-01-02 09:07:06 obarthel Exp $
+ * $Id: amiga_argarrayinit.c,v 1.3 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,11 +61,11 @@ struct DiskObject * CXLIB_disko;
 STRPTR *
 ArgArrayInit(LONG argc, CONST_STRPTR * argv)
 {
-	unsigned char ** result = NULL;
+	STRPTR * result = NULL;
 
 	if(argc != 0) /* run from CLI */
 	{
-		int i;
+		LONG i;
 
 		if(argc == 1)
 			goto out; /* skip command name */

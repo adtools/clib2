@@ -1,5 +1,5 @@
 /*
- * $Id: math_floor.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_floor.c,v 1.4 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -153,7 +153,8 @@ __floor(double x)
 #if defined(PPC_FLOATING_POINT_SUPPORT)
 
 static const double huge = 1.0e300;
-INLINE STATIC const double
+
+INLINE STATIC double
 __floor(double x)
 {
 	int i0,i1,j0;

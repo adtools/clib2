@@ -1,5 +1,5 @@
 /*
- * $Id: termios_headers.h,v 1.1 2005-06-04 10:46:21 obarthel Exp $
+ * $Id: termios_headers.h,v 1.2 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,7 @@
 extern int __termios_console_hook(struct fd *,struct file_action_message *);
 extern int __termios_serial_hook(struct fd *,struct file_action_message *);
 extern struct termios *__get_termios(struct fd *);
+extern int openserial(const char *device_name,int unit,int mode);
 
 /****************************************************************************/
 

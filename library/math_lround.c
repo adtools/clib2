@@ -1,5 +1,5 @@
 /*
- * $Id: math_lround.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
+ * $Id: math_lround.c,v 1.3 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -82,7 +82,7 @@ lround(double x)
           result = msw >> (20 - exponent_less_1023);
         }
     }
-  else if (exponent_less_1023 < (8 * sizeof (long int)) - 1)
+  else if (exponent_less_1023 < (LONG)(8 * sizeof (long int)) - 1)
     {
       if (exponent_less_1023 >= 52)
         result = ((long int) msw << (exponent_less_1023 - 20)) | (lsw << (exponent_less_1023 - 52));

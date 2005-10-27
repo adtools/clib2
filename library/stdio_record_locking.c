@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.13 2005-04-25 15:39:56 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.14 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -462,7 +462,7 @@ create_file_lock_node(struct fd * fd,struct FileLockNode ** result_ptr)
 		goto out;
 	}
 
-	strcpy(fln->fln_FileName,fib->fib_FileName);
+	strcpy((char *)fln->fln_FileName,fib->fib_FileName);
 
 	NewList((struct List *)&fln->fln_LockedRegionList);
 
@@ -523,7 +523,7 @@ find_file_lock_node_by_drawer_and_name(
 
 		if(status == LOCK_SAME)
 		{
-			if(Stricmp(fln->fln_FileName,file_name) == SAME)
+			if(Stricmp((STRPTR)fln->fln_FileName,file_name) == SAME)
 			{
 				error = OK;
 

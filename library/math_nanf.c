@@ -1,5 +1,5 @@
 /*
- * $Id: math_nanf.c,v 1.2 2005-05-14 10:52:31 obarthel Exp $
+ * $Id: math_nanf.c,v 1.3 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,7 +47,7 @@
 /****************************************************************************/
 
 float
-nanf(const char * UNUSED tagp)
+nanf(const char * UNUSED unused_tagp)
 {
 	union ieee_single x;
 

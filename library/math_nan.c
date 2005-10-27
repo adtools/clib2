@@ -1,5 +1,5 @@
 /*
- * $Id: math_nan.c,v 1.2 2005-05-14 10:52:31 obarthel Exp $
+ * $Id: math_nan.c,v 1.3 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,7 +47,7 @@
 /****************************************************************************/
 
 double
-nan(const char * UNUSED tagp)
+nan(const char * UNUSED unused_tagp)
 {
 	union ieee_double x;
 

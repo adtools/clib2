@@ -1,5 +1,5 @@
 /*
- * $Id: math_tanh.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_tanh.c,v 1.4 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,7 +139,7 @@ __tanh(double x)
 
 static const double one=1.0, two=2.0, tiny = 1.0e-300;
 
-INLINE STATIC const double
+INLINE STATIC double
 __tanh(double x)
 {
 	double t,z;

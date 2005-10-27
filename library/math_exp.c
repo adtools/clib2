@@ -1,5 +1,5 @@
 /*
- * $Id: math_exp.c,v 1.4 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_exp.c,v 1.5 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -155,7 +155,7 @@ P3   =  6.61375632143793436117e-05,        /* 0x3F11566A, 0xAF25DE2C */
 P4   = -1.65339022054652515390e-06,        /* 0xBEBBBD41, 0xC5D26BF1 */
 P5   =  4.13813679705723846039e-08;        /* 0x3E663769, 0x72BEA4D0 */
 
-INLINE STATIC const double
+INLINE STATIC double
 __exp(double x)
 {
 	double y,hi,lo,c,t;

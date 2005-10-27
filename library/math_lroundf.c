@@ -1,5 +1,5 @@
 /*
- * $Id: math_lroundf.c,v 1.2 2005-10-09 10:38:55 obarthel Exp $
+ * $Id: math_lroundf.c,v 1.3 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ lroundf(float x)
   w &= 0x7fffff;
   w |= 0x800000;
 
-  if (exponent_less_127 < (8 * sizeof (long int)) - 1)
+  if (exponent_less_127 < (LONG)(8 * sizeof (long int)) - 1)
     {
       if (exponent_less_127 < 0)
         return exponent_less_127 < -1 ? 0 : sign;

@@ -1,5 +1,5 @@
 /*
- * $Id: math_asin.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_asin.c,v 1.6 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -156,7 +156,7 @@ qS3 = -6.88283971605453293030e-01, /* 0xBFE6066C, 0x1B8D0159 */
 qS4 =  7.70381505559019352791e-02; /* 0x3FB3B8C5, 0xB12E9282 */
 
 
-INLINE STATIC const double
+INLINE STATIC double
 __asin(double x)
 {
 	double t,w,p,q,c,r,s;

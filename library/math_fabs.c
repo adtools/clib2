@@ -1,5 +1,5 @@
 /*
- * $Id: math_fabs.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_fabs.c,v 1.7 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -134,7 +134,7 @@ __fabs(double x)
 
 /****************************************************************************/
 
-INLINE STATIC const double
+INLINE STATIC double
 __fabs(double x)
 {
 	double res;

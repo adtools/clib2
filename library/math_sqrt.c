@@ -1,5 +1,5 @@
 /*
- * $Id: math_sqrt.c,v 1.6 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_sqrt.c,v 1.7 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,7 +139,7 @@ __sqrt(double x)
 
 static	const double	one	= 1.0, tiny=1.0e-300;
 
-INLINE STATIC const double
+INLINE STATIC double
 __sqrt(double x)
 {
 	double z;

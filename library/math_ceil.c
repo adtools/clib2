@@ -1,5 +1,5 @@
 /*
- * $Id: math_ceil.c,v 1.4 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_ceil.c,v 1.5 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -152,7 +152,7 @@ __ceil(double x)
 
 static const double huge = 1.0e300;
 
-INLINE STATIC const double
+INLINE STATIC double
 __ceil(double x)
 {
 	int i0,i1,j0;

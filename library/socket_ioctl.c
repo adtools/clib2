@@ -1,5 +1,5 @@
 /*
- * $Id: socket_ioctl.c,v 1.9 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: socket_ioctl.c,v 1.10 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -91,14 +91,14 @@ ioctl(int sockfd,int request, ... /* char *arg */)
 	{
 		int * option = (int *)param;
 
-		if(request == FIONBIO)
+		if(request == (unsigned int)FIONBIO)
 		{
 			if((*option) != 0)
 				SET_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 			else
 				CLEAR_FLAG(fd->fd_Flags,FDF_NON_BLOCKING);
 		}
-		else if (request == FIOASYNC)
+		else if (request == (unsigned int)FIOASYNC)
 		{
 			if((*option) != 0)
 				SET_FLAG(fd->fd_Flags,FDF_ASYNC_IO);

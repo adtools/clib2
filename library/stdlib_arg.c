@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.8 2005-07-03 10:36:47 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.9 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -135,7 +135,7 @@ ARG_CONSTRUCTOR(arg_init)
 		while(is_space(*arg_str))
 			arg_str++;
 
-		arg_len = strlen(arg_str);
+		arg_len = strlen((char *)arg_str);
 
 		while(arg_len > 0 && is_space(arg_str[arg_len - 1]))
 			arg_len--;

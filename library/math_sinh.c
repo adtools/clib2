@@ -1,5 +1,5 @@
 /*
- * $Id: math_sinh.c,v 1.3 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: math_sinh.c,v 1.4 2005-10-27 08:58:41 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,7 +139,7 @@ __sinh(double x)
 
 static const double one = 1.0, shuge = 1.0e307;
 
-INLINE STATIC const double
+INLINE STATIC double
 __sinh(double x)
 {	
 	double t,w,h;
