@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.82 2005-10-20 07:19:15 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.83 2005-10-27 08:26:17 obarthel Exp $
 #
 # :ts=8
 #
@@ -7,27 +7,38 @@
 
 ##############################################################################
 
-# You may have to tweak this for the native OS4 compiler
-SDK_INCLUDE = $(V)/include
-NET_INCLUDE = netinclude
+# You may have to change the following sets of macro definitions which will
+# be used throughout the build makefile. These definitions cover the paths
+# to look into for the operating system and networking header files, and
+# the names and parameters passed to the program which actually do the
+# compilation, library building and cleanup work.
+#
+# Note that for either set you still need the GNU make utility to build the
+# library!
 
 # These are for the cross compiler
+SDK_INCLUDE = $(V)/include
+NET_INCLUDE = netinclude
 CC = ppc-amigaos-gcc
 AR = ppc-amigaos-ar -q
 RANLIB = ppc-amigaos-ranlib
 COPY = cp -a
 DELETE = rm -rf
-MAKEDIR = mkdir
+MAKEDIR = mkdir -p
+MAKE_OPTS =
 
 # The following are for the native OS4 compiler
-# CC = gcc
-# AR = ar -q
-# RANLIB = ranlib
-# COPY = copy
-# DELETE = delete all quiet
-# MAKEDIR = makedir
+#SDK_INCLUDE = /SDK/Include/include_h
+#NET_INCLUDE = /SDK/Include/netinclude
+#CC = gcc
+#AR = ar -q
+#RANLIB = ranlib
+#COPY = copy
+#DELETE = delete all quiet
+#MAKEDIR = makedir all
+#MAKE_OPTS = --jobs=2
 
-MAKE = $(MAKE_COMMAND) -f GNUmakefile.os4
+MAKE = $(MAKE_COMMAND) -f GNUmakefile.os4 $(MAKE_OPTS)
 
 ##############################################################################
 
@@ -88,8 +99,6 @@ $(LIBPROFILE_OBJS)/%.o : %.S
 	@echo "Assembling $< [$(TYPE):profile]"
 	@$(CC) -o $(LIBPROFILE_OBJS)/$*.o -Wa,-mregnames -c $(CFLAGS) $<
 
-
-
 ##############################################################################
 
 # Build options for the individual libraries
@@ -122,8 +131,8 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -I$(SDK_INCLUDE)
- OPTIONS = -D__THREAD_SAFE -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
-#OPTIONS =                 -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+#OPTIONS = -D__THREAD_SAFE -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+OPTIONS =                 -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
 OPTIMIZE = -O3
 #DEBUG = -ggdb
 
@@ -938,7 +947,7 @@ cvs-tag:
 # This target first creates a directory to store the object files in, then
 # proceeds to build the libraries from the code. It is invoked by the
 # individual library build targets below.
-all_libraries: $(TYPE) $(LIBS)
+all_libraries: $(LIBS)
 
 ##############################################################################
 
@@ -973,9 +982,9 @@ baserel:
 # Dependencies for libm.a (large data variant with hardware floating point code
 # support): this actually ends up building all the libraries rather than just
 # libm.a
-lib/libm.a: large_data large_data/libm.a
+lib/libm.a: large_data/libm.a
 
-large_data/libm.a:
+large_data/libm.a: large_data
 	$(MAKE) TYPE=large_data all_libraries
 	$(COPY) $(foreach file,$(LIBS),large_data/$(file)) lib
 
@@ -984,9 +993,9 @@ large_data/libm.a:
 # Dependencies for libm.a (large data variant with software floating point code
 # support): this actually ends up building all the libraries rather than just
 # libm.a
-lib/soft-float/libm.a: large_data_softfloat large_data_softfloat/libm.a
+lib/soft-float/libm.a: large_data_softfloat/libm.a
 
-large_data_softfloat/libm.a:
+large_data_softfloat/libm.a: large_data_softfloat
 	$(MAKE) TYPE=large_data_softfloat all_libraries
 	$(COPY) $(foreach file,$(LIBS),large_data_softfloat/$(file)) lib/soft-float
 
@@ -994,9 +1003,9 @@ large_data_softfloat/libm.a:
 
 # Dependencies for libm.a (small data variant): this actually ends up building all
 # the libraries rather than just libm.a
-lib/small-data/libm.a: small_data small_data/libm.a
+lib/small-data/libm.a: small_data/libm.a
 
-small_data/libm.a:
+small_data/libm.a: small_data
 	$(MAKE) TYPE=small_data all_libraries
 	$(COPY) $(foreach file,$(LIBS),small_data/$(file)) lib/small-data
 
@@ -1004,41 +1013,59 @@ small_data/libm.a:
 
 # Dependencies for libm.a (baserel variant)
 
-lib/baserel/libm.a: baserel baserel/libm.a
+lib/baserel/libm.a: baserel/libm.a
 
-baserel/libm.a:
+baserel/libm.a: baserel
 	$(MAKE) TYPE=baserel all_libraries
 	$(COPY) $(foreach file,$(LIBS),baserel/$(file)) lib/baserel
 
 ##############################################################################
 
 # Rules to build and move the startup code
-lib/crt0.o : lib crt0.o
+lib/crt0.o : crt0.o
 	$(COPY) crt0.o lib
 
-lib/crtbegin.o : lib crtbegin.o
+crt0.o : lib
+
+lib/crtbegin.o : crtbegin.o
 	$(COPY) crtbegin.o lib
 
-lib/crtend.o : lib crtend.o
+crtbegin.o : lib
+
+lib/crtend.o : crtend.o
 	$(COPY) crtend.o lib
 
-lib/small-data/crt0.o : lib small_data/crt0.o
+crtend.o : lib
+
+lib/small-data/crt0.o : small_data/crt0.o
 	$(COPY) small_data/crt0.o lib/small-data
 
-lib/small-data/crtbegin.o : lib small_data/crtbegin.o
+small_data/crt0.o : lib
+
+lib/small-data/crtbegin.o : small_data/crtbegin.o
 	$(COPY) small_data/crtbegin.o lib/small-data
 
-lib/small-data/crtend.o : lib small_data/crtend.o
+small_data/crtbegin.o : lib
+
+lib/small-data/crtend.o : small_data/crtend.o
 	$(COPY) small_data/crtend.o lib/small-data
 
-lib/baserel/crt0.o : lib baserel/crt0.o
+small_data/crtend.o : lib
+
+lib/baserel/crt0.o : baserel/crt0.o
 	$(COPY) baserel/crt0.o lib/baserel
 
-lib/baserel/crtbegin.o : lib baserel/crtbegin.o
+baserel/crt0.o : lib
+
+lib/baserel/crtbegin.o : baserel/crtbegin.o
 	$(COPY) baserel/crtbegin.o lib/baserel
 
-lib/baserel/crtend.o : lib baserel/crtend.o
+baserel/crtbegin.o : lib
+
+lib/baserel/crtend.o : baserel/crtend.o
 	$(COPY) baserel/crtend.o lib/baserel
+
+baserel/crtend.o : lib
 
 ##############################################################################
 
@@ -1240,4 +1267,3 @@ baserel/crtbegin.o : crtbegin.c
 baserel/crtend.o : crtend.c
 	@echo "Assembling $<"
 	@$(CC) -o baserel/crtend.o -c $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(INCLUDES) -mbaserel -DBASEREL_DATA crtend.c
-
