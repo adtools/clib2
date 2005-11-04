@@ -1,11 +1,17 @@
 #
-# $Id: GNUmakefile.os4,v 1.84 2005-10-27 08:58:41 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.85 2005-11-04 09:35:02 obarthel Exp $
 #
 # :ts=8
 #
 # -*- mode: makefile; -*-
 
 ##############################################################################
+
+.PHONY : all clean version cvs-tag all_libraries directories
+.PHONY : large_data_libs
+.PHONY : large_data_softfloat_libs
+.PHONY : small_data_libs
+.PHONY : baserel_libs
 
 # You may have to change the following sets of macro definitions which will
 # be used throughout the build makefile. These definitions cover the paths
@@ -16,8 +22,10 @@
 # Note that for either set you still need the GNU make utility to build the
 # library!
 
-# These are for the cross compiler
-SDK_INCLUDE = $(V)/include
+# These are for the cross compiler, with the operating system header files
+# stored in "/V/include" and the network header files in a local directory
+# called "netinclude".
+SDK_INCLUDE = /V/include
 NET_INCLUDE = netinclude
 CC = ppc-amigaos-gcc
 AR = ppc-amigaos-ar -q
@@ -28,7 +36,9 @@ MAKEDIR = mkdir -p
 MAKE_OPTS =
 LOG_COMMAND = 2>&1 | tee -a compiler.log
 
-# The following are for the native OS4 compiler
+# The following are for the native OS4 compiler; note that the
+# LOG_COMMAND should not be enabled unless you have a shell
+# installed which supports it.
 #SDK_INCLUDE = /SDK/Include/include_h
 #NET_INCLUDE = /SDK/Include/netinclude
 #CC = gcc
@@ -36,11 +46,11 @@ LOG_COMMAND = 2>&1 | tee -a compiler.log
 #RANLIB = ranlib
 #COPY = copy
 #DELETE = delete all quiet
-#MAKEDIR = makedir all
-#MAKE_OPTS = --jobs=2
-#LOG_COMMAND =
+#MAKEDIR = makedir all force
+#MAKE_OPTS = --jobs=1
+#LOG_COMMAND = *>< | tee >>compiler.log
 
-MAKE = $(MAKE_COMMAND) -f GNUmakefile.os4 $(MAKE_OPTS)
+BUILD = $(MAKE_COMMAND) -f GNUmakefile.os4 $(MAKE_OPTS)
 
 ##############################################################################
 
@@ -103,25 +113,29 @@ $(LIBPROFILE_OBJS)/%.o : %.S
 
 ##############################################################################
 
-# Build options for the individual libraries
+# Build options and destination directory for the individual libraries
 ifeq (small_data,$(TYPE))
 CODE_TYPE := -msdata=sysv -DSMALL_DATA
 FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
+DEST_DIR := lib/small-data
 endif
 
 ifeq (large_data,$(TYPE))
 CODE_TYPE := -msdata=data
 FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
+DEST_DIR := lib
 endif
 
 ifeq (large_data_softfloat,$(TYPE))
 CODE_TYPE := -msdata=data -msoft-float
 FLOAT_TYPE :=
+DEST_DIR := lib/soft-float
 endif
 
 ifeq (baserel,$(TYPE))
 CODE_TYPE := -mbaserel -DBASEREL_DATA
 FLOAT_TYPE := -DPPC_FLOATING_POINT_SUPPORT
+DEST_DIR := lib/baserel
 endif
 
 ##############################################################################
@@ -134,7 +148,7 @@ WARNINGS = \
 
 INCLUDES = -Iinclude -I. -I$(SDK_INCLUDE)
 #OPTIONS = -D__THREAD_SAFE -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
-OPTIONS =                 -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+ OPTIONS =                 -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
 OPTIMIZE = -O3
 #DEBUG = -ggdb
 
@@ -886,29 +900,26 @@ STARTUPS := crt0.o crtbegin.o crtend.o
 ##############################################################################
 
 # This is the first target: it creates the necessary directories, then proceeds
-# to build the startup object files and finally the libraries
+# to build the startup object files and libraries
 all: \
-	lib \
-	lib/soft-float \
-	lib/small-data \
-	lib/baserel \
-	small_data \
-	large_data \
-	large_data_softfloat \
-	baserel \
-	lib/crt0.o \
-	lib/crtbegin.o \
-	lib/crtend.o \
-	lib/libm.a \
-	lib/small-data/crt0.o \
-	lib/small-data/crtbegin.o \
-	lib/small-data/crtend.o \
-	lib/small-data/libm.a \
-	lib/soft-float/libm.a \
-	lib/baserel/crt0.o \
-	lib/baserel/crtbegin.o \
-	lib/baserel/crtend.o \
-	lib/baserel/libm.a
+	directories \
+	large_data_libs \
+	large_data_softfloat_libs \
+	small_data_libs \
+	baserel_libs
+
+##############################################################################
+
+# Create all the directories
+directories:
+	@-$(MAKEDIR) lib
+	@-$(MAKEDIR) lib/small-data
+	@-$(MAKEDIR) lib/soft-float
+	@-$(MAKEDIR) lib/baserel
+	@-$(MAKEDIR) small_data
+	@-$(MAKEDIR) large_data
+	@-$(MAKEDIR) large_data_softfloat
+	@-$(MAKEDIR) baserel
 
 ##############################################################################
 
@@ -922,14 +933,14 @@ clean:
 
 # Update the version numbers bound to the individual libraries
 version:
-	cp c.lib_rev.rev amiga.lib_rev.rev
-	cp c.lib_rev.rev debug.lib_rev.rev
-	cp c.lib_rev.rev m.lib_rev.rev
-	cp c.lib_rev.rev m881.lib_rev.rev
-	cp c.lib_rev.rev net.lib_rev.rev
-	cp c.lib_rev.rev stack.lib_rev.rev
-	cp c.lib_rev.rev unix.lib_rev.rev
-	cp c.lib_rev.rev profile.lib_rev.rev
+	$(COPY) c.lib_rev.rev amiga.lib_rev.rev
+	$(COPY) c.lib_rev.rev debug.lib_rev.rev
+	$(COPY) c.lib_rev.rev m.lib_rev.rev
+	$(COPY) c.lib_rev.rev m881.lib_rev.rev
+	$(COPY) c.lib_rev.rev net.lib_rev.rev
+	$(COPY) c.lib_rev.rev stack.lib_rev.rev
+	$(COPY) c.lib_rev.rev unix.lib_rev.rev
+	$(COPY) c.lib_rev.rev profile.lib_rev.rev
 	bumprev 1 amiga.lib
 	bumprev 1 c.lib
 	bumprev 1 debug.lib
@@ -955,121 +966,63 @@ all_libraries: $(LIBS)
 
 ##############################################################################
 
-# These create the required subdirectories to store object files and
-# libraries in
-lib:
-	-$(MAKEDIR) $@
-
-lib/small-data: lib
-	-$(MAKEDIR) $@
-
-lib/soft-float: lib
-	-$(MAKEDIR) $@
-
-lib/baserel: lib
-	-$(MAKEDIR) $@
-
-small_data:
-	-$(MAKEDIR) $@
-
-large_data:
-	-$(MAKEDIR) $@
-
-large_data_softfloat:
-	-$(MAKEDIR) $@
-
-baserel:
-	-$(MAKEDIR) $@
+# Dependencies for large data variant with hardware floating point code
+# support.
+large_data_libs: $(addprefix lib/,$(STARTUPS))
+	@-$(MAKEDIR) $(addprefix large_data/,$(dir $(LIBS)))
+	$(BUILD) TYPE=large_data all_libraries
 
 ##############################################################################
 
-# Dependencies for libm.a (large data variant with hardware floating point code
-# support): this actually ends up building all the libraries rather than just
-# libm.a
-lib/libm.a: large_data/libm.a
-
-large_data/libm.a: large_data
-	$(MAKE) TYPE=large_data all_libraries
-	$(COPY) $(foreach file,$(LIBS),large_data/$(file)) lib
+# Dependencies for large data variant with software floating point code
+# support.
+large_data_softfloat_libs: $(addprefix lib/,$(STARTUPS))
+	@-$(MAKEDIR) $(addprefix large_data_softfloat/,$(dir $(LIBS)))
+	$(BUILD) TYPE=large_data_softfloat all_libraries
 
 ##############################################################################
 
-# Dependencies for libm.a (large data variant with software floating point code
-# support): this actually ends up building all the libraries rather than just
-# libm.a
-lib/soft-float/libm.a: large_data_softfloat/libm.a
-
-large_data_softfloat/libm.a: large_data_softfloat
-	$(MAKE) TYPE=large_data_softfloat all_libraries
-	$(COPY) $(foreach file,$(LIBS),large_data_softfloat/$(file)) lib/soft-float
+# Dependencies for small data variant.
+small_data_libs: $(addprefix lib/small-data/,$(STARTUPS))
+	@-$(MAKEDIR) $(addprefix small_data/,$(dir $(LIBS)))
+	$(BUILD) TYPE=small_data all_libraries
 
 ##############################################################################
 
-# Dependencies for libm.a (small data variant): this actually ends up building all
-# the libraries rather than just libm.a
-lib/small-data/libm.a: small_data/libm.a
-
-small_data/libm.a: small_data
-	$(MAKE) TYPE=small_data all_libraries
-	$(COPY) $(foreach file,$(LIBS),small_data/$(file)) lib/small-data
-
-##############################################################################
-
-# Dependencies for libm.a (baserel variant)
-
-lib/baserel/libm.a: baserel/libm.a
-
-baserel/libm.a: baserel
-	$(MAKE) TYPE=baserel all_libraries
-	$(COPY) $(foreach file,$(LIBS),baserel/$(file)) lib/baserel
+# Dependencies for baserel variant.
+baserel_libs: $(addprefix lib/baserel/,$(STARTUPS))
+	@-$(MAKEDIR) $(addprefix baserel/,$(dir $(LIBS)))
+	$(BUILD) TYPE=baserel all_libraries
 
 ##############################################################################
 
 # Rules to build and move the startup code
 lib/crt0.o : crt0.o
-	$(COPY) crt0.o lib
-
-crt0.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/crtbegin.o : crtbegin.o
-	$(COPY) crtbegin.o lib
-
-crtbegin.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/crtend.o : crtend.o
-	$(COPY) crtend.o lib
-
-crtend.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/small-data/crt0.o : small_data/crt0.o
-	$(COPY) small_data/crt0.o lib/small-data
-
-small_data/crt0.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/small-data/crtbegin.o : small_data/crtbegin.o
-	$(COPY) small_data/crtbegin.o lib/small-data
-
-small_data/crtbegin.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/small-data/crtend.o : small_data/crtend.o
-	$(COPY) small_data/crtend.o lib/small-data
-
-small_data/crtend.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/baserel/crt0.o : baserel/crt0.o
-	$(COPY) baserel/crt0.o lib/baserel
-
-baserel/crt0.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/baserel/crtbegin.o : baserel/crtbegin.o
-	$(COPY) baserel/crtbegin.o lib/baserel
-
-baserel/crtbegin.o : lib
+	$(COPY) $< $(dir $@)
 
 lib/baserel/crtend.o : baserel/crtend.o
-	$(COPY) baserel/crtend.o lib/baserel
-
-baserel/crtend.o : lib
+	$(COPY) $< $(dir $@)
 
 ##############################################################################
 
@@ -1167,79 +1120,65 @@ $(LIBUNIX_OBJS)/unistd_getcwd_debug.o : unistd_getcwd.c
 ##############################################################################
 
 # Individual build rules for libc.a
-$(LIBC_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBC_OBJS)/libc.a : $(LIBC_OBJS) $(foreach file,$(C_LIB),$(LIBC_OBJS)/$(file))
+$(LIBC_OBJS)/libc.a : $(foreach file,$(C_LIB),$(LIBC_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(C_LIB),$(LIBC_OBJS)/$(file))
 	$(RANLIB) $@
+	$(COPY) $@ $(DEST_DIR)
 
 ##############################################################################
 
 # Individual build rules for libunix.a
-$(LIBUNIX_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBUNIX_OBJS)/libunix.a : $(LIBUNIX_OBJS) $(foreach file,$(UNIX_LIB),$(LIBUNIX_OBJS)/$(file))
+$(LIBUNIX_OBJS)/libunix.a : $(foreach file,$(UNIX_LIB),$(LIBUNIX_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(UNIX_LIB),$(LIBUNIX_OBJS)/$(file))
 	$(RANLIB) $@
+	$(COPY) $@ $(DEST_DIR)
 
 ##############################################################################
 
 # Individual build rules for libm.a
-$(LIBM_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBM_OBJS)/libm.a : $(LIBM_OBJS) $(foreach file,$(MATH_LIB),$(LIBM_OBJS)/$(file))
+$(LIBM_OBJS)/libm.a : $(foreach file,$(MATH_LIB),$(LIBM_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(MATH_LIB),$(LIBM_OBJS)/$(file))
 	$(RANLIB) $@
+	$(COPY) $@ $(DEST_DIR)
 
 ##############################################################################
 
 # Individual build rules for libnet.a
-$(LIBNET_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBNET_OBJS)/libnet.a : $(LIBNET_OBJS) $(foreach file,$(NET_LIB),$(LIBNET_OBJS)/$(file))
+$(LIBNET_OBJS)/libnet.a : $(foreach file,$(NET_LIB),$(LIBNET_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(NET_LIB),$(LIBNET_OBJS)/$(file))
 	$(RANLIB) $@
+	$(COPY) $@ $(DEST_DIR)
 
 ##############################################################################
 
 # Individual build rules for libdebug.a
-$(LIBDEBUG_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBDEBUG_OBJS)/libdebug.a : $(LIBDEBUG_OBJS) $(foreach file,$(DEBUG_LIB),$(LIBDEBUG_OBJS)/$(file))
+$(LIBDEBUG_OBJS)/libdebug.a : $(foreach file,$(DEBUG_LIB),$(LIBDEBUG_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(DEBUG_LIB),$(LIBDEBUG_OBJS)/$(file))
 	$(RANLIB) $@
+	$(COPY) $@ $(DEST_DIR)
 
 ##############################################################################
 
 # Individual build rules for libamiga.a
-$(LIBAMIGA_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBAMIGA_OBJS)/libamiga.a : $(LIBAMIGA_OBJS) $(foreach file,$(AMIGA_LIB),$(LIBAMIGA_OBJS)/$(file))
+$(LIBAMIGA_OBJS)/libamiga.a : $(foreach file,$(AMIGA_LIB),$(LIBAMIGA_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(AMIGA_LIB),$(LIBAMIGA_OBJS)/$(file))
 	$(RANLIB) $@
+	$(COPY) $@ $(DEST_DIR)
 
 ##############################################################################
 
 # Individual build rules for libprofile.a
-$(LIBPROFILE_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBPROFILE_OBJS)/libprofile.a : $(LIBPROFILE_OBJS) $(foreach file,$(PROFILE_LIB),$(LIBPROFILE_OBJS)/$(file))
+$(LIBPROFILE_OBJS)/libprofile.a : $(foreach file,$(PROFILE_LIB),$(LIBPROFILE_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(PROFILE_LIB),$(LIBPROFILE_OBJS)/$(file))
 	$(RANLIB) $@
+	$(COPY) $@ $(DEST_DIR)
 
 ##############################################################################
 
