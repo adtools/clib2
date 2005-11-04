@@ -19,7 +19,7 @@ cp -a include $dir_name
 cp changes $dir_name
 
 # Delete the CVS data from the include directory
-rm -rf ${dir_name}/include/CVS ${dir_name}/include/sys/CVS
+rm -rf ${dir_name}/include/CVS ${dir_name}/include/sys/CVS ${dir_name}/include/arpa/CVS ${dir_name}/include/netinet/CVS
 
 # Finally, create an lha type 5 archive; the Amiga LhA port
 # can unpack it.
