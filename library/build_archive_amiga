@@ -15,7 +15,7 @@ copy include ram:${dir_name}/include all clone quiet
 copy changes ram:$dir_name clone
 
 ; Delete the CVS data from the include directory
-delete ram:${dir_name}/include/CVS ram:${dir_name}/include/sys/CVS all quiet
+delete ram:${dir_name}/include/CVS ram:${dir_name}/include/sys/CVS ram:${dir_name}/include/arpa/CVS ram:${dir_name}/include/netinet/CVS all quiet
 
 ; Finally, create an lha archive in RAM:
 pushcd ram:
