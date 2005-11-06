@@ -1,5 +1,5 @@
 /*
- * $Id: select.h,v 1.1 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: select.h,v 1.2 2005-11-06 14:37:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -72,9 +72,9 @@ typedef	struct fd_set
 	unsigned long bits[(FD_SETSIZE + 31) / 32];
 } fd_set;
 
-#define	FD_SET(n,p)		((void)((n) < FD_SETSIZE ? (p)->bits[((unsigned long)n) >> 5] |=  (1UL << (((unsigned long)n) & 31)) : 0))
-#define	FD_CLR(n,p)		((void)((n) < FD_SETSIZE ? (p)->bits[((unsigned long)n) >> 5] &= ~(1UL << (((unsigned long)n) & 31)) : 0))
-#define	FD_ISSET(n,p)	((n) < FD_SETSIZE && ((p)->bits[((unsigned long)n) >> 5] & (1UL << (((unsigned long)n) & 31))) != 0)
+#define	FD_SET(n,p)		((void)(((unsigned long)n) < FD_SETSIZE ? (p)->bits[((unsigned long)n) >> 5] |=  (1UL << (((unsigned long)n) & 31)) : 0))
+#define	FD_CLR(n,p)		((void)(((unsigned long)n) < FD_SETSIZE ? (p)->bits[((unsigned long)n) >> 5] &= ~(1UL << (((unsigned long)n) & 31)) : 0))
+#define	FD_ISSET(n,p)	(((unsigned long)n) < FD_SETSIZE && ((p)->bits[((unsigned long)n) >> 5] & (1UL << (((unsigned long)n) & 31))) != 0)
 #define	FD_COPY(f,t)	((void)memmove(t,f,sizeof(*(f))))
 #define	FD_ZERO(p)		((void)memset(p,0,sizeof(*(p))))
 
