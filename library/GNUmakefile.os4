@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.85 2005-11-04 09:35:02 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.86 2005-11-19 17:11:22 obarthel Exp $
 #
 # :ts=8
 #
@@ -579,6 +579,17 @@ MATH_LIB = \
 	complex_creal.o \
 	complex_crealf.o \
 	complex_creall.o \
+	fenv_feclearexcept.o \
+	fenv_fegetenv.o \
+	fenv_fegetexceptflag.o \
+	fenv_fegetround.o \
+	fenv_feholdexcept.o \
+	fenv_feraiseexcept.o \
+	fenv_fesetenv.o \
+	fenv_fesetexceptflag.o \
+	fenv_fetestexcept.o \
+	fenv_fetestround.o \
+	fenv_feupdateenv.o \
 	math_acos.o \
 	math_acosf.o \
 	math_acosh.o \

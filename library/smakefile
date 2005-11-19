@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.55 2005-10-20 07:19:15 obarthel Exp $
+# $Id: smakefile,v 1.56 2005-11-19 17:11:22 obarthel Exp $
 #
 # :ts=8
 #
@@ -179,6 +179,17 @@ LOCALE_OBJ = \
 	locale_setlocale.o
 
 MATH_OBJ = \
+	fenv_feclearexcept.o \
+	fenv_fegetenv.o \
+	fenv_fegetexceptflag.o \
+	fenv_fegetround.o \
+	fenv_feholdexcept.o \
+	fenv_feraiseexcept.o \
+	fenv_fesetenv.o \
+	fenv_fesetexceptflag.o \
+	fenv_fetestexcept.o \
+	fenv_fetestround.o \
+	fenv_feupdateenv.o \
 	math_acos.o \
 	math_acosf.o \
 	math_acosh.o \
