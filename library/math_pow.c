@@ -1,5 +1,5 @@
 /*
- * $Id: math_pow.c,v 1.8 2005-11-19 17:11:22 obarthel Exp $
+ * $Id: math_pow.c,v 1.9 2005-11-19 17:17:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -265,7 +265,7 @@ __pow(double x,double y)
 	    if(hy==0x40000000) return x*x; /* y is  2 */
 	    if(hy==0x3fe00000) {	/* y is  0.5 */
 		if(hx>=0)	/* x >= +0 */
-		return __ieee754_sqrt(x);	
+		return sqrt(x);	
 	    }
 	}
 
