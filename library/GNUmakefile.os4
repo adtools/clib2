@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.86 2005-11-19 17:11:22 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.87 2005-11-20 17:00:22 obarthel Exp $
 #
 # :ts=8
 #
@@ -526,6 +526,8 @@ UNIX_LIB = \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
+	stdlib_malloc.o \
+	stdlib_realloc.o \
 	stdlib_system.o \
 	termios_cfgetispeed.o \
 	termios_cfgetospeed.o \

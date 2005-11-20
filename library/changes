@@ -6,6 +6,10 @@
 - Replaced the old pow() implementation. However, powf() may need to
   be changed to set a domain error.
 
+- In libunix.a malloc(), calloc() and realloc() no longer treat a
+  request to allocate 0 bytes as an error, returning NULL. They all
+  return a 1 byte memory chunk initialized to 0 instead.
+
 
 c.lib 1.197 (4.11.2005)
 

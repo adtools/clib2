@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_calloc.c,v 1.5 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdlib_calloc.c,v 1.6 2005-11-20 17:00:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,7 @@ __static void *
 __calloc(size_t num_elements,size_t element_size,const char * file,int line)
 {
 	void * result = NULL;
+	size_t total_size;
 
 	#ifdef __MEM_DEBUG
 	{
@@ -58,24 +59,13 @@ __calloc(size_t num_elements,size_t element_size,const char * file,int line)
 	}
 	#endif /* __MEM_DEBUG */
 
-	assert( (int)num_elements >= 0 && (int)element_size >= 0 );
+	total_size = num_elements * element_size;
 
-	if(num_elements > 0 && element_size > 0)
-	{
-		size_t total_size;
-
-		total_size = num_elements * element_size;
-
-		result = __malloc(total_size,file,line);
-		if(result != NULL)
-			memset(result,0,total_size);
-		else
-			SHOWMSG("memory allocation failure");
-	}
+	result = __malloc(total_size,file,line);
+	if(result != NULL)
+		memset(result,0,total_size);
 	else
-	{
-		SHOWMSG("zero length allocation");
-	}
+		SHOWMSG("memory allocation failure");
 
 	return(result);
 }

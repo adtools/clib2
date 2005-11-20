@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_realloc.c,v 1.6 2005-03-18 12:38:24 obarthel Exp $
+ * $Id: stdlib_realloc.c,v 1.7 2005-11-20 17:00:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,18 +65,20 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 
 		result = __malloc(size,file,line);
 	}
+#ifndef UNIX_PATH_SEMANTICS
 	else if (size == 0)
 	{
 		D(("calling free(0x%08lx)",ptr));
 
 		__free(ptr,file,line);
 	}
+#endif /* UNIX_PATH_SEMANTICS */
 	else
 	{
 		struct MemoryNode * mn;
 		BOOL reallocate;
 
-		assert( ptr != NULL && size > 0 );
+		assert( ptr != NULL );
 
 		/* Try to find the allocation in the list. */
 		mn = __find_memory_node(ptr);
@@ -84,8 +86,7 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 		#ifdef __MEM_DEBUG
 		{
 			/* If we managed to find the memory allocation,
-			 * reallocate it.
-			 */
+			   reallocate it. */
 			if(mn == NULL)
 			{
 				SHOWMSG("allocation not found");
@@ -93,9 +94,7 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 				kprintf("[%s] %s:%ld:Address for realloc(0x%08lx,%ld) not known.\n",__program_name,file,line,ptr,size);
 
 				/* Apparently, the address did not qualify for
-				 * reallocation.
-				 */
-				__set_errno(ENOMEM);
+				   reallocation. */
 				goto out;
 			}
 		}
@@ -108,14 +107,11 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 		if(mn == NULL || mn->mn_NeverFree)
 		{
 			SHOWMSG("cannot free this chunk");
-
-			__set_errno(ENOMEM);
 			goto out;
 		}
 
-		/* Don't do anything unless the size of the allocation has really
-		 * changed.
-		 */
+		/* Don't do anything unless the size of the allocation
+		   has really changed. */
 		#if defined(__MEM_DEBUG)
 		{
 			reallocate = (mn->mn_Size != size);
@@ -132,19 +128,17 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 				size_t rounded_allocation_size;
 
 				/* Round the total allocation size to the operating system
-				 * granularity.
-				 */
+				   granularity. */
 				rounded_allocation_size = __get_allocation_size(size);
 
 				assert( rounded_allocation_size >= size );
 
 				/* Optimization: If the block size shrinks by less than half the
-				 *               original allocation size, do not reallocate the
-				 *               block and do not copy over the contents of the old
-				 *               allocation. We also take into account that the
-				 *               actual size of the allocation is affected by a
-				 *               certain operating system imposed granularity.
-				 */
+				                 original allocation size, do not reallocate the
+				                 block and do not copy over the contents of the old
+				                 allocation. We also take into account that the
+				                 actual size of the allocation is affected by a
+				                 certain operating system imposed granularity. */
 				reallocate = (rounded_allocation_size < mn->mn_Size && rounded_allocation_size <= mn->mn_Size / 2);
 			}
 		}
@@ -162,8 +156,6 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 			if(new_ptr == NULL)
 			{
 				SHOWMSG("could not reallocate memory");
-
-				__set_errno(ENOMEM);
 				goto out;
 			}
 

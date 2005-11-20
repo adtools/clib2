@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.14 2005-10-27 08:58:41 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.15 2005-11-20 17:00:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -99,16 +99,28 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 	struct MemoryNode * mn;
 	size_t allocation_size;
 	void * result = NULL;
+	size_t original_size;
 
-	assert( size > 0 );
+	#if defined(UNIX_PATH_SEMANTICS)
+	{
+		original_size = size;
+
+		/* The libunix.a flavour accepts zero length memory allocations
+		   and quietly turns them into 1 byte allocations. */
+		if(size == 0)
+			size++;
+	}
+	#endif /* UNIX_PATH_SEMANTICS */
 
 	__memory_lock();
+
+	/* Zero length allocations are by default rejected. */
+	if(size == 0)
+		goto out;
 
 	if(__free_memory_threshold > 0 && AvailMem(MEMF_ANY|MEMF_LARGEST) < __free_memory_threshold)
 	{
 		SHOWMSG("not enough free memory available to safely proceed with allocation");
-
-		__set_errno(ENOMEM);
 		goto out;
 	}
 
@@ -137,8 +149,6 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 	if(mn == NULL)
 	{
 		SHOWMSG("not enough memory");
-
-		__set_errno(ENOMEM);
 		goto out;
 	}
 
@@ -195,6 +205,16 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 	}
 	#endif /* __MEM_DEBUG */
 
+	#if defined(UNIX_PATH_SEMANTICS)
+	{
+		/* Zero length memory allocations in libunix.a quietly
+		   return one byte of memory each, and that byte is
+		   set to '\0'. */
+		if(original_size == 0)
+			*(char *)result = '\0';
+	}
+	#endif /* UNIX_PATH_SEMANTICS */
+
 	assert( (((ULONG)result) & 3) == 0 );
 
  out:
@@ -232,28 +252,8 @@ __malloc(size_t size,const char * file,int line)
 	}
 	#endif /* __MEM_DEBUG */
 
-	if(size == 0)
-	{
-		#ifdef __MEM_DEBUG
-		{
-			kprintf("[%s] ",__program_name);
-
-			if(file != NULL)
-				kprintf("%s:%ld:",file,line);
-
-			kprintf("malloc(0) called.\n");
-		}
-		#endif /* __MEM_DEBUG */
-
-		goto out;
-	}
-
-	assert( (int)size > 0 );
-
 	/* Allocate memory which can be put through realloc() and free(). */
 	result = __allocate_memory(size,FALSE,file,line);
-
- out:
 
 	return(result);
 }

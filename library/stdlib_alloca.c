@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.6 2005-03-18 12:38:23 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.7 2005-11-20 17:00:22 obarthel Exp $
  *
  * :ts=4
  *
@@ -126,25 +126,7 @@ __alloca(size_t size,const char * file,int line)
 
 	__alloca_cleanup(file,line);
 
-	assert( (int)size >= 0 );
-
-	if(size == 0)
-	{
-		#ifdef __MEM_DEBUG
-		{
-			kprintf("[%s] ",__program_name);
-
-			if(file != NULL)
-				kprintf("%s:%ld:",file,line);
-
-			kprintf("alloca(0) called.\n");
-		}
-		#endif /* __MEM_DEBUG */
-
-		goto out;
-	}
-
-	mcn = __allocate_memory(sizeof(*mcn),FALSE,file,line);
+	mcn = __malloc(sizeof(*mcn),file,line);
 	if(mcn == NULL)
 	{
 		SHOWMSG("not enough memory");
