@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_assertion_failure.c,v 1.10 2005-03-19 11:06:57 obarthel Exp $
+ * $Id: stdlib_assertion_failure.c,v 1.11 2005-11-20 19:04:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -101,7 +101,7 @@ __assertion_failure(
 
 				es.es_StructSize	= sizeof(es);
 				es.es_Title			= (STRPTR)__program_name;
-				es.es_TextFormat	= (STRPTR)"Assertion of expression\n\"%s\"\nfailed in file \"%s\", line %ld.";
+				es.es_TextFormat	= (STRPTR)"Assertion of condition\n\"%s\"\nfailed in file \"%s\", line %ld.";
 				es.es_GadgetFormat	= (STRPTR)"Sorry";
 
 				EasyRequest(NULL,&es,NULL,
