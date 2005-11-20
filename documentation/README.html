@@ -71,13 +71,13 @@ underlying <tt>bsdsocket.library</tt> API is not supposed to be used by any proc
 other than the one that opened it. While one TCP/IP stack (my own "Roadshow") allows you
 to share the library base among different processes, if so configured, it is the
 exception. No other TCP/IP stack available for the Amiga robustly supports a similar
-feature. Any attempt to enable it by default would introduce incompatibilities which
-might be difficult to support.</p>
+feature. If the TCP/IP stack supports this feature, then the global variable
+<tt>__can_share_socket_library_base</tt> will be set to a non-zero value.</p>
 
-<p>Also yet unsolved is the issue of reading
-error codes from the <tt>errno</tt> variable which currently always contains the
-error code left by the last caller. This is also the case for the global <tt>h_errno</tt>
-variable, which the socket I/O name resolution functions may change.</p>
+<p>Errors reported by the socket I/O functions which modify the global variables
+<tt>errno</tt> and <tt>h_errno</tt> may be directed to call the <tt>__set_errno()</tt>
+and <tt>__set_h_errno()</tt> functions instead if the TCP/IP stack supports this feature. The global
+variable <tt>__thread_safe_errno_h_errno</tt> will be set to a non-zero value if it does.</p>
 
 <p>A much more serious problem resides with the <tt>exit()</tt>, <tt>abort()</tt>,
 <tt>assert()</tt> and <tt>raise()</tt> functions, and the how <tt>SIGINT</tt> signal is
@@ -136,15 +136,6 @@ the fact that the code itself is very simple in design. It should speak for
 itself. However, to make a usable runtime library you have to have a user
 documentation as in man pages or autodocs. We will eventually have to have
 autodocs for this library.</p>
-
-<p>The code is currently plastered with assertions and debug code. It is
-therefore much larger than it ought to be and runs much slower than it ought
-to be. For example, the <tt>malloc()</tt> routine will set the contents of the memory
-allocated to a 'dirty' bit pattern which is likely to break software which
-makes assumptions about its contents. Likewise, the <tt>free()</tt> routine will trash
-the memory to deallocate with a different 'dirty' bit pattern to turn up reuse
-of memory after deallocation. All these debugging features can be disabled by
-defining the <tt>NDEBUG</tt> preprocessor symbol at compile time (see <tt>&lt;assert.h&gt;</tt>).</p>
 
 <p>The exception handling in the math code is not particularly effective. For one
 part this is due to the fact that there is no exception handler installed by
@@ -220,6 +211,190 @@ performance analysis to be made independant of the actual system load. The Perfo
 is available on all PowerPC models supported by AmigaOS 4 except for the <tt>603e</tt>, and
 embedded versions of the PowerPC like the <tt>405</tt> and <tt>440</tt> series. Consult the manual
 of the appropriate chip for more information.</p>
+
+<h3>5.6 Implementation defined behaviour</h3>
+
+<h4>5.6.1. 'C' language</h4>
+
+<h5>5.6.1.1. Environment</h5>
+
+<p>The <tt>main(int argc,char **argv);</tt> function may be called with an <tt>argc</tt> value of 0,
+in which case the <tt>argv</tt> variable will contain a pointer to the Amiga Workbench startup
+message, which is of type <tt>struct WBStartup *</tt>, and is defined in the Amiga system header
+file <tt>&lt;workbench/startup.h&gt;</tt>.</p>
+
+<h5>5.6.1.2. Characters</h5>
+
+<p>The current locale is derived from the current Amiga operating system locale settings. The
+<tt>setlocale("")</tt> function call will choose the current Amiga operating system locale settings.
+Any other name passed to the <tt>setlocale()</tt> function, with the except of <tt>"C"</tt>,
+which selects the 'C' locale, must be a locale name, as used by the Amiga operating system
+function <tt>OpenLocale()</tt> in <tt>locale.library</tt>.</p>
+
+<h5>5.6.1.3. Floating-point</h5>
+
+<p>The 68k version of clib2 supports single and double precision floating point numbers,
+according to the IEEE 754 standard. The software floating point number support is built upon the Amiga
+operating system libraries <tt>mathieeesingbas.library</tt>, <tt>mathieeedoubbas.library</tt>
+and <tt>mathieeedoubtrans.library</tt>. The hardware floating point number support uses
+the M68881/M68882/M68040/M68060 floating point unit intead.</p>
+
+<p>The PowerPC version of clib2 supports only double precision floating point numbers, according to
+the IEEE 754 standard, because that is exactly what the PowerPC CPU supports. Single precision
+numbers may be implicitly converted to double precision numbers.</p>
+
+<p>Both the 68k and the PowerPC versions of clib2 may call software floating point support
+routines in order to perform double and single precision operations that go beyond
+simple addition and multiplication, such as <tt>sqrt()</tt>. These functions come from
+Sun Microsystems <i>fdlibm 5.3</i> library.</p>
+
+<p>Unless your software is linked against <tt>libm.a</tt> no floating point functions will
+be available to it, possibly causing a linker error. When using the GNU 'C' compiler, you will
+want to add the option <tt>-lm -lc</tt> to the linker command line.</p>
+
+<p>The exception handling is currently entirely out of control of the developer
+and solely subject to the rules imposed by the operating system itself.</p>
+
+<h4>5.6.2. Library functions</h4>
+
+<h5>5.6.2.1. <tt>NULL</tt></h5>
+
+<p>The <tt>NULL</tt> pointer constant is defined in the <tt>&lt;stddef.h&gt;</tt> header and
+will expand to <tt>((void *)0L)</tt> if the 'C' compiler is used. For a C++ compiler the constant
+will expand to <tt>0L</tt> instead.</p>
+
+<h5>5.6.2.2. <tt>assert()</tt> diagnostic messages</h5>
+
+<p>The diagnostic messages printed by the <tt>assert()</tt> function take the following form:</p>
+
+<blockquote><tt>[<i>program name</i>] <i>file</i>:<i>line</i>: failed assertion "<i>condition</i>".</tt></blockquote>
+
+<p>where:</p>
+<table border=0>
+<tr><th align=right>program name</th><td>Optional program name; if the program name is not yet known, then the
+entire text enclosed in square brackets will be omitted.</td></tr>
+<tr><th align=right>file</th><td>The value of the <tt>__FILE__</tt> symbol at the location of the <tt>assert()</tt> call.</td></tr>
+<tr><th align=right>line</th><td>The value of the <tt>__LINE__</tt> symbol at the location of the <tt>assert()</tt> call.</td></tr>
+<tr><th align=right>condition</th><td>The condition passed to the <tt>assert()</tt> function.</td></tr>
+</table>
+
+<p>If available, the diagnostic messages will be sent to <tt>stderr</tt>.</p>
+
+<p>If the program was launched from Workbench or if the global variable <tt>__no_standard_io</tt> is set
+to a non-zero value, then the assertion failure message will not be displayed in the shell window, but
+in a requester window. The diagnostic message shown in this window will take the following form:</p>
+
+<blockquote><tt>Assertion of condition "<i>condition</i>" failed in file "<i>file</i>", line <i>line</i>.</tt></blockquote>
+
+<p>The name of the program, if it is know at that time, will be displayed in the requester window title.</p>
+
+<h5>5.6.2.3. Signal handling</h5>
+
+<p>Only the minimum of required signals are supported by this library. These are <tt>SIGABRT</tt>, <tt>SIGFPE</tt>,
+<tt>SIGILL</tt>, <tt>SIGINT</tt>, <tt>SIGSEGV</tt> and <tt>SIGTERM</tt>.</p>
+
+<p>As of this writing <tt>SIGFPE</tt> is never called by the floating point library functions.</p>
+
+<p>The <tt>Ctrl+C</tt> event is translated into <tt>SIGINT</tt>. Signal delivery may delayed
+until a library function which polls for the signal examines it. This means, for example, that
+a runaway program called in an infinite loop cannot be aborted by sending it a <tt>Ctrl+C</tt> event.<p>
+
+<p>Processing of the <tt>Ctrl+C</tt> event involves the internal <tt>__check_abort()</tt> function which
+polls for the presence of the event and which will call <tt>raise(SIGINT);</tt>. The <tt>__check_abort()</tt>
+function may be replaced by user code.</p>
+
+<h5>5.6.2.4. Files</h5>
+
+<p>No new line characters are written unless specifically requested.</p>
+
+<p>Space characters in a text stream before a new line character are read in and not discarded.</p>
+
+<p>When data is read from a file, the last character does not have to be a new line character.</p>
+
+<p>No NUL byte will be appended to data written to a binary stream.</p>
+
+<p>There is no difference between text and binary streams.</p>
+
+<p>Writing to a text or binary stream does not truncate the associated file.</p>
+
+<p>The file position indicator is initially set to the end of an append mode stream.</p>
+
+<h5>5.6.2.5. <tt>printf()</tt> family</h5>
+
+<p>The <tt>%p</tt> conversion is the hexadecimal representation of the pointer, and
+it is preceded by the string <tt>0x</tt>.</p>
+
+<h5>5.6.2.6. <tt>scanf()</tt> family</h5>
+
+<p>The input for the <tt>%p</tt> conversion must be a hexadecimal number,
+preceded by either the string <tt>0x</tt> or <tt>0X</tt>.</p>
+
+<p>In the <tt>%[</tt> conversion a <tt>-</tt> (dash) character that is neither the
+first nor the last character in the scanset indicates that a subrange of
+characters should be used. Thus <tt>%[a-d]</tt> is equivalent to <tt>%[abcd]</tt>.</p>
+
+<p>The period (.) is the decimal-point character. The locale specific decimal-point
+character is accepted as an alternative to the period (.).</p>
+
+<h5>5.6.2.7. <tt>malloc()</tt>, <tt>realloc()</tt> and <tt>calloc()</tt></h5>
+
+<p>In the standard <tt>libc.a</tt> implementation any request to allocate
+0 (zero) bytes will fail. A result value of <tt>NULL</tt> will be returned and
+the global <tt>errno</tt> variable will be set to <tt>EINVAL</tt>.</p>
+
+<p>In the <tt>libunix.a</tt> implementation a request to allocate
+0 (zero) bytes will result in an allocation of at least 1 byte, which will
+be set to zero. Each zero length allocation will return a different
+memory address.</p>
+
+<h5>5.6.2.8. <tt>rename()</tt></h5>
+
+<p>In the standard <tt>libc.a</tt> implementation the <tt>rename()</tt> function
+will fail if there already is a file or directory by the new name to be used.</p>
+
+<p>In the <tt>libunix.a</tt> implementation the <tt>rename()</tt> function will
+delete any existing file or directory by the new name.</p>
+
+<h5>5.6.2.9. <tt>remove()</tt></h5>
+
+<p>In the standard <tt>libc.a</tt> implementation the <tt>remove()</tt> function
+will fail if the file is protected by deletion or currently in use.</p>
+
+<p>In the <tt>libunix.a</tt> implementation the <tt>remove()</tt> function
+will remove the file when the program exits or the file is closed.</p>
+
+<h5>5.6.2.10. <tt>abort()</tt></h5>
+
+<p>The <tt>abort()</tt> function will flush all buffered files and
+close all the files currently open. Memory allocated will be freed.</tt>
+
+<h5>5.6.2.11. <tt>exit()</tt></h5>
+
+<p>The value passed to the <tt>exit()</tt> function will be passed to the
+Amiga operating system. The value of <tt>EXIT_FAILURE</tt> is equivalent
+to <tt>RETURN_FAIL</tt> as defined in the Amiga system header file
+<tt>&lt;dos/dos.h&gt;</tt>; this value maps to the number 20. The value
+of <tt>EXIT_SUCCESS</tt> is equivalent to <tt>RETURN_OK</tt> as defined in
+the Amiga system header file <tt>&lt;dos/dos.h&gt;</tt>; this value maps to
+the number 0.</p>
+
+<h5>5.6.2.11. Time</tt></h5>
+
+<p>The default time zone is derived from the Amiga operating system locale
+settings and takes the form <tt>GMT+<i>hh</i></tt> or <tt>GMT-<i>hh</i></tt>,
+respectively in which <i>hh</i> stands for the difference between the local
+time zone and Greenwich Mean Time.</p>
+
+<p>Daylight savings time is not supported.</p>
+
+<p>The reference point used by the <tt>clock()</tt> function is the time
+when the program was started.</p>
+
+<h4>5.6.3. Locale specific behaviour</h4>
+
+<p>The direction of printing is from left to right.</p>
+
+<p>The period (.) is the decimal-point character.</p>
 
 <h2>6. Conventions and design issues</h2>
 
