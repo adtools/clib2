@@ -126,7 +126,7 @@ much about the environment GCC expects, I borrowed code snippets from libnix,
 which was written by Matthias Fleischer and Gunther Nikl. This in particular
 concerns the integer and floating point math support, the <tt>setjmp</tt>/<tt>longjmp</tt>
 routines and the startup code. The M68881 inline math code comes from the
-<tt>&lt;math-68881.h&gt;</tt> file written by Matthew Self <tt>(self@bayes.arc.nasa.gov)</tt>.</p>
+<tt>&lt;math-68881.h&gt;</tt> file written by Matthew Self <tt>(self [at] bayes&#46;arc&#46;nasa&#46;gov)</tt>.</p>
 
 
 <h2>5. Limitations and caveats</h2>
@@ -175,7 +175,7 @@ if simultaneous and overlapping accesses to files, memory allocation and other
 resources are taking place.</p>
 
 <p> Also take care with file I/O involving the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt>
-streams; read/write operations on these streams will be mapped to the <tt>Input()</tt>/</tt>Output()</tt>/<tt>ErrorOutput()</tt>
+streams; read/write operations on these streams will be mapped to the <tt>Input()</tt>/<tt>Output()</tt>/<tt>ErrorOutput()</tt>
 file handles of the process performing these operations. Since only this small set of
 operations is mapped, functions such as <tt>fcntl()</tt> or <tt>select()</tt> will not
 work on the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt> streams and the corresponding
@@ -201,7 +201,7 @@ You will have to modify this to look like this:
 lib:
 %{pg: -lprofile} --start-group -lc --end-group
 </pre>
-Normally, the specs file is located at the compilers installation directory. For cross-compilers,
+<p>Normally, the specs file is located at the compilers installation directory. For cross-compilers,
 this is <tt>/usr/local/amiga/lib/gcc/ppc-amigaos/<i>compiler-version</i>/specs</tt>. For a native compiler,
 it's in <tt>gcc:lib/gcc/ppc-amigaos/<i>compiler-version</i>/specs</tt>. Most likely, your compiler will already have this added to it's specs file.</p>
 
@@ -255,6 +255,9 @@ want to add the option <tt>-lm -lc</tt> to the linker command line.</p>
 <p>The exception handling is currently entirely out of control of the developer
 and solely subject to the rules imposed by the operating system itself.</p>
 
+<p>The <tt>fmod()</tt> function returns the value of the <tt>x</tt> parameter and
+sets <tt>errno</tt> to <tt>EDOM</tt> if the <tt>y</tt> parameter value is 0.</p>
+
 <h4>5.6.2. Library functions</h4>
 
 <h5>5.6.2.1. <tt>NULL</tt></h5>
@@ -297,7 +300,7 @@ in a requester window. The diagnostic message shown in this window will take the
 
 <p>The <tt>Ctrl+C</tt> event is translated into <tt>SIGINT</tt>. Signal delivery may delayed
 until a library function which polls for the signal examines it. This means, for example, that
-a runaway program called in an infinite loop cannot be aborted by sending it a <tt>Ctrl+C</tt> event.<p>
+a runaway program called in an infinite loop cannot be aborted by sending it a <tt>Ctrl+C</tt> event.</p>
 
 <p>Processing of the <tt>Ctrl+C</tt> event involves the internal <tt>__check_abort()</tt> function which
 polls for the presence of the event and which will call <tt>raise(SIGINT);</tt>. The <tt>__check_abort()</tt>
@@ -315,7 +318,9 @@ function may be replaced by user code.</p>
 
 <p>There is no difference between text and binary streams.</p>
 
-<p>Writing to a text or binary stream does not truncate the associated file.</p>
+<p>Writing to a text or binary stream does not truncate the associated file. A stream may be
+truncated by the initial <tt>fopen()</tt> call if the <tt>mode</tt> parameter starts with
+the letter <tt>w</tt>.</p>
 
 <p>The file position indicator is initially set to the end of an append mode stream.</p>
 
@@ -323,6 +328,10 @@ function may be replaced by user code.</p>
 
 <p>The <tt>%p</tt> conversion is the hexadecimal representation of the pointer, and
 it is preceded by the string <tt>0x</tt>.</p>
+
+<p>The <tt>%a</tt>, <tt>%e</tt>, <tt>%f</tt>, <tt>%g</tt>, <tt>%A</tt>,
+<tt>%E</tt>, <tt>%F</tt> and <tt>%G</tt> specifiers will produce the string <tt>inf</tt>
+for infinity.</p>
 
 <h5>5.6.2.6. <tt>scanf()</tt> family</h5>
 
@@ -365,10 +374,10 @@ will remove the file when the program exits or the file is closed.</p>
 
 <h5>5.6.2.10. <tt>abort()</tt></h5>
 
-<p>The <tt>abort()</tt> function will flush all buffered files and
-close all the files currently open. Memory allocated will be freed.</tt>
+<p>The <tt>abort()</tt> function will flush all buffered files,
+close all the files currently open and delete temporary files.</p>
 
-<h5>5.6.2.11. <tt>exit()</tt></h5>
+<h5>5.6.2.11. <tt>exit()</tt> and <tt>_Exit()</tt></h5>
 
 <p>The value passed to the <tt>exit()</tt> function will be passed to the
 Amiga operating system. The value of <tt>EXIT_FAILURE</tt> is equivalent
@@ -378,12 +387,32 @@ of <tt>EXIT_SUCCESS</tt> is equivalent to <tt>RETURN_OK</tt> as defined in
 the Amiga system header file <tt>&lt;dos/dos.h&gt;</tt>; this value maps to
 the number 0.</p>
 
-<h5>5.6.2.11. Time</tt></h5>
+<p>The <tt>_Exit()</tt> function will flush all buffered files,
+close all the files currently open and delete temporary files.</p>
+
+<h5>5.6.2.12. <tt>getenv()</tt></h5>
+
+<p>Environment data is retrieved from the global Amiga operating system environment
+storage area through the <tt>dos.library/GetEnv()</tt> function. Global variables are
+stored in files in the <tt>ENV:</tt> directory.</p>
+
+<h5>5.6.2.13. <tt>system()</tt></h5>
+
+<p>If the <tt>command</tt> parameter is not NULL and the <tt>system()</tt> function returns, then the result will
+be equivalent to the exit code of the program invoked, or -1 if the program could not be started.
+This follows the behaviour of the Amiga operating system function <tt>dos.library/System()</tt>.
+A return value of 0 typically indicates successful execution and a value &gt; 0 
+typically indicates failure.</p>
+
+<h5>5.6.2.15. Time</h5>
 
 <p>The default time zone is derived from the Amiga operating system locale
 settings and takes the form <tt>GMT+<i>hh</i></tt> or <tt>GMT-<i>hh</i></tt>,
-respectively in which <i>hh</i> stands for the difference between the local
+respectively, in which <i>hh</i> stands for the difference between the local
 time zone and Greenwich Mean Time.</p>
+
+<p>The <tt>clock_t</tt> and <tt>time_t</tt> types are unsigned 32 bit integers.
+The <tt>time_t</tt> epoch starts with midnight January 1st, 1970.</p>
 
 <p>Daylight savings time is not supported.</p>
 
@@ -395,6 +424,12 @@ when the program was started.</p>
 <p>The direction of printing is from left to right.</p>
 
 <p>The period (.) is the decimal-point character.</p>
+
+<p>The <tt>strftime()</tt> behaviour follows the Amiga operating system locale
+settings. If the 'C' locale is in effect, then the output generated by the
+<tt>%Z</tt> takes the form <tt>GMT+<i>hh</i></tt> or <tt>GMT-<i>hh</i></tt>,
+respectively, in which <i>hh</i> stands for the difference between the local
+time zone and Greenwich Mean Time.</p>
 
 <h2>6. Conventions and design issues</h2>
 
@@ -494,6 +529,6 @@ can reach me at:</p>
 
 <p>Or via e-mail:</p>
 
-<p>olsen&#64;sourcery&#46;han&#46;de</p>
+<p>olsen [at] sourcery&#46;han&#46;de</p>
 </body>
 </html>
