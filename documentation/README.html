@@ -57,41 +57,6 @@ when it starts up. This is controlled via the <tt>__stack_size</tt> variable (se
 <p>I added some <tt>amiga.lib</tt> and <tt>debug.lib</tt> functionality to the library, but don't
 count on it to be complete.</p>
 
-<h3>2.1 Thread-safety</h3>
-
-<p>The library code is supposed to be thread-safe if built with the <tt>__THREAD_SAFE</tt>
-preprocesssor symbold defined. Note that 'thread-safe' does <em>not</em> mean
-'reentrant'. Multiple callers for certain library functions are permitted, but
-not for all of them. For example, <tt>mkdtemp()</tt> is not thread-safe, and neither is
-<tt>rand()</tt> or <tt>localtime()</tt>. But as per <b>POSIX 1003.1c-1995</b> there are thread-safe
-variants of <tt>rand()</tt> and <tt>localtime()</tt> called <tt>rand_r()</tt>, <tt>localtime_r()</tt>, and others.</p>
-
-<p>The use of the socket I/O functions is still problematic because the
-underlying <tt>bsdsocket.library</tt> API is not supposed to be used by any process
-other than the one that opened it. While one TCP/IP stack (my own "Roadshow") allows you
-to share the library base among different processes, if so configured, it is the
-exception. No other TCP/IP stack available for the Amiga robustly supports a similar
-feature. If the TCP/IP stack supports this feature, then the global variable
-<tt>__can_share_socket_library_base</tt> will be set to a non-zero value.</p>
-
-<p>Errors reported by the socket I/O functions which modify the global variables
-<tt>errno</tt> and <tt>h_errno</tt> may be directed to call the <tt>__set_errno()</tt>
-and <tt>__set_h_errno()</tt> functions instead if the TCP/IP stack supports this feature. The global
-variable <tt>__thread_safe_errno_h_errno</tt> will be set to a non-zero value if it does.</p>
-
-<p>A much more serious problem resides with the <tt>exit()</tt>, <tt>abort()</tt>,
-<tt>assert()</tt> and <tt>raise()</tt> functions, and the how <tt>SIGINT</tt> signal is
-processed. In the thread-safe library only the <tt>main()</tt> function may directly
-or indirectly call the <tt>exit()</tt> function. No child process may do so, since this
-would wreck its stack context, crashing it instantly; the main program would be very
-likely to crash, too, because <tt>exit()</tt> will clean up after all memory allocations
-and files currently in use. Functions such as <tt>abort()</tt> and <tt>raise()</tt> may
-call the <tt>exit()</tt> function indirectly. And the <tt>raise()</tt> function may
-be invoked as part of the <tt>Control+C</tt> checking. You should make sure that the
-signal handling does not affect any child processes. This can be done by replacing the
-<tt>__check_abort()</tt> function or by disabling <tt>SIGINT</tt> processing altogether,
-such as through a <tt>signal(SIGINT,SIG_IGN)</tt> call.</p>
-
 <h2>3. What does it not do?</h2>
 
 <p>This library is a departure from the typical 'C' runtime environments of the
@@ -173,6 +138,39 @@ access and close the same file. There is no resource tracking to that degree
 yet. All that the thread-safety tries to afford you is not to get into big trouble
 if simultaneous and overlapping accesses to files, memory allocation and other
 resources are taking place.</p>
+
+<p>The library code is supposed to be thread-safe if built with the <tt>__THREAD_SAFE</tt>
+preprocesssor symbold defined. Note that 'thread-safe' does <em>not</em> mean
+'reentrant'. Multiple callers for certain library functions are permitted, but
+not for all of them. For example, <tt>mkdtemp()</tt> is not thread-safe, and neither is
+<tt>rand()</tt> or <tt>localtime()</tt>. But as per <b>POSIX 1003.1c-1995</b> there are thread-safe
+variants of <tt>rand()</tt> and <tt>localtime()</tt> called <tt>rand_r()</tt>, <tt>localtime_r()</tt>, and others.</p>
+
+<p>The use of the socket I/O functions is still problematic because the
+underlying <tt>bsdsocket.library</tt> API is not supposed to be used by any process
+other than the one that opened it. While one TCP/IP stack (my own "Roadshow") allows you
+to share the library base among different processes, if so configured, it is the
+exception. No other TCP/IP stack available for the Amiga robustly supports a similar
+feature. If the TCP/IP stack supports this feature, then the global variable
+<tt>__can_share_socket_library_base</tt> will be set to a non-zero value.</p>
+
+<p>Errors reported by the socket I/O functions which modify the global variables
+<tt>errno</tt> and <tt>h_errno</tt> may be directed to call the <tt>__set_errno()</tt>
+and <tt>__set_h_errno()</tt> functions instead if the TCP/IP stack supports this feature. The global
+variable <tt>__thread_safe_errno_h_errno</tt> will be set to a non-zero value if it does.</p>
+
+<p>A much more serious problem resides with the <tt>exit()</tt>, <tt>abort()</tt>,
+<tt>assert()</tt> and <tt>raise()</tt> functions, and the how <tt>SIGINT</tt> signal is
+processed. In the thread-safe library only the <tt>main()</tt> function may directly
+or indirectly call the <tt>exit()</tt> function. No child process may do so, since this
+would wreck its stack context, crashing it instantly; the main program would be very
+likely to crash, too, because <tt>exit()</tt> will clean up after all memory allocations
+and files currently in use. Functions such as <tt>abort()</tt> and <tt>raise()</tt> may
+call the <tt>exit()</tt> function indirectly. And the <tt>raise()</tt> function may
+be invoked as part of the <tt>Control+C</tt> checking. You should make sure that the
+signal handling does not affect any child processes. This can be done by replacing the
+<tt>__check_abort()</tt> function or by disabling <tt>SIGINT</tt> processing altogether,
+such as through a <tt>signal(SIGINT,SIG_IGN)</tt> call.</p>
 
 <p> Also take care with file I/O involving the <tt>stdin</tt>/<tt>stdout</tt>/<tt>stderr</tt>
 streams; read/write operations on these streams will be mapped to the <tt>Input()</tt>/<tt>Output()</tt>/<tt>ErrorOutput()</tt>
@@ -352,7 +350,7 @@ character is accepted as an alternative to the period (.).</p>
 the global <tt>errno</tt> variable will be set to <tt>EINVAL</tt>.</p>
 
 <p>In the <tt>libunix.a</tt> implementation a request to allocate
-0 (zero) bytes will result in an allocation of at least 1 byte, which will
+0 (zero) bytes will result in an allocation of at least 4 bytes, which will
 be set to zero. Each zero length allocation will return a different
 memory address.</p>
 
