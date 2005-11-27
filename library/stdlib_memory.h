@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_memory.h,v 1.2 2005-03-20 11:18:06 obarthel Exp $
+ * $Id: stdlib_memory.h,v 1.3 2005-11-27 09:26:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -114,11 +114,8 @@
 
 #define __static
 
-#define __alloca_cleanup __alloca_cleanup_debug
-
 #define __find_memory_node __find_memory_node_debug
 #define __free_memory_node __free_memory_node_debug
-#define __force_free __force_free_debug
 
 #define __get_allocation_size __get_allocation_size_debug
 #define __allocate_memory __allocate_memory_debug

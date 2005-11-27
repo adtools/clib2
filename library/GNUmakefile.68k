@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.75 2005-11-20 17:00:22 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.76 2005-11-27 09:26:55 obarthel Exp $
 #
 # :ts=8
 #
@@ -283,6 +283,7 @@ C_LIB = \
 	stdlib_abort.o \
 	stdlib_abs.o \
 	stdlib_alloca.o \
+	stdlib_alloca_cleanup.o \
 	stdlib_assertion_failure.o \
 	stdlib_atexit.o \
 	stdlib_atoi.o \

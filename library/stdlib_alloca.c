@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.7 2005-11-20 17:00:22 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.8 2005-11-27 09:26:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,16 +55,17 @@ extern void * alloca(size_t size);
 
 /****************************************************************************/
 
-struct MemoryContextNode
-{
-	struct MinNode	mcn_MinNode;
-	void *			mcn_StackPointer;
-	void *			mcn_Memory;
-};
+static struct MinList alloca_memory_list;
 
 /****************************************************************************/
 
-static struct MinList alloca_memory_list;
+struct MemoryContextNode
+{
+	struct MinNode	mcn_MinNode;		/* The usual linkage. */
+	void *			mcn_StackPointer;	/* Points to stack frame this allocation
+										   is associated with. */
+	void *			mcn_Memory;			/* Points to the memory allocated. */
+};
 
 /****************************************************************************/
 
@@ -80,9 +81,14 @@ CLIB_DESTRUCTOR(alloca_exit)
 
 /****************************************************************************/
 
-void
-__alloca_cleanup(const char * file,int line)
+/* Cleans up after all alloca() allocations that have been made so far. */
+static void
+alloca_cleanup(const char * file,int line)
 {
+	void * stack_pointer = __get_sp();
+
+	__memory_lock();
+
 	/* Initialize this if it hasn't been taken care of yet. */
 	if(alloca_memory_list.mlh_Head == NULL)
 		NewList((struct List *)&alloca_memory_list);
@@ -90,7 +96,6 @@ __alloca_cleanup(const char * file,int line)
 	/* Is this worth cleaning up? */
 	if(NOT IsListEmpty((struct List *)&alloca_memory_list))
 	{
-		void * stack_pointer = __get_sp();
 		struct MemoryContextNode * mcn_prev;
 		struct MemoryContextNode * mcn;
 
@@ -109,10 +114,17 @@ __alloca_cleanup(const char * file,int line)
 
 			Remove((struct Node *)mcn);
 
-			__force_free(mcn->mcn_Memory,file,line);
-			__free(mcn,file,line);
+			__free_memory(mcn->mcn_Memory,TRUE,file,line);
+			__free_memory(mcn,FALSE,file,line);
 		}
+
+		/* Drop the cleanup callback if there's nothing to be cleaned
+		   up any more. */
+		if(IsListEmpty((struct List *)&alloca_memory_list))
+			__alloca_cleanup = NULL;
 	}
+
+	__memory_unlock();
 }
 
 /****************************************************************************/
@@ -124,9 +136,12 @@ __alloca(size_t size,const char * file,int line)
 	struct MemoryContextNode * mcn;
 	void * result = NULL;
 
-	__alloca_cleanup(file,line);
+	__memory_lock();
 
-	mcn = __malloc(sizeof(*mcn),file,line);
+	__alloca_cleanup = alloca_cleanup;
+	(*__alloca_cleanup)(file,line);
+
+	mcn = __allocate_memory(sizeof(*mcn),FALSE,file,line);
 	if(mcn == NULL)
 	{
 		SHOWMSG("not enough memory");
@@ -152,6 +167,8 @@ __alloca(size_t size,const char * file,int line)
 	result = mcn->mcn_Memory;
 
  out:
+
+	__memory_unlock();
 
 	return(result);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_free.c,v 1.10 2005-03-20 11:18:06 obarthel Exp $
+ * $Id: stdlib_free.c,v 1.11 2005-11-27 09:26:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -446,15 +446,12 @@ __free_memory_node(struct MemoryNode * mn,const char * UNUSED file,int UNUSED li
 
 /****************************************************************************/
 
-STATIC VOID
-free_memory(void * ptr,BOOL force,const char * file,int line)
+VOID
+__free_memory(void * ptr,BOOL force,const char * file,int line)
 {
 	struct MemoryNode * mn;
 
 	assert(ptr != NULL);
-
-	/* Try to get rid of now unused memory. */
-	/*__alloca_cleanup(file,line);*/
 
 	#ifdef __MEM_DEBUG
 	{
@@ -499,20 +496,19 @@ free_memory(void * ptr,BOOL force,const char * file,int line)
 
 /****************************************************************************/
 
-void
-__force_free(void * ptr,const char * file,int line)
-{
-	if(ptr != NULL)
-		free_memory(ptr,TRUE,file,line);
-}
-
-/****************************************************************************/
-
 __static void
 __free(void * ptr,const char * file,int line)
 {
+	__memory_lock();
+
+	/* Try to get rid of now unused memory. */
+	if(__alloca_cleanup != NULL)
+		(*__alloca_cleanup)(file,line);
+
+	__memory_unlock();
+
 	if(ptr != NULL)
-		free_memory(ptr,FALSE,file,line);
+		__free_memory(ptr,FALSE,file,line);
 }
 
 /****************************************************************************/

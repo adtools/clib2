@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.18 2005-07-03 10:36:47 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.19 2005-11-27 09:26:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -151,6 +151,10 @@ extern unsigned int NOCOMMON __random_seed;
 extern jmp_buf NOCOMMON	__exit_jmp_buf;
 extern int NOCOMMON		__exit_value;
 extern BOOL	NOCOMMON	__exit_blocked;
+
+/****************************************************************************/
+
+extern void NOCOMMON (*__alloca_cleanup)(const char * file,int line);
 
 /****************************************************************************/
 

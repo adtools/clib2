@@ -8,7 +8,19 @@
 
 - In libunix.a malloc(), calloc() and realloc() no longer treat a
   request to allocate 0 bytes as an error, returning NULL. They all
-  return a 1 byte memory chunk initialized to 0 instead.
+  return a pointer sized memory chunk (= four bytes) initialized to
+  NULL (= 0) instead.
+
+- The alloca() implementation which allocates memory from the system
+  rather than the local stack frame is thread-safe now. It also
+  interacts with the realloc(), calloc(), free() and malloc() functions
+  in that the alloca() cleanup routine is called once alloca() has
+  done its job. If all the memory allocated through alloca() has been
+  released no further calls to the cleanup function will be made.
+
+- In the thread-safe library, realloc() permitted two different overlapping
+  calls to succeed in trying to reallocate the same chunk of memory due to
+  a race condition. Fixed.
 
 
 c.lib 1.197 (4.11.2005)

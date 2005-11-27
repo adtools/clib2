@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.16 2005-11-20 19:04:10 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.17 2005-11-27 09:26:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,9 +106,9 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 		original_size = size;
 
 		/* The libunix.a flavour accepts zero length memory allocations
-		   and quietly turns them into 1 byte allocations. */
+		   and quietly turns them into a pointer sized allocations. */
 		if(size == 0)
-			size++;
+			size = sizeof(char *);
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
@@ -210,11 +210,9 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
-		/* Zero length memory allocations in libunix.a quietly
-		   return one byte of memory each, and that byte is
-		   set to '\0'. */
+		/* Set the zero length allocation contents to NULL. */
 		if(original_size == 0)
-			*(char *)result = '\0';
+			*(char **)result = NULL;
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
@@ -245,8 +243,13 @@ __malloc(size_t size,const char * file,int line)
 {
 	void * result = NULL;
 
+	__memory_lock();
+
 	/* Try to get rid of now unused memory. */
-	/*__alloca_cleanup(file,line);*/
+	if(__alloca_cleanup != NULL)
+		(*__alloca_cleanup)(file,line);
+
+	__memory_unlock();
 
 	#ifdef __MEM_DEBUG
 	{
