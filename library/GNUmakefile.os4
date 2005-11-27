@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.88 2005-11-27 09:26:55 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.89 2005-11-27 10:28:15 obarthel Exp $
 #
 # :ts=8
 #
@@ -522,6 +522,8 @@ UNIX_LIB = \
 	stdio_record_locking.o \
 	stdio_remove.o \
 	stdio_rename.o \
+	stdlib_alloca.o \
+	stdlib_alloca_cleanup.o \
 	stdlib_arg.o \
 	stdlib_main.o \
 	stdlib_mkdtemp.o \

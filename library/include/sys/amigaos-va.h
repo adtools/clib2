@@ -1,5 +1,5 @@
 /*
- * $Id: amigaos-va.h,v 1.5 2005-11-27 09:51:45 obarthel Exp $
+ * $Id: amigaos-va.h,v 1.6 2005-11-27 10:28:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -30,12 +30,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- ****************************************************************************/
+ *****************************************************************************
  *
  * Documentation and source code for this library, and the most recent library
  * build are available from <http://sourceforge.net/projects/clib2>.
  *
- ****************************************************************************/
+ *****************************************************************************
  */
 
 #ifndef _SYS_AMIGAOS_VA_H

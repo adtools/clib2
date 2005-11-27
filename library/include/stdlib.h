@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.13 2005-11-27 09:51:45 obarthel Exp $
+ * $Id: stdlib.h,v 1.14 2005-11-27 10:28:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -30,12 +30,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- ****************************************************************************/
+ *****************************************************************************
  *
  * Documentation and source code for this library, and the most recent library
  * build are available from <http://sourceforge.net/projects/clib2>.
  *
- ****************************************************************************/
+ *****************************************************************************
  */
 
 #ifndef _STDLIB_H
@@ -159,6 +159,14 @@ extern long atol(const char *str);
 extern int rand_r(unsigned int * seed);
 
 /****************************************************************************/
+
+/*
+ * You can request to use the alloca() variant that actually does allocate
+ * memory from the system rather than the current stack frame, which will
+ * ease stack requirements but may not release allocate memory immediately.
+ * In order to do so, add #define __USE_CLIB2_ALLOCA to your program, or
+ * -D__USE_CLIB2_ALLOCA to your build makefile.
+ */
 
 #if defined(__GNUC__) && !defined(__USE_CLIB2_ALLOCA)
  #undef alloca
