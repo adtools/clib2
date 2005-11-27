@@ -1,5 +1,5 @@
 /*
- * $Id: stdarg.h,v 1.4 2005-04-03 10:22:48 obarthel Exp $
+ * $Id: stdarg.h,v 1.5 2005-11-27 09:51:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,13 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
+ *
+ * Documentation and source code for this library, and the most recent library
+ * build are available from <http://sourceforge.net/projects/clib2>.
+ *
+ ****************************************************************************/
  */
 
 #ifndef _STDARG_H

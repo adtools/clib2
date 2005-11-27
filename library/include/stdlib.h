@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.12 2005-10-09 12:32:18 obarthel Exp $
+ * $Id: stdlib.h,v 1.13 2005-11-27 09:51:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,6 +29,13 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
+ *
+ * Documentation and source code for this library, and the most recent library
+ * build are available from <http://sourceforge.net/projects/clib2>.
+ *
+ ****************************************************************************/
  */
 
 #ifndef _STDLIB_H
@@ -153,7 +160,7 @@ extern int rand_r(unsigned int * seed);
 
 /****************************************************************************/
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__USE_CLIB2_ALLOCA)
  #undef alloca
  #define alloca(size) __builtin_alloca(size)
 #else
