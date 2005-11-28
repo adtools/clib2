@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.8 2005-11-27 09:26:55 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.9 2005-11-28 09:53:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -169,6 +169,11 @@ __alloca(size_t size,const char * file,int line)
  out:
 
 	__memory_unlock();
+
+	/* If we are about to return NULL and a trap function is
+	   provided, call it rather than returning NULL. */
+	if(result == NULL && __alloca_trap != NULL)
+		(*__alloca_trap)();
 
 	return(result);
 }

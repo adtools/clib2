@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.14 2005-11-27 10:28:15 obarthel Exp $
+ * $Id: stdlib.h,v 1.15 2005-11-28 09:53:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -168,8 +168,11 @@ extern int rand_r(unsigned int * seed);
  * -D__USE_CLIB2_ALLOCA to your build makefile.
  */
 
+#if defined(alloca)
+#undef alloca
+#endif /* alloca */
+
 #if defined(__GNUC__) && !defined(__USE_CLIB2_ALLOCA)
- #undef alloca
  #define alloca(size) __builtin_alloca(size)
 #else
  extern void * alloca(size_t size);
@@ -178,6 +181,10 @@ extern int rand_r(unsigned int * seed);
   extern void * __alloca(size_t size,const char *file,int line);
 
   #define alloca(size) __alloca((size),__FILE__,__LINE__)
+ #else
+  /* This is necessary because some applications key off the fact that
+     alloca is a symbol defined by the preprocessor. */
+  #define alloca alloca
  #endif /* __MEM_DEBUG */
 #endif /* __GNUC__ */
 

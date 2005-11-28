@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.57 2005-11-27 09:26:55 obarthel Exp $
+# $Id: smakefile,v 1.58 2005-11-28 09:53:51 obarthel Exp $
 #
 # :ts=8
 #
@@ -483,6 +483,7 @@ STDLIB_OBJ = \
 	stdlib_abs.o \
 	stdlib_alloca.o \
 	stdlib_alloca_cleanup.o \
+	stdlib_alloca_trap.o \
 	stdlib_assertion_failure.o \
 	stdlib_atexit.o \
 	stdlib_atof.o \
@@ -511,6 +512,7 @@ STDLIB_OBJ = \
 	stdlib_free.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
+	stdlib_getmemstats.o \
 	stdlib_getsp.o \
 	stdlib_isresident.o \
 	stdlib_labs.o \
@@ -535,6 +537,7 @@ STDLIB_OBJ = \
 	stdlib_rand_r.o \
 	stdlib_realloc.o \
 	stdlib_red_black.o \
+	stdlib_resetmemstats.o \
 	stdlib_setenv.o \
 	stdlib_setjmp.o \
 	stdlib_set_process_window.o \

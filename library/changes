@@ -22,6 +22,25 @@
   calls to succeed in trying to reallocate the same chunk of memory due to
   a race condition. Fixed.
 
+- Added a new function __get_mem_stats() (the prototype is in <dos.h>) which
+  can be used to query the current and maximum memory usage, counting the
+  allocations performed through malloc(), free() and all other functions which
+  use them.
+
+- Added another function called __reset_max_mem_stats() which will reset the
+  counters for "maximum amount of memory used" and "maximum number of chunks
+  allocated" to the current figures for these values.
+
+- Fixed the alloca() declaration in <stdlib.h> so that software which keys
+  off the fact whether or not the alloca preprocessor symbol is defined
+  will do the right thing.
+
+- Added an optional call-back function which can be called if alloca()
+  is about to return NULL, which some software does not consider.
+  Rather than letting such software drop into an illegal memory access
+  or worse, that call-back function will be invoked instead, which can
+  print an error message and eventually call abort().
+
 
 c.lib 1.197 (4.11.2005)
 

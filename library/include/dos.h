@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.15 2005-11-27 10:28:15 obarthel Exp $
+ * $Id: dos.h,v 1.16 2005-11-28 09:53:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,6 +50,10 @@
 #ifndef _STDIO_H
 #include <stdio.h>
 #endif /* _STDIO_H */
+
+#ifndef _STDDEF_H
+#include <stddef.h>
+#endif /* _STDDEF_H */
 
 /****************************************************************************/
 
@@ -199,6 +203,47 @@ extern BOOL __never_free;
  * of 250000 bytes is recommended.
  */
 extern ULONG __free_memory_threshold;
+
+/****************************************************************************/
+
+/*
+ * You can monitor how much memory, and in how many chunks, is allocated
+ * over the lifetime of your program. Call the following function with
+ * non-NULL parameters to obtain the current state of memory allocations.
+ * Parameters called with NULL instead of pointer to the counters to
+ * be filled in will be ignored.
+ */
+extern void __get_mem_stats(size_t * current_memory,size_t * max_memory,
+	size_t * current_chunks,size_t * max_chunks);
+
+/*
+ * The following function will reset the counters for "maximum amount
+ * of memory used" and "maximum number of chunks used" to the figures
+ * for the current memory usage.
+ */
+extern void __reset_max_mem_stats(void);
+
+/****************************************************************************/
+
+/*
+ * If you use the clib2-supplied alloca() function, which will allocate
+ * memory from the system pool rather than extending the current stack
+ * frame, then your program will use a lot less stack space. It might
+ * use a lot more system memory, though. While the system memory usage
+ * solves the problem of a program crashing due to ever increasing
+ * stack usage, which is hard to gauge, there is problem in that many
+ * programs which call alloca() never test if the value returned is
+ * not NULL. They just assume that alloca() will always succeed. If
+ * you use the clib2-supplied alloca() function then the result may in
+ * fact be NULL. In which case the program making the call might just
+ * crash because of a missing NULL test.
+ *
+ * You can avoid trouble by filling in a pointer to a function which
+ * will be called when the clib2-supplied alloca() function finds that it
+ * must return NULL. That function is expected to print an error message
+ * and to call abort().
+ */
+extern void (*__alloca_trap)(void);
 
 /****************************************************************************/
 

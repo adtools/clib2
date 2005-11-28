@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_malloc.c,v 1.17 2005-11-27 09:26:55 obarthel Exp $
+ * $Id: stdlib_malloc.c,v 1.18 2005-11-28 09:53:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,18 +54,16 @@
 
 /****************************************************************************/
 
-#ifdef __MEM_DEBUG
-
 unsigned long NOCOMMON __maximum_memory_allocated;
 unsigned long NOCOMMON __current_memory_allocated;
 unsigned long NOCOMMON __maximum_num_memory_chunks_allocated;
 unsigned long NOCOMMON __current_num_memory_chunks_allocated;
 
-#if defined(__USE_MEM_TREES)
-struct MemoryTree NOCOMMON __memory_tree;
-#endif /* __USE_MEM_TREES */
+/****************************************************************************/
 
-#endif /* __MEM_DEBUG */
+#if defined(__MEM_DEBUG) && defined(__USE_MEM_TREES)
+struct MemoryTree NOCOMMON __memory_tree;
+#endif /* __MEM_DEBUG && __USE_MEM_TREES */
 
 /****************************************************************************/
 
@@ -160,6 +158,14 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 
 	AddTail((struct List *)&__memory_list,(struct Node *)mn);
 
+	__current_memory_allocated += allocation_size;
+	if(__maximum_memory_allocated < __current_memory_allocated)
+		__maximum_memory_allocated = __current_memory_allocated;
+
+	__current_num_memory_chunks_allocated++;
+	if(__maximum_num_memory_chunks_allocated < __current_num_memory_chunks_allocated)
+		__maximum_num_memory_chunks_allocated = __current_num_memory_chunks_allocated;
+
 	#ifdef __MEM_DEBUG
 	{
 		char * head = (char *)(mn + 1);
@@ -177,14 +183,6 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 		memset(head,MALLOC_HEAD_FILL,MALLOC_HEAD_SIZE);
 		memset(body,MALLOC_NEW_FILL,size);
 		memset(tail,MALLOC_TAIL_FILL,MALLOC_TAIL_SIZE);
-
-		__current_memory_allocated += size;
-		if(__maximum_memory_allocated < __current_memory_allocated)
-			__maximum_memory_allocated = __current_memory_allocated;
-
-		__current_num_memory_chunks_allocated++;
-		if(__maximum_num_memory_chunks_allocated < __current_num_memory_chunks_allocated)
-			__maximum_num_memory_chunks_allocated = __current_num_memory_chunks_allocated;
 
 		#ifdef __MEM_DEBUG_LOG
 		{
