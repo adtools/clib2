@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.15 2005-11-28 09:53:51 obarthel Exp $
+ * $Id: stdlib.h,v 1.16 2005-12-11 08:55:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -165,7 +165,9 @@ extern int rand_r(unsigned int * seed);
  * memory from the system rather than the current stack frame, which will
  * ease stack requirements but may not release allocate memory immediately.
  * In order to do so, add #define __USE_CLIB2_ALLOCA to your program, or
- * -D__USE_CLIB2_ALLOCA to your build makefile.
+ * -D__USE_CLIB2_ALLOCA to your build makefile. For GCC you will also have
+ * to compile your program with the -fno-builtin switch to override the
+ * built-in alloca() function.
  */
 
 #if defined(alloca)

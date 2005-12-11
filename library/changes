@@ -1,3 +1,5 @@
+c.lib 1.198 (11.12.2005)
+
 - Added <fenv.h> for C99, and the (yet unimplemented) functions
   feclearexcept(), fegetenv(), fegetexceptflag(), fegetround(),
   feholdexcept(), feraiseexcept(), fesetenv(), fesetexceptflag(),

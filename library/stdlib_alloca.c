@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_alloca.c,v 1.9 2005-11-28 09:53:51 obarthel Exp $
+ * $Id: stdlib_alloca.c,v 1.10 2005-12-11 08:55:29 obarthel Exp $
  *
  * :ts=4
  *
@@ -137,6 +137,10 @@ __alloca(size_t size,const char * file,int line)
 	void * result = NULL;
 
 	__memory_lock();
+
+	/* Initialize this if it hasn't been taken care of yet. */
+	if(alloca_memory_list.mlh_Head == NULL)
+		NewList((struct List *)&alloca_memory_list);
 
 	__alloca_cleanup = alloca_cleanup;
 	(*__alloca_cleanup)(file,line);
