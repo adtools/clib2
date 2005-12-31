@@ -1,3 +1,9 @@
+- The __main() stub function expected by the 68k GCC build is no
+  longer part of "stdlib_main.c". This helps the C++ support, since the
+  __main symbol definition no longer clashes with the definition in
+  "libgcc.a".
+
+
 c.lib 1.198 (11.12.2005)
 
 - Added <fenv.h> for C99, and the (yet unimplemented) functions

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.90 2005-11-28 09:53:51 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.91 2005-12-31 12:23:53 obarthel Exp $
 #
 # :ts=8
 #
@@ -354,6 +354,7 @@ C_LIB = \
 	stdlib_lib_startup.o \
 	stdlib_machine_test.o \
 	stdlib_main.o \
+	stdlib_main_stub.o \
 	stdlib_malloc.o \
 	stdlib_math.o \
 	stdlib_mkdtemp.o \
@@ -531,6 +532,7 @@ UNIX_LIB = \
 	stdlib_arg.o \
 	stdlib_getmemstats.o \
 	stdlib_main.o \
+	stdlib_main_stub.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
