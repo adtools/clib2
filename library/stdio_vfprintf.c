@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.19 2005-06-26 11:57:26 tfrieden Exp $
+ * $Id: stdio_vfprintf.c,v 1.20 2006-01-02 13:23:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -997,20 +997,20 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 								if(max_digits > 0 && max_digits < num_trailing_zeroes)
 									num_trailing_zeroes = max_digits;
 							}
-						}
 
-						/* Strip trailing digits and decimal point
-						 * unless we shouldn't.
-						 */
-						if(strip_trailing_zeroes && FLAG_IS_CLEAR(format_flags,FORMATF_AlternateConversion))
-						{
-							SHOWMSG("strip trailing zeroes and comma");
+							/* Strip trailing digits and decimal point
+							 * unless we shouldn't.
+							 */
+							if(strip_trailing_zeroes && FLAG_IS_CLEAR(format_flags,FORMATF_AlternateConversion))
+							{
+								SHOWMSG("strip trailing zeroes and comma");
 
-							while(output_buffer > buffer_start+1 && output_buffer[-1] == '0')
-								output_buffer--;
+								while(output_buffer > buffer_start+1 && output_buffer[-1] == '0')
+									output_buffer--;
 
-							if(output_buffer > buffer_start && output_buffer[-1] == '.')
-								output_buffer--;
+								if(output_buffer > buffer_start && output_buffer[-1] == '.')
+									output_buffer--;
+							}
 						}
 					}
 					else

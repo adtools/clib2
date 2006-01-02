@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.58 2005-11-28 09:53:51 obarthel Exp $
+# $Id: smakefile,v 1.59 2006-01-02 13:23:33 obarthel Exp $
 #
 # :ts=8
 #
@@ -36,7 +36,7 @@ INCLUDE_DIR = V:include
  CPU		= cpu=060
 MATH		= define=IEEE_FLOATING_POINT_SUPPORT math=IEEE
 SUPPORT		= define=UNIX_PATH_SEMANTICS define=SOCKET_SUPPORT define=USERGROUP_SUPPORT \
-		  define=__C_MACROS__ define=__THREAD_SAFE
+		  define=__C_MACROS__
 
 ##############################################################################
 
@@ -557,7 +557,6 @@ STDLIB_OBJ = \
 	stdlib_system.o \
 	stdlib_unsetenv.o \
 	stdlib_utilitybase.o \
-	stdlib_wildcard_expand.o \
 	stdlib_stdio_window_spec.o
 
 STRING_OBJ = \
@@ -630,7 +629,6 @@ UNISTD_OBJ = \
 	termios_cfsetispeed.o \
 	termios_cfsetospeed.o \
 	termios_console_fdhookentry.o \
-	termios_headers.h
 	termios_openserial.o \
 	termios_tcdrain.o \
 	termios_tcflow.o \
@@ -679,9 +677,8 @@ UNISTD_OBJ = \
 	unistd_unix_path_semantics.o \
 	unistd_unlink.o \
 	unistd_usleep.o \
-	utsname_uname.o
-# \
-#	unistd_wildcard_expand.o
+	utsname_uname.o \
+	unistd_wildcard_expand.o
 
 USERGROUP_OBJ = \
 	usergroup_crypt.o \
@@ -962,7 +959,6 @@ c.lib: \
 	@echo >>T:$@.cmd $(MATH_OBJ)
 	@echo >>T:$@.cmd $(MOUNT_OBJ)
 	@echo >>T:$@.cmd $(SIGNAL_OBJ)
-	@echo >>T:$@.cmd $(SOCKET_OBJ)
 	@echo >>T:$@.cmd $(STAT_OBJ)
 	@echo >>T:$@.cmd $(STDIO_OBJ)
 	@echo >>T:$@.cmd $(STDLIB_OBJ)
@@ -970,11 +966,13 @@ c.lib: \
 	@echo >>T:$@.cmd $(STRING_OBJ)
 	@echo >>T:$@.cmd $(TIME_OBJ)
 	@echo >>T:$@.cmd $(UNISTD_OBJ)
-	@echo >>T:$@.cmd $(USERGROUP_OBJ)
 	@echo >>T:$@.cmd $(UTIME_OBJ)
 	oml T:$@ <T:$@.cmd
 	@copy buf=0 T:$@ $@
 	@-delete T:$@ T:$@.cmd
+
+#	@echo >>T:$@.cmd $(USERGROUP_OBJ)
+#	@echo >>T:$@.cmd $(SOCKET_OBJ)
 
 ##############################################################################
 

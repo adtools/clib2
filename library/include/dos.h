@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.16 2005-11-28 09:53:51 obarthel Exp $
+ * $Id: dos.h,v 1.17 2006-01-02 13:23:33 obarthel Exp $
  *
  * :ts=4
  *
@@ -427,7 +427,7 @@ extern int __translate_io_error_to_errno(LONG io_error);
  * linker library.
  */
 extern VOID __lib_exit(VOID);
-extern BOOL __lib_init(struct Library * SysBase);
+extern BOOL __lib_init(struct Library * _SysBase);
 
 /****************************************************************************/
 
