@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.8 2005-08-26 12:21:51 obarthel Exp $
+# $Id: smakefile,v 1.9 2006-01-02 13:11:39 obarthel Exp $
 #
 # :ts=8
 #
@@ -67,14 +67,14 @@ all: \
 	setup \
 	test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
-	fstat_stdout_test simple_sprintf date_test \
+	fstat_stdout_test simple_sprintf date_test factorial \
 	cleanup
 
 clean:
 	-delete \#?.o \#?.map \
 		test fgets_test iotest sscanf_test printf_test sprintf_test \
 		stack_size_test translate_test strtok_test uname simple \
-		simple_sprintf date_test
+		simple_sprintf date_test factorial
 
 ##############################################################################
 
@@ -156,6 +156,11 @@ fstat_stdout_test: fstat_stdout_test.o
 simple_sprintf: simple_sprintf.o
 	@echo "Linking $@"
 	@slink simple_sprintf.o to $@ lib $(LIB)c.lib addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+factorial: factorial.o
+	@echo "Linking $@"
+	@slink $(LIB)startup.o factorial.o to $@ lib $(LIB)c.lib addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 ##############################################################################
