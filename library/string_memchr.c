@@ -1,10 +1,10 @@
 /*
- * $Id: string_memchr.c,v 1.5 2005-02-25 10:14:21 obarthel Exp $
+ * $Id: string_memchr.c,v 1.6 2006-01-08 12:04:26 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

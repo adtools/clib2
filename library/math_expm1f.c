@@ -1,10 +1,10 @@
 /*
- * $Id: math_expm1f.c,v 1.2 2005-05-29 14:45:32 obarthel Exp $
+ * $Id: math_expm1f.c,v 1.3 2006-01-08 12:04:23 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

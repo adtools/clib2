@@ -1,10 +1,10 @@
 /*
- * $Id: stdlib_alloca_cleanup.c,v 1.1 2005-11-28 10:11:07 obarthel Exp $
+ * $Id: stdlib_alloca_cleanup.c,v 1.2 2006-01-08 12:04:25 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

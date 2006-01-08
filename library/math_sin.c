@@ -1,10 +1,10 @@
 /*
- * $Id: math_sin.c,v 1.4 2005-10-27 08:58:41 obarthel Exp $
+ * $Id: math_sin.c,v 1.5 2006-01-08 12:04:24 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

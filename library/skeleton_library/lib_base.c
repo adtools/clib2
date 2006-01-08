@@ -1,10 +1,10 @@
 /*
- * $Id: lib_base.c,v 1.4 2005-07-04 11:14:27 obarthel Exp $
+ * $Id: lib_base.c,v 1.5 2006-01-08 12:06:14 obarthel Exp $
  *
  * :ts=4
  *
  * Amiga shared library skeleton example
- * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

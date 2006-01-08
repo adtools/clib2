@@ -1,10 +1,10 @@
 /*
- * $Id: stdlib_calloc.c,v 1.6 2005-11-20 17:00:22 obarthel Exp $
+ * $Id: stdlib_calloc.c,v 1.7 2006-01-08 12:04:25 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

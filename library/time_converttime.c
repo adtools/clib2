@@ -1,10 +1,10 @@
 /*
- * $Id: time_converttime.c,v 1.3 2005-01-29 18:05:14 obarthel Exp $
+ * $Id: time_converttime.c,v 1.4 2006-01-08 12:04:27 obarthel Exp $
  *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2005 by Olaf Barthel <olsen@sourcery.han.de>
+ * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
