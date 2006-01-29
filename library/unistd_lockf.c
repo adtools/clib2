@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_symlink.c,v 1.8 2006-01-29 09:17:00 obarthel Exp $
+ * $Id: 
  *
  * :ts=4
  *
@@ -31,12 +31,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _STDLIB_NULL_POINTER_CHECK_H
-#include "stdlib_null_pointer_check.h"
-#endif /* _STDLIB_NULL_POINTER_CHECK_H */
-
-/****************************************************************************/
-
 #ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
@@ -48,82 +42,61 @@
 /****************************************************************************/
 
 int
-symlink(const char * actual_path, const char * symbolic_path)
+lockf(int file_descriptor,int function,off_t size)
 {
-	#if defined(UNIX_PATH_SEMANTICS)
-	struct name_translation_info actual_path_name_nti;
-	struct name_translation_info symbolic_path_name_nti;
-	#endif /* UNIX_PATH_SEMANTICS */
-	int result = ERROR;
-	LONG status;
+	struct flock l;
+	int result = -1;
+	int cmd;
 
-	ENTER();
+	l.l_whence	= SEEK_CUR;
+	l.l_start	= 0;
+	l.l_len		= size;
 
-	SHOWSTRING(actual_path);
-	SHOWSTRING(symbolic_path);
-
-	assert( actual_path != NULL && symbolic_path != NULL );
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	#if defined(CHECK_FOR_NULL_POINTERS)
+	switch(function)
 	{
-		if(actual_path == NULL || symbolic_path == NULL)
-		{
-			SHOWMSG("invalid parameters");
+		case F_ULOCK:
 
-			__set_errno(EFAULT);
+			cmd = F_SETLK;
+			l.l_type = F_UNLCK;
+			break;
+
+		case F_LOCK:
+
+			cmd = F_SETLKW;
+			l.l_type = F_WRLCK;
+			break;
+
+		case F_TLOCK:
+
+			cmd = F_SETLK;
+			l.l_type = F_WRLCK;
+			break;
+
+		case F_TEST:
+
+			l.l_type = F_WRLCK;
+
+			if(fcntl(file_descriptor,F_GETLK,&l) == -1)
+				goto out;
+
+			if(l.l_pid == getpid() || l.l_type == F_UNLCK)
+			{
+				result = 0;
+				goto out;
+			}
+
+			__set_errno(EAGAIN);
 			goto out;
-		}
-	}
-	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	#if defined(UNIX_PATH_SEMANTICS)
-	{
-		if(__unix_path_semantics)
-		{
-			if(actual_path[0] == '\0' || symbolic_path[0] == '\0')
-			{
-				SHOWMSG("no name given");
+		default:
 
-				__set_errno(ENOENT);
-				goto out;
-			}
-
-			if(__translate_unix_to_amiga_path_name(&actual_path,&actual_path_name_nti) != 0)
-				goto out;
-
-			if(__translate_unix_to_amiga_path_name(&symbolic_path,&symbolic_path_name_nti) != 0)
-				goto out;
-
-			if(actual_path_name_nti.is_root || symbolic_path_name_nti.is_root)
-			{
-				__set_errno(EACCES);
-				goto out;
-			}
-		}
-	}
-	#endif /* UNIX_PATH_SEMANTICS */
-
-	SHOWMSG("trying to make that link");
-
-	PROFILE_OFF();
-	status = MakeLink((STRPTR)symbolic_path,(LONG)actual_path,LINK_SOFT);
-	PROFILE_ON();
-
-	if(status == DOSFALSE)
-	{
-		SHOWMSG("that didn't work");
-
-		__set_errno(__translate_io_error_to_errno(IoErr()));
-		goto out;
+			__set_errno(EINVAL);
+			goto out;
 	}
 
-	result = OK;
+	result = fcntl(file_descriptor,cmd,&l);
 
  out:
 
-	RETURN(result);
 	return(result);
 }

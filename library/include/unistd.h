@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.17 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: unistd.h,v 1.18 2006-01-29 09:17:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -83,6 +83,13 @@ extern "C" {
 
 /****************************************************************************/
 
+#define F_ULOCK	0
+#define F_LOCK	1
+#define F_TLOCK	2
+#define F_TEST	3
+
+/****************************************************************************/
+
 extern int opterr;
 extern int optind;
 extern int optopt;
@@ -104,6 +111,7 @@ extern int unlink(const char * path_name);
 extern int symlink(const char * actual_path, const char * symbolic_path);
 extern int readlink(const char * path_name, char * buffer, int buffer_size);
 extern int chdir(const char * path_name);
+extern int lockf(int file_descriptor, int function, off_t size);
 extern unsigned int sleep(unsigned int seconds);
 extern void usleep(unsigned long microseconds);
 extern int getopt(int argc, char * argv[], char *opts);

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.79 2005-12-31 12:23:53 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.80 2006-01-29 09:16:59 obarthel Exp $
 #
 # :ts=8
 #
@@ -21,7 +21,6 @@ LIBC_OBJS	= libc_objs
 LIBUNIX_OBJS	= libunix_objs
 LIBM_OBJS	= libm_objs
 LIBM881_OBJS	= libm881_objs
-LIBSTACK_OBJS	= libstack_objs
 LIBNET_OBJS	= libnet_objs
 LIBDEBUG_OBJS	= libdebug_objs
 LIBAMIGA_OBJS	= libamiga_objs
@@ -30,7 +29,6 @@ LIBC_OBJS	= $(TYPE)/libc_objs
 LIBUNIX_OBJS	= $(TYPE)/libunix_objs
 LIBM_OBJS	= $(TYPE)/libm_objs
 LIBM881_OBJS	= $(TYPE)/libm881_objs
-LIBSTACK_OBJS	= $(TYPE)/libstack_objs
 LIBNET_OBJS	= $(TYPE)/libnet_objs
 LIBDEBUG_OBJS	= $(TYPE)/libdebug_objs
 LIBAMIGA_OBJS	= $(TYPE)/libamiga_objs
@@ -57,10 +55,6 @@ $(LIBM_OBJS)/%.o : %.c
 $(LIBM881_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m881]"
 	@$(CC) -o $(LIBM881_OBJS)/$*.o -c $(CFLAGS) -DM68881_FLOATING_POINT_SUPPORT -m68881 $<
-
-$(LIBSTACK_OBJS)/%.o : %.c
-	@echo "Compiling $< [$(TYPE):stack]"
-	@$(CC) -o $(LIBSTACK_OBJS)/$*.o -c $(CFLAGS) -DSTACK_EXTENSION $<
 
 $(LIBNET_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):net]"
@@ -447,6 +441,7 @@ C_LIB = \
 	unistd_isatty.o \
 	unistd_lchown.o \
 	unistd_link.o \
+	unistd_lockf.o \
 	unistd_readlink.o \
 	unistd_realpath.o \
 	unistd_sleep.o \
@@ -526,11 +521,13 @@ UNIX_LIB = \
 	unistd_getcwd.o \
 	unistd_lchown.o \
 	unistd_link.o \
+	unistd_lockf.o \
 	unistd_readlink.o \
 	unistd_realpath.o \
 	unistd_restorepathname.o \
 	unistd_setcurrentpath.o \
 	unistd_strip_double_slash.o \
+	unistd_symlink.o \
 	unistd_translatea2u.o \
 	unistd_translaterel.o \
 	unistd_translateu2a.o \
@@ -740,14 +737,6 @@ MATH_LIB_IEEE = \
 	math_subsf3.o \
 	math_truncdfsf2.o
 
-STACK_LIB = \
-	stack.lib_rev.o \
-	stdlib_setjmp.o \
-	stdlib_stackextension.o \
-	stdlib_stackminframe.o \
-	stdlib_stackoverflow.o \
-	stdlib_stacksafezone.o
-
 NET_LIB = \
 	net.lib_rev.o \
 	socket_accept.o \
@@ -906,7 +895,7 @@ MEMDEBUG_LIB = \
 
 ##############################################################################
 
-LIBS_68K := $(LIBC_OBJS)/libc.a $(LIBSTACK_OBJS)/libstack.a $(LIBUNIX_OBJS)/libunix.a \
+LIBS_68K := $(LIBC_OBJS)/libc.a $(LIBUNIX_OBJS)/libunix.a \
             $(LIBNET_OBJS)/libnet.a $(LIBDEBUG_OBJS)/libdebug.a $(LIBAMIGA_OBJS)/libamiga.a \
             $(LIBM_OBJS)/libm.a
 LIBS_020 := $(LIBM881_OBJS)/libm881.a $(LIBS_68K)
@@ -943,7 +932,7 @@ all: \
 clean:
 	-$(DELETE) $(TYPE) $(LIBS_020) $(STARTUPS) \
 		$(LIBC_OBJS) $(LIBUNIX_OBJS) $(LIBM_OBJS) \
-		$(LIBM881_OBJS) $(LIBSTACK_OBJS) $(LIBNET_OBJS) $(LIBDEBUG_OBJS) \
+		$(LIBM881_OBJS) $(LIBNET_OBJS) $(LIBDEBUG_OBJS) \
 		$(LIBAMIGA_OBJS)
 
 realclean:
@@ -959,7 +948,6 @@ version:
 	copy clone c.lib_rev.rev m.lib_rev.rev
 	copy clone c.lib_rev.rev m881.lib_rev.rev
 	copy clone c.lib_rev.rev net.lib_rev.rev
-	copy clone c.lib_rev.rev stack.lib_rev.rev
 	copy clone c.lib_rev.rev unix.lib_rev.rev
 	bumprev 1 amiga.lib
 	bumprev 1 c.lib
@@ -967,7 +955,6 @@ version:
 	bumprev 1 m.lib
 	bumprev 1 m881.lib
 	bumprev 1 net.lib
-	bumprev 1 stack.lib
 	bumprev 1 unix.lib
 
 ##############################################################################
@@ -1051,8 +1038,6 @@ $(LIBC_OBJS)/stdlib_swapstack.o : stdlib_swapstack.c
 
 $(LIBC_OBJS)/stdlib_setjmp.o : stdlib_setjmp.c
 
-$(LIBSTACK_OBJS)/stdlib_setjmp.o : stdlib_setjmp.c
-
 ##############################################################################
 
 $(LIBC_OBJS)/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
@@ -1062,8 +1047,6 @@ $(LIBUNIX_OBJS)/unix.lib_rev.o : unix.lib_rev.c unix.lib_rev.h
 $(LIBM_OBJS)/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
 
 $(LIBM881_OBJS)/m881.lib_rev.o : m881.lib_rev.c m881.lib_rev.h
-
-$(LIBSTACK_OBJS)/stack.lib_rev.o : stack.lib_rev.c stack.lib_rev.h
 
 $(LIBNET_OBJS)/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
 
@@ -1200,16 +1183,6 @@ $(LIBM881_OBJS) :
 $(LIBM881_OBJS)/libm881.a : $(LIBM881_OBJS) $(foreach file,$(MATH_LIB_881),$(LIBM881_OBJS)/$(file))
 	-$(DELETE) $@
 	@$(AR) $@ $(foreach file,$(MATH_LIB_881),$(LIBM881_OBJS)/$(file))
-	$(RANLIB) $@
-
-##############################################################################
-
-$(LIBSTACK_OBJS) :
-	$(MAKEDIR) $@
-
-$(LIBSTACK_OBJS)/libstack.a : $(LIBSTACK_OBJS) $(foreach file,$(STACK_LIB),$(LIBSTACK_OBJS)/$(file))
-	-$(DELETE) $@
-	@$(AR) $@ $(foreach file,$(STACK_LIB),$(LIBSTACK_OBJS)/$(file))
 	$(RANLIB) $@
 
 ##############################################################################

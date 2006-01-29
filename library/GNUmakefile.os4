@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.91 2005-12-31 12:23:53 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.92 2006-01-29 09:17:00 obarthel Exp $
 #
 # :ts=8
 #
@@ -481,6 +481,7 @@ C_LIB = \
 	unistd_isatty.o \
 	unistd_lchown.o \
 	unistd_link.o \
+	unistd_lockf.o \
 	unistd_readlink.o \
 	unistd_realpath.o \
 	unistd_sleep.o \
@@ -562,11 +563,13 @@ UNIX_LIB = \
 	unistd_getcwd.o \
 	unistd_lchown.o \
 	unistd_link.o \
+	unistd_lockf.o \
 	unistd_readlink.o \
 	unistd_realpath.o \
 	unistd_restorepathname.o \
 	unistd_setcurrentpath.o \
 	unistd_strip_double_slash.o \
+	unistd_symlink.o \
 	unistd_translatea2u.o \
 	unistd_translaterel.o \
 	unistd_translateu2a.o \

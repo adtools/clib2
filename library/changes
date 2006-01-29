@@ -1,3 +1,10 @@
+- Added lockf() support, as supplied by Henning Nielsen Lund.
+  Thank you very much!
+
+- symlink() now also works for absolute and relative links, and is
+  part of "libunix.a". This patch was supplied by Henning Nielsen Lund.
+  Thank you very much!
+
 - The __main() stub function expected by the 68k GCC build is no
   longer part of "stdlib_main.c". This helps the C++ support, since the
   __main symbol definition no longer clashes with the definition in
