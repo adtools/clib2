@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_realloc.c,v 1.9 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: stdlib_realloc.c,v 1.10 2006-02-17 10:55:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -122,21 +122,21 @@ __realloc(void *ptr,size_t size,const char * file,int line)
 		}
 		#else
 		{
-			if(size > mn->mn_Size)
+			size_t rounded_allocation_size;
+
+			/* Round the total allocation size to the operating system
+			   granularity. */
+			rounded_allocation_size = __get_allocation_size(size);
+
+			assert( rounded_allocation_size >= size );
+
+			if(rounded_allocation_size > mn->mn_Size)
 			{
 				/* Allocation size should grow. */
 				reallocate = TRUE;
 			}
 			else
 			{
-				size_t rounded_allocation_size;
-
-				/* Round the total allocation size to the operating system
-				   granularity. */
-				rounded_allocation_size = __get_allocation_size(size);
-
-				assert( rounded_allocation_size >= size );
-
 				/* Optimization: If the block size shrinks by less than half the
 				                 original allocation size, do not reallocate the
 				                 block and do not copy over the contents of the old

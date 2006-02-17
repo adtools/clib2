@@ -13,6 +13,8 @@
 - The printf() family stripped trailing zeroes from the integer part
   of %g output. Fixed.
 
+- Moved an allocation size roundup operation in realloc().
+
 
 c.lib 1.198 (11.12.2005)
 
