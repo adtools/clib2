@@ -233,7 +233,7 @@ mongetpcs(uint32* lowpc, uint32 *highpc)
 	if (!IElf) goto out;
 
 	self = (struct Process *)FindTask(0);
-	seglist = GetProcSegList(self);
+	seglist = GetProcSegList(self, GPSLF_CLI | GPSLF_SEG);
 
 	GetSegListInfoTags(seglist,
 		GSLI_ElfHandle,		&elfHandle,
