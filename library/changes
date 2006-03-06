@@ -1,3 +1,6 @@
+- In <stdio.h> MAXPATHLEN is now equivalent to PATH_MAX (from <limits.h>),
+  as suggested by Henning Nielsen Lund.
+
 - Added lockf() support, as supplied by Henning Nielsen Lund.
   Thank you very much!
 

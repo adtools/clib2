@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.21 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: stdio.h,v 1.22 2006-03-06 08:43:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,6 +50,10 @@
 #ifndef _STDARG_H
 #include <stdarg.h>
 #endif /* _STDARG_H */
+
+#ifndef _LIMITS_H
+#include <limits.h>
+#endif /* _LIMITS_H */
 
 #ifndef _SYS_TYPES_H
 #include <sys/types.h>
@@ -349,7 +353,7 @@ extern char *tmpnam(char *buf);
 
 /****************************************************************************/
 
-#define MAXPATHLEN (4 * FILENAME_MAX)
+#define MAXPATHLEN PATH_MAX
 
 /****************************************************************************/
 
