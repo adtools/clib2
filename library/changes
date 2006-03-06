@@ -1,3 +1,5 @@
+c.lib 1.199 (6.3.2006)
+
 - In <stdio.h> MAXPATHLEN is now equivalent to PATH_MAX (from <limits.h>),
   as suggested by Henning Nielsen Lund.
 
