@@ -1,3 +1,10 @@
+c.lib 1.200
+
+- added <sys/time.h> include to sys/socket.h due to latest "TimeVal" change
+  in the OS4 SDK. Otherwise "struct timeval" will not be defined at the time
+  the <net/if.h> of the netincludes will be included by <proto/bsdsocket.h>.
+
+
 c.lib 1.199 (6.3.2006)
 
 - In <stdio.h> MAXPATHLEN is now equivalent to PATH_MAX (from <limits.h>),

@@ -1,5 +1,5 @@
 /*
- * $Id: socket.h,v 1.5 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: socket.h,v 1.6 2006-04-04 21:59:13 damato Exp $
  *
  * :ts=4
  *
@@ -54,6 +54,10 @@
 #ifndef _SYS_UIO_H_
 #include <sys/uio.h>
 #endif /* _SYS_UIO_H_ */
+
+#ifndef _SYS_TIME_H
+#include <sys/time.h>
+#endif /* _SYS_TIME_H */
 
 /****************************************************************************/
 
