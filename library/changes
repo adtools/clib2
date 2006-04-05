@@ -1,8 +1,17 @@
-c.lib 1.200
-
-- added <sys/time.h> include to sys/socket.h due to latest "TimeVal" change
+- Added <sys/time.h> include to <sys/socket.h> due to latest "TimeVal" change
   in the OS4 SDK. Otherwise "struct timeval" will not be defined at the time
   the <net/if.h> of the netincludes will be included by <proto/bsdsocket.h>.
+
+- The strftime() hook function had the locale and character parameters
+  switched, which made 'setlocale(LC_ALL,""); strftime(..);' unusable.
+  Fixed.
+
+- fchown() and chown() now accept owner and group ID values of -1, which
+  indicate that the respective information should not be changed.
+
+- The OS4 library build now includes the crtbegin.o and crtend.o object
+  files in the libc.a library, which solves a problem with the thread-safe
+  shared library support code.
 
 
 c.lib 1.199 (6.3.2006)

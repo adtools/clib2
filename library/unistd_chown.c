@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chown.c,v 1.9 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_chown.c,v 1.10 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,6 +54,8 @@ chown(const char * path_name, uid_t owner, gid_t group)
 	struct name_translation_info path_name_nti;
 	#endif /* UNIX_PATH_SEMANTICS */
 	struct DevProc * dvp = NULL;
+	BPTR file_lock = ZERO;
+	BOOL owner_changed = TRUE;
 	LONG status;
 	int result = ERROR;
 
@@ -80,14 +82,6 @@ chown(const char * path_name, uid_t owner, gid_t group)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(owner > 65535 || group > 65535)
-	{
-		SHOWMSG("invalid owner or group");
-
-		__set_errno(EINVAL);
-		goto out;
-	}
-
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
 		if(__unix_path_semantics)
@@ -112,58 +106,105 @@ chown(const char * path_name, uid_t owner, gid_t group)
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
-	D(("changing owner of '%s'",path_name));
+	/* A value of -1 for either the owner or the group ID means
+	   that what's currently being used should not be changed. */
+	if(owner == (uid_t)-1 || group == (gid_t)-1)
+	{
+		D_S(struct FileInfoBlock,fib);
 
-	#if defined(__amigaos4__)
-	{
 		PROFILE_OFF();
-		status = SetOwner((STRPTR)path_name,(LONG)((((ULONG)owner) << 16) | group));
+
+		/* Try to find out which owner/group information
+		   is currently in use. */
+		lock = Lock(path_name,SHARED_LOCK);
+		if(lock == ZERO || CANNOT Examine(file_lock,fib))
+		{
+			PROFILE_ON();
+
+			__set_errno(__translate_access_io_error_to_errno(IoErr()));
+			goto out;
+		}
+
+		UnLock(lock);
+		lock = ZERO;
+
 		PROFILE_ON();
+
+		/* Replace the information that should not be changed. */
+		if(owner == (uid_t)-1)
+			owner = fib->fib_OwnerUID;
+
+		if(group == (gid_t)-1)
+			group = fib->fib_OwnerGID;
+
+		/* Is anything different at all? */
+		if(owner == fib->fib_OwnerUID && group == fib->fib_OwnerGID)
+			owner_changed = FALSE;
 	}
-	#else
+
+	if(owner > 65535 || group > 65535)
 	{
-		if(((struct Library *)DOSBase)->lib_Version >= 39)
+		SHOWMSG("invalid owner or group");
+
+		__set_errno(EINVAL);
+		goto out;
+	}
+
+	if(owner_changed)
+	{
+		D(("changing owner of '%s'",path_name));
+
+		#if defined(__amigaos4__)
 		{
 			PROFILE_OFF();
 			status = SetOwner((STRPTR)path_name,(LONG)((((ULONG)owner) << 16) | group));
 			PROFILE_ON();
 		}
-		else
+		#else
 		{
-			D_S(struct bcpl_name,new_name);
-			size_t len;
-
-			len = strlen(path_name);
-			if(len >= sizeof(new_name->name))
+			if(((struct Library *)DOSBase)->lib_Version >= 39)
 			{
-				__set_errno(ENAMETOOLONG);
-				goto out;
+				PROFILE_OFF();
+				status = SetOwner((STRPTR)path_name,(LONG)((((ULONG)owner) << 16) | group));
+				PROFILE_ON();
 			}
-
-			PROFILE_OFF();
-			dvp = GetDeviceProc((STRPTR)path_name,NULL);
-			PROFILE_ON();
-
-			if(dvp == NULL)
+			else
 			{
-				__set_errno(__translate_io_error_to_errno(IoErr()));
-				goto out;
+				D_S(struct bcpl_name,new_name);
+				size_t len;
+
+				len = strlen(path_name);
+				if(len >= sizeof(new_name->name))
+				{
+					__set_errno(ENAMETOOLONG);
+					goto out;
+				}
+
+				PROFILE_OFF();
+				dvp = GetDeviceProc((STRPTR)path_name,NULL);
+				PROFILE_ON();
+
+				if(dvp == NULL)
+				{
+					__set_errno(__translate_io_error_to_errno(IoErr()));
+					goto out;
+				}
+
+				new_name->name[0] = len;
+				memmove(&new_name->name[1],path_name,len);
+
+				PROFILE_OFF();
+				status = DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0,0);
+				PROFILE_ON();
 			}
-
-			new_name->name[0] = len;
-			memmove(&new_name->name[1],path_name,len);
-
-			PROFILE_OFF();
-			status = DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0,0);
-			PROFILE_ON();
 		}
-	}
-	#endif /* __amigaos4__ */
+		#endif /* __amigaos4__ */
 
-	if(status == DOSFALSE)
-	{
-		__set_errno(__translate_io_error_to_errno(IoErr()));
-		goto out;
+		if(status == DOSFALSE)
+		{
+			__set_errno(__translate_io_error_to_errno(IoErr()));
+			goto out;
+		}
 	}
 
 	result = OK;
@@ -171,7 +212,12 @@ chown(const char * path_name, uid_t owner, gid_t group)
  out:
 
 	PROFILE_OFF();
+
 	FreeDeviceProc(dvp);
+
+	if(file_lock != ZERO)
+		UnLock(file_lock);
+
 	PROFILE_ON();
 
 	RETURN(result);

@@ -1,5 +1,5 @@
 /*
- * $Id: time_strftime.c,v 1.18 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: time_strftime.c,v 1.19 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,8 +59,8 @@ struct format_hook_data
 STATIC VOID
 format_hook_function(
 	struct Hook *			hook,
-	long					c,
-	struct Locale *	UNUSED	unused_locale)
+	struct Locale *	UNUSED	unused_locale,
+	ULONG					c)
 {
 	struct format_hook_data * data = hook->h_Data;
 
@@ -97,7 +97,7 @@ store_string_via_hook(const char * string,int len,struct Hook * hook)
 		len = strlen(string);
 
 	while(len-- > 0)
-		CallHookPkt(hook,(APTR)((ULONG)(*string++)),NULL);
+		CallHookPkt(hook,NULL,(APTR)((ULONG)(*string++)));
 }
 
 /****************************************************************************/

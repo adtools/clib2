@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_headers.h,v 1.9 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_headers.h,v 1.10 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,10 +64,24 @@ extern struct MinList NOCOMMON __unlink_list;
 /****************************************************************************/
 
 /* Local timer I/O. */
-extern struct MsgPort *		NOCOMMON __timer_port;
+extern struct MsgPort *	NOCOMMON __timer_port;
+extern BOOL				NOCOMMON __timer_busy;
+extern struct Library *	NOCOMMON __TimerBase;
+
+/****************************************************************************/
+
+/* A quick workaround for the timeval/timerequest->TimeVal/TimeRequest
+   change in the recent OS4 header files. */
+
+#if defined(__NEW_TIMEVAL_DEFINITION_USED__)
+
+extern struct TimeRequest *	NOCOMMON __timer_request;
+
+#else
+
 extern struct timerequest *	NOCOMMON __timer_request;
-extern BOOL					NOCOMMON __timer_busy;
-extern struct Library *		NOCOMMON __TimerBase;
+
+#endif /* __NEW_TIMEVAL_DEFINITION_USED__ */
 
 /****************************************************************************/
 

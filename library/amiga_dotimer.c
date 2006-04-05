@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_dotimer.c,v 1.7 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: amiga_dotimer.c,v 1.8 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,23 @@
 
 /****************************************************************************/
 
+/* A quick workaround for the timeval/timerequest->TimeVal/TimeRequest
+   change in the recent OS4 header files. */
+
+#if defined(__NEW_TIMEVAL_DEFINITION_USED__)
+
+#define timeval		TimeVal
+#define tv_secs		Seconds
+#define tv_micro	Microseconds
+
+#define timerequest	TimeRequest
+#define tr_node		Request
+#define tr_time		Time
+
+#endif /* __NEW_TIMEVAL_DEFINITION_USED__ */
+
+/****************************************************************************/
+
 LONG
 DoTimer(struct timeval *tv,LONG unit,LONG command)
 {
@@ -67,10 +84,10 @@ DoTimer(struct timeval *tv,LONG unit,LONG command)
 	#if defined(__amigaos4__)
 	{
 		mp = AllocSysObjectTags(ASOT_PORT,
-			ASOPORT_Action,			PA_SIGNAL,
+			ASOPORT_Action,		PA_SIGNAL,
 			ASOPORT_AllocSig,	FALSE,
-			ASOPORT_Signal,			SIGB_SINGLE,
-			ASOPORT_Target,			FindTask(NULL),
+			ASOPORT_Signal,		SIGB_SINGLE,
+			ASOPORT_Target,		FindTask(NULL),
 		TAG_DONE);
 
 		if(mp == NULL)

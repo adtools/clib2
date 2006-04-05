@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_timer.c,v 1.9 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_timer.c,v 1.10 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,6 +48,18 @@
 /****************************************************************************/
 
 /* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+/* A quick workaround for the timeval/timerequest->TimeVal/TimeRequest
+   change in the recent OS4 header files. */
+
+#if defined(__NEW_TIMEVAL_DEFINITION_USED__)
+
+#define timerequest	TimeRequest
+#define tr_node		Request
+
+#endif /* __NEW_TIMEVAL_DEFINITION_USED__ */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.93 2006-02-27 11:18:51 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.94 2006-04-05 06:43:56 obarthel Exp $
 #
 # :ts=8
 #
@@ -147,10 +147,10 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -I$(SDK_INCLUDE)
-#OPTIONS = -D__THREAD_SAFE -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
- OPTIONS =                 -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+ OPTIONS = -D__THREAD_SAFE -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+#OPTIONS =                 -DNDEBUG -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
 OPTIMIZE = -O3
- DEBUG = -ggdb
+#DEBUG = -ggdb
 
 CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
 
@@ -159,6 +159,8 @@ CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
 # All objects files which make up libc.a
 C_LIB = \
 	c.lib_rev.o \
+	crtbegin.o \
+	crtend.o \
 	ctype_isalnum.o \
 	ctype_isalpha.o \
 	ctype_isascii.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: lib_user.c,v 1.6 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: lib_user.c,v 1.7 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -100,7 +100,7 @@ UserLibOpen(struct UserData * ud)
 {
 	BOOL result = FALSE;
 
-	/* For the AmigaOS4 build, invoke the clib2 shared library
+	/* For the thread safe build, invoke the clib2 shared library
 	   initialization code. Note that this is not strictly
 	   necessary. In fact, you should not need this functionality
 	   if you stick to use Amiga operating system routines only
@@ -109,15 +109,15 @@ UserLibOpen(struct UserData * ud)
 	   Use this feature only if you are porting code to the Amiga
 	   which cannot be easily converted to follow the AmigaOS
 	   API definitions only. */
-	#if defined(__amigaos4__) && defined(__THREAD_SAFE)
+	#if defined(__THREAD_SAFE)
 	{
 		/* Note that the clib2 library initialization is
 		   called exactly once, when the first client
 		   opens this library. */
-		if(ud->ud_UseCount == 0 && !__lib_init(SysBase))
+		if(ud->ud_UseCount == 0 && !__lib_init(ud->ud_SysBase))
 			goto out;
 	}
-	#endif /* __amigaos4__ && __THREAD_SAFE */
+	#endif /* __THREAD_SAFE */
 
 	/* Remember that one more customer is using this data structure. */
 	ud->ud_UseCount++;
@@ -140,7 +140,7 @@ UserLibClose(struct UserData * ud)
 	/* Remember that one less customer is using this data structure. */
 	ud->ud_UseCount--;
 
-	/* For the AmigaOS4 build, invoke the clib2 shared library
+	/* For the thread safe build, invoke the clib2 shared library
 	   cleanup code. Note that this is not strictly
 	   necessary. In fact, you should not need this functionality
 	   if you stick to use Amiga operating system routines only
@@ -149,7 +149,7 @@ UserLibClose(struct UserData * ud)
 	   Use this feature only if you are porting code to the Amiga
 	   which cannot be easily converted to follow the AmigaOS
 	   API definitions only. */
-	#if defined(__amigaos4__) && defined(__THREAD_SAFE)
+	#if defined(__THREAD_SAFE)
 	{
 		/* Note that the clib2 library cleanup code is
 		   called exactly once, when the last client
@@ -157,7 +157,7 @@ UserLibClose(struct UserData * ud)
 		if(ud->ud_UseCount == 0)
 			__lib_exit();
 	}
-	#endif /* __amigaos4__ && __THREAD_SAFE */
+	#endif /* __THREAD_SAFE */
 }
 
 /****************************************************************************/

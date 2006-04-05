@@ -1,5 +1,5 @@
 /*
- * $Id: sas_profile.c,v 1.6 2005-04-24 08:46:37 obarthel Exp $
+ * $Id: sas_profile.c,v 1.7 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,6 +49,19 @@ extern struct Library * SysBase;
 
 #include "macros.h"
 #include "debug.h"
+
+/****************************************************************************/
+
+/* A quick workaround for the timeval/timerequest->TimeVal/TimeRequest
+   change in the recent OS4 header files. */
+
+#if defined(__NEW_TIMEVAL_DEFINITION_USED__)
+
+#define timerequest	TimeRequest
+#define tr_node		Request
+#define tr_time		Time
+
+#endif /* __NEW_TIMEVAL_DEFINITION_USED__ */
 
 /****************************************************************************/
 

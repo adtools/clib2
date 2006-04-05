@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fchown.c,v 1.12 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_fchown.c,v 1.13 2006-04-05 06:43:56 obarthel Exp $
  *
  * :ts=4
  *
@@ -88,17 +88,6 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 		goto out;
 	}
 
-	if(owner > 65535 || group > 65535)
-	{
-		SHOWMSG("owner or group not OK");
-
-		SHOWVALUE(owner);
-		SHOWVALUE(group);
-
-		__set_errno(EINVAL);
-		goto out;
-	}
-
 	PROFILE_OFF();
 	success = (__safe_examine_file_handle(fd->fd_DefaultFile,fib) && (parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile)) != ZERO);
 	PROFILE_ON();
@@ -114,59 +103,86 @@ fchown(int file_descriptor, uid_t owner, gid_t group)
 	old_current_dir = CurrentDir(parent_dir);
 	current_dir_changed = TRUE;
 
-	PROFILE_OFF();
+	/* A value of -1 for either the owner or the group ID means
+	   that what's currently being used should not be changed. */
+	if(owner == (uid_t)-1)
+		owner = fib->fib_OwnerUID;
 
-	#if defined(__amigaos4__)
+	if(group == (gid_t)-1)
+		group = fib->fib_OwnerGID;
+
+	/* Check if the owner and group IDs are usable. This test
+	   follows the comparison against -1 above just so that we
+	   can be sure that we are not mistaking a -1 for a
+	   large unsigned number. */
+	if(owner > 65535 || group > 65535)
 	{
-		success = SetOwner(fib->fib_FileName,(LONG)((((ULONG)owner) << 16) | group));
+		SHOWMSG("owner or group not OK");
+
+		SHOWVALUE(owner);
+		SHOWVALUE(group);
+
+		__set_errno(EINVAL);
+		goto out;
 	}
-	#else
+
+	/* Did anything change at all? */
+	if(group != fib->fib_OwnerUID || owner != fib->fib_OwnerUID)
 	{
-		if(((struct Library *)DOSBase)->lib_Version >= 39)
+		PROFILE_OFF();
+
+		#if defined(__amigaos4__)
 		{
-			success = SetOwner(fib->fib_FileName,(LONG)((((ULONG)owner) << 16) | group));
+			success = SetOwner(fib->fib_FileName,(LONG)((((ULONG)owner) << 16) | (ULONG)group));
 		}
-		else
+		#else
 		{
-			D_S(struct bcpl_name,new_name);
-			struct DevProc * dvp;
-			unsigned int len;
-
-			SHOWMSG("have to do this manually...");
-
-			success = DOSFALSE;
-
-			len = strlen(fib->fib_FileName);
-
-			assert( len < sizeof(new_name->name) );
-
-			dvp = GetDeviceProc(fib->fib_FileName,NULL);
-			if(dvp != NULL)
+			if(((struct Library *)DOSBase)->lib_Version >= 39)
 			{
-				LONG error;
+				success = SetOwner(fib->fib_FileName,(LONG)((((ULONG)owner) << 16) | (ULONG)group));
+			}
+			else
+			{
+				D_S(struct bcpl_name,new_name);
+				struct DevProc * dvp;
+				unsigned int len;
 
-				new_name->name[0] = len;
-				memmove(&new_name->name[1],fib->fib_FileName,len);
+				SHOWMSG("have to do this manually...");
 
-				success	= DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0,0);
-				error	= IoErr();
+				success = DOSFALSE;
 
-				FreeDeviceProc(dvp);
+				len = strlen(fib->fib_FileName);
 
-				SetIoErr(error);
+				assert( len < sizeof(new_name->name) );
+
+				dvp = GetDeviceProc(fib->fib_FileName,NULL);
+				if(dvp != NULL)
+				{
+					LONG error;
+
+					new_name->name[0] = len;
+					memmove(&new_name->name[1],fib->fib_FileName,len);
+
+					success	= DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | (ULONG)group),0,0);
+					error	= IoErr();
+
+					FreeDeviceProc(dvp);
+
+					SetIoErr(error);
+				}
 			}
 		}
-	}
-	#endif /* __amigaos4__ */
+		#endif /* __amigaos4__ */
 
-	PROFILE_ON();
+		PROFILE_ON();
 
-	if(NO success)
-	{
-		SHOWMSG("couldn't change owner/group");
+		if(NO success)
+		{
+			SHOWMSG("couldn't change owner/group");
 
-		__set_errno(__translate_io_error_to_errno(IoErr()));
-		goto out;
+			__set_errno(__translate_io_error_to_errno(IoErr()));
+			goto out;
+		}
 	}
 
 	result = OK;
