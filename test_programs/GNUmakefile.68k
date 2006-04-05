@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.10 2006-01-02 13:11:39 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.11 2006-04-05 06:35:42 obarthel Exp $
 #
 # :ts=8
 #
@@ -48,15 +48,20 @@ LIBS = -lm -lc -lgcc
 
 all: test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
-	fstat_stdout_test simple_sprintf date_test sscanf_64 factorial
+	fstat_stdout_test simple_sprintf date_test sscanf_64 factorial \
+	setlocale
 
 clean:
 	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test \
 		sprintf_test stack_size_test translate_test strtok_test uname \
 		simple fstat_stdout_test simple_sprintf date_test sscanf_64 \
-		factorial
+		factorial setlocale
 
 ##############################################################################
+
+setlocale : setlocale.o
+	@echo "Linking $@"
+	$(CC) $(CFLAGS) -o $@ setlocale.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
 test : test.o
 	@echo "Linking $@"
