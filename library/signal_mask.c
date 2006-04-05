@@ -1,5 +1,5 @@
 /*
- * $Id: signal_kill.c,v 1.8 2006-04-05 08:39:45 obarthel Exp $
+ * $Id: signal_mask.c,v 1.1 2006-04-05 08:39:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,66 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
+
 #ifndef _SIGNAL_HEADERS_H
 #include "signal_headers.h"
 #endif /* _SIGNAL_HEADERS_H */
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-int
-kill(pid_t pid, int signal_number)
-{
-	int result = ERROR;
-
-	ENTER();
-
-	SHOWVALUE(pid);
-	SHOWVALUE(signal_number);
-
-	Forbid();
-
-	if(pid > 0)
-	{
-		ULONG max_cli_number,i;
-		BOOL found = FALSE;
-
-		max_cli_number = MaxCli();
-
-		for(i = 1 ; i <= max_cli_number ; i++)
-		{
-			if(FindCliProc(i) == (struct Process *)pid)
-			{
-				found = TRUE;
-				break;
-			}
-		}
-
-		if(NOT found)
-		{
-			SHOWMSG("didn't find the process");
-
-			__set_errno(ESRCH);
-			goto out;
-		}
-
-		SHOWMSG("found the process");
-
-		if(signal_number == SIGTERM || signal_number == SIGINT)
-			Signal((struct Task *)pid,__break_signal_mask);
-		else
-			SHOWMSG("but won't shut it down");
-	}
-
-	result = OK;
-
- out:
-
-	Permit();
-
-	RETURN(result);
-	return(result);
-}
+ULONG __break_signal_mask = SIGBREAKF_CTRL_C;

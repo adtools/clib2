@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select_signal.c,v 1.1 2006-04-05 07:53:24 obarthel Exp $
+ * $Id: socket_select_signal.c,v 1.2 2006-04-05 08:39:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -762,7 +762,7 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 				break_mask = signal_mask;
 
 				if(__check_abort_enabled)
-					break_mask |= SIGBREAKF_CTRL_C;
+					break_mask |= __break_signal_mask;
 
 				/* Check for socket input. */
 				PROFILE_OFF();
@@ -770,9 +770,9 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 				PROFILE_ON();
 
 				/* Stop if a break signal arrives. */
-				if((result < 0 && __get_errno() == EINTR) || FLAG_IS_SET(break_mask,SIGBREAKF_CTRL_C))
+				if((result < 0 && __get_errno() == EINTR) || FLAG_IS_SET(break_mask,__break_signal_mask))
 				{
-					SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
+					SetSignal(__break_signal_mask,__break_signal_mask);
 					__check_abort();
 				}
 
@@ -919,15 +919,15 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 			break_mask = signal_mask;
 
 			if(__check_abort_enabled)
-				break_mask |= SIGBREAKF_CTRL_C;
+				break_mask |= __break_signal_mask;
 
 			PROFILE_OFF();
 			result = __WaitSelect(total_socket_fd,socket_read_fds,socket_write_fds,socket_except_fds,timeout,&break_mask);
 			PROFILE_ON();
 
-			if((result < 0 && __get_errno() == EINTR) || FLAG_IS_SET(break_mask,SIGBREAKF_CTRL_C))
+			if((result < 0 && __get_errno() == EINTR) || FLAG_IS_SET(break_mask,__break_signal_mask))
 			{
-				SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
+				SetSignal(__break_signal_mask,__break_signal_mask);
 				__check_abort();
 			}
 
@@ -1065,7 +1065,7 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 					   standard break signal bit, then we must not clear the
 					   break signal. The ^C checking depends upon it to
 					   remain set. */
-					(*signal_mask_ptr) = signal_mask & SetSignal(0,signal_mask & ~SIGBREAKF_CTRL_C);
+					(*signal_mask_ptr) = signal_mask & SetSignal(0,signal_mask & ~__break_signal_mask);
 					break;
 				}
 
@@ -1093,7 +1093,7 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 			SHOWMSG("no files to worry about");
 
 			if(signal_mask != 0)
-				(*signal_mask_ptr) = signal_mask & SetSignal(0,signal_mask & ~SIGBREAKF_CTRL_C);
+				(*signal_mask_ptr) = signal_mask & SetSignal(0,signal_mask & ~__break_signal_mask);
 		}
 	}
 

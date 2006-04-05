@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.83 2006-04-05 08:24:32 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.84 2006-04-05 08:39:45 obarthel Exp $
 #
 # :ts=8
 #
@@ -169,6 +169,7 @@ C_LIB = \
 	signal_checkabort.o \
 	signal_data.o \
 	signal_kill.o \
+	signal_mask.o \
 	signal_raise.o \
 	signal_sigaddset.o \
 	signal_sigblock.o \

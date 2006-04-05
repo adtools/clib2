@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_time_delay.c,v 1.8 2006-04-05 06:43:56 obarthel Exp $
+ * $Id: unistd_time_delay.c,v 1.9 2006-04-05 08:39:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -103,7 +103,7 @@ __time_delay(unsigned long seconds,unsigned long microseconds)
 		SetSignal(0,signals_to_wait_for);
 
 		if(__check_abort_enabled)
-			SET_FLAG(signals_to_wait_for,SIGBREAKF_CTRL_C);
+			SET_FLAG(signals_to_wait_for,__break_signal_mask);
 
 		PROFILE_OFF();
 		GetSysTime(&tv);
@@ -119,7 +119,7 @@ __time_delay(unsigned long seconds,unsigned long microseconds)
 			signals = Wait(signals_to_wait_for);
 			PROFILE_ON();
 
-			if(FLAG_IS_SET(signals,SIGBREAKF_CTRL_C))
+			if(FLAG_IS_SET(signals,__break_signal_mask))
 			{
 				ULONG seconds_now;
 
@@ -128,7 +128,7 @@ __time_delay(unsigned long seconds,unsigned long microseconds)
 
 				WaitIO((struct IORequest *)__timer_request);
 
-				SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
+				SetSignal(__break_signal_mask,__break_signal_mask);
 				__check_abort();
 
 				/* Now figure out how many seconds have elapsed and

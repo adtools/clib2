@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_wildcard_expand.c,v 1.16 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_wildcard_expand.c,v 1.17 2006-04-05 08:39:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -186,7 +186,7 @@ __wildcard_expand_init(void)
 	{
 		ap = AllocDosObjectTags(DOS_ANCHORPATH,
 			ADO_Strlen,	2 * MAXPATHLEN,
-			ADO_Mask,	(__check_abort_enabled) ? SIGBREAKF_CTRL_C : 0,
+			ADO_Mask,	(__check_abort_enabled) ? __break_signal_mask : 0,
 		TAG_END);
 
 		if(ap == NULL)
@@ -214,7 +214,7 @@ __wildcard_expand_init(void)
 		ap->ap_Strlen = MAXPATHLEN;
 
 		if(__check_abort_enabled)
-			ap->ap_BreakBits = SIGBREAKF_CTRL_C;
+			ap->ap_BreakBits = __break_signal_mask;
 	}
 	#endif /* __amigaos4__ */
 
@@ -308,7 +308,7 @@ __wildcard_expand_init(void)
 					{
 						__set_process_window(old_window_pointer);
 
-						SetSignal(SIGBREAKF_CTRL_C,SIGBREAKF_CTRL_C);
+						SetSignal(__break_signal_mask,__break_signal_mask);
 						__check_abort();
 
 						old_window_pointer = __set_process_window((APTR)-1);

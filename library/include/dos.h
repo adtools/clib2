@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.18 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: dos.h,v 1.19 2006-04-05 08:39:46 obarthel Exp $
  *
  * :ts=4
  *
@@ -120,6 +120,19 @@ extern BOOL __check_abort_enabled;
  * Ctrl+C checking.
  */
 extern void __check_abort(void);
+
+/****************************************************************************/
+
+/*
+ * You can override the default break signal mask which is used by
+ * __check_abort() and other functions. This must be done at link
+ * time because the break signal checking is set up very early on
+ * while the program startup code is preparing your code to be run.
+ * In particular, this affects the socket I/O functionality which
+ * configures the break signal only once. The default value of the
+ * __break_signal_mask variable is SIGBREAKF_CTRL_C.
+ */
+extern ULONG __break_signal_mask;
 
 /****************************************************************************/
 

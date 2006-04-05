@@ -1,5 +1,5 @@
 /*
- * $Id: socket_init_exit.c,v 1.25 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_init_exit.c,v 1.26 2006-04-05 08:39:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -224,7 +224,7 @@ SOCKET_CONSTRUCTOR(socket_init)
 	tags[1].ti_Tag = SBTM_SETVAL(SBTC_BREAKMASK);
 
 	if(__check_abort_enabled)
-		tags[1].ti_Data	= SIGBREAKF_CTRL_C;
+		tags[1].ti_Data	= __break_signal_mask;
 	else
 		tags[1].ti_Data	= 0;
 

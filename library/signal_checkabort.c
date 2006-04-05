@@ -1,5 +1,5 @@
 /*
- * $Id: signal_checkabort.c,v 1.3 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: signal_checkabort.c,v 1.4 2006-04-05 08:39:45 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,6 +44,6 @@
 void
 __check_abort(void)
 {
-	if(__check_abort_enabled && FLAG_IS_SET(SetSignal(0,SIGBREAKF_CTRL_C),SIGBREAKF_CTRL_C))
+	if(__check_abort_enabled && FLAG_IS_SET(SetSignal(0,__break_signal_mask),__break_signal_mask))
 		raise(SIGINT);
 }
