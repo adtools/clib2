@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.81 2006-04-05 07:53:23 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.82 2006-04-05 08:19:11 obarthel Exp $
 #
 # :ts=8
 #
@@ -105,7 +105,7 @@ WARNINGS = \
 
 INCLUDES = -Iinclude -I. -Inetinclude
 #OPTIONS = -fno-builtin -fno-common -DDEBUG
- OPTIONS = -fno-builtin -fno-common -DNDEBUG
+ OPTIONS = -fno-builtin -fno-common -DNDEBUG -D__THREAD_SAFE
 #OPTIONS = -fno-builtin -fno-common -D__MEM_DEBUG
 #OPTIONS = -fno-builtin -fno-common -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG
  OPTIMIZE = -O -fomit-frame-pointer -fstrength-reduce -finline-functions
