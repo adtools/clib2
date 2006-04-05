@@ -1,3 +1,6 @@
+- Added a wait_select() function which works very much like the
+  bsdsocket.library/WaitSelect() function.
+
 - Added <sys/time.h> include to <sys/socket.h> due to latest "TimeVal" change
   in the OS4 SDK. Otherwise "struct timeval" will not be defined at the time
   the <net/if.h> of the netincludes will be included by <proto/bsdsocket.h>.

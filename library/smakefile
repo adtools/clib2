@@ -1,5 +1,5 @@
 #
-# $Id: smakefile,v 1.59 2006-01-02 13:23:33 obarthel Exp $
+# $Id: smakefile,v 1.60 2006-04-05 07:53:24 obarthel Exp $
 #
 # :ts=8
 #
@@ -358,7 +358,9 @@ SOCKET_OBJ = \
 	socket_recv.o \
 	socket_recvfrom.o \
 	socket_recvmsg.o \
+	socket_select_signal.o \
 	socket_select.o \
+	socket_wait_select.o \
 	socket_send.o \
 	socket_sendmsg.o \
 	socket_sendto.o \
@@ -801,7 +803,7 @@ dirent_opendir.o : dirent_opendir.c stdlib_memory.h
 
 fcntl_open.o : fcntl_open.c stdlib_memory.h
 
-socket_select.o : socket_select.c stdlib_memory.h
+socket_select_signal.o : socket_select_signal.c stdlib_memory.h
 
 stdio_fclose.o : stdio_fclose.c stdlib_memory.h
 

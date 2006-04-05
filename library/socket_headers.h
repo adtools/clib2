@@ -1,5 +1,5 @@
 /*
- * $Id: socket_headers.h,v 1.13 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_headers.h,v 1.14 2006-04-05 07:53:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -127,6 +127,7 @@ extern int __socket_hook_entry(struct fd * fd,struct file_action_message * fam);
 extern int __get_h_errno(void);
 extern void __set_h_errno(int new_h_errno);
 extern BOOL __obtain_daemon_message(VOID);
+extern int __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout,ULONG * signal_mask_ptr);
 
 /****************************************************************************/
 

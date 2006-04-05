@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.94 2006-04-05 06:43:56 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.95 2006-04-05 07:53:24 obarthel Exp $
 #
 # :ts=8
 #
@@ -784,7 +784,9 @@ NET_LIB = \
 	socket_recv.o \
 	socket_recvfrom.o \
 	socket_recvmsg.o \
+	socket_select_signal.o \
 	socket_select.o \
+	socket_wait_select.o \
 	socket_send.o \
 	socket_sendmsg.o \
 	socket_sendto.o \
