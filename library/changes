@@ -3,7 +3,7 @@
   variable value for __break_signal_mask. This may have to be
   augmented by an API for changing the value.
 
-- Added a wait_select() function which works very much like the
+- Added a waitselect() function which works very much like the
   bsdsocket.library/WaitSelect() function.
 
 - Added <sys/time.h> include to <sys/socket.h> due to latest "TimeVal" change

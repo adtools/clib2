@@ -1,5 +1,5 @@
 /*
- * $Id: socket_wait_select.c,v 1.1 2006-04-05 07:53:24 obarthel Exp $
+ * $Id: socket_wait_select.c,v 1.2 2006-04-07 15:45:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -42,7 +42,7 @@
 /****************************************************************************/
 
 int
-wait_select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout,ULONG * signal_mask)
+waitselect(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout,ULONG * signal_mask)
 {
 	int result;
 

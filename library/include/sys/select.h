@@ -1,5 +1,5 @@
 /*
- * $Id: select.h,v 1.7 2006-04-05 07:53:30 obarthel Exp $
+ * $Id: select.h,v 1.8 2006-04-07 15:45:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -120,9 +120,9 @@ extern int select(int nfds, fd_set *readfds,fd_set *writefds, fd_set *errorfds,s
    In brief, wait_select() works exactly like the bsdsocket.library/WaitSelect()
    function. */
 
-#ifndef __NO_WAIT_SELECT
-extern int wait_select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout,ULONG * signal_mask);
-#endif /* __NO_WAIT_SELECT */
+#ifndef __NO_WAITSELECT
+extern int waitselect(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout,ULONG * signal_mask);
+#endif /* __NO_WAITSELECT */
 
 #endif /* __NO_NET_API */
 
