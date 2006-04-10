@@ -1,5 +1,5 @@
 /*
- * $Id: select.h,v 1.8 2006-04-07 15:45:49 obarthel Exp $
+ * $Id: select.h,v 1.9 2006-04-10 15:08:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -121,7 +121,7 @@ extern int select(int nfds, fd_set *readfds,fd_set *writefds, fd_set *errorfds,s
    function. */
 
 #ifndef __NO_WAITSELECT
-extern int waitselect(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout,ULONG * signal_mask);
+extern int waitselect(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struct timeval *timeout,unsigned long * signal_mask);
 #endif /* __NO_WAITSELECT */
 
 #endif /* __NO_NET_API */
