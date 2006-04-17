@@ -1,3 +1,5 @@
+c.lib 1.200 (17.4.2006)
+
 - The default break signal mask (SIGBREAKF_CTRL_C) is no longer
   hard-coded. You can override it at link time with a different
   variable value for __break_signal_mask. This may have to be
