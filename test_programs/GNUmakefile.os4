@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.12 2006-04-05 06:35:42 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.13 2006-04-18 08:29:46 obarthel Exp $
 #
 # :ts=8
 #
@@ -47,7 +47,7 @@ clean:
 	$(DELETE) *.o *.map test fgets_test iotest sscanf_test printf_test \
 		sprintf_test stack_size_test translate_test strtok_test \
 		uname simple fstat_stdout_test simple_sprintf date_test \
-		sscanf_64 factorial setlocale
+		sscanf_64 factorial setlocale rand
 
 ##############################################################################
 
@@ -118,3 +118,7 @@ sscanf_64 : sscanf_64.o
 factorial : factorial.o
 	@echo "Linking $@"
 	$(CC) -nostdlib $(CFLAGS) -o $@ factorial.o -lc -lgcc -Wl,--cref,-M,-Map=$@.map
+
+rand : rand.o
+	@echo "Linking $@"
+	$(CC) -nostdlib $(CFLAGS) -o $@ rand.o -lc -lgcc -Wl,--cref,-M,-Map=$@.map
