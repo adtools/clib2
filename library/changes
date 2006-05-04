@@ -1,3 +1,9 @@
+- Added the global variable __expand_wildcard_args which can be used
+  to disable wildcard pattern expansion of command line parameters when
+  linked against "libunix.a". Note that this has no effect on the "regular"
+  libc.a behaviour.
+
+
 c.lib 1.200 (17.4.2006)
 
 - The default break signal mask (SIGBREAKF_CTRL_C) is no longer

@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.19 2006-04-05 08:39:46 obarthel Exp $
+ * $Id: dos.h,v 1.20 2006-05-04 08:01:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -467,6 +467,25 @@ extern BOOL __can_share_socket_library_base;
  * be used to change the corresponding variables:
  */
 extern BOOL __thread_safe_errno_h_errno;
+
+/****************************************************************************/
+
+/*
+ * If you link against libunix.a then the default command line processing
+ * function will attempt to expand every single wildcard parameter on the
+ * command line into a series of file and directories names matching the
+ * wildcards. The idea is to provide functionality which on Unix the
+ * shell is responsible for. On AmigaDOS the shell commands need to perform
+ * the expansion. However, if you are mixing AmigaDOS commands which expand
+ * wildcard patterns with a shell that already does the job, you may run into
+ * big trouble. To disable the expansion, declare the global variable named
+ * "__expand_wildcard_args" in your code and have it set to FALSE. Because
+ * the program startup code checks this variable early on, its value must
+ * be available at that time, i.e. you cannot just set it differently in
+ * your code lateron because by that time the startup code will have already
+ * checked it.
+ */
+extern BOOL __expand_wildcard_args;
 
 /****************************************************************************/
 
