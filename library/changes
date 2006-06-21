@@ -1,3 +1,7 @@
+- The <sys/ioctl.h> header file now includes both <sys/select.h> and
+  <sys/filio.h> for better compatibility with the TCP/IP stack header
+  files.
+
 - Added the global variable __expand_wildcard_args which can be used
   to disable wildcard pattern expansion of command line parameters when
   linked against "libunix.a". Note that this has no effect on the "regular"

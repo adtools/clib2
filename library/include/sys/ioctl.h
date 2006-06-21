@@ -1,5 +1,5 @@
 /*
- * $Id: ioctl.h,v 1.4 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: ioctl.h,v 1.5 2006-06-21 15:53:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,6 +44,16 @@
 /****************************************************************************/
 
 /* The following is not part of the ISO 'C' (1994) standard. */
+
+/****************************************************************************/
+
+#ifndef _SYS_SELECT_H
+#include <sys/select.h>
+#endif /* _SYS_SELECT_H */
+
+#ifndef _SYS_FILIO_H
+#include <sys/filio.h>
+#endif /* _SYS_FILIO_H */
 
 /****************************************************************************/
 
