@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.4 2006-01-08 12:06:14 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.5 2006-06-22 09:30:25 obarthel Exp $
 #
 # :ts=4
 #
@@ -40,6 +40,8 @@ CPU =
 OPTIONS = -DNDEBUG -mcrt=clib2-ts
 OPTIMIZE = -O
 DEBUG = -ggdb
+CRTBEGIN = /usr/local/amiga/ppc-amigaos/clib2/lib/crtbegin.o
+CRTEND = /usr/local/amiga/ppc-amigaos/clib2/lib/crtend.o
 
 ###############################################################################
 
@@ -52,7 +54,7 @@ OBJS = \
 
 ###############################################################################
 
-LIBS = -lc -lamiga
+LIBS = $(CRTBEGIN) -lc -lamiga $(CRTEND)
 
 ###############################################################################
 
