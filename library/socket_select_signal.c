@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select_signal.c,v 1.2 2006-04-05 08:39:45 obarthel Exp $
+ * $Id: socket_select_signal.c,v 1.3 2006-06-22 09:02:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -938,7 +938,7 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 	else
 	{
 		/* Wait for file input? */
-		if((total_file_fd > 0) && (timeout == NULL || timeout->tv_secs > 0 || timeout->tv_micro > 0))
+		if(timeout == NULL || timeout->tv_secs > 0 || timeout->tv_micro > 0)
 		{
 			struct DateStamp stop_when;
 			BOOL got_input;
@@ -1090,7 +1090,7 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 		}
 		else
 		{
-			SHOWMSG("no files to worry about");
+			SHOWMSG("no files and no timeout to worry about");
 
 			if(signal_mask != 0)
 				(*signal_mask_ptr) = signal_mask & SetSignal(0,signal_mask & ~__break_signal_mask);

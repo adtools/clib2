@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.97 2006-05-04 08:01:46 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.98 2006-06-22 09:02:44 obarthel Exp $
 #
 # :ts=8
 #
@@ -160,7 +160,6 @@ CFLAGS = $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) $(CODE_TYPE) $(INCLUDES)
 C_LIB = \
 	c.lib_rev.o \
 	crtbegin.o \
-	crtend.o \
 	ctype_isalnum.o \
 	ctype_isalpha.o \
 	ctype_isascii.o \
@@ -496,7 +495,8 @@ C_LIB = \
 	unistd_unlink.o \
 	unistd_usleep.o \
 	utime_utime.o \
-	utsname_uname.o
+	utsname_uname.o \
+	crtend.o
 
 # All objects files which make up libunix.a
 UNIX_LIB = \
