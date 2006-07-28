@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.85 2006-05-04 08:01:45 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.86 2006-07-28 13:19:11 obarthel Exp $
 #
 # :ts=8
 #
@@ -515,6 +515,7 @@ UNIX_LIB = \
 	termios_tcgetattr.o \
 	termios_tcsendbreak.o \
 	termios_tcsetattr.o \
+	timeb_ftime.o \
 	uio_readv.o \
 	uio_writev.o \
 	unistd_access.o \
@@ -606,6 +607,10 @@ MATH_LIB = \
 	math_floorf.o \
 	math_fma.o \
 	math_fmaf.o \
+	math_fmax.o \
+	math_fmaxf.o \
+	math_fmin.o \
+	math_fminf.o \
 	math_fmod.o \
 	math_fmodf.o \
 	math_fpclassify.o \

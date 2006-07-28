@@ -1,5 +1,5 @@
 /*
- * $Id: stat.h,v 1.9 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: stat.h,v 1.10 2006-07-28 13:19:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,12 +106,13 @@ extern "C" {
 
 /****************************************************************************/
 
-#define	S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)	/* directory */
-#define	S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)	/* char special */
-#define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)	/* regular file */
-#define	S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)	/* symbolic link */
-#define	S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)	/* fifo */
-#define	S_ISBLK(m)	(0)							/* block special */
+#define	S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)		/* directory */
+#define	S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)		/* char special */
+#define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)		/* regular file */
+#define	S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)		/* symbolic link */
+#define	S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)		/* fifo */
+#define	S_ISBLK(m)	(0)								/* block special */
+#define S_ISSOCK(m)	(((m) & S_IFSOCK) == S_IFSOCK)	/* socket */
 
 /****************************************************************************/
 

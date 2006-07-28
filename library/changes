@@ -1,3 +1,11 @@
+- Added ftime(), as contributed by Peter Bengtsson. Thank you very much!
+
+- Added the missing S_ISSOCKET() macro to <sys/stat.h>. Note that this
+  is not actually a POSIX feature.
+
+- Added fmin(), fminf(), fmax() and fmaxf() to the build makefiles.
+  Somehow I must have forgotten about them :-(
+
 - select() and waitselect() can now be called without any file descriptor
   sets to work with, as some software does which uses select() in place
   of sleep().
