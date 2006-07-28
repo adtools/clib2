@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.18 2006-01-29 09:17:00 obarthel Exp $
+ * $Id: unistd.h,v 1.19 2006-07-28 14:37:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -164,6 +164,42 @@ extern pid_t setsid(void);
 extern int setuid(uid_t uid);
 
 #endif /* __NO_NET_API */
+
+/****************************************************************************/
+
+/* The following is for use with pathconf()/fpathconf() */
+#define	_PC_LINK_MAX				0
+#define	_PC_MAX_CANON				1
+#define	_PC_MAX_INPUT				2
+#define	_PC_NAME_MAX				3
+#define	_PC_PATH_MAX				4
+#define	_PC_PIPE_BUF				5
+#define	_PC_CHOWN_RESTRICTED		6
+#define	_PC_NO_TRUNC				7
+#define	_PC_VDISABLE				8
+#define	_PC_SYNC_IO					9
+#define	_PC_ASYNC_IO				10
+#define	_PC_PRIO_IO					11
+#define	_PC_SOCK_MAXBUF				12
+#define	_PC_FILESIZEBITS			13
+#if 0
+#define	_PC_REC_INCR_XFER_SIZE		14
+#define	_PC_REC_MAX_XFER_SIZE		15
+#define	_PC_REC_MIN_XFER_SIZE		16
+#define	_PC_REC_XFER_ALIGN			17
+#define	_PC_ALLOC_SIZE_MIN			18
+#endif
+#define	_PC_SYMLINK_MAX				19
+#define	_PC_XATTR_EXISTS			20
+#define	_PC_XATTR_ENABLED			21
+
+/* Amiga Specific */
+#define	_PC_DOSTYPE					300
+
+/****************************************************************************/
+
+extern long pathconf(const char *path,int name);
+extern long fpathconf(int file_descriptor,int name);
 
 /****************************************************************************/
 

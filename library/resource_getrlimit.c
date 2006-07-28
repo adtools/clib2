@@ -1,5 +1,5 @@
 /*
- * $Id: resource_getrlimit.c,v 1.1 2006-07-28 13:36:16 obarthel Exp $
+ * $Id: resource_getrlimit.c,v 1.2 2006-07-28 14:37:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,6 +38,10 @@
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 

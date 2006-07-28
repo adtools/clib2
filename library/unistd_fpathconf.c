@@ -1,5 +1,5 @@
 /*
- * $Id: timeb_ftime.c,v 1.2 2006-07-28 14:37:27 obarthel Exp $
+ * $Id: unistd_fpathconf.c,v 1.1 2006-07-28 14:37:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,14 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/timeb.h>
-#include <sys/time.h>
+#ifndef _STDLIB_NULL_POINTER_CHECK_H
+#include "stdlib_null_pointer_check.h"
+#endif /* _STDLIB_NULL_POINTER_CHECK_H */
 
 /****************************************************************************/
 
-#ifndef _STDLIB_HEADERS_H
-#include "stdlib_headers.h"
-#endif /* _STDLIB_HEADERS_H */
+#ifndef _UNISTD_HEADERS_H
+#include "unistd_headers.h"
+#endif /* _UNISTD_HEADERS_H */
 
 /****************************************************************************/
 
@@ -46,33 +47,28 @@
 
 /****************************************************************************/
 
-int
-ftime(struct timeb *tb)
+long
+fpathconf(int file_descriptor,int name)
 {
-	struct timeval tv;
-	struct timezone tz;
-	int retval = -1;
+	struct FileHandle *fh;
+	long ret = -1;
+	struct fd *fd;
 
 	ENTER();
 
-	if(tb == NULL)
+	fd = __get_file_descriptor(file_descriptor);
+	if(fd == NULL)
 	{
-		__set_errno(EFAULT);
+		__set_errno(EINVAL);
 		goto out;
 	}
 
-	if(gettimeofday(&tv,&tz) != 0)
-		goto out;
+	fh = BADDR(fd->fd_DefaultFile);
 
-	tb->time		= tv.tv_sec;
-	tb->millitm		= tv.tv_usec / 1000;
-	tb->timezone	= tz.tz_minuteswest;
-	tb->dstflag		= tz.tz_dsttime;
-
-	retval = 0;
+	ret = __pathconf(fh->fh_Type,name); /* Ok if fh->fh_Type==NULL */
 
  out:
 
-	RETURN(retval);
-	return(retval);
+	RETURN(ret);
+	return(ret);
 }

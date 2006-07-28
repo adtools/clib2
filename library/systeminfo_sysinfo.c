@@ -1,5 +1,5 @@
 /*
- * $Id: systeminfo_sysinfo.c,v 1.1 2006-07-28 14:02:31 obarthel Exp $
+ * $Id: systeminfo_sysinfo.c,v 1.2 2006-07-28 14:37:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -33,6 +33,10 @@
 
 #include <sys/systeminfo.h>
 #include <sys/utsname.h>
+
+/****************************************************************************/
+
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_headers.h,v 1.10 2006-04-05 06:43:56 obarthel Exp $
+ * $Id: unistd_headers.h,v 1.11 2006-07-28 14:37:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -109,6 +109,10 @@ extern int __strip_double_slash(char * file_name,int len);
 /****************************************************************************/
 
 extern unsigned int __time_delay(unsigned long seconds,unsigned long microseconds);
+
+/****************************************************************************/
+
+extern long __pathconf(struct MsgPort *port,int name);
 
 /****************************************************************************/
 

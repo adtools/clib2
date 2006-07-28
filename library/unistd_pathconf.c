@@ -1,5 +1,5 @@
 /*
- * $Id: timeb_ftime.c,v 1.2 2006-07-28 14:37:27 obarthel Exp $
+ * $Id: unistd_pathconf.c,v 1.1 2006-07-28 14:37:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,14 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/timeb.h>
-#include <sys/time.h>
+#ifndef _STDLIB_NULL_POINTER_CHECK_H
+#include "stdlib_null_pointer_check.h"
+#endif /* _STDLIB_NULL_POINTER_CHECK_H */
 
 /****************************************************************************/
 
-#ifndef _STDLIB_HEADERS_H
-#include "stdlib_headers.h"
-#endif /* _STDLIB_HEADERS_H */
+#ifndef _UNISTD_HEADERS_H
+#include "unistd_headers.h"
+#endif /* _UNISTD_HEADERS_H */
 
 /****************************************************************************/
 
@@ -46,33 +47,75 @@
 
 /****************************************************************************/
 
-int
-ftime(struct timeb *tb)
+long
+pathconf(const char *path,int name)
 {
-	struct timeval tv;
-	struct timezone tz;
-	int retval = -1;
+	struct name_translation_info path_name_nti;
+	struct DevProc * dvp = NULL;
+	BOOL ignore_port = FALSE;
+	long ret = -1;
 
 	ENTER();
 
-	if(tb == NULL)
+	SHOWSTRING(path);
+	SHOWVALUE(name);
+
+	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		__set_errno(EFAULT);
-		goto out;
+		if(path == NULL)
+		{
+			SHOWMSG("invalid path name");
+
+			__set_errno(EFAULT);
+			goto out;
+		}
+	}
+	#endif /* CHECK_FOR_NULL_POINTERS */
+
+	#if defined(UNIX_PATH_SEMANTICS)
+	{
+		if(__unix_path_semantics)
+		{
+			if(path[0] == '\0')
+			{
+				SHOWMSG("Empty name");
+
+				__set_errno(ENOENT);
+				goto out;
+			}
+
+			if(__translate_unix_to_amiga_path_name(&path,&path_name_nti) != 0)
+				goto out;
+
+			if(path_name_nti.is_root)
+			{
+				/* Should we disallow / or use OFS as the lowest common denominator? */
+				ignore_port = TRUE;
+			}
+		}
+	}
+	#endif /* UNIX_PATH_SEMANTICS */
+
+	if(!ignore_port)
+	{
+		dvp = GetDeviceProc((STRPTR)path,NULL);
+		if(dvp == NULL)
+		{
+			__set_errno(__translate_access_io_error_to_errno(IoErr()));
+			goto out;
+		}
 	}
 
-	if(gettimeofday(&tv,&tz) != 0)
-		goto out;
+	ret = __pathconf((dvp != NULL) ? dvp->dvp_Port : NULL,name);
 
-	tb->time		= tv.tv_sec;
-	tb->millitm		= tv.tv_usec / 1000;
-	tb->timezone	= tz.tz_minuteswest;
-	tb->dstflag		= tz.tz_dsttime;
+out:
 
-	retval = 0;
+	if(dvp != NULL)
+	{
+		FreeDeviceProc(dvp);
+		dvp = NULL;
+	}
 
- out:
-
-	RETURN(retval);
-	return(retval);
+	RETURN(ret);
+	return(ret);
 }
