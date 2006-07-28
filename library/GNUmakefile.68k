@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.87 2006-07-28 13:36:16 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.88 2006-07-28 14:02:30 obarthel Exp $
 #
 # :ts=8
 #
@@ -506,6 +506,7 @@ UNIX_LIB = \
 	stdlib_realloc.o \
 	stdlib_resetmemstats.o \
 	stdlib_system.o \
+	systeminfo_sysinfo.o \
 	termios_cfgetispeed.o \
 	termios_cfgetospeed.o \
 	termios_cfmakeraw.o \
@@ -797,6 +798,7 @@ NET_LIB = \
 	socket_get_h_errno.o \
 	socket_set_h_errno.o \
 	stat_umask.o \
+	systeminfo_sysinfo.o \
 	usergroup_crypt.o \
 	usergroup_data.o \
 	usergroup_endgrent.o \

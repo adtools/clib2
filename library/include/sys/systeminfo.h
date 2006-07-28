@@ -1,5 +1,5 @@
 /*
- * $Id: resource.h,v 1.2 2006-07-28 14:02:32 obarthel Exp $
+ * $Id: systeminfo.h,v 1.1 2006-07-28 14:02:32 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,14 +38,12 @@
  *****************************************************************************
  */
 
-#ifndef	_SYS_RESOURCE_H
-#define	_SYS_RESOURCE_H
+#ifndef _SYS_SYSTEMINFO_H
+#define _SYS_SYSTEMINFO_H
 
 /****************************************************************************/
 
-#ifndef _SYS_TYPES_H
-#include <sys/types.h>	/* For the definition of rlim_t */
-#endif /* _SYS_TYPES_H */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
@@ -55,38 +53,25 @@ extern "C" {
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
+/* Numbers are picked to be the same as for Solaris */
+
+#define	SI_SYSNAME			1
+#define	SI_HOSTNAME			2
+#define	SI_RELEASE			3
+#define	SI_VERSION			4
+#define	SI_MACHINE			5
+#define	SI_ARCHITECTURE		6
+#define	SI_HW_SERIAL		7
+#define	SI_HW_PROVIDER		8
+
+#define	SI_SET_HOSTNAME		258
+
+#define	SI_PLATFORM			513
+#define	SI_ISALIST			514
 
 /****************************************************************************/
 
-#define	RLIM_INFINITY	0xffffffffUL
-#define	RLIM_SAVED_MAX	(RLIM_INFINITY-1)
-#define	RLIM_SAVED_CUR	(RLIM_INFINITY-2)
-
-/****************************************************************************/
-
-#define	RLIM_VMEM	1
-#define	RLIM_AS		RLIM_VMEM
-#define	RLIM_CORE	2
-#define	RLIM_CPU	3
-#define	RLIM_DATA	4
-#define	RLIM_FSIZE	5
-#define	RLIM_NOFILE	6
-#define	RLIM_OFILE	RLIMIT_NOFILE
-#define	RLIM_STACK	7
-
-/****************************************************************************/
-
-struct rlimit
-{
-	rlim_t	rlim_cur;
-	rlim_t	rlim_max;
-};
-
-/****************************************************************************/
-
-extern int getrlimit(int resource,struct rlimit *rlp);
-extern int setrlimit(int resource,const struct rlimit *rlp);
+extern long sysinfo(int cmd,char *buf,long buflen);
 
 /****************************************************************************/
 
@@ -96,4 +81,4 @@ extern int setrlimit(int resource,const struct rlimit *rlp);
 
 /****************************************************************************/
 
-#endif /* _SYS_RESOURCE_H */
+#endif /* _SYS_SYSTEMINFO_H */

@@ -1,4 +1,4 @@
-- Added ftime(), ulimit(), getrlimit() and setrlimit() as contributed by
+- Added sysinfo(), ftime(), ulimit(), getrlimit() and setrlimit() as contributed by
   Peter Bengtsson. Thank you very much!
 
 - Added the missing S_ISSOCKET() macro to <sys/stat.h>. Note that this

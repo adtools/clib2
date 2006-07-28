@@ -1,5 +1,5 @@
 /*
- * $Id: timeb.h,v 1.3 2006-07-28 14:02:32 obarthel Exp $
+ * $Id: ulimit_ulimit.c,v 1.1 2006-07-28 14:02:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,54 +29,62 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- *****************************************************************************
- *
- * Documentation and source code for this library, and the most recent library
- * build are available from <http://sourceforge.net/projects/clib2>.
- *
- *****************************************************************************
  */
 
-#ifndef	_SYS_TIMEB_H
-#define	_SYS_TIMEB_H
+#include <ulimit.h>
 
 /****************************************************************************/
 
-#ifndef _TIME_H
-#include <time.h>	/* For the definition of time_t */
-#endif /* _TIME_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-struct timeb
+long
+ulimit(int cmd,long newlim)
 {
-	time_t			time;
-	unsigned short	millitm;
-	short			timezone;
-	short			dstflag;
-};
+	long ret = -1;
 
-/****************************************************************************/
+	switch(cmd)
+	{
+		case UL_GETFSIZE:
 
-extern int ftime(struct timeb *);
+			/* Maximum number of 512-byte blocks in a file. Largefile aware programs should not use ulimit() anyway. */
+			ret = (0x7fffffffL >> 9) - 1L; /* Max Filesize/512 - 1 */
+			break;
 
-/****************************************************************************/
+		case UL_GMEMLIM:	/* Which flags are appropriate for AvailMem()? */
 
-#ifdef __cplusplus
+			#if defined(__amigaos4__)
+			{
+				ret = AvailMem(MEMF_TOTAL|MEMF_VIRTUAL);
+			}
+			#else
+			{
+				ret = AvailMem(MEMF_ANY|MEMF_LARGEST);	/* Too conservative? */
+			}
+			#endif
+
+			break;
+
+		case UL_GDESLIM:	/* No limit, so we just return a reasonably large value. */
+
+			ret = 1024;
+			break;
+
+		case UL_SETFSIZE:	/* Not supported */
+
+			__set_errno(EPERM);
+			goto out;
+
+		default:
+
+			__set_errno(EINVAL);
+			goto out;
+	}
+
+ out:
+
+	return(ret);
 }
-#endif /* __cplusplus */
-
-/****************************************************************************/
-
-#endif /* _SYS_TIMEB_H */
