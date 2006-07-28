@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.86 2006-07-28 13:19:11 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.87 2006-07-28 13:36:16 obarthel Exp $
 #
 # :ts=8
 #
@@ -423,6 +423,7 @@ C_LIB = \
 	time_weekday.o \
 	uio_readv.o \
 	uio_writev.o \
+	ulimit_ulimit.o \
 	unistd_access.o \
 	unistd_chdir.o \
 	unistd_chdir_exit.o \
@@ -470,6 +471,8 @@ UNIX_LIB = \
 	getopt_getopt_long.o \
 	mount_convertinfo.o \
 	mount_statfs.o \
+	resource_getrlimit.o \
+	resource_setrlimit.o \
 	stat_chmod.o \
 	stat_fstat.o \
 	stat_lstat.o \

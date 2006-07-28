@@ -1,5 +1,5 @@
 /*
- * $Id: timeb.h,v 1.2 2006-07-28 13:36:17 obarthel Exp $
+ * $Id: resource_setrlimit.c,v 1.1 2006-07-28 13:36:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,42 +29,51 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- *****************************************************************************
- *
- * Documentation and source code for this library, and the most recent library
- * build are available from <http://sourceforge.net/projects/clib2>.
- *
- *****************************************************************************
  */
 
-#ifndef	_SYS_TIMEB_H
-#define	_SYS_TIMEB_H
+#include <sys/resource.h>
 
 /****************************************************************************/
 
-#ifndef _TIME_H
-#include <time.h>	/* For the definition of time_t */
-#endif /* _TIME_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-struct timeb
+int
+setrlimit(int resource,const struct rlimit *rlp)
 {
-	time_t			time;
-	unsigned short	millitm;
-	short			timezone;
-	short			dstflag;
-};
+	int ret = -1;
 
-/****************************************************************************/
+	if(rlp == NULL)
+	{
+		__set_errno(EFAULT);
+		goto out;
+	}
 
-extern int ftime(struct timeb *);
+	switch(resource)
+	{
+		case RLIM_VMEM:
+		case RLIM_CORE:
+		case RLIM_CPU:
+		case RLIM_DATA:
+		case RLIM_FSIZE:
+		case RLIM_NOFILE:
+		case RLIM_STACK:	/* TODO: See if it might be possible to set the stacksize here. */
 
-/****************************************************************************/
+			__set_errno(EPERM);
+			goto out;
 
-#endif /* _SYS_TIMEB_H */
+		default:
+
+			__set_errno(EINVAL);
+			goto out;
+	}
+
+	ret = 0;
+
+ out:
+
+	return(ret);
+}

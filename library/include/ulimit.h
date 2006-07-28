@@ -1,5 +1,5 @@
 /*
- * $Id: timeb.h,v 1.2 2006-07-28 13:36:17 obarthel Exp $
+ * $Id: ulimit.h,v 1.1 2006-07-28 13:36:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,33 +38,20 @@
  *****************************************************************************
  */
 
-#ifndef	_SYS_TIMEB_H
-#define	_SYS_TIMEB_H
+#ifndef	_ULIMIT_H
+#define	_ULIMIT_H
 
 /****************************************************************************/
 
-#ifndef _TIME_H
-#include <time.h>	/* For the definition of time_t */
-#endif /* _TIME_H */
+#define	UL_GETFSIZE	1
+#define	UL_SETFSIZE	2
+#define	UL_GMEMLIM	3
+#define	UL_GDESLIM	4
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
+extern long ulimit(int cmd,long newlimit);
 
 /****************************************************************************/
 
-struct timeb
-{
-	time_t			time;
-	unsigned short	millitm;
-	short			timezone;
-	short			dstflag;
-};
-
-/****************************************************************************/
-
-extern int ftime(struct timeb *);
-
-/****************************************************************************/
-
-#endif /* _SYS_TIMEB_H */
+#endif /* _ULIMIT_H */

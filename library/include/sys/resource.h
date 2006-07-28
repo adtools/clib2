@@ -1,5 +1,5 @@
 /*
- * $Id: timeb.h,v 1.2 2006-07-28 13:36:17 obarthel Exp $
+ * $Id: resource.h,v 1.1 2006-07-28 13:36:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -38,14 +38,14 @@
  *****************************************************************************
  */
 
-#ifndef	_SYS_TIMEB_H
-#define	_SYS_TIMEB_H
+#ifndef	_SYS_RESOURCE_H
+#define	_SYS_RESOURCE_H
 
 /****************************************************************************/
 
-#ifndef _TIME_H
-#include <time.h>	/* For the definition of time_t */
-#endif /* _TIME_H */
+#ifndef _SYS_TYPES_H
+#include <sys/types.h>	/* For the definition of rlim_t */
+#endif /* _SYS_TYPES_H */
 
 /****************************************************************************/
 
@@ -53,18 +53,35 @@
 
 /****************************************************************************/
 
-struct timeb
+#define	RLIM_INFINITY	0xffffffffUL
+#define	RLIM_SAVED_MAX	(RLIM_INFINITY-1)
+#define	RLIM_SAVED_CUR	(RLIM_INFINITY-2)
+
+/****************************************************************************/
+
+#define	RLIM_VMEM	1
+#define	RLIM_AS		RLIM_VMEM
+#define	RLIM_CORE	2
+#define	RLIM_CPU	3
+#define	RLIM_DATA	4
+#define	RLIM_FSIZE	5
+#define	RLIM_NOFILE	6
+#define	RLIM_OFILE	RLIMIT_NOFILE
+#define	RLIM_STACK	7
+
+/****************************************************************************/
+
+struct rlimit
 {
-	time_t			time;
-	unsigned short	millitm;
-	short			timezone;
-	short			dstflag;
+	rlim_t	rlim_cur;
+	rlim_t	rlim_max;
 };
 
 /****************************************************************************/
 
-extern int ftime(struct timeb *);
+extern int getrlimit(int resource,struct rlimit *rlp);
+extern int setrlimit(int resource,const struct rlimit *rlp);
 
 /****************************************************************************/
 
-#endif /* _SYS_TIMEB_H */
+#endif /* _SYS_RESOURCE_H */

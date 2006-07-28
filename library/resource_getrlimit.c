@@ -1,5 +1,5 @@
 /*
- * $Id: timeb.h,v 1.2 2006-07-28 13:36:17 obarthel Exp $
+ * $Id: resource_getrlimit.c,v 1.1 2006-07-28 13:36:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -29,42 +29,99 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- *****************************************************************************
- *
- * Documentation and source code for this library, and the most recent library
- * build are available from <http://sourceforge.net/projects/clib2>.
- *
- *****************************************************************************
  */
 
-#ifndef	_SYS_TIMEB_H
-#define	_SYS_TIMEB_H
+#include <sys/resource.h>
 
 /****************************************************************************/
 
-#ifndef _TIME_H
-#include <time.h>	/* For the definition of time_t */
-#endif /* _TIME_H */
+#ifndef _STDLIB_HEADERS_H
+#include "stdlib_headers.h"
+#endif /* _STDLIB_HEADERS_H */
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-struct timeb
+int
+getrlimit(int resource,struct rlimit *rlp)
 {
-	time_t			time;
-	unsigned short	millitm;
-	short			timezone;
-	short			dstflag;
-};
+	struct Task *self;
+	int ret = -1;
+	rlim_t l;
 
-/****************************************************************************/
+	if(rlp == NULL)
+	{
+		__set_errno(EFAULT);
+		goto out;
+	}
 
-extern int ftime(struct timeb *);
+	switch(resource)
+	{
+		case RLIM_VMEM:
 
-/****************************************************************************/
+			rlp->rlim_cur = RLIM_INFINITY;
+			rlp->rlim_max = RLIM_INFINITY;
+			break;
 
-#endif /* _SYS_TIMEB_H */
+		case RLIM_CORE:	/* Coredumps are not supported. */
+
+			rlp->rlim_cur = 0;
+			rlp->rlim_max = 0;
+			break;
+
+		case RLIM_CPU:
+
+			rlp->rlim_cur = RLIM_INFINITY;
+			rlp->rlim_max = RLIM_INFINITY;
+			break;
+
+		case RLIM_DATA:
+
+			#if defined(__amigaos4__)
+			{
+		 		l = AvailMem(MEMF_TOTAL|MEMF_VIRTUAL);
+		 	}
+		 	#else
+			{
+		 		l = AvailMem(MEMF_TOTAL);
+		 	}
+		 	#endif /* __amigaos4__ */
+
+			rlp->rlim_cur = l;
+			rlp->rlim_max = l;
+			break;
+
+		case RLIM_FSIZE:
+
+			rlp->rlim_cur = RLIM_INFINITY;	/* Use RLIM_INFINITY in case we have a 64-bit fs. pathconf() can be more precise. */
+			rlp->rlim_max = RLIM_INFINITY;
+			break;
+
+		case RLIM_NOFILE:
+
+			rlp->rlim_cur = RLIM_INFINITY;
+			rlp->rlim_max = RLIM_INFINITY;
+			break;
+
+		case RLIM_STACK:	/* Return current stacksize. */
+
+			self = FindTask(NULL);
+
+			l = (char *)self->tc_SPUpper - (char *)self->tc_SPLower;
+
+			rlp->rlim_cur = l;
+			rlp->rlim_max = RLIM_INFINITY;
+
+			break;
+
+		default:
+
+			__set_errno(EINVAL);
+			goto out;
+	}
+
+	ret = 0;
+
+ out:
+
+	return(ret);
+}
