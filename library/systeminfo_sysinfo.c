@@ -1,5 +1,5 @@
 /*
- * $Id: systeminfo_sysinfo.c,v 1.2 2006-07-28 14:37:27 obarthel Exp $
+ * $Id: systeminfo_sysinfo.c,v 1.3 2006-07-31 13:32:35 obarthel Exp $
  *
  * :ts=4
  *
@@ -137,6 +137,7 @@ sysinfo(int cmd,char *buf,long buflen)
 				   convention of specifying isa+ext from Solaris on SPARC machines. This way of implementing
 				   SI_ISALIST seemed like a good idea at the time. */
 				uint32 vecu;
+				char * s;
 
 				GetCPUInfoTags(GCIT_VectorUnit,&vecu,TAG_DONE);
 
