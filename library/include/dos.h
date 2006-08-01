@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.20 2006-05-04 08:01:47 obarthel Exp $
+ * $Id: dos.h,v 1.21 2006-08-01 17:01:14 obarthel Exp $
  *
  * :ts=4
  *
@@ -486,6 +486,11 @@ extern BOOL __thread_safe_errno_h_errno;
  * checked it.
  */
 extern BOOL __expand_wildcard_args;
+
+/****************************************************************************/
+
+extern char ** __default_path_delimiter;
+extern char ** __default_path;
 
 /****************************************************************************/
 

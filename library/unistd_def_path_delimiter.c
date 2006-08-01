@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execv.c,v 1.2 2006-08-01 17:01:13 obarthel Exp $
+ * $Id: unistd_def_path_delimiter.c,v 1.1 2006-08-01 17:01:13 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,16 +37,4 @@
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-int
-execv(const char *path,char * const argv[])
-{
-	int result;
-
-	result = execve(path,argv,NULL	/*environ*/);
-
-	return(result);
-}
+char ** __default_path_delimiter = ":";
