@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.1 2006-08-01 14:27:52 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.2 2006-08-01 19:01:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,24 +41,214 @@
 
 /****************************************************************************/
 
-/* Try to find a file, given its full path name. Since it's possible that
-   the path name may reference volumes, devices or assignments which are
-   not currently valid we'll turn off DOS requesters while looking. */
-STATIC int
-find_file_and_parent(
-	char *					path,
-	BPTR *					parent_lock_ptr,
-	struct FileInfoBlock *	fib)
+/* This gets handed around when trying to locate a program or a script
+   interpreter which knows how to do the job. */
+struct program_info
+{
+	struct Segment *	resident_command;	/* If not NULL, points to a valid
+											   resident command */
+	BPTR				home_dir;			/* If not ZERO refers to the directory
+											   in which the command to be executed
+											   can be found */
+	BPTR				segment_list;		/* If not ZERO refers to a command
+											   loaded into memory */
+	char *				program_name;		/* Points to the name of the command */
+	char *				interpreter_name;	/* If not NULL the name of the command
+											   interpreter to use */
+	char *				interpreter_args;	/* If not NULL these are additional
+											   arguments to be passedto the command
+											   interpreter */
+};
+
+/****************************************************************************/
+
+/* Try to find a resident command by name; returns a pointer to the Segment
+   data structure ready to use, or NULL if none could be found */
+static struct Segment *
+find_resident_command(const char * command_name)
+{
+	struct Segment * seg;
+
+	/* This must be done under Forbid() since dos.library does not have
+	   a more sophisticated arbitration method for this yet... */
+	Forbid();
+
+	seg = FindSegment((STRPTR)name,NULL,0);
+	if(seg != NULL)
+	{
+		/* Check if that's a disable command or something else. */
+		if((seg->seg_UC < 0) && ((seg->seg_UC > CMD_INTERNAL) || (seg->seg_UC <= CMD_DISABLED)))
+		{
+			seg = NULL;
+		}
+		else
+		{
+			/* Unless it's a built-in command, mark it as having another user. */
+			if(seg->seg_UC >= 0)
+				seg->seg_UC++;
+		}
+	}
+
+	Permit();
+
+	return(seg);
+}
+
+/****************************************************************************/
+
+/* Try to read the first line of a script file */
+static int
+get_first_script_line(const char * path,char ** line_ptr)
+{
+	BPTR script_file;
+	int result = -1;
+	char * script_line = NULL;
+	size_t script_line_size = 0;
+	LONG c;
+
+	(*line_ptr) = NULL;
+
+	script_file = Open(path,MODE_OLDFILE);
+	if(script_file == ZERO)
+	{
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	/* Make file access a little more robust. */
+	SetVBuf(script_file,NULL,BUF_LINE,1024);
+
+	while((c = FGetC(script_file)) != -1)
+	{
+		/* Still enough room in the buffer? We always reserve
+		   enough memory for the next character and a NUL
+		   to terminate the string with. */
+		if(script_line_length + 2 > script_line_size)
+		{
+			char * new_script_line;
+
+			/* Always reserve a little more memory than needed,
+			   and one extra byte to allow us to to NUL-terminate
+			   the string. */
+			new_script_line = realloc(script_line,script_line_length + 10);
+			if(new_script_line == NULL)
+			{
+				__set_error(ENOMEM);
+				goto out;
+			}
+
+			script_line			= new_script_line;
+			script_line_size	= script_line_length + 10;
+		}
+
+		script_line[script_line_length++] = c;
+
+		/* Stop when we hit a line feed or unprintable character */
+		if(c == '\n' || c < ' ' || (c >= 128 && c < 160))
+			break;
+	}
+
+	/* Check for read error */
+	if(c == -1 && IoErr() != 0)
+	{
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
+	}
+
+	/* Provide for NUL-termination. */
+	if(script_line_size > 0)
+	{
+		/* Also strip all trailing blank spaces; that includes
+		   line feed and carriage return characters. */
+		while(script_line_length > 0 && isspace(script_line[script_line_length-1]))
+			script_line_length--;
+
+		script_line[script_line_length] = '\0';
+	}
+
+	(*line_ptr) = script_line;
+
+	result = 0;
+
+ out:
+
+	if(script_file != ZERO)
+		Close(script_file);
+
+	if(script_line != NULL)
+		free(script_line);
+
+	return(result);
+}
+
+/****************************************************************************/
+
+/* Release all the resources allocate for the program information, as produced
+   by the find_command() function */
+static void
+free_program_info(struct program_info * pi)
+{
+	if(pi != NULL)
+	{
+		if(pi->resident_command != NULL)
+		{
+			Forbid();
+
+			if(pi->resident_command->seg_UC > 0)
+				pi->resident_command->seg_UC--;
+
+			Permit();
+		}
+
+		if(pi->interpreter_name != NULL)
+			free(pi->interpreter_name);
+
+		if(pi->interpreter_args != NULL)
+			free(pi->interpreter_args);
+
+		if(pi->program_name != NULL)
+			free(pi->program_name);
+
+		if(pi->home_dir != ZERO)
+			UnLock(pi->home_dir);
+
+		if(pi->segment_list)
+			UnLoadSeg(pi->segment_list);
+
+		free(pi);
+	}
+}
+
+/****************************************************************************/
+
+/* Try to find a command by name; if the name does not include any path
+   information, try the dos.library resident command list */
+static int
+find_command(char * path,struct program_info ** result_ptr)
 {
 	struct name_translation_info nti;
+	char * script_line = NULL;
+	struct program_info * pi;
 	APTR old_window_ptr;
-	BPTR file_lock = ZERO;
 	int result = -1;
+	BPTR file_lock;
+	BPTR old_dir;
 	int error;
 
-	(*parent_lock_ptr) = ZERO;
+	(*result_ptr) = NULL;
 
+	/* We don't want to show any dos.library requesters while we
+	   are looking */
 	old_window_ptr = __set_process_window((APTR)-1);
+
+	pi = malloc(sizeof(*pi));
+	if(pi == NULL)
+	{
+		__set_errno(ENOMEM);
+		goto out;
+	}
+
+	memset(pi,0,sizeof(*pi));
 
 	error = __translate_unix_to_amiga_path_name(&path,&nti);
 	if(error != 0)
@@ -67,64 +257,187 @@ find_file_and_parent(
 		goto out;
 	}
 
-	/* ZZZ we ought to walk down the assignment list all on our
-	   own rather than trusting the Lock() to find the right
-	   kind of file */
-	file_lock = Lock(path,SHARED_LOCK);
-	if(file_lock == ZERO)
+	/* No relative or absolute path given? */
+	if(FilePart(path) == (STRPTR)path)
 	{
-		__set_errno(__translate_io_error_to_errno(IoErr()));
-		goto out;
+		/* Try to find the command on the resident list */
+		pi->resident_command = find_resident_command(path);
+		if(pi->resident_command == NULL)
+		{
+			__set_errno(ENOENT);
+			goto out;
+		}
+	}
+	else
+	{
+		struct MsgPort * file_system;
+		struct DevProc * dvp = NULL;
+		BOOL done = FALSE;
+		LONG io_err;
+		int error = 0;
+
+		/* Now for the simple stuff. Find a command or command script file
+		   under the path name given. Handle multi-volume assignments, such as
+		   referring to "C:" gracefully */
+		file_system = GetFileSysTask();
+
+		do
+		{
+			dvp = GetDeviceProc(path,dvp);
+			if(dvp != NULL)
+			{
+				SetFileSysTask(dvp->dvp_Port);
+
+				old_dir = CurrentDir(dvp->dvp_Lock);
+
+				/* First try: let's assume that that the file is
+				   executable */
+				pi->segment_list = LoadSeg(path);
+				if(pi->segment_list != ZERO)
+				{
+					/* Remember where that file came from so that
+					   "PROGDIR:" will work */
+					pi->home_dir = DupLock(dvp->dvp_Lock);
+					if(pi->home_dir != ZERO)
+					{
+						/* Also remember the name of the command */
+						pi->program_name = strdup(path);
+						if(pi->program_name != NULL)
+							done = TRUE;
+						else
+							error = ENOMEM;
+					}
+					else
+					{
+						error = __translate_io_error_to_errno(IoErr());
+					}
+				}
+
+				io_err = IoErr();
+
+				/* If that didn't work and we might be dealing with a script
+				   file, have a closer look at it. */
+				if(error == 0 && !done && (io_err == ERROR_OBJECT_NOT_FOUND || io_err == ERROR_OBJECT_WRONG_TYPE || io_err == ERROR_BAD_HUNK))
+				{
+					/* Could that be an ARexx or shell script? */
+					if(get_first_script_line(path,&script_line) == 0)
+					{
+						if(strncmp(script_line,"/*",2) == SAME)
+						{
+							/* That's an ARexx script */
+							pi->interpreter_name = strdup("RX");
+							if(pi->interpreter_name != NULL)
+								done = TRUE;
+							else
+								error = ENOMEM;
+						}
+						else if (strncmp(script_line,"#!",2) == SAME)
+						{
+							char * name;
+							char * args;
+
+							/* That's probably a shell script */
+							name = &script_line[2];
+							while((*name) != '\0' && isspace(*name))
+								name++;
+
+							/* Do we have a command name? */
+							if((*name) != '\0')
+							{
+								/* Find out if there are any script parameters */
+								args = name;
+								while((*args) != '\0' && !isspace(*args))
+									args++;
+
+								if((*args) != '\0')
+								{
+									(*args++) = '\0';
+
+									while((*args) != '\0' && isspace(*args))
+										args++;
+								}
+
+								/* Remember the parameters, if any */
+								if((*args) != '\0')
+								{
+									pi->interpreter_args = strdup(args);
+									if(pi->interpreter_args == NULL)
+										error = ENOMEM;
+								}
+
+								/* And remember the interpreter name. */
+								if(error == 0)
+								{
+									pi->interpreter_name = strdup(name);
+									if(pi->interpreter_name != NULL)
+										done = TRUE;
+									else
+										error = ENOMEM;
+								}
+							}
+						}
+
+						free(script_line);
+						script_line = NULL;
+					}
+
+					/* If that still didn't work, check if the file has
+					   the script bit set */
+					if(error == 0 && !done)
+					{
+						BPTR file_lock;
+
+						file_lock = Lock(path,SHARED_LOCK);
+						if(file_lock != ZERO)
+						{
+							D_S(struct FileInfoBlock,fib);
+
+							if(Examine(file_lock,fib))
+							{
+								if(fib->fib_Protection & FIBF_SCRIPT)
+								{
+									/* If it's an AmigaDOS script, remember
+									   to run it through the Execute command */
+									pi->interpreter_name = strdup("Execute");
+									if(pi->interpreter_name != NULL)
+										done = TRUE;
+									else
+										error = ENOMEM;
+								}
+							}
+							else
+							{
+								error = __translate_io_error_to_errno(IoErr());
+							}
+
+							UnLock(file_lock);
+						}
+					}
+				}
+
+				CurrentDir(old_dir);
+			}
+		}
+		while(!done && error == 0 && dvp != NULL && (dvp->dvp_Flags & DVPF_ASSIGN));
+
+		SetFileSysTask(file_system);
+
+		if(error != 0)
+		{
+			__set_errno(error);
+			goto out;
+		}
 	}
 
-	if(CANNOT Examine(file_lock,fib))
-	{
-		__set_errno(__translate_io_error_to_errno(IoErr()));
-		goto out;
-	}
-
-	/* This must be a file. */
-	if(fib->fib_DirEntryType >= 0)
-	{
-		__set_errno(EISDIR);
-		goto out;
-	}
-
-	/* And it should be executable. */
-	if(fib->fib_Protection & FIBF_EXECUTE)
-	{
-		__set_errno(ENOEXEC);
-		goto out;
-	}
-
-	(*parent_lock_ptr) = ParentDir(file_lock);
-	if((*parent_lock_ptr) == ZERO)
-	{
-		LONG io_error;
-
-		io_error = IoErr();
-		if(io_error == 0)
-			io_error = ERROR_OBJECT_WRONG_TYPE;
-
-		__set_errno(__translate_io_error_to_errno(io_err));
-		goto out;
-	}
-
-	result = 0;
+	(*result_ptr) = pi;
 
  out:
 
-	if(file_lock != ZERO)
-		UnLock(file_lock);
+	if(script_line != NULL)
+		free(script_line);
 
-	if(result != 0)
-	{
-		if((*parent_lock_ptr) != ZERO)
-		{
-			UnLock(*parent_lock_ptr);
-			(*parent_lock_ptr) = ZERO;
-		}
-	}
+	if(pi != NULL)
+		free_program_info(pi);
 
 	__set_process_window(old_window_ptr);
 
@@ -133,6 +446,9 @@ find_file_and_parent(
 
 /****************************************************************************/
 
+/* Scan the string, looking for characters which need to be
+   escape with a '*' if that string is to be quoted and the
+   contents should remain in the same form */
 static size_t
 count_extra_escape_chars(const char * string,size_t len)
 {
@@ -152,8 +468,10 @@ count_extra_escape_chars(const char * string,size_t len)
 
 /****************************************************************************/
 
+/* Scan a string for characters which may require that the string
+   should be quoted */
 STATIC BOOL
-string_needs_escaping(const char * string,size_t len)
+string_needs_quoting(const char * string,size_t len)
 {
 	BOOL result = FALSE;
 	size_t i;
@@ -174,6 +492,10 @@ string_needs_escaping(const char * string,size_t len)
 
 /****************************************************************************/
 
+/* Figure out how many characters would go into a string composed of
+   individual arguments. This takes into account the lengths of
+   the individual argument strings, the separator characters, the
+   quote characters and any escape characters. */
 static size_t
 get_arg_string_length(char *const argv[])
 {
@@ -190,7 +512,7 @@ get_arg_string_length(char *const argv[])
 		{
 			if((*s) != '\"')
 			{
-				if(string_needs_escaping(s,len))
+				if(string_needs_quoting(s,len))
 					len += 1 + count_extra_escape_chars(s,len) + 1;
 			}
 
@@ -206,6 +528,10 @@ get_arg_string_length(char *const argv[])
 
 /****************************************************************************/
 
+/* Put together an argument string from a list of individual
+   components, quoting characters, escape characters and
+   separator characters. You're supposed to have enough memory
+   reserved for the whole string to fit */
 static void
 build_arg_string(char *const argv[],char * arg_string)
 {
@@ -225,7 +551,7 @@ build_arg_string(char *const argv[],char * arg_string)
 			else
 				(*arg_string++) = ' ';
 
-			if((*s) != '\"' && string_needs_escaping(s,len))
+			if((*s) != '\"' && string_needs_quoting(s,len))
 			{
 				(*arg_string++) = '\"';
 
@@ -254,265 +580,144 @@ int
 execve(const char *path, char *const argv[], char *const envp[])
 {
 	struct Process * this_process = (struct Process *)FindTask(NULL);
-	D_S(struct FileInfoBlock,fib);
 	char old_program_name[256]
-	BPTR parent_dir = ZERO;
-	BPTR old_dir;
-	BPTR script_file = ZERO;
 	int result = -1;
-	char * interpreter_line = NULL;
-	size_t interpreter_line_size = 0;
-	size_t interpreter_line_length = 0;
-	char * interpreter_name = NULL;
-	char * interpreter_args = NULL;
+	struct program_info * pi;
 	char * arg_string = NULL;
 	size_t arg_string_len = 0;
 	size_t parameter_string_len;
-	BPTR segment_list = ZERO;
 	BOOL success = FALSE;
 	int error;
 	LONG rc;
 	LONG c;
 
-	/* We begin by looking at the file or command to be run. */
-	if(find_file_and_parent(path,&parent_dir,fib) != 0)
+	/* We begin by trying to find the command to execute */
+	if(find_command((char *)path,&pi) != 0)
 		goto out;
 
-	/* Now open that file again so that we can check if it's
-	   a script file. */
-	old_dir = CurrentDir(parent_dir);
-	script_file = Open(fib->fib_FileName,MODE_OLDFILE);
-	CurrentDir(old_dir);
-
-	if(script_file == ZERO)
-	{
-		__set_errno(__translate_io_error_to_errno(IoErr()));
-		goto out;
-	}
-
-	SetVBuf(script_file,NULL,BUF_LINE,1024);
-
-	/* Check if the first line begins with "#!" and if so,
-	   read what else can be found in that line. */
-	c = FGetC(script_file);
-	if(c == '#')
-	{
-		c = FGetC(script_file);
-		if(c == '!')
-		{
-			/* Skip leading blank spaces. */
-			do
-			{
-				c = FGetC(script_file);
-				if(c == -1)
-					break;
-			}
-			while(isspace(c));
-
-			if(c != -1)
-			{
-				/* Read everything that follows. */
-				while((c = FGetC(script_file)) != -1)
-				{
-					/* Still enough room in the buffer? We always reserve
-					   enough memory for the next character and a NUL
-					   to terminate the string with. */
-					if(interpreter_line_length + 2 > interpreter_line_size)
-					{
-						char * new_interpreter_line;
-
-						/* Always reserve a little more memory than needed,
-						   and one extra byte to allow us to to NUL-terminate
-						   the string. */
-						new_interpreter_line = realloc(interpreter_line,interpreter_line_length + 10);
-						if(new_interpreter_line == NULL)
-						{
-							__set_error(ENOMEM);
-							goto out;
-						}
-
-						interpreter_line		= new_interpreter_line;
-						interpreter_line_size	= interpreter_line_length + 10;
-					}
-
-					interpreter_line[interpreter_line_length++] = c;
-					if(c == '\n')
-						break;
-				}
-
-				/* Provide for NUL-termination. */
-				if(interpreter_line_size > 0)
-				{
-					/* Also strip all trailing blank spaces; that includes
-					   line feed and carriage return characters. */
-					while(interpreter_line_length > 0 && isspace(interpreter_line[interpreter_line_length-1]))
-						interpreter_line_length--;
-
-					interpreter_line[interpreter_line_length] = '\0';
-				}
-			}
-		}
-	}
-
-	if(c == -1)
-	{
-		LONG io_error;
-
-		/* Check if we just hit the end of the file or whethere
-		   there was a genuine problem. */
-		io_error = IoErr();
-		if(io_error != 0)
-		{
-			__set_errno(__translate_io_error_to_errno(io_error));
-			goto out;
-		}
-	}
-
-	Close(script_file);
-	script_file = ZERO;
-
-	if(interpreter_line_size > 0)
-	{
-		interpreter_name = interpreter_line;
-
-		for(i = 0 ; i < interpreter_line_size ; i++)
-		{
-			if(isspace(interpreter_name[i]))
-			{
-				interpreter_name[i] = '\0';
-
-				interpreter_args = &interpreter_name[i+1];
-
-				while((*interpreter_args) != '\0' && isspace(*interpreter_args))
-					interpreter_args++;
-
-				if((*interpreter_args) == '\0')
-					interpreter_args = NULL;
-
-				break;
-			}
-		}
-	}
-
+	/* We'll need to know how much memory to reserve for the
+	   parameters anyway */
 	parameter_string_len = get_arg_string_length(argv);
 
-	if(interpreter_name != NULL)
+	/* Do we have to use a script interpreter? */
+	if(pi->interpreter_name != NULL)
 	{
-		struct name_translation_info nti;
-		size_t interpreter_args_len;
-		size_t len;
+		struct program_info * pi_interpreter;
 
-		UnLock(parent_dir);
-		parent_dir = ZERO;
-
-		if(find_file_and_parent(interpreter_name,&parent_dir,fib) != 0)
+		/* Now try to find the command corresponding to the
+		   interpreter given */
+		if(find_command(pi->interpreter_name,&pi_interpreter) != 0)
 			goto out;
 
-		error = __translate_unix_to_amiga_path_name(&path,&nti);
-		if(error != 0)
+		/* We only try to resolve the name once. If this is still
+		   not a command we can launch, we chicken out */
+		if(pi_interpreter->interpreter_name != NULL)
 		{
-			__set_errno(error);
+			free_program_info(pi_interpreter);
 			goto out;
 		}
 
-		if(interpreter_args != NULL)
-			interpreter_args_len = strlen(interpreter_args);
+		/* Just remember the arguments that need to be passed
+		   to the interpreter */
+		pi_interpreter->interpreter_args = pi->interpreter_args;
+		pi->interpreter_args = NULL;
+
+		free_program_info(pi);
+		pi = pi_interpreter;
+
+		/* Reserve as much memory as is required for the
+		   interpreter's parameters and the command's
+		   arguments */
+		if(pi->interpreter_args != NULL)
+		{
+			arg_string_len = strlen(pi->interpreter_args);
+
+			arg_string = malloc(arg_string_len + 1 + parameter_string_len + 1 + 1);
+			if(arg_string == NULL)
+			{
+				__set_errno(ENOMEM);
+				goto out;
+			}
+
+			memcpy(arg_string,pi->interpreter_args,arg_string_len);
+
+			if(parameter_string_len > 0)
+				arg_string[arg_string_len++] = ' ';
+		}
 		else
-			interpreter_args_len = 0;
-
-		len = strlen(path);
-
-		arg_string = malloc(interpreter_args_len + 1 + len + parameter_string_len + 1 + 1);
-		if(arg_string == NULL)
 		{
-			__set_errno(ENOMEM);
-			goto out;
+			arg_string = malloc(parameter_string_len + 1 + 1);
 		}
-
-		if(interpreter_args_len > 0)
-		{
-			memcpy(arg_string,interpreter_args,interpreter_args_len);
-			arg_string_len += interpreter_args_len;
-			
-			arg_string[arg_string_len++] = ' ';
-		}
-
-		memcpy(&arg_string[arg_string_len],path,len);
-		arg_string_len += len;
-
-		if(parameter_string_len > 0)
-			arg_string[arg_string_len++] = ' ';
 	}
 	else
 	{
 		arg_string = malloc(parameter_string_len + 1 + 1);
-		if(arg_string == NULL)
-		{
-			__set_errno(ENOMEM);
-			goto out;
-		}
 	}
 
+	/* If that didn't work, we quit here */
+	if(arg_string == NULL)
+	{
+		__set_errno(ENOMEM);
+		goto out;
+	}
+
+	/* Any command parameters to take care of? */
 	if(parameter_string_len > 0)
 	{
 		build_arg_string(argv,&arg_string[arg_string_len]);
 		arg_string_len += parameter_string_len;
 	}
 
+	/* Add the terminating new line character and a NUL,
+	   to be nice... */
 	arg_string[arg_string_len++]	= '\n';
 	arg_string[arg_string_len]		= '\0';
 
-	old_dir = CurrentDir(parent_dir);
-	segment_list = LoadSeg(fib->fib_FileName);
-	CurrentDir(old_dir);
-
-	if(segment_list == ZERO)
-	{
-		__set_errno(ENOENT);
-		goto out;
-	}
-
+	/* Change the shell's program name */
 	GetProgramName(old_program_name,sizeof(old_program_name));
-	SetProgramName(fib->fib_FileName);
+	SetProgramName(pi->program_name);
 
+	/* Change the command's home directory, so that "PROGDIR:"
+	   can be used */
 	old_dir = ThisProcess->pr_HomeDir;
-	ThisProcess->pr_HomeDir = parent_dir;
+	ThisProcess->pr_HomeDir = pi->home_dir;
 
+	/* Reset the break signal before the program starts */
 	SetSignal(0,SIGBREAKF_CTRL_C);
 
-	rc = RunCommand(segment_list,Cli()->cli_DefaultStack * sizeof(LONG),arg_string,arg_string_len);
+	/* Now try to run the program with the accumulated parameters */
+	rc = RunCommand((pi->resident_command != NULL) ? pi->resident_command->seg_Seg : pi->segment_list,Cli()->cli_DefaultStack * sizeof(LONG),arg_string,arg_string_len);
 
+	/* Restore the home directory */
 	ThisProcess->pr_HomeDir = old_dir;
 
+	/* Restore the program name */
+	SetProgramName(old_program_name);
+
+	/* Did we launch the program? */
 	if(rc == -1)
 	{
-		SetProgramName(old_program_name);
-
 		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
 	}
 
+	/* Looks good, doesn't it? */
 	success = TRUE;
 
  out:
 
+	/* Clean up... */
+	if(pi != NULL)
+		free_program_info(pi);
+
 	if(arg_string != NULL)
 		free(arg_string);
 
-	if(parent_dir != ZERO)
-		UnLock(parent_dir);
-
-	if(script_file != ZERO)
-		Close(script_file);
-
-	if(interpreter_line != NULL)
-		free(interpreter_line);
-
-	if(segment_list != ZERO)
-		UnLoadSeg(segment_list);
-
+	/* If things went well, we can actually quit now. */
 	if(success)
 		exit(result);
 
-	return(result);
+	/* This function only returns control to the caller
+	   if something went wrong... */
+	return(-1);
 }
