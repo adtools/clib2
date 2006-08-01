@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.21 2006-08-01 17:01:14 obarthel Exp $
+ * $Id: dos.h,v 1.22 2006-08-01 19:06:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -489,8 +489,13 @@ extern BOOL __expand_wildcard_args;
 
 /****************************************************************************/
 
-extern char ** __default_path_delimiter;
-extern char ** __default_path;
+/*
+ * Defaults for path delimiter (":") and the shell search path
+ * ("/gcc/bin:/SDK/C:/SDK/Local/C:/C:.") as used by the execvp()
+ * function.
+ */
+extern char * __default_path_delimiter;
+extern char * __default_path;
 
 /****************************************************************************/
 
