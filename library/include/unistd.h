@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.19 2006-07-28 14:37:28 obarthel Exp $
+ * $Id: unistd.h,v 1.20 2006-08-01 16:41:02 obarthel Exp $
  *
  * :ts=4
  *
@@ -122,7 +122,12 @@ extern int fdatasync(int file_descriptor);
 extern char *ttyname(int);
 extern int ttyname_r(int file_descriptor,char *name,size_t buflen);
 extern int ttyname_t(int,char *,size_t);
-
+extern int execl(const char *path,const char *arg0,...);
+extern int execle(const char *path,const char *arg0,...):
+extern int execlp(const char *path,const char *arg0,...);
+extern int execv(const char *path,char * const argv[]);
+extern int execve(const char *path,char *const argv[],char *const envp[]);
+extern int execvp(const char *command,char * const argv[]);
 extern int profil(unsigned short *buffer, size_t bufSize, size_t offset, unsigned int scale);
 
 /****************************************************************************/

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.102 2006-07-28 14:37:27 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.103 2006-08-01 16:41:01 obarthel Exp $
 #
 # :ts=8
 #
@@ -570,6 +570,12 @@ UNIX_LIB = \
 	unistd_chdir_exit.o \
 	unistd_chown.o \
 	unistd_common_pathconf.o \
+	unistd_execl.o \
+	unistd_execle.o \
+	unistd_execlp.o \
+	unistd_execv.o \
+	unistd_execve.o \
+	unistd_execvp.o \
 	unistd_fpathconf.o \
 	unistd_getcwd.o \
 	unistd_lchown.o \
