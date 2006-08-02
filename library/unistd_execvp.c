@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execvp.c,v 1.2 2006-08-01 17:01:13 obarthel Exp $
+ * $Id: unistd_execvp.c,v 1.3 2006-08-02 06:49:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -98,7 +98,6 @@ execvp(const char *command,char * const argv[])
 	char * command_buffer = NULL;
 	char * path_copy = NULL;
 	int result = -1;
-	char * bp;
 
 	/* Do not allow null command */
 	if(command == NULL || (*command) == '\0')

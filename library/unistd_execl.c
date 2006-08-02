@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execl.c,v 1.1 2006-08-01 14:27:52 obarthel Exp $
+ * $Id: unistd_execl.c,v 1.2 2006-08-02 06:49:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,12 +75,12 @@ execl(const char *path, const char *arg0, ...)
 	{
 		size_t i;
 
-		argv[0] = arg0;
+		argv[0] = (char *)arg0;
 
 		va_start(args,arg0);
 
 		for(i = 1 ; i < argc ; i++)
-			argv[i] = va_arg(args,const char *);
+			argv[i] = va_arg(args,char *);
 
 		va_end(args);
 	}

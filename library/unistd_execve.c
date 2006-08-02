@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.2 2006-08-01 19:01:17 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.3 2006-08-02 06:49:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,6 +34,10 @@
 #ifndef _UNISTD_HEADERS_H
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
+
+/****************************************************************************/
+
+#include <dos/stdio.h>
 
 /****************************************************************************/
 
@@ -73,7 +77,7 @@ find_resident_command(const char * command_name)
 	   a more sophisticated arbitration method for this yet... */
 	Forbid();
 
-	seg = FindSegment((STRPTR)name,NULL,0);
+	seg = FindSegment((STRPTR)command_name,NULL,0);
 	if(seg != NULL)
 	{
 		/* Check if that's a disable command or something else. */
@@ -104,11 +108,12 @@ get_first_script_line(const char * path,char ** line_ptr)
 	int result = -1;
 	char * script_line = NULL;
 	size_t script_line_size = 0;
+	size_t script_line_length = 0;
 	LONG c;
 
 	(*line_ptr) = NULL;
 
-	script_file = Open(path,MODE_OLDFILE);
+	script_file = Open((STRPTR)path,MODE_OLDFILE);
 	if(script_file == ZERO)
 	{
 		__set_errno(__translate_io_error_to_errno(IoErr()));
@@ -133,7 +138,7 @@ get_first_script_line(const char * path,char ** line_ptr)
 			new_script_line = realloc(script_line,script_line_length + 10);
 			if(new_script_line == NULL)
 			{
-				__set_error(ENOMEM);
+				__set_errno(ENOMEM);
 				goto out;
 			}
 
@@ -141,11 +146,11 @@ get_first_script_line(const char * path,char ** line_ptr)
 			script_line_size	= script_line_length + 10;
 		}
 
-		script_line[script_line_length++] = c;
-
 		/* Stop when we hit a line feed or unprintable character */
 		if(c == '\n' || c < ' ' || (c >= 128 && c < 160))
 			break;
+
+		script_line[script_line_length++] = c;
 	}
 
 	/* Check for read error */
@@ -224,14 +229,13 @@ free_program_info(struct program_info * pi)
 /* Try to find a command by name; if the name does not include any path
    information, try the dos.library resident command list */
 static int
-find_command(char * path,struct program_info ** result_ptr)
+find_command(const char * path,struct program_info ** result_ptr)
 {
 	struct name_translation_info nti;
 	char * script_line = NULL;
 	struct program_info * pi;
 	APTR old_window_ptr;
 	int result = -1;
-	BPTR file_lock;
 	BPTR old_dir;
 	int error;
 
@@ -258,7 +262,7 @@ find_command(char * path,struct program_info ** result_ptr)
 	}
 
 	/* No relative or absolute path given? */
-	if(FilePart(path) == (STRPTR)path)
+	if(FilePart((STRPTR)path) == (STRPTR)path)
 	{
 		/* Try to find the command on the resident list */
 		pi->resident_command = find_resident_command(path);
@@ -272,6 +276,7 @@ find_command(char * path,struct program_info ** result_ptr)
 	{
 		struct MsgPort * file_system;
 		struct DevProc * dvp = NULL;
+		STRPTR relative_path;
 		BOOL done = FALSE;
 		LONG io_err;
 		int error = 0;
@@ -281,18 +286,30 @@ find_command(char * path,struct program_info ** result_ptr)
 		   referring to "C:" gracefully */
 		file_system = GetFileSysTask();
 
+		/* Figure out which part of the path name includes the device
+		   or assignment portion, then skip it. This is because the
+		   loop below uses GetDeviceProc() to find the file or command,
+		   and it starts by changing to the directory the device, volume
+		   or assignment in the path name is bound to. */
+		relative_path = (STRPTR)strchr(path,':');
+		if(relative_path != NULL)
+			relative_path++;
+		else
+			relative_path = (STRPTR)path;
+
 		do
 		{
-			dvp = GetDeviceProc(path,dvp);
+			dvp = GetDeviceProc((STRPTR)path,dvp);
 			if(dvp != NULL)
 			{
+
 				SetFileSysTask(dvp->dvp_Port);
 
 				old_dir = CurrentDir(dvp->dvp_Lock);
 
 				/* First try: let's assume that that the file is
 				   executable */
-				pi->segment_list = LoadSeg(path);
+				pi->segment_list = LoadSeg(relative_path);
 				if(pi->segment_list != ZERO)
 				{
 					/* Remember where that file came from so that
@@ -320,7 +337,7 @@ find_command(char * path,struct program_info ** result_ptr)
 				if(error == 0 && !done && (io_err == ERROR_OBJECT_NOT_FOUND || io_err == ERROR_OBJECT_WRONG_TYPE || io_err == ERROR_BAD_HUNK))
 				{
 					/* Could that be an ARexx or shell script? */
-					if(get_first_script_line(path,&script_line) == 0)
+					if(get_first_script_line(relative_path,&script_line) == 0)
 					{
 						if(strncmp(script_line,"/*",2) == SAME)
 						{
@@ -387,7 +404,7 @@ find_command(char * path,struct program_info ** result_ptr)
 					{
 						BPTR file_lock;
 
-						file_lock = Lock(path,SHARED_LOCK);
+						file_lock = Lock(relative_path,SHARED_LOCK);
 						if(file_lock != ZERO)
 						{
 							D_S(struct FileInfoBlock,fib);
@@ -458,7 +475,7 @@ count_extra_escape_chars(const char * string,size_t len)
 
 	for(i = 0 ; i < len ; i++)
 	{
-		c = (*s++);
+		c = (*string++);
 		if(c == '\"' || c == '*' || c == '\n')
 			count++;
 	}
@@ -479,7 +496,7 @@ string_needs_quoting(const char * string,size_t len)
 
 	for(i = 0 ; i < len ; i++)
 	{
-		c = (*s++);
+		c = (*string++);
 		if(c == ' ' || ((unsigned char)c) == 0xA0 || c == '\t' || c == '\n' || c == '\"')
 		{
 			result = TRUE;
@@ -580,16 +597,15 @@ int
 execve(const char *path, char *const argv[], char *const envp[])
 {
 	struct Process * this_process = (struct Process *)FindTask(NULL);
-	char old_program_name[256]
+	char old_program_name[256];
 	int result = -1;
 	struct program_info * pi;
 	char * arg_string = NULL;
 	size_t arg_string_len = 0;
 	size_t parameter_string_len;
 	BOOL success = FALSE;
-	int error;
+	BPTR old_dir;
 	LONG rc;
-	LONG c;
 
 	/* We begin by trying to find the command to execute */
 	if(find_command((char *)path,&pi) != 0)
@@ -679,8 +695,8 @@ execve(const char *path, char *const argv[], char *const envp[])
 
 	/* Change the command's home directory, so that "PROGDIR:"
 	   can be used */
-	old_dir = ThisProcess->pr_HomeDir;
-	ThisProcess->pr_HomeDir = pi->home_dir;
+	old_dir = this_process->pr_HomeDir;
+	this_process->pr_HomeDir = pi->home_dir;
 
 	/* Reset the break signal before the program starts */
 	SetSignal(0,SIGBREAKF_CTRL_C);
@@ -689,7 +705,7 @@ execve(const char *path, char *const argv[], char *const envp[])
 	rc = RunCommand((pi->resident_command != NULL) ? pi->resident_command->seg_Seg : pi->segment_list,Cli()->cli_DefaultStack * sizeof(LONG),arg_string,arg_string_len);
 
 	/* Restore the home directory */
-	ThisProcess->pr_HomeDir = old_dir;
+	this_process->pr_HomeDir = old_dir;
 
 	/* Restore the program name */
 	SetProgramName(old_program_name);

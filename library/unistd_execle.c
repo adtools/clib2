@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execle.c,v 1.2 2006-08-01 17:01:13 obarthel Exp $
+ * $Id: unistd_execle.c,v 1.3 2006-08-02 06:49:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -78,10 +78,10 @@ execle(const char *path, const char *arg0, ...)
 	{
 		size_t i;
 
-		argv[0] = arg0;
+		argv[0] = (char *)arg0;
 
 		for(i = 1 ; i < argc ; i++)
-			argv[i] = va_arg(args,const char *);
+			argv[i] = va_arg(args,char *);
 
 		/* Skip the NULL terminator */
 		(void)va_arg(args, char **);
