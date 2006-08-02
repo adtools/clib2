@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.5 2006-08-02 11:07:57 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.6 2006-08-02 14:44:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -83,7 +83,7 @@ find_resident_command(const char * command_name)
 
 	if(seg != NULL)
 	{
-		/* Check if that's a disable command or something else. */
+		/* Check if that's a disabled command or something else. */
 		if((seg->seg_UC < 0) && ((seg->seg_UC > CMD_INTERNAL) || (seg->seg_UC <= CMD_DISABLED)))
 		{
 			seg = NULL;
@@ -149,8 +149,8 @@ get_first_script_line(const char * path,char ** line_ptr)
 			script_line_size	= script_line_length + 10;
 		}
 
-		/* Stop when we hit a line feed or unprintable character */
-		if(c == '\n' || c < ' ' || (c >= 128 && c < 160))
+		/* Stop when we hit a line feed or an unprintable character */
+		if(c == '\n' || (c < ' ' && c != '\t' && c != '\r') || (c >= 128 && c < 160))
 			break;
 
 		script_line[script_line_length++] = c;
@@ -594,7 +594,7 @@ build_arg_string(char *const argv[],char * arg_string)
 						(*arg_string++) = '*';
 						(*arg_string++) = s[j];
 					}
-					else if(s[j] == '\n')
+					else if (s[j] == '\n')
 					{
 						(*arg_string++) = '*';
 						(*arg_string++) = 'N';

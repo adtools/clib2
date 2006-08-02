@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execvp.c,v 1.4 2006-08-02 08:00:29 obarthel Exp $
+ * $Id: unistd_execvp.c,v 1.5 2006-08-02 14:44:01 obarthel Exp $
  *
  * :ts=4
  *
@@ -96,8 +96,10 @@ int
 execvp(const char *command,char * const argv[])
 {
 	char * command_buffer = NULL;
+	size_t command_name_len,i;
 	char * path_copy = NULL;
 	int result = -1;
+	BOOL found_path_separators;
 
 	/* Do not allow null command */
 	if(command == NULL || (*command) == '\0')
@@ -106,14 +108,28 @@ execvp(const char *command,char * const argv[])
 		goto out;
 	}
 
+	command_name_len = strlen(command);
+
+	/* Check if there are any path separator characters in the
+	   command name. */
+	found_path_separators = FALSE;
+
+	for(i = 0 ; i < command_name_len ; i++)
+	{
+		if(command[i] == '/' || command[i] == ':')
+		{
+			found_path_separators = TRUE;
+			break;
+		}
+	}
+
 	/* If it's an absolute or relative path name, it's easy. */
-	if(strchr(command,'/') != NULL || strchr(command,':') != NULL)
+	if(found_path_separators)
 	{
 		result = execve(command, argv, environ);
 	}
 	else
 	{
-		size_t command_name_len = strlen(command);
 		size_t command_buffer_size = 0;
 		char * path_delimiter;
 		char * path;
