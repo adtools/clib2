@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.4 2006-08-02 08:00:27 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.5 2006-08-02 11:07:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,7 +77,10 @@ find_resident_command(const char * command_name)
 	   a more sophisticated arbitration method for this yet... */
 	Forbid();
 
-	seg = FindSegment((STRPTR)command_name,NULL,0);
+	seg = FindSegment((STRPTR)command_name,NULL,FALSE);
+	if(seg == NULL)
+		seg = FindSegment((STRPTR)command_name,NULL,TRUE);
+
 	if(seg != NULL)
 	{
 		/* Check if that's a disable command or something else. */
@@ -167,11 +170,12 @@ get_first_script_line(const char * path,char ** line_ptr)
 		   line feed and carriage return characters. */
 		while(script_line_length > 0 && isspace(script_line[script_line_length-1]))
 			script_line_length--;
-
-		script_line[script_line_length] = '\0';
 	}
 
+	script_line[script_line_length] = '\0';
+
 	(*line_ptr) = script_line;
+	script_line = NULL;
 
 	result = 0;
 
@@ -269,6 +273,13 @@ find_command(const char * path,struct program_info ** result_ptr)
 		if(pi->resident_command == NULL)
 		{
 			__set_errno(ENOENT);
+			goto out;
+		}
+
+		pi->program_name = strdup(path);
+		if(pi->program_name == NULL)
+		{
+			__set_errno(ENOMEM);
 			goto out;
 		}
 	}
@@ -396,38 +407,37 @@ find_command(const char * path,struct program_info ** result_ptr)
 						free(script_line);
 						script_line = NULL;
 					}
+				}
 
-					/* If that still didn't work, check if the file has
-					   the script bit set */
-					if(error == 0 && !done)
+				/* If that still didn't work, check if the file has
+				   the "script" protection bit set. */
+				if(error == 0 && !done)
+				{
+					BPTR file_lock;
+
+					file_lock = Lock(relative_path,SHARED_LOCK);
+					if(file_lock != ZERO)
 					{
-						BPTR file_lock;
+						D_S(struct FileInfoBlock,fib);
 
-						file_lock = Lock(relative_path,SHARED_LOCK);
-						if(file_lock != ZERO)
+						if(Examine(file_lock,fib))
 						{
-							D_S(struct FileInfoBlock,fib);
-
-							if(Examine(file_lock,fib))
+							if(fib->fib_Protection & FIBF_SCRIPT)
 							{
-								if(fib->fib_Protection & FIBF_SCRIPT)
-								{
-									/* If it's an AmigaDOS script, remember
-									   to run it through the Execute command */
-									pi->interpreter_name = strdup("Execute");
-									if(pi->interpreter_name != NULL)
-										done = TRUE;
-									else
-										error = ENOMEM;
-								}
+								/* That's an AmigaDOS script */
+								pi->interpreter_name = strdup("Execute");
+								if(pi->interpreter_name != NULL)
+									done = TRUE;
+								else
+									error = ENOMEM;
 							}
-							else
-							{
-								error = __translate_io_error_to_errno(IoErr());
-							}
-
-							UnLock(file_lock);
 						}
+						else
+						{
+							error = __translate_io_error_to_errno(IoErr());
+						}
+
+						UnLock(file_lock);
 					}
 				}
 
@@ -438,6 +448,9 @@ find_command(const char * path,struct program_info ** result_ptr)
 
 		SetFileSysTask(file_system);
 
+		if(error == 0 && !done)
+			error = ENOENT;
+
 		if(error != 0)
 		{
 			__set_errno(error);
@@ -446,6 +459,9 @@ find_command(const char * path,struct program_info ** result_ptr)
 	}
 
 	(*result_ptr) = pi;
+	pi = NULL;
+
+	result = 0;
 
  out:
 
@@ -551,7 +567,7 @@ get_arg_string_length(char *const argv[])
 static void
 build_arg_string(char *const argv[],char * arg_string)
 {
-	BOOL first_char = FALSE;
+	BOOL first_char = TRUE;
 	size_t i,j,len;
 	char * s;
 
@@ -573,10 +589,20 @@ build_arg_string(char *const argv[],char * arg_string)
 
 				for(j = 0 ; j < len ; j++)
 				{
-					if(s[j] == '\"' || s[j] == '*' || s[j] == '\n')
+					if(s[j] == '\"' || s[j] == '*')
+					{
 						(*arg_string++) = '*';
-
-					(*arg_string++) = s[j];
+						(*arg_string++) = s[j];
+					}
+					else if(s[j] == '\n')
+					{
+						(*arg_string++) = '*';
+						(*arg_string++) = 'N';
+					}
+					else
+					{
+						(*arg_string++) = s[j];
+					}
 				}
 
 				(*arg_string++) = '\"';
@@ -607,7 +633,6 @@ build_arg_string(char *const argv[],char * arg_string)
 int
 execve(const char *path, char *const argv[], char *const envp[])
 {
-	struct Process * this_process = (struct Process *)FindTask(NULL);
 	char old_program_name[256];
 	int result = -1;
 	struct program_info * pi;
@@ -617,7 +642,6 @@ execve(const char *path, char *const argv[], char *const envp[])
 	BOOL success = FALSE;
 	BOOL clean_up_env = FALSE;
 	BPTR old_dir;
-	LONG rc;
 
 	/* We begin by trying to find the command to execute */
 	if(find_command((char *)path,&pi) != 0)
@@ -631,6 +655,7 @@ execve(const char *path, char *const argv[], char *const envp[])
 	if(pi->interpreter_name != NULL)
 	{
 		struct program_info * pi_interpreter;
+		size_t path_len = strlen(path);
 
 		/* Now try to find the command corresponding to the
 		   interpreter given */
@@ -658,35 +683,45 @@ execve(const char *path, char *const argv[], char *const envp[])
 		   arguments */
 		if(pi->interpreter_args != NULL)
 		{
-			arg_string_len = strlen(pi->interpreter_args);
+			size_t interpreter_args_len = strlen(pi->interpreter_args);
 
-			arg_string = malloc(arg_string_len + 1 + parameter_string_len + 1 + 1);
+			arg_string = malloc(interpreter_args_len + 1 + path_len + 1 + parameter_string_len + 1 + 1);
 			if(arg_string == NULL)
 			{
 				__set_errno(ENOMEM);
 				goto out;
 			}
 
-			memcpy(arg_string,pi->interpreter_args,arg_string_len);
+			memcpy(arg_string,pi->interpreter_args,interpreter_args_len);
+			arg_string_len = interpreter_args_len;
+			arg_string[arg_string_len++] = ' ';
 
-			if(parameter_string_len > 0)
-				arg_string[arg_string_len++] = ' ';
+			memcpy(&arg_string[arg_string_len],path,path_len);
+			arg_string_len += path_len;
+			arg_string[arg_string_len++] = ' ';
 		}
 		else
 		{
-			arg_string = malloc(parameter_string_len + 1 + 1);
+			arg_string = malloc(path_len + 1 + parameter_string_len + 1 + 1);
+			if(arg_string == NULL)
+			{
+				__set_errno(ENOMEM);
+				goto out;
+			}
+
+			memcpy(arg_string,path,path_len);
+			arg_string_len = path_len;
+			arg_string[arg_string_len++] = ' ';
 		}
 	}
 	else
 	{
 		arg_string = malloc(parameter_string_len + 1 + 1);
-	}
-
-	/* If that didn't work, we quit here */
-	if(arg_string == NULL)
-	{
-		__set_errno(ENOMEM);
-		goto out;
+		if(arg_string == NULL)
+		{
+			__set_errno(ENOMEM);
+			goto out;
+		}
 	}
 
 	/* Any command parameters to take care of? */
@@ -717,23 +752,22 @@ execve(const char *path, char *const argv[], char *const envp[])
 
 	/* Change the command's home directory, so that "PROGDIR:"
 	   can be used */
-	old_dir = this_process->pr_HomeDir;
-	this_process->pr_HomeDir = pi->home_dir;
+	old_dir = SetProgramDir(pi->home_dir);
 
 	/* Reset the break signal before the program starts */
 	SetSignal(0,SIGBREAKF_CTRL_C);
 
 	/* Now try to run the program with the accumulated parameters */
-	rc = RunCommand((pi->resident_command != NULL) ? pi->resident_command->seg_Seg : pi->segment_list,Cli()->cli_DefaultStack * sizeof(LONG),arg_string,arg_string_len);
+	result = RunCommand((pi->resident_command != NULL) ? pi->resident_command->seg_Seg : pi->segment_list,Cli()->cli_DefaultStack * sizeof(LONG),arg_string,arg_string_len);
 
 	/* Restore the home directory */
-	this_process->pr_HomeDir = old_dir;
+	SetProgramDir(old_dir);
 
 	/* Restore the program name */
 	SetProgramName(old_program_name);
 
 	/* Did we launch the program? */
-	if(rc == -1)
+	if(result == -1)
 	{
 		__set_errno(__translate_io_error_to_errno(IoErr()));
 		goto out;
@@ -748,12 +782,12 @@ execve(const char *path, char *const argv[], char *const envp[])
 	if(clean_up_env)
 		__execve_environ_exit(envp);
 
+	if(pi != NULL)
+		free_program_info(pi);
+
 	/* If things went well, we can actually quit now. */
 	if(success)
 		exit(result);
-
-	if(pi != NULL)
-		free_program_info(pi);
 
 	if(arg_string != NULL)
 		free(arg_string);
