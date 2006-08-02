@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.12 2006-04-18 08:29:46 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.13 2006-08-02 09:22:38 obarthel Exp $
 #
 # :ts=8
 #
@@ -49,13 +49,13 @@ LIBS = -lm -lc -lgcc
 all: test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
 	fstat_stdout_test simple_sprintf date_test sscanf_64 factorial \
-	setlocale rand
+	execvp_test setlocale rand
 
 clean:
 	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test \
 		sprintf_test stack_size_test translate_test strtok_test uname \
 		simple fstat_stdout_test simple_sprintf date_test sscanf_64 \
-		factorial setlocale rand
+		factorial execvp_test setlocale rand
 
 ##############################################################################
 
@@ -126,6 +126,10 @@ sscanf_64 : sscanf_64.o
 factorial : factorial.o
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) -o $@ factorial.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
+
+execvp_test : execvp_test.o
+	@echo "Linking $@"
+	$(CC) $(CFLAGS) -o $@ execvp_test.o -lunix $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
 rand : rand.o
 	@echo "Linking $@"
