@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.3 2006-08-02 06:49:47 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.4 2006-08-02 08:00:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -302,7 +302,6 @@ find_command(const char * path,struct program_info ** result_ptr)
 			dvp = GetDeviceProc((STRPTR)path,dvp);
 			if(dvp != NULL)
 			{
-
 				SetFileSysTask(dvp->dvp_Port);
 
 				old_dir = CurrentDir(dvp->dvp_Lock);
@@ -593,6 +592,18 @@ build_arg_string(char *const argv[],char * arg_string)
 
 /****************************************************************************/
 
+/* NOTE: This is not an execve() function which works like you might expect it
+         to do on a Unix-like system. Specifically, the command which will
+         be executed does not replace the currently running program. That
+         command will be executed first, and when it has returned the currently
+         running program will exit. Also, if you need to redirect the standard
+         input/output/error streams you will have to do this using the
+         equivalent AmigaDOS functions (Open, SelectInput(), SelectOutput()
+         and SelectErrorOutput()), restoring these streams before your program
+         exits. What this execve() function does is very similar to how the
+         built-in AmigaDOS shell works, but it is much more limited in what
+         it can do. */
+
 int
 execve(const char *path, char *const argv[], char *const envp[])
 {
@@ -604,6 +615,7 @@ execve(const char *path, char *const argv[], char *const envp[])
 	size_t arg_string_len = 0;
 	size_t parameter_string_len;
 	BOOL success = FALSE;
+	BOOL clean_up_env = FALSE;
 	BPTR old_dir;
 	LONG rc;
 
@@ -689,6 +701,16 @@ execve(const char *path, char *const argv[], char *const envp[])
 	arg_string[arg_string_len++]	= '\n';
 	arg_string[arg_string_len]		= '\0';
 
+	/* Almost ready: prepare the environment data so that it can
+	   be used by the command to be executed. */
+	if(envp != NULL)
+	{
+		if(__execve_environ_init(envp) != 0)
+			goto out;
+
+		clean_up_env = TRUE;
+	}
+
 	/* Change the shell's program name */
 	GetProgramName(old_program_name,sizeof(old_program_name));
 	SetProgramName(pi->program_name);
@@ -723,15 +745,18 @@ execve(const char *path, char *const argv[], char *const envp[])
  out:
 
 	/* Clean up... */
+	if(clean_up_env)
+		__execve_environ_exit(envp);
+
+	/* If things went well, we can actually quit now. */
+	if(success)
+		exit(result);
+
 	if(pi != NULL)
 		free_program_info(pi);
 
 	if(arg_string != NULL)
 		free(arg_string);
-
-	/* If things went well, we can actually quit now. */
-	if(success)
-		exit(result);
 
 	/* This function only returns control to the caller
 	   if something went wrong... */

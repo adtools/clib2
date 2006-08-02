@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_atoll.c,v 1.2 2006-01-08 12:04:25 obarthel Exp $
+ * $Id: stdlib_atoll.c,v 1.3 2006-08-02 08:00:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,7 +58,7 @@ atoll(const char *str)
 	{
 		if(str == NULL)
 		{
-			errno = EFAULT;
+			__set_errno(EFAULT);
 			goto out;
 		}
 	}

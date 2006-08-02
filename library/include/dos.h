@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.22 2006-08-01 19:06:48 obarthel Exp $
+ * $Id: dos.h,v 1.23 2006-08-02 08:00:30 obarthel Exp $
  *
  * :ts=4
  *
@@ -496,6 +496,34 @@ extern BOOL __expand_wildcard_args;
  */
 extern char * __default_path_delimiter;
 extern char * __default_path;
+
+/****************************************************************************/
+
+/*
+ * 'environ' is the default environment variable table as used by the execl(),
+ * execv() and execvp() functions. This needs to be initialized before you
+ * can use it. The table has the following form:
+ *
+ *    char ** environ =
+ *    { 
+ *       "variable1=value",
+ *       "variable2=value",
+ *       NULL
+ *    };
+ *
+ * Note that if you initialize the 'environ' table you will also have to
+ * provide for a function which prepares its contents in execve() for use
+ * by the command to be executed. That function is called
+ * __execve_environ_init(). Should program execution fail, you need to
+ * clean up after what __execve_environ_init() set up. To do this, call
+ * __execve_environ_exit(). There are stubs in clib2 for these functions
+ * which essentially do nothing at all. You will have to implement these
+ * yourself if you want to use them.
+ */
+extern char ** environ;
+
+extern int __execve_environ_init(char * const envp[]);
+extern void __execve_environ_exit(char * const envp[]);
 
 /****************************************************************************/
 

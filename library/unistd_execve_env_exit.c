@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execv.c,v 1.3 2006-08-02 08:00:27 obarthel Exp $
+ * $Id: unistd_execve_env_exit.c,v 1.1 2006-08-02 08:00:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,16 +37,11 @@
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-int
-execv(const char *path,char * const argv[])
+/* This is a stub which you need override with your own implementation. The
+   Function expects a non-NULL pointer to an environment table and will
+   do whatever is necessary to clean up after what a previous call to the
+   __execve_environ_init() function did. */
+void
+__execve_environ_exit(char * const envp[])
 {
-	int result;
-
-	result = execve(path,argv,environ);
-
-	return(result);
 }

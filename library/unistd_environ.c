@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execv.c,v 1.3 2006-08-02 08:00:27 obarthel Exp $
+ * $Id: unistd_environ.c,v 1.1 2006-08-02 08:00:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,16 +37,4 @@
 
 /****************************************************************************/
 
-/* The following is not part of the ISO 'C' (1994) standard. */
-
-/****************************************************************************/
-
-int
-execv(const char *path,char * const argv[])
-{
-	int result;
-
-	result = execve(path,argv,environ);
-
-	return(result);
-}
+char ** environ;

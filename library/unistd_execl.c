@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execl.c,v 1.2 2006-08-02 06:49:47 obarthel Exp $
+ * $Id: unistd_execl.c,v 1.3 2006-08-02 08:00:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -87,7 +87,7 @@ execl(const char *path, const char *arg0, ...)
 
 	argv[argc] = NULL;
 
-	result = execve(path,(char * const *)argv, NULL /*environ*/ );
+	result = execve(path,(char * const *)argv,environ);
 
  out:
 

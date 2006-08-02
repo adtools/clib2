@@ -1,3 +1,9 @@
+- Added the POSIX exec() family functions, based upon code contributed
+  by Henning Nielsen Lund. Thank you very much!
+
+- atoll() no longer sets 'errno' directly but now calls __set_errno()
+  instead.
+
 - Added pathconf(), fpathconf(), sysinfo(), ftime(), ulimit(), getrlimit()
   and setrlimit() as contributed by Peter Bengtsson. Thank you very much!
 
