@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.106 2006-08-06 08:15:42 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.107 2006-08-06 08:31:05 obarthel Exp $
 #
 # :ts=8
 #
@@ -666,6 +666,8 @@ MATH_LIB = \
 	math_expm1f.o \
 	math_fabs.o \
 	math_fabsf.o \
+	math_fdim.o \
+	math_fdimf.o \
 	math_floor.o \
 	math_floorf.o \
 	math_fma.o \
@@ -713,6 +715,8 @@ MATH_LIB = \
 	math_logb.o \
 	math_logbf.o \
 	math_logf.o \
+	math_lrint.o \
+	math_lrintf.o \
 	math_lround.o \
 	math_lroundf.o \
 	math_modf.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.7 2006-08-06 08:15:42 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.8 2006-08-06 08:31:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -134,6 +134,13 @@ get_first_script_line(const char * path,char ** line_ptr)
 		if(script_line_length + 2 > script_line_size)
 		{
 			char * new_script_line;
+
+			/* Give the user a chance to bail out. */
+			if(__check_abort_enabled && (SetSignal(0,0) & __break_signal_mask) != 0)
+			{
+				__set_errno(EAGAIN);
+				goto out;
+			}
 
 			/* Always reserve a little more memory than needed,
 			   and one extra byte to allow us to to NUL-terminate
@@ -310,6 +317,13 @@ find_command(const char * path,struct program_info ** result_ptr)
 
 		do
 		{
+			/* Give the user a chance to bail out. */
+			if(__check_abort_enabled && (SetSignal(0,0) & __break_signal_mask) != 0)
+			{
+				error = EAGAIN;
+				break;
+			}
+
 			dvp = GetDeviceProc((STRPTR)path,dvp);
 			if(dvp != NULL)
 			{
@@ -795,6 +809,9 @@ execve(const char *path, char *const argv[], char *const envp[])
 	/* If things went well, we can actually quit now. */
 	if(success)
 		__execve_exit(result);
+
+	/* Just in case somebody wants to quit... */
+	__check_abort();
 
 	return(result);
 }

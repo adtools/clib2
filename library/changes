@@ -1,3 +1,7 @@
+- Added the missing fdim() and fdimf() functions to the build
+  makefiles. The OS4 build makefile was missing lrint() and
+  lrintf(). Ouch.
+
 - Added the POSIX exec() family functions, based upon code contributed
   by Henning Nielsen Lund. Thank you very much!
 
