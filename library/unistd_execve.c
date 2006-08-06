@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.6 2006-08-02 14:44:01 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.7 2006-08-06 08:15:42 obarthel Exp $
  *
  * :ts=4
  *
@@ -535,7 +535,9 @@ get_arg_string_length(char *const argv[])
 	size_t i,len;
 	char * s;
 
-	for(i = 0 ; argv[i] != NULL ; i++)
+	/* The first argv[] element is skipped; it does not contain part of
+	   the command line but holds the name of the program to be run. */
+	for(i = 1 ; argv[i] != NULL ; i++)
 	{
 		s = (char *)argv[i];
 
@@ -571,7 +573,9 @@ build_arg_string(char *const argv[],char * arg_string)
 	size_t i,j,len;
 	char * s;
 
-	for(i = 0 ; argv[i] != NULL ; i++)
+	/* The first argv[] element is skipped; it does not contain part of
+	   the command line but holds the name of the program to be run. */
+	for(i = 1 ; argv[i] != NULL ; i++)
 	{
 		s = (char *)argv[i];
 
@@ -785,14 +789,12 @@ execve(const char *path, char *const argv[], char *const envp[])
 	if(pi != NULL)
 		free_program_info(pi);
 
-	/* If things went well, we can actually quit now. */
-	if(success)
-		exit(result);
-
 	if(arg_string != NULL)
 		free(arg_string);
 
-	/* This function only returns control to the caller
-	   if something went wrong... */
-	return(-1);
+	/* If things went well, we can actually quit now. */
+	if(success)
+		__execve_exit(result);
+
+	return(result);
 }

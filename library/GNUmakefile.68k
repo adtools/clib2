@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.92 2006-08-02 08:00:27 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.93 2006-08-06 08:15:42 obarthel Exp $
 #
 # :ts=8
 #
@@ -537,6 +537,7 @@ UNIX_LIB = \
 	unistd_execve.o \
 	unistd_execve_env_exit.o \
 	unistd_execve_env_init.o \
+	unistd_execve_exit.o \
 	unistd_execvp.o \
 	unistd_fpathconf.o \
 	unistd_getcwd.o \

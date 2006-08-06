@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.23 2006-08-02 08:00:30 obarthel Exp $
+ * $Id: dos.h,v 1.24 2006-08-06 08:15:42 obarthel Exp $
  *
  * :ts=4
  *
@@ -524,6 +524,19 @@ extern char ** environ;
 
 extern int __execve_environ_init(char * const envp[]);
 extern void __execve_environ_exit(char * const envp[]);
+
+/****************************************************************************/
+
+/*
+ * The __execve_exit() function is called by execve() if the command
+ * executed correctly and control should be returned to the shell. The
+ * default behaviour is to eventually call exit(). You can, however,
+ * replace __execve_exit() with a stub which does nothing at all. In
+ * that case the execve() function will return control to the caller
+ * instead.
+ */
+
+extern void __execve_exit(int return_code);
 
 /****************************************************************************/
 
