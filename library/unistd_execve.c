@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.8 2006-08-06 08:31:06 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.9 2006-08-13 15:15:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -228,7 +228,7 @@ free_program_info(struct program_info * pi)
 		if(pi->home_dir != ZERO)
 			UnLock(pi->home_dir);
 
-		if(pi->segment_list)
+		if(pi->segment_list != ZERO)
 			UnLoadSeg(pi->segment_list);
 
 		free(pi);
@@ -242,13 +242,15 @@ free_program_info(struct program_info * pi)
 static int
 find_command(const char * path,struct program_info ** result_ptr)
 {
-	struct name_translation_info nti;
 	char * script_line = NULL;
 	struct program_info * pi;
 	APTR old_window_ptr;
 	int result = -1;
 	BPTR old_dir;
 	int error;
+	BOOL found_path_separator;
+	const char *p = path;
+	char c;
 
 	(*result_ptr) = NULL;
 
@@ -265,15 +267,22 @@ find_command(const char * path,struct program_info ** result_ptr)
 
 	memset(pi,0,sizeof(*pi));
 
-	error = __translate_unix_to_amiga_path_name(&path,&nti);
-	if(error != 0)
+	/* Check if the path name uses separator characters, which
+	   indicate that the command should be located along a
+	   relative or absolute path. */
+	found_path_separator = FALSE;
+
+	while((c = (*p++)) != '\0')
 	{
-		__set_errno(error);
-		goto out;
+		if(c == ':' || c == '/')
+		{
+			found_path_separator = TRUE;
+			break;
+		}
 	}
 
 	/* No relative or absolute path given? */
-	if(FilePart((STRPTR)path) == (STRPTR)path)
+	if(!found_path_separator)
 	{
 		/* Try to find the command on the resident list */
 		pi->resident_command = find_resident_command(path);
@@ -292,12 +301,20 @@ find_command(const char * path,struct program_info ** result_ptr)
 	}
 	else
 	{
+		struct name_translation_info nti;
 		struct MsgPort * file_system;
 		struct DevProc * dvp = NULL;
 		STRPTR relative_path;
 		BOOL done = FALSE;
 		LONG io_err;
 		int error = 0;
+
+		error = __translate_unix_to_amiga_path_name(&path,&nti);
+		if(error != 0)
+		{
+			__set_errno(error);
+			goto out;
+		}
 
 		/* Now for the simple stuff. Find a command or command script file
 		   under the path name given. Handle multi-volume assignments, such as
@@ -336,22 +353,12 @@ find_command(const char * path,struct program_info ** result_ptr)
 				pi->segment_list = LoadSeg(relative_path);
 				if(pi->segment_list != ZERO)
 				{
-					/* Remember where that file came from so that
-					   "PROGDIR:" will work */
-					pi->home_dir = DupLock(dvp->dvp_Lock);
-					if(pi->home_dir != ZERO)
-					{
-						/* Also remember the name of the command */
-						pi->program_name = strdup(path);
-						if(pi->program_name != NULL)
-							done = TRUE;
-						else
-							error = ENOMEM;
-					}
+					/* Also remember the name of the command */
+					pi->program_name = strdup(path);
+					if(pi->program_name != NULL)
+						done = TRUE;
 					else
-					{
-						error = __translate_io_error_to_errno(IoErr());
-					}
+						error = ENOMEM;
 				}
 
 				io_err = IoErr();
@@ -455,12 +462,39 @@ find_command(const char * path,struct program_info ** result_ptr)
 					}
 				}
 
+				/* If we found what we came for, also try to get a lock on
+				   the command/script home directory, so that "PROGDIR:"
+				   will work. */
+				if(done)
+				{
+					BPTR file_lock;
+
+					/* Remember where that file came from so that
+					   "PROGDIR:" will work. */
+					file_lock = Lock(relative_path,SHARED_LOCK);
+					if(file_lock != ZERO)
+					{
+						pi->home_dir = ParentDir(file_lock);
+						if(pi->home_dir == ZERO)
+							error = __translate_io_error_to_errno(IoErr());
+
+						UnLock(file_lock);
+					}
+					else
+					{
+						error = __translate_io_error_to_errno(IoErr());
+					}
+				}
+
 				CurrentDir(old_dir);
 			}
 		}
 		while(!done && error == 0 && dvp != NULL && (dvp->dvp_Flags & DVPF_ASSIGN));
 
 		SetFileSysTask(file_system);
+
+		if(dvp != NULL)
+			FreeDeviceProc(dvp);
 
 		if(error == 0 && !done)
 			error = ENOENT;
