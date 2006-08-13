@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.10 2006-08-13 15:35:40 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.11 2006-08-13 15:56:38 obarthel Exp $
  *
  * :ts=4
  *
@@ -247,7 +247,6 @@ find_command(const char * path,struct program_info ** result_ptr)
 	APTR old_window_ptr;
 	int result = -1;
 	BPTR old_dir;
-	int error;
 	BOOL found_path_separator;
 	const char *p = path;
 	char c;
