@@ -2,7 +2,7 @@
   checking if the file name includes path separators. If it does not,
   then the search for the command begins with the resident command list;
   otherwise the local directories are checked. The new code also properly
-  cleans after itself (a FreeDeviceProc() was missing) and the "PROGDIR:"
+  cleans up after itself (a FreeDeviceProc() was missing) and the "PROGDIR:"
   lock now always refers to the directory in which the command/script
   file is found.
 

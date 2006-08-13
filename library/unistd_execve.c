@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.9 2006-08-13 15:15:11 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.10 2006-08-13 15:35:40 obarthel Exp $
  *
  * :ts=4
  *
@@ -304,7 +304,6 @@ find_command(const char * path,struct program_info ** result_ptr)
 		struct name_translation_info nti;
 		struct MsgPort * file_system;
 		struct DevProc * dvp = NULL;
-		STRPTR relative_path;
 		BOOL done = FALSE;
 		LONG io_err;
 		int error = 0;
@@ -320,17 +319,6 @@ find_command(const char * path,struct program_info ** result_ptr)
 		   under the path name given. Handle multi-volume assignments, such as
 		   referring to "C:" gracefully */
 		file_system = GetFileSysTask();
-
-		/* Figure out which part of the path name includes the device
-		   or assignment portion, then skip it. This is because the
-		   loop below uses GetDeviceProc() to find the file or command,
-		   and it starts by changing to the directory the device, volume
-		   or assignment in the path name is bound to. */
-		relative_path = (STRPTR)strchr(path,':');
-		if(relative_path != NULL)
-			relative_path++;
-		else
-			relative_path = (STRPTR)path;
 
 		do
 		{
@@ -350,7 +338,7 @@ find_command(const char * path,struct program_info ** result_ptr)
 
 				/* First try: let's assume that that the file is
 				   executable */
-				pi->segment_list = LoadSeg(relative_path);
+				pi->segment_list = LoadSeg((STRPTR)path);
 				if(pi->segment_list != ZERO)
 				{
 					/* Also remember the name of the command */
@@ -368,7 +356,7 @@ find_command(const char * path,struct program_info ** result_ptr)
 				if(error == 0 && !done && (io_err == ERROR_OBJECT_NOT_FOUND || io_err == ERROR_OBJECT_WRONG_TYPE || io_err == ERROR_BAD_HUNK))
 				{
 					/* Could that be an ARexx or shell script? */
-					if(get_first_script_line(relative_path,&script_line) == 0)
+					if(get_first_script_line((STRPTR)path,&script_line) == 0)
 					{
 						if(strncmp(script_line,"/*",2) == SAME)
 						{
@@ -436,7 +424,7 @@ find_command(const char * path,struct program_info ** result_ptr)
 				{
 					BPTR file_lock;
 
-					file_lock = Lock(relative_path,SHARED_LOCK);
+					file_lock = Lock((STRPTR)path,SHARED_LOCK);
 					if(file_lock != ZERO)
 					{
 						D_S(struct FileInfoBlock,fib);
@@ -471,7 +459,7 @@ find_command(const char * path,struct program_info ** result_ptr)
 
 					/* Remember where that file came from so that
 					   "PROGDIR:" will work. */
-					file_lock = Lock(relative_path,SHARED_LOCK);
+					file_lock = Lock((STRPTR)path,SHARED_LOCK);
 					if(file_lock != ZERO)
 					{
 						pi->home_dir = ParentDir(file_lock);
