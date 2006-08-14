@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.11 2006-08-13 15:56:38 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.12 2006-08-14 14:08:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -242,13 +242,16 @@ free_program_info(struct program_info * pi)
 static int
 find_command(const char * path,struct program_info ** result_ptr)
 {
+	struct name_translation_info nti;
 	char * script_line = NULL;
 	struct program_info * pi;
 	APTR old_window_ptr;
 	int result = -1;
-	BPTR old_dir;
+	BPTR old_dir = ZERO;
 	BOOL found_path_separator;
-	const char *p = path;
+	BOOL found_volume_separator;
+	const char *p;
+	int error;
 	char c;
 
 	(*result_ptr) = NULL;
@@ -266,57 +269,56 @@ find_command(const char * path,struct program_info ** result_ptr)
 
 	memset(pi,0,sizeof(*pi));
 
+	error = __translate_unix_to_amiga_path_name(&path,&nti);
+	if(error != 0)
+	{
+		__set_errno(error);
+		goto out;
+	}
+
 	/* Check if the path name uses separator characters, which
 	   indicate that the command should be located along a
 	   relative or absolute path. */
-	found_path_separator = FALSE;
+	found_path_separator = found_volume_separator = FALSE;
+
+	p = path;
 
 	while((c = (*p++)) != '\0')
 	{
-		if(c == ':' || c == '/')
-		{
+		if(c == '/')
 			found_path_separator = TRUE;
-			break;
-		}
+
+		if(c == ':')
+			found_volume_separator = TRUE;
 	}
 
-	/* No relative or absolute path given? */
-	if(!found_path_separator)
+	/* No relative or absolute path given? Try the resident command list. */
+	if(!found_path_separator && !found_volume_separator)
 	{
 		/* Try to find the command on the resident list */
 		pi->resident_command = find_resident_command(path);
-		if(pi->resident_command == NULL)
+		if(pi->resident_command != NULL)
 		{
-			__set_errno(ENOENT);
-			goto out;
-		}
-
-		pi->program_name = strdup(path);
-		if(pi->program_name == NULL)
-		{
-			__set_errno(ENOMEM);
-			goto out;
+			pi->program_name = strdup(path);
+			if(pi->program_name == NULL)
+			{
+				__set_errno(ENOMEM);
+				goto out;
+			}
 		}
 	}
-	else
+
+	/* No resident command found? Try the file system. */
+	if(pi->resident_command == NULL)
 	{
-		struct name_translation_info nti;
 		struct MsgPort * file_system;
 		struct DevProc * dvp = NULL;
 		BOOL done = FALSE;
 		LONG io_err;
-		int error = 0;
-
-		error = __translate_unix_to_amiga_path_name(&path,&nti);
-		if(error != 0)
-		{
-			__set_errno(error);
-			goto out;
-		}
 
 		/* Now for the simple stuff. Find a command or command script file
 		   under the path name given. Handle multi-volume assignments, such as
-		   referring to "C:" gracefully */
+		   referring to "C:", gracefully */
 		file_system = GetFileSysTask();
 
 		do
@@ -328,153 +330,157 @@ find_command(const char * path,struct program_info ** result_ptr)
 				break;
 			}
 
-			dvp = GetDeviceProc((STRPTR)path,dvp);
-			if(dvp != NULL)
+			if(found_volume_separator)
 			{
-				SetFileSysTask(dvp->dvp_Port);
-
-				old_dir = CurrentDir(dvp->dvp_Lock);
-
-				/* First try: let's assume that that the file is
-				   executable */
-				pi->segment_list = LoadSeg((STRPTR)path);
-				if(pi->segment_list != ZERO)
+				dvp = GetDeviceProc((STRPTR)path,dvp);
+				if(dvp != NULL)
 				{
-					/* Also remember the name of the command */
-					pi->program_name = strdup(path);
-					if(pi->program_name != NULL)
-						done = TRUE;
-					else
-						error = ENOMEM;
+					SetFileSysTask(dvp->dvp_Port);
+
+					old_dir = CurrentDir(dvp->dvp_Lock);
 				}
+			}
 
-				io_err = IoErr();
+			/* First try: let's assume that that the file is
+			   executable */
+			pi->segment_list = LoadSeg((STRPTR)path);
+			if(pi->segment_list != ZERO)
+			{
+				/* Also remember the name of the command */
+				pi->program_name = strdup(path);
+				if(pi->program_name != NULL)
+					done = TRUE;
+				else
+					error = ENOMEM;
+			}
 
-				/* If that didn't work and we might be dealing with a script
-				   file, have a closer look at it. */
-				if(error == 0 && !done && (io_err == ERROR_OBJECT_NOT_FOUND || io_err == ERROR_OBJECT_WRONG_TYPE || io_err == ERROR_BAD_HUNK))
+			io_err = IoErr();
+
+			/* If that didn't work and we might be dealing with a script
+			   file, have a closer look at it. */
+			if(error == 0 && !done && (io_err == ERROR_OBJECT_NOT_FOUND || io_err == ERROR_OBJECT_WRONG_TYPE || io_err == ERROR_BAD_HUNK))
+			{
+				/* Could that be an ARexx or shell script? */
+				if(get_first_script_line((STRPTR)path,&script_line) == 0)
 				{
-					/* Could that be an ARexx or shell script? */
-					if(get_first_script_line((STRPTR)path,&script_line) == 0)
+					if(strncmp(script_line,"/*",2) == SAME)
 					{
-						if(strncmp(script_line,"/*",2) == SAME)
-						{
-							/* That's an ARexx script */
-							pi->interpreter_name = strdup("RX");
-							if(pi->interpreter_name != NULL)
-								done = TRUE;
-							else
-								error = ENOMEM;
-						}
-						else if (strncmp(script_line,"#!",2) == SAME)
-						{
-							char * name;
-							char * args;
-
-							/* That's probably a shell script */
-							name = &script_line[2];
-							while((*name) != '\0' && isspace(*name))
-								name++;
-
-							/* Do we have a command name? */
-							if((*name) != '\0')
-							{
-								/* Find out if there are any script parameters */
-								args = name;
-								while((*args) != '\0' && !isspace(*args))
-									args++;
-
-								if((*args) != '\0')
-								{
-									(*args++) = '\0';
-
-									while((*args) != '\0' && isspace(*args))
-										args++;
-								}
-
-								/* Remember the parameters, if any */
-								if((*args) != '\0')
-								{
-									pi->interpreter_args = strdup(args);
-									if(pi->interpreter_args == NULL)
-										error = ENOMEM;
-								}
-
-								/* And remember the interpreter name. */
-								if(error == 0)
-								{
-									pi->interpreter_name = strdup(name);
-									if(pi->interpreter_name != NULL)
-										done = TRUE;
-									else
-										error = ENOMEM;
-								}
-							}
-						}
-
-						free(script_line);
-						script_line = NULL;
+						/* That's an ARexx script */
+						pi->interpreter_name = strdup("RX");
+						if(pi->interpreter_name != NULL)
+							done = TRUE;
+						else
+							error = ENOMEM;
 					}
-				}
-
-				/* If that still didn't work, check if the file has
-				   the "script" protection bit set. */
-				if(error == 0 && !done)
-				{
-					BPTR file_lock;
-
-					file_lock = Lock((STRPTR)path,SHARED_LOCK);
-					if(file_lock != ZERO)
+					else if (strncmp(script_line,"#!",2) == SAME)
 					{
-						D_S(struct FileInfoBlock,fib);
+						char * name;
+						char * args;
 
-						if(Examine(file_lock,fib))
+						/* That's probably a shell script */
+						name = &script_line[2];
+						while((*name) != '\0' && isspace(*name))
+							name++;
+
+						/* Do we have a command name? */
+						if((*name) != '\0')
 						{
-							if(fib->fib_Protection & FIBF_SCRIPT)
+							/* Find out if there are any script parameters */
+							args = name;
+							while((*args) != '\0' && !isspace(*args))
+								args++;
+
+							if((*args) != '\0')
 							{
-								/* That's an AmigaDOS script */
-								pi->interpreter_name = strdup("Execute");
+								(*args++) = '\0';
+
+								while((*args) != '\0' && isspace(*args))
+									args++;
+							}
+
+							/* Remember the parameters, if any */
+							if((*args) != '\0')
+							{
+								pi->interpreter_args = strdup(args);
+								if(pi->interpreter_args == NULL)
+									error = ENOMEM;
+							}
+
+							/* And remember the interpreter name. */
+							if(error == 0)
+							{
+								pi->interpreter_name = strdup(name);
 								if(pi->interpreter_name != NULL)
 									done = TRUE;
 								else
 									error = ENOMEM;
 							}
 						}
-						else
-						{
-							error = __translate_io_error_to_errno(IoErr());
-						}
-
-						UnLock(file_lock);
 					}
+
+					free(script_line);
+					script_line = NULL;
 				}
+			}
 
-				/* If we found what we came for, also try to get a lock on
-				   the command/script home directory, so that "PROGDIR:"
-				   will work. */
-				if(done)
+			/* If that still didn't work, check if the file has
+			   the "script" protection bit set. */
+			if(error == 0 && !done)
+			{
+				BPTR file_lock;
+
+				file_lock = Lock((STRPTR)path,SHARED_LOCK);
+				if(file_lock != ZERO)
 				{
-					BPTR file_lock;
+					D_S(struct FileInfoBlock,fib);
 
-					/* Remember where that file came from so that
-					   "PROGDIR:" will work. */
-					file_lock = Lock((STRPTR)path,SHARED_LOCK);
-					if(file_lock != ZERO)
+					if(Examine(file_lock,fib))
 					{
-						pi->home_dir = ParentDir(file_lock);
-						if(pi->home_dir == ZERO)
-							error = __translate_io_error_to_errno(IoErr());
-
-						UnLock(file_lock);
+						if(fib->fib_Protection & FIBF_SCRIPT)
+						{
+							/* That's an AmigaDOS script */
+							pi->interpreter_name = strdup("Execute");
+							if(pi->interpreter_name != NULL)
+								done = TRUE;
+							else
+								error = ENOMEM;
+						}
 					}
 					else
 					{
 						error = __translate_io_error_to_errno(IoErr());
 					}
-				}
 
-				CurrentDir(old_dir);
+					UnLock(file_lock);
+				}
 			}
+
+			/* If we found what we came for, also try to get a lock on
+			   the command/script home directory, so that "PROGDIR:"
+			   will work. */
+			if(done)
+			{
+				BPTR file_lock;
+
+				/* Remember where that file came from so that
+				   "PROGDIR:" will work. */
+				file_lock = Lock((STRPTR)path,SHARED_LOCK);
+				if(file_lock != ZERO)
+				{
+					pi->home_dir = ParentDir(file_lock);
+					if(pi->home_dir == ZERO)
+						error = __translate_io_error_to_errno(IoErr());
+
+					UnLock(file_lock);
+				}
+				else
+				{
+					error = __translate_io_error_to_errno(IoErr());
+				}
+			}
+
+			if(dvp != NULL)
+				CurrentDir(old_dir);
 		}
 		while(!done && error == 0 && dvp != NULL && (dvp->dvp_Flags & DVPF_ASSIGN));
 
