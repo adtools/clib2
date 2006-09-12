@@ -1,5 +1,5 @@
 /*
- * $Id: termios_console_fdhookentry.c,v 1.2 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: termios_console_fdhookentry.c,v 1.3 2006-09-12 14:16:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -328,7 +328,7 @@ __termios_console_hook(
 				}
 				else
 				{
-					if(WaitForChar(fd->fd_DefaultFile,100000*tios->c_cc[VTIME]))
+					if(WaitForChar(file,100000*tios->c_cc[VTIME]))
 						result = Read(file,fam->fam_Data,fam->fam_Size);
 				}
 			}

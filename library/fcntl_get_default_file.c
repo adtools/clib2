@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_get_default_file.c,v 1.5 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: fcntl_get_default_file.c,v 1.6 2006-09-12 14:16:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,8 +44,9 @@
 int
 __get_default_file(int file_descriptor,long * file_ptr)
 {
-	struct fd * fd;
 	int result = ERROR;
+	struct fd * fd;
+	BPTR file;
 
 	assert( file_descriptor >= 0 && file_descriptor < __num_fd );
 	assert( __fd[file_descriptor] != NULL );
@@ -59,11 +60,73 @@ __get_default_file(int file_descriptor,long * file_ptr)
 		goto out;
 	}
 
-	(*file_ptr) = (long)fd->fd_DefaultFile;
+	__fd_unlock(fd);
+
+	#if defined(__THREAD_SAFE)
+	{
+		/* Check if this file should be dynamically bound to one of the
+		   three standard I/O streams. */
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+		{
+			switch(fd->fd_DefaultFile)
+			{
+				case STDIN_FILENO:
+
+					file = Input();
+					break;
+
+				case STDOUT_FILENO:
+
+					file = Output();
+					break;
+
+				case STDERR_FILENO:
+
+					#if defined(__amigaos4__)
+					{
+						file = ErrorOutput();
+					}
+					#else
+					{
+						struct Process * this_process = (struct Process *)FindTask(NULL);
+
+						file = this_process->pr_CES;
+					}
+					#endif /* __amigaos4__ */
+
+					/* The following is rather controversial; if the standard error stream
+					   is unavailable, we default to reuse the standard output stream. This
+					   is problematic if the standard output stream was redirected and should
+					   not be the same as the standard error output stream. */
+					if(file == ZERO)
+						file = Output();
+
+					break;
+
+				default:
+
+					file = ZERO;
+					break;
+			}
+		}
+		else
+		{
+			file = fd->fd_DefaultFile;
+		}
+	}
+	#else
+	{
+		file = fd->fd_DefaultFile;
+	}
+	#endif /* __THREAD_SAFE */
+
+	(*file_ptr) = (long)file;
 
 	result = 0;
 
  out:
+
+	__fd_unlock(fd);
 
 	return(result);
 }

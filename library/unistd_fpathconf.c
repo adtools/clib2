@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fpathconf.c,v 1.1 2006-07-28 14:37:28 obarthel Exp $
+ * $Id: unistd_fpathconf.c,v 1.2 2006-09-12 14:16:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,6 +60,12 @@ fpathconf(int file_descriptor,int name)
 	if(fd == NULL)
 	{
 		__set_errno(EINVAL);
+		goto out;
+	}
+
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO) || FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	{
+		__set_errno(EBADF);
 		goto out;
 	}
 
