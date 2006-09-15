@@ -17,13 +17,13 @@
 
 
 *link:
-%{fbaserel:%{!resident:-m amiga_bss -fl libb}} %{resident:-m amiga_bss -amiga-datadata-reloc -fl libb} %{fbaserel32:%{!resident32:-m amiga_bss -fl libb32}} %{resident32:-m amiga_bss -amiga-datadata-reloc -fl libb32} %{g:-amiga-debug-hunk} %{m68020:-fl libm020} %{mc68020:-fl libm020} %{m68030:-fl libm020} %{m68040:-fl libm020} %{m68060:-fl libm020} %{m68020-40:-fl libm020} %{m68020-60:-fl libm020}
+%{fbaserel:%{!resident:-m amiga_bss -fl libb}} %{resident:-m amiga_bss -amiga-datadata-reloc -fl libb} %{fbaserel32:%{!resident32:-m amiga_bss -fl libb32}} %{resident32:-m amiga_bss -amiga-datadata-reloc -fl libb32} %{g:-amiga-debug-hunk} %{m68020:-fl libm020} %{mc68020:-fl libm020} %{m68030:-fl libm020} %{m68040:-fl libm020} %{m68060:-fl libm020} %{m68020-40:-fl libm020} %{m68020-60:-fl libm020} %{noixemul:}
 
 *lib:
 %{mstackextend:-lstack} -lc -lamiga -ldebug -lgcc -lc
 
 *libgcc:
-
+%{mstackextend:-lstack} -lc -lgcc
 
 *startfile:
 %{resident32:nr32crt0.o%s}%{!resident32:%{fbaserel32:nb32crt0.o%s}%{!fbaserel32:%{resident:nrcrt0.o%s}%{!resident:%{fbaserel:nbcrt0.o%s}%{!fbaserel:ncrt0.o%s}}}}
@@ -35,7 +35,7 @@
 %{funsigned-char:-D__CHAR_UNSIGNED__}
 
 *predefines:
--Dmc68000 -Damiga -Damigaos -DMCH_AMIGA -DAMIGA -D__chip=__attribute__((__chip__)) -D__saveds=__attribute__((__saveds__)) -D__interrupt=__attribute__((__interrupt__)) -D__stackext=__attribute__((__stackext__)) -D__regargs=__attribute__((__regparm__)) -D__stdargs=__attribute__((__stkparm__)) -D__aligned=__attribute__((__aligned__(4))) -Asystem(amigaos) -Acpu(m68k) -Amachine(m68k)
+-Dmc68000 -Damiga -Damigaos -DMCH_AMIGA -DAMIGA -D__CLIB2__ -D__chip=__attribute__((__chip__)) -D__saveds=__attribute__((__saveds__)) -D__interrupt=__attribute__((__interrupt__)) -D__stackext=__attribute__((__stackext__)) -D__regargs=__attribute__((__regparm__)) -D__stdargs=__attribute__((__stkparm__)) -D__aligned=__attribute__((__aligned__(4))) -Asystem(amigaos) -Acpu(m68k) -Amachine(m68k)
 
 *cross_compile:
 0
