@@ -1,8 +1,11 @@
-- updated m68k specs file in /documentation to contain an own __CLIB2__
+- Updated m68k specs file in /documentation to contain an own __CLIB2__
   define so that existing m68k compilers also have this define. In addition,
   the common "-noixemul" option can now also be specified but will do a NOP
   so that Makefiles sharing multiple runtime lib setups work without
   a warning.
+
+- Added a new callback function which can be used in programs which want
+  to avoid that the command line wildcard expansion takes place.  
 
 - __get_default_file() now dynamically fills in file handles for the
   stdin/stdout/stderr streams if it's part of the thread-safe library.

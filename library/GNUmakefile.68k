@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.94 2006-08-06 08:31:05 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.95 2006-09-15 06:58:16 obarthel Exp $
 #
 # :ts=8
 #
@@ -496,6 +496,7 @@ UNIX_LIB = \
 	stdlib_alloca_trap.o \
 	stdlib_arg.o \
 	stdlib_expand_wildcard.o \
+	stdlib_expand_wildcard_check.o \
 	stdlib_getmemstats.o \
 	stdlib_main.o \
 	stdlib_main_stub.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.11 2006-05-04 08:01:47 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.12 2006-09-15 06:58:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -121,11 +121,24 @@ ARG_CONSTRUCTOR(arg_init)
 	/* Shell startup? */
 	if(__WBenchMsg == NULL)
 	{
+		BOOL			expand_wildcard_args;
 		size_t			number_of_arguments;
 		unsigned char *	arg_str;
 		size_t			arg_len;
 		unsigned char *	command_line;
 		unsigned char *	str;
+
+		/* Check if wildcard expansion of command line parameters
+		   should be enabled. Note that the callback function, if
+		   declared, takes precedence over the global variable. */
+		#if defined(UNIX_PATH_SEMANTICS)
+		{
+			expand_wildcard_args = __expand_wildcard_args;
+
+			if(__expand_wildcard_args_check != NULL)
+				expand_wildcard_args = (*__expand_wildcard_args_check)();
+		}
+		#endif /* UNIX_PATH_SEMANTICS */
 
 		/* Get the shell parameter string and find out
 		   how long it is, stripping a trailing line
@@ -234,7 +247,7 @@ ARG_CONSTRUCTOR(arg_init)
 				#if defined(UNIX_PATH_SEMANTICS)
 				{
 					/* If necessary, indicate that this parameter was quoted. */
-					if(__expand_wildcard_args && __wildcard_quote_parameter(__argc) < 0)
+					if(expand_wildcard_args && __wildcard_quote_parameter(__argc) < 0)
 						goto out;
 				}
 				#endif /* UNIX_PATH_SEMANTICS */
@@ -319,7 +332,7 @@ ARG_CONSTRUCTOR(arg_init)
 		{
 			/* If necessary, expand wildcard patterns found in the command
 			   line string into file and directory names. */
-			if(__expand_wildcard_args && __wildcard_expand_init() < 0)
+			if(expand_wildcard_args && __wildcard_expand_init() < 0)
 				goto out;
 		}
 		#endif /* UNIX_PATH_SEMANTICS */

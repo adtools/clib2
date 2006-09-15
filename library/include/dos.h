@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.24 2006-08-06 08:15:42 obarthel Exp $
+ * $Id: dos.h,v 1.25 2006-09-15 06:58:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -486,6 +486,17 @@ extern BOOL __thread_safe_errno_h_errno;
  * checked it.
  */
 extern BOOL __expand_wildcard_args;
+
+/*
+ * Similar to the boolean flag value __expand_wildcard_args described above,
+ * a function can be called which may be used to enable/disable wildcard
+ * expansion at runtime. The function is undefined by default, which means
+ * that the __expand_wildcard_args value will take precedence. If you want
+ * to override the effects of the __expand_wildcard_args variable, declare
+ * your own check function and then assign it to the
+ * __expand_wildcard_args_check pointer.
+ */
+extern BOOL (*__expand_wildcard_args_check)(void);
 
 /****************************************************************************/
 
