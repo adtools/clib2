@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_common_pathconf.c,v 1.1 2006-07-28 14:37:27 obarthel Exp $
+ * $Id: unistd_common_pathconf.c,v 1.2 2006-09-17 17:53:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -104,7 +104,7 @@ __pathconf(struct MsgPort *port,int name)
 	{
 		D_S(struct InfoData,id);
 
-		if(DoPkt(port,ACTION_IS_FILESYSTEM,0,0,0,0,0) == DOSFALSE) /* Not a filesystem */
+		if(DoPkt(port,ACTION_IS_FILESYSTEM,0,0,0,0,0) == DOSFALSE) /* Not a filesystem. */
 		{
 			SHOWMSG("Not a filesystem.");
 
@@ -170,14 +170,15 @@ __pathconf(struct MsgPort *port,int name)
 
 			#if defined(__amigaos4__)
 			{
+				uint32 Bufsize;
 				struct TagItem TagList[2]=
 				{
-					{DC_FHBufferR,	0},
+					{DC_FHBufferR,	&Bufsize},
 					{TAG_DONE,		0}
 				};
 
 				DosControl(TagList);
-				ret = TagList[0].ti_Data;	/* Default is 2048 bytes. */
+				ret = Bufsize;	/* Default is 2048 bytes. */
 			}
 			#else
 			{
