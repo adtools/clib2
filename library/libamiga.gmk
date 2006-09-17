@@ -1,0 +1,127 @@
+#
+# $Id: libamiga.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+#
+# :ts=8
+#
+# -*- mode: makefile; -*-
+
+##############################################################################
+
+LIBS += \
+	lib/libamiga.a \
+	lib/soft-float/libamiga.a \
+	lib/small-data/libamiga.a \
+	lib/baserel/libamiga.a \
+	lib.threadsafe/libamiga.a \
+	lib.threadsafe/soft-float/libamiga.a \
+	lib.threadsafe/small-data/libamiga.a \
+	lib.threadsafe/baserel/libamiga.a
+
+##############################################################################
+
+AMIGA_LIB = \
+	amiga.lib_rev.o \
+	amiga_acrypt.o \
+	amiga_addtof.o \
+	amiga_argarraydone.o \
+	amiga_argarrayinit.o \
+	amiga_argint.o \
+	amiga_argstring.o \
+	amiga_beginio.o \
+	amiga_callhooka.o \
+	amiga_coercemethod.o \
+	amiga_createextio.o \
+	amiga_createport.o \
+	amiga_createstdio.o \
+	amiga_createtask.o \
+	amiga_deleteextio.o \
+	amiga_deleteport.o \
+	amiga_deletestdio.o \
+	amiga_deletetask.o \
+	amiga_domethod.o \
+	amiga_dosupermethod.o \
+	amiga_dotimer.o \
+	amiga_fastrand.o \
+	amiga_freeievents.o \
+	amiga_hotkey.o \
+	amiga_invertstring.o \
+	amiga_newlist.o \
+	amiga_rangerand.o \
+	amiga_remtof.o \
+	amiga_rexxvars.o \
+	amiga_setsuperattrs.o \
+	amiga_timedelay.o \
+	amiga_waitbeam.o
+
+##############################################################################
+
+# Dependencies to rebuild if the library version changes
+
+obj/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj/soft-float/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj/small-data/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj/baserel/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj.threadsafe/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj.threadsafe/soft-float/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj.threadsafe/small-data/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj.threadsafe/baserel/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+
+##############################################################################
+
+obj/libamiga/%.o : CFLAGS += $(LARGEDATA)
+obj/libamiga/%.o : %.c
+	@$(COMPILE)
+
+obj/soft-float/libamiga/%.o : CFLAGS += $(SOFTFLOAT)
+obj/soft-float/libamiga/%.o : %.c
+	@$(COMPILE)
+
+obj/small-data/libamiga/%.o : CFLAGS += $(SMALLDATA)
+obj/small-data/libamiga/%.o : %.c
+	@$(COMPILE)
+
+obj/baserel/libamiga/%.o : CFLAGS += $(BASEREL)
+obj/baserel/libamiga/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/libamiga/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA)
+obj.threadsafe/libamiga/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/soft-float/libamiga/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT)
+obj.threadsafe/soft-float/libamiga/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/small-data/libamiga/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA)
+obj.threadsafe/small-data/libamiga/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/baserel/libamiga/%.o : CFLAGS += $(THREADSAFE) $(BASEREL)
+obj.threadsafe/baserel/libamiga/%.o : %.c
+	@$(COMPILE)
+
+##############################################################################
+
+lib/libamiga.a : $(addprefix obj/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)
+
+lib/soft-float/libamiga.a : $(addprefix obj/soft-float/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)
+
+lib/small-data/libamiga.a : $(addprefix obj/small-data/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)
+
+lib/baserel/libamiga.a : $(addprefix obj/baserel/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/libamiga.a : $(addprefix obj.threadsafe/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/soft-float/libamiga.a : $(addprefix obj.threadsafe/soft-float/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/small-data/libamiga.a : $(addprefix obj.threadsafe/small-data/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/baserel/libamiga.a : $(addprefix obj.threadsafe/baserel/libamiga/,$(AMIGA_LIB))
+	@$(MAKELIB)

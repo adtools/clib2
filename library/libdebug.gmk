@@ -1,0 +1,125 @@
+#
+# $Id: libdebug.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+#
+# :ts=8
+#
+# -*- mode: makefile; -*-
+
+##############################################################################
+
+LIBS += \
+	lib/libdebug.a \
+	lib/soft-float/libdebug.a \
+	lib/small-data/libdebug.a \
+	lib/baserel/libdebug.a \
+	lib.threadsafe/libdebug.a \
+	lib.threadsafe/soft-float/libdebug.a \
+	lib.threadsafe/small-data/libdebug.a \
+	lib.threadsafe/baserel/libdebug.a
+
+##############################################################################
+
+DEBUG_LIB = \
+	debug.lib_rev.o \
+	debug.o \
+	debug_cmpstrexec.o \
+	debug_kcmpstr.o \
+	debug_kdofmt.o \
+	debug_kgetc.o \
+	debug_kgetch1.o \
+	debug_kgetch2.o \
+	debug_kgetchar1.o \
+	debug_kgetchar2.o \
+	debug_kgetnum1.o \
+	debug_kgetnum2.o \
+	debug_kmaygetch.o \
+	debug_kmaygetchar.o \
+	debug_kprintf1.o \
+	debug_kprintf2.o \
+	debug_kputc.o \
+	debug_kputch1.o \
+	debug_kputch2.o \
+	debug_kputchar1.o \
+	debug_kputchar2.o \
+	debug_kputfmt.o \
+	debug_kputs1.o \
+	debug_kputs2.o \
+	debug_kputstr1.o \
+	debug_kputstr2.o \
+	debug_kvprintf1.o \
+	debug_kvprintf2.o \
+	debug_level.o
+
+##############################################################################
+
+# Dependencies to rebuild if the library version changes
+
+obj/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj/soft-float/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj/small-data/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj/baserel/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj.threadsafe/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj.threadsafe/soft-float/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj.threadsafe/small-data/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj.threadsafe/baserel/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+
+##############################################################################
+
+
+obj/libdebug/%.o : CFLAGS += $(LARGEDATA)
+obj/libdebug/%.o : %.c
+	@$(COMPILE)
+
+obj/soft-float/libdebug/%.o : CFLAGS += $(SOFTFLOAT)
+obj/soft-float/libdebug/%.o : %.c
+	@$(COMPILE)
+
+obj/small-data/libdebug/%.o : CFLAGS += $(SMALLDATA)
+obj/small-data/libdebug/%.o : %.c
+	@$(COMPILE)
+
+obj/baserel/libdebug/%.o : CFLAGS += $(BASEREL)
+obj/baserel/libdebug/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/libdebug/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA)
+obj.threadsafe/libdebug/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/soft-float/libdebug/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT)
+obj.threadsafe/soft-float/libdebug/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/small-data/libdebug/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA)
+obj.threadsafe/small-data/libdebug/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/baserel/libdebug/%.o : CFLAGS += $(THREADSAFE) $(BASEREL)
+obj.threadsafe/baserel/libdebug/%.o : %.c
+	@$(COMPILE)
+
+##############################################################################
+
+lib/libdebug.a : $(addprefix obj/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)
+
+lib/soft-float/libdebug.a : $(addprefix obj/soft-float/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)
+
+lib/small-data/libdebug.a : $(addprefix obj/small-data/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)
+
+lib/baserel/libdebug.a : $(addprefix obj/baserel/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/libdebug.a : $(addprefix obj.threadsafe/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/soft-float/libdebug.a : $(addprefix obj.threadsafe/soft-float/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/small-data/libdebug.a : $(addprefix obj.threadsafe/small-data/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/baserel/libdebug.a : $(addprefix obj.threadsafe/baserel/libdebug/,$(DEBUG_LIB))
+	@$(MAKELIB)

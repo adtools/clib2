@@ -1,0 +1,200 @@
+#
+# $Id: libunix.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+#
+# :ts=8
+#
+# -*- mode: makefile; -*-
+
+##############################################################################
+
+LIBS += \
+	lib/libunix.a \
+	lib/soft-float/libunix.a \
+	lib/small-data/libunix.a \
+	lib/baserel/libunix.a \
+	lib.threadsafe/libunix.a \
+	lib.threadsafe/soft-float/libunix.a \
+	lib.threadsafe/small-data/libunix.a \
+	lib.threadsafe/baserel/libunix.a
+
+##############################################################################
+
+UNIX_LIB := \
+	unix.lib_rev.o \
+	dirent_closedir.o \
+	dirent_rewinddir.o \
+	dirent_opendir.o \
+	dirent_readdir.o \
+	fcntl_creat.o \
+	fcntl_fcntl.o \
+	fcntl_open.o \
+	fcntl_get_default_file.o \
+	getopt_getopt_long.o \
+	mount_convertinfo.o \
+	mount_statfs.o \
+	resource_getrlimit.o \
+	resource_setrlimit.o \
+	stat_chmod.o \
+	stat_fstat.o \
+	stat_lstat.o \
+	stat_mkdir.o \
+	stat_rmdir.o \
+	stat_stat.o \
+	stdio_ctermid.o \
+	stdio_fdhookentry.o \
+	stdio_fflush.o \
+	stdio_fopen.o \
+	stdio_file_init.o \
+	stdio_init_exit.o \
+	stdio_locksemaphorename.o \
+	stdio_openiob.o \
+	stdio_popen.o \
+	stdio_record_locking.o \
+	stdio_remove.o \
+	stdio_rename.o \
+	stdlib_alloca.o \
+	stdlib_alloca_cleanup.o \
+	stdlib_alloca_trap.o \
+	stdlib_arg.o \
+	stdlib_expand_wildcard.o \
+	stdlib_expand_wildcard_check.o \
+	stdlib_getmemstats.o \
+	stdlib_main.o \
+	stdlib_main_stub.o \
+	stdlib_mkdtemp.o \
+	stdlib_mkstemp.o \
+	stdlib_mktemp.o \
+	stdlib_malloc.o \
+	stdlib_realloc.o \
+	stdlib_resetmemstats.o \
+	stdlib_system.o \
+	systeminfo_sysinfo.o \
+	termios_cfgetispeed.o \
+	termios_cfgetospeed.o \
+	termios_cfmakeraw.o \
+	termios_cfsetispeed.o \
+	termios_cfsetospeed.o \
+	termios_console_fdhookentry.o \
+	termios_openserial.o \
+	termios_tcdrain.o \
+	termios_tcflow.o \
+	termios_tcflush.o \
+	termios_tcgetattr.o \
+	termios_tcsendbreak.o \
+	termios_tcsetattr.o \
+	timeb_ftime.o \
+	uio_readv.o \
+	uio_writev.o \
+	unistd_access.o \
+	unistd_chdir.o \
+	unistd_chdir_exit.o \
+	unistd_chown.o \
+	unistd_common_pathconf.o \
+	unistd_def_path.o \
+	unistd_def_path_delimiter.o \
+	unistd_environ.o \
+	unistd_execl.o \
+	unistd_execle.o \
+	unistd_execlp.o \
+	unistd_execv.o \
+	unistd_execve.o \
+	unistd_execve_env_exit.o \
+	unistd_execve_env_init.o \
+	unistd_execve_exit.o \
+	unistd_execvp.o \
+	unistd_fpathconf.o \
+	unistd_getcwd.o \
+	unistd_lchown.o \
+	unistd_link.o \
+	unistd_lockf.o \
+	unistd_pathconf.o \
+	unistd_readlink.o \
+	unistd_realpath.o \
+	unistd_restorepathname.o \
+	unistd_setcurrentpath.o \
+	unistd_strip_double_slash.o \
+	unistd_symlink.o \
+	unistd_translatea2u.o \
+	unistd_translaterel.o \
+	unistd_translateu2a.o \
+	unistd_truncate.o \
+	unistd_ttyname.o \
+	unistd_ttyname_r.o \
+	unistd_unix_path_semantics.o \
+	unistd_unlink.o \
+	unistd_wildcard_expand.o \
+	utime_utime.o
+
+##############################################################################
+
+# Dependencies to rebuild if the library version changes
+
+obj/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj/soft-float/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj/small-data/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj/baserel/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj.threadsafe/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj.threadsafe/soft-float/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj.threadsafe/small-data/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj.threadsafe/baserel/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+
+##############################################################################
+
+
+obj/libunix/%.o : CFLAGS += $(LARGEDATA) -DUNIX_PATH_SEMANTICS
+obj/libunix/%.o : %.c
+	@$(COMPILE)
+
+obj/soft-float/libunix/%.o : CFLAGS += $(SOFTFLOAT) -DUNIX_PATH_SEMANTICS
+obj/soft-float/libunix/%.o : %.c
+	@$(COMPILE)
+
+obj/small-data/libunix/%.o : CFLAGS += $(SMALLDATA) -DUNIX_PATH_SEMANTICS
+obj/small-data/libunix/%.o : %.c
+	@$(COMPILE)
+
+obj/baserel/libunix/%.o : CFLAGS += $(BASEREL) -DUNIX_PATH_SEMANTICS
+obj/baserel/libunix/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/libunix/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA) -DUNIX_PATH_SEMANTICS
+obj.threadsafe/libunix/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/soft-float/libunix/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT) -DUNIX_PATH_SEMANTICS
+obj.threadsafe/soft-float/libunix/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/small-data/libunix/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA) -DUNIX_PATH_SEMANTICS
+obj.threadsafe/small-data/libunix/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/baserel/libunix/%.o : CFLAGS += $(THREADSAFE) $(BASEREL) -DUNIX_PATH_SEMANTICS
+obj.threadsafe/baserel/libunix/%.o : %.c
+	@$(COMPILE)
+
+##############################################################################
+
+lib/libunix.a : $(addprefix obj/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)
+
+lib/soft-float/libunix.a : $(addprefix obj/soft-float/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)
+
+lib/small-data/libunix.a : $(addprefix obj/small-data/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)
+
+lib/baserel/libunix.a : $(addprefix obj/baserel/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/libunix.a : $(addprefix obj.threadsafe/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/soft-float/libunix.a : $(addprefix obj.threadsafe/soft-float/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/small-data/libunix.a : $(addprefix obj.threadsafe/small-data/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/baserel/libunix.a : $(addprefix obj.threadsafe/baserel/libunix/,$(UNIX_LIB))
+	@$(MAKELIB)

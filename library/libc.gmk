@@ -1,0 +1,436 @@
+#
+# $Id: libc.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+#
+# :ts=8
+#
+# -*- mode: makefile; -*-
+
+##############################################################################
+
+LIBS += \
+	lib/libc.a \
+	lib/soft-float/libc.a \
+	lib/small-data/libc.a \
+	lib/baserel/libc.a \
+	lib.threadsafe/libc.a \
+	lib.threadsafe/soft-float/libc.a \
+	lib.threadsafe/small-data/libc.a \
+	lib.threadsafe/baserel/libc.a
+
+##############################################################################
+
+C_LIB := \
+	c.lib_rev.o \
+	crtbegin.o \
+	ctype_isalnum.o \
+	ctype_isalpha.o \
+	ctype_isascii.o \
+	ctype_isblank.o \
+	ctype_iscntrl.o \
+	ctype_isdigit.o \
+	ctype_isgraph.o \
+	ctype_islower.o \
+	ctype_isprint.o \
+	ctype_ispunct.o \
+	ctype_isspace.o \
+	ctype_isupper.o \
+	ctype_isxdigit.o \
+	ctype_table.o \
+	ctype_tolower.o \
+	ctype_toupper.o \
+	dirent_closedir.o \
+	dirent_opendir.o \
+	dirent_readdir.o \
+	dirent_rewinddir.o \
+	errno_data.o \
+	fcntl_close.o \
+	fcntl_creat.o \
+	fcntl_fcntl.o \
+	fcntl_get_default_file.o \
+	fcntl_lock.o \
+	fcntl_lseek.o \
+	fcntl_open.o \
+	fcntl_read.o \
+	fcntl_write.o \
+	ftw_ftw.o \
+	ftw_nftw.o \
+	inttypes_imaxdiv.o \
+	inttypes_imaxabs.o \
+	inttypes_strtoimax.o \
+	inttypes_strtoumax.o \
+	libgen_basename.o \
+	libgen_dirname.o \
+	locale_init_exit.o \
+	locale_localeconv.o \
+	locale_open_locale.o \
+	locale_setlocale.o \
+	mount_convertinfo.o \
+	mount_fstatfs.o \
+	mount_statfs.o \
+	profile_profil.o \
+	signal_checkabort.o \
+	signal_data.o \
+	signal_kill.o \
+	signal_mask.o \
+	signal_raise.o \
+	signal_sigaddset.o \
+	signal_sigblock.o \
+	signal_sigemptyset.o \
+	signal_sigmask.o \
+	signal_signal.o \
+	signal_sigprocmask.o \
+	signal_sigsetmask.o \
+	stat_chmod.o \
+	stat_convertfileinfo.o \
+	stat_fchmod.o \
+	stat_fstat.o \
+	stat_lstat.o \
+	stat_mkdir.o \
+	stat_rmdir.o \
+	stat_stat.o \
+	stat_umask.o \
+	stdio_asprintf.o \
+	stdio_clearerr.o \
+	stdio_dropiobreadbuffer.o \
+	stdio_duplicate_fd.o \
+	stdio_examine_fh.o \
+	stdio_fclose.o \
+	stdio_fdhookentry.o \
+	stdio_feof.o \
+	stdio_ferror.o \
+	stdio_fflush.o \
+	stdio_fgetc.o \
+	stdio_fgetpos.o \
+	stdio_fgets.o \
+	stdio_filliobreadbuffer.o \
+	stdio_findvacantfdentry.o \
+	stdio_findvacantiobentry.o \
+	stdio_flockfile.o \
+	stdio_flush.o \
+	stdio_flush_all_files.o \
+	stdio_flushiobwritebuffer.o \
+	stdio_fopen.o \
+	stdio_fprintf.o \
+	stdio_fputc.o \
+	stdio_fputs.o \
+	stdio_fread.o \
+	stdio_freopen.o \
+	stdio_fscanf.o \
+	stdio_fseek.o \
+	stdio_fseeko.o \
+	stdio_fsetpos.o \
+	stdio_ftell.o \
+	stdio_ftello.o \
+	stdio_ftrylockfile.o \
+	stdio_funlockfile.o \
+	stdio_fwrite.o \
+	stdio_getc.o \
+	stdio_getc_unlocked.o \
+	stdio_getchar.o \
+	stdio_getchar_unlocked.o \
+	stdio_gets.o \
+	stdio_get_file_descriptor.o \
+	stdio_growfdtable.o \
+	stdio_growiobtable.o \
+	stdio_grow_file.o \
+	stdio_initializefd.o \
+	stdio_initializeiob.o \
+	stdio_init_exit.o \
+	stdio_file_init.o \
+	stdio_iobhookentry.o \
+	stdio_lock.o \
+	stdio_locksemaphorename.o \
+	stdio_nostdio.o \
+	stdio_openiob.o \
+	stdio_parent_of_fh.o \
+	stdio_perror.o \
+	stdio_popen.o \
+	stdio_printf.o \
+	stdio_putc.o \
+	stdio_putc_unlocked.o \
+	stdio_putchar.o \
+	stdio_putchar_unlocked.o \
+	stdio_puts.o \
+	stdio_remove.o \
+	stdio_remove_fd_alias.o \
+	stdio_rename.o \
+	stdio_rewind.o \
+	stdio_scanf.o \
+	stdio_setbuf.o \
+	stdio_setvbuf.o \
+	stdio_snprintf.o \
+	stdio_sprintf.o \
+	stdio_sscanf.o \
+	stdio_sscanf_hook_entry.o \
+	stdio_tmpfile.o \
+	stdio_tmpnam.o \
+	stdio_translateioerror.o \
+	stdio_ungetc.o \
+	stdio_unlockfile.o \
+	stdio_vasprintf.o \
+	stdio_vasprintf_hook_entry.o \
+	stdio_vfprintf.o \
+	stdio_vfscanf.o \
+	stdio_vsscanf.o \
+	stdio_vscanf.o \
+	stdio_vprintf.o \
+	stdio_vsnprintf.o \
+	stdio_vsnprintf_hook_entry.o \
+	stdio_vsprintf.o \
+	stdio_vsprintf_hook_entry.o \
+	stdlib_abort.o \
+	stdlib_abs.o \
+	stdlib_alloca.o \
+	stdlib_alloca_cleanup.o \
+	stdlib_alloca_trap.o \
+	stdlib_assertion_failure.o \
+	stdlib_atexit.o \
+	stdlib_atoi.o \
+	stdlib_atol.o \
+	stdlib_atoll.o \
+	stdlib_bsearch.o \
+	stdlib_calloc.o \
+	stdlib_checkdetach.o \
+	stdlib_constructor.o \
+	stdlib_constructor_begin.o \
+	stdlib_default_pool_size.o \
+	stdlib_default_puddle_size.o \
+	stdlib_destructor.o \
+	stdlib_detach.o \
+	stdlib_disablerequesters.o \
+	stdlib_div.o \
+	stdlib_divsi3.o \
+	stdlib_divsi4.o \
+	stdlib_dosbase.o \
+	stdlib_exit.o \
+	stdlib_free.o \
+	stdlib_getdefstacksize.o \
+	stdlib_getenv.o \
+	stdlib_getmemstats.o \
+	stdlib_getsp.o \
+	stdlib_get_errno.o \
+	stdlib_isresident.o \
+	stdlib_labs.o \
+	stdlib_llabs.o \
+	stdlib_ldiv.o \
+	stdlib_lldiv.o \
+	stdlib_lib_main.o \
+	stdlib_lib_startup.o \
+	stdlib_machine_test.o \
+	stdlib_main.o \
+	stdlib_main_stub.o \
+	stdlib_malloc.o \
+	stdlib_math.o \
+	stdlib_mkdtemp.o \
+	stdlib_mkstemp.o \
+	stdlib_mktemp.o \
+	stdlib_modsi3.o \
+	stdlib_mulsi3.o \
+	stdlib_never_free.o \
+	stdlib_osliberror.o \
+	stdlib_oslibversion.o \
+	stdlib_priority.o \
+	stdlib_process_name.o \
+	stdlib_program_name.o \
+	stdlib_putenv.o \
+	stdlib_qsort.o \
+	stdlib_rand.o \
+	stdlib_rand_r.o \
+	stdlib_realloc.o \
+	stdlib_red_black.o \
+	stdlib_resetmemstats.o \
+	stdlib_semaphore.o \
+	stdlib_setenv.o \
+	stdlib_setjmp.o \
+	stdlib_set_errno.o \
+	stdlib_set_process_window.o \
+	stdlib_shell_escape.o \
+	stdlib_showerror.o \
+	stdlib_srand.o \
+	stdlib_stackargbytes.o \
+	stdlib_stackcheck.o \
+	stdlib_stackoverflow.o \
+	stdlib_stacksafezone.o \
+	stdlib_stacksize.o \
+	stdlib_stack_usage.o \
+	stdlib_arg.o \
+	stdlib_stdio_window_spec.o \
+	stdlib_strtol.o \
+	stdlib_strtoll.o \
+	stdlib_strtoul.o \
+	stdlib_strtoull.o \
+	stdlib_swapstack.o \
+	stdlib_sysbase.o \
+	stdlib_system.o \
+	stdlib_termination_message.o \
+	stdlib_threshold.o \
+	stdlib_utilitybase.o \
+	stdlib_udivsi3.o \
+	stdlib_udivsi4.o \
+	stdlib_umodsi3.o \
+	stdlib_unsetenv.o \
+	strings_ffs.o \
+	strings_strcasecmp.o \
+	strings_strncasecmp.o \
+	string_bcmp.o \
+	string_bcopy.o \
+	string_bzero.o \
+	string_index.o \
+	string_memchr.o \
+	string_memcmp.o \
+	string_memcpy.o \
+	string_memmove.o \
+	string_memset.o \
+	string_rindex.o \
+	string_strcat.o \
+	string_strchr.o \
+	string_strcmp.o \
+	string_strcoll.o \
+	string_strcpy.o \
+	string_strcspn.o \
+	string_strdup.o \
+	string_strerror.o \
+	string_strerror_r.o \
+	string_strlcat.o \
+	string_strlcpy.o \
+	string_strlen.o \
+	string_strncat.o \
+	string_strncmp.o \
+	string_strncpy.o \
+	string_strpbrk.o \
+	string_strrchr.o \
+	string_strspn.o \
+	string_strstr.o \
+	string_strtok.o \
+	string_strtok_r.o \
+	string_strxfrm.o \
+	time_asctime.o \
+	time_asctime_r.o \
+	time_clock.o \
+	time_converttime.o \
+	time_convert_datestamp.o \
+	time_convert_time.o \
+	time_ctime.o \
+	time_ctime_r.o \
+	time_data.o \
+	time_days_per_date.o \
+	time_gettimeofday.o \
+	time_gmtime.o \
+	time_gmtime_r.o \
+	time_localtime.o \
+	time_localtime_r.o \
+	time_mktime.o \
+	time_numbertostring.o \
+	time_strftime.o \
+	time_time.o \
+	time_weekday.o \
+	uio_readv.o \
+	uio_writev.o \
+	ulimit_ulimit.o \
+	unistd_access.o \
+	unistd_chdir.o \
+	unistd_chdir_exit.o \
+	unistd_chown.o \
+	unistd_currentpathname.o \
+	unistd_dup.o \
+	unistd_dup2.o \
+	unistd_fchown.o \
+	unistd_fdatasync.o \
+	unistd_fdopen.o \
+	unistd_fileno.o \
+	unistd_fsync.o \
+	unistd_ftruncate.o \
+	unistd_getcwd.o \
+	unistd_getopt.o \
+	unistd_getpid.o \
+	unistd_init_exit.o \
+	unistd_isatty.o \
+	unistd_lchown.o \
+	unistd_link.o \
+	unistd_lockf.o \
+	unistd_readlink.o \
+	unistd_realpath.o \
+	unistd_sleep.o \
+	unistd_symlink.o \
+	unistd_sync_fd.o \
+	unistd_timer.o \
+	unistd_time_delay.o \
+	unistd_truncate.o \
+	unistd_unlink.o \
+	unistd_usleep.o \
+	utime_utime.o \
+	utsname_uname.o \
+	crtend.o
+
+##############################################################################
+
+# Dependencies to rebuild if the library version changes
+
+obj/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj/soft-float/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj/small-data/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj/baserel/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj.threadsafe/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj.threadsafe/soft-float/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj.threadsafe/small-data/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj.threadsafe/baserel/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+
+##############################################################################
+
+obj/libc/%.o : CFLAGS += $(LARGEDATA)
+obj/libc/%.o : %.c
+	@$(COMPILE)
+
+obj/soft-float/libc/%.o : CFLAGS += $(SOFTFLOAT)
+obj/soft-float/libc/%.o : %.c
+	@$(COMPILE)
+
+obj/small-data/libc/%.o : CFLAGS += $(SMALLDATA)
+obj/small-data/libc/%.o : %.c
+	@$(COMPILE)
+
+obj/baserel/libc/%.o : CFLAGS += $(BASEREL)
+obj/baserel/libc/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/libc/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA)
+obj.threadsafe/libc/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/soft-float/libc/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT)
+obj.threadsafe/soft-float/libc/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/small-data/libc/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA)
+obj.threadsafe/small-data/libc/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/baserel/libc/%.o : CFLAGS += $(THREADSAFE) $(BASEREL)
+obj.threadsafe/baserel/libc/%.o : %.c
+	@$(COMPILE)
+
+##############################################################################
+
+lib/libc.a : $(addprefix obj/libc/,$(C_LIB))
+	@$(MAKELIB)
+
+lib/soft-float/libc.a : $(addprefix obj/soft-float/libc/,$(C_LIB))
+	@$(MAKELIB)
+
+lib/small-data/libc.a : $(addprefix obj/small-data/libc/,$(C_LIB))
+	@$(MAKELIB)
+
+lib/baserel/libc.a : $(addprefix obj/baserel/libc/,$(C_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/libc.a : $(addprefix obj.threadsafe/libc/,$(C_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/soft-float/libc.a : $(addprefix obj.threadsafe/soft-float/libc/,$(C_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/small-data/libc.a : $(addprefix obj.threadsafe/small-data/libc/,$(C_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/baserel/libc.a : $(addprefix obj.threadsafe/baserel/libc/,$(C_LIB))
+	@$(MAKELIB)

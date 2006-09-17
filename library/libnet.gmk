@@ -1,0 +1,174 @@
+#
+# $Id: libnet.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+#
+# :ts=8
+#
+# -*- mode: makefile; -*-
+
+##############################################################################
+
+LIBS += \
+	lib/libnet.a \
+	lib/soft-float/libnet.a \
+	lib/small-data/libnet.a \
+	lib/baserel/libnet.a \
+	lib.threadsafe/libnet.a \
+	lib.threadsafe/soft-float/libnet.a \
+	lib.threadsafe/small-data/libnet.a \
+	lib.threadsafe/baserel/libnet.a
+
+##############################################################################
+
+NET_LIB := \
+	net.lib_rev.o \
+	socket_accept.o \
+	socket_bind.o \
+	socket_check_daemon.o \
+	socket_connect.o \
+	socket_gethostbyaddr.o \
+	socket_gethostbyname.o \
+	socket_gethostid.o \
+	socket_gethostname.o \
+	socket_getnetbyaddr.o \
+	socket_getnetbyname.o \
+	socket_getpeername.o \
+	socket_getprotobyname.o \
+	socket_getprotobynumber.o \
+	socket_getservbyname.o \
+	socket_getservbyport.o \
+	socket_getsockname.o \
+	socket_getsockopt.o \
+	socket_get_descriptor.o \
+	socket_inet_addr.o \
+	socket_inet_aton.o \
+	socket_inet_lnaof.o \
+	socket_inet_makeaddr.o \
+	socket_inet_netof.o \
+	socket_inet_network.o \
+	socket_inet_ntoa.o \
+	socket_init_exit.o \
+	socket_ioctl.o \
+	socket_isdaemon.o \
+	socket_listen.o \
+	socket_obtain_daemon.o \
+	socket_recv.o \
+	socket_recvfrom.o \
+	socket_recvmsg.o \
+	socket_select_signal.o \
+	socket_select.o \
+	socket_wait_select.o \
+	socket_send.o \
+	socket_sendmsg.o \
+	socket_sendto.o \
+	socket_setsockopt.o \
+	socket_shutdown.o \
+	socket_socket.o \
+	socket_hook_entry.o \
+	socket_hstrerror.o \
+	socket_get_h_errno.o \
+	socket_set_h_errno.o \
+	systeminfo_sysinfo.o \
+	stat_umask.o \
+	usergroup_crypt.o \
+	usergroup_data.o \
+	usergroup_endgrent.o \
+	usergroup_endpwent.o \
+	usergroup_getegid.o \
+	usergroup_geteuid.o \
+	usergroup_getgid.o \
+	usergroup_getgrent.o \
+	usergroup_getgrgid.o \
+	usergroup_getgrnam.o \
+	usergroup_getgroups.o \
+	usergroup_getpass.o \
+	usergroup_getpwent.o \
+	usergroup_getpwnam.o \
+	usergroup_getpwuid.o \
+	usergroup_getuid.o \
+	usergroup_initgroups.o \
+	usergroup_init_exit.o \
+	usergroup_rootmode.o \
+	usergroup_setegid.o \
+	usergroup_seteuid.o \
+	usergroup_setgid.o \
+	usergroup_setgrent.o \
+	usergroup_setgroups.o \
+	usergroup_setpwent.o \
+	usergroup_setregid.o \
+	usergroup_setreuid.o \
+	usergroup_setsid.o \
+	usergroup_setuid.o \
+	utsname_uname.o
+
+##############################################################################
+
+# Dependencies to rebuild if the library version changes
+
+obj/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj/soft-float/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj/small-data/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj/baserel/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj.threadsafe/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj.threadsafe/soft-float/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj.threadsafe/small-data/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj.threadsafe/baserel/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+
+##############################################################################
+
+obj/libnet/%.o : CFLAGS += $(LARGEDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj/libnet/%.o : %.c
+	@$(COMPILE)
+
+obj/soft-float/libnet/%.o : CFLAGS += $(SOFTFLOAT) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj/soft-float/libnet/%.o : %.c
+	@$(COMPILE)
+
+obj/small-data/libnet/%.o : CFLAGS += $(SMALLDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj/small-data/libnet/%.o : %.c
+	@$(COMPILE)
+
+obj/baserel/libnet/%.o : CFLAGS += $(BASEREL) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj/baserel/libnet/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/libnet/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj.threadsafe/libnet/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/soft-float/libnet/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj.threadsafe/soft-float/libnet/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/small-data/libnet/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj.threadsafe/small-data/libnet/%.o : %.c
+	@$(COMPILE)
+
+obj.threadsafe/baserel/libnet/%.o : CFLAGS += $(THREADSAFE) $(BASEREL) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
+obj.threadsafe/baserel/libnet/%.o : %.c
+	@$(COMPILE)
+
+##############################################################################
+
+lib/libnet.a : $(addprefix obj/libnet/,$(NET_LIB))
+	@$(MAKELIB)
+
+lib/soft-float/libnet.a : $(addprefix obj/soft-float/libnet/,$(NET_LIB))
+	@$(MAKELIB)
+
+lib/small-data/libnet.a : $(addprefix obj/small-data/libnet/,$(NET_LIB))
+	@$(MAKELIB)
+
+lib/baserel/libnet.a : $(addprefix obj/baserel/libnet/,$(NET_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/libnet.a : $(addprefix obj.threadsafe/libnet/,$(NET_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/soft-float/libnet.a : $(addprefix obj.threadsafe/soft-float/libnet/,$(NET_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/small-data/libnet.a : $(addprefix obj.threadsafe/small-data/libnet/,$(NET_LIB))
+	@$(MAKELIB)
+
+lib.threadsafe/baserel/libnet.a : $(addprefix obj.threadsafe/baserel/libnet/,$(NET_LIB))
+	@$(MAKELIB)
