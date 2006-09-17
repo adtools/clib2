@@ -1,3 +1,8 @@
+- Integrated the new OS4 build makefile collection, as contributed by
+  Steven Solie. Thank you very much!
+
+- Added the missing strerror_r() function.
+
 - fpathconf() should work with the stdio streams, even in the thread-safe
   library version, again.
 

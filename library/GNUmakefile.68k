@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.95 2006-09-15 06:58:16 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.96 2006-09-17 17:36:42 obarthel Exp $
 #
 # :ts=8
 #
@@ -388,6 +388,7 @@ C_LIB = \
 	string_strcspn.o \
 	string_strdup.o \
 	string_strerror.o \
+	string_strerror_r.o \
 	string_strlcat.o \
 	string_strlcpy.o \
 	string_strlen.o \

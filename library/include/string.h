@@ -1,5 +1,5 @@
 /*
- * $Id: string.h,v 1.11 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: string.h,v 1.12 2006-09-17 17:36:42 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,6 +106,7 @@ extern void *memset(void *ptr, int val, size_t len);
 
 /****************************************************************************/
 
+extern int strerror_r(int error,char * buffer,size_t buffer_size);
 extern char * index(const char *s, int c);
 extern char * rindex(const char *s, int c);
 

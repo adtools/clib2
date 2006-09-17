@@ -1,5 +1,5 @@
 /*
- * $Id: string_strerror.c,v 1.3 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: string_strerror.c,v 1.4 2006-09-17 17:36:42 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,162 +37,78 @@
 
 /****************************************************************************/
 
-static char * error_table[EILSEQ - EPERM + 1] =
+static void
+number_to_string(int number,char * string,size_t string_size)
 {
-	"Operation not permitted",
-	"No such file or directory",
-	"No such process",
-	"Interrupted system call",
-	"Input/output error",
-	"Device not configured",
-	"Argument list too long",
-	"Exec format error",
-	"Bad file descriptor",
-	"No child processes",
-	"Resource deadlock avoided",
-	"Cannot allocate memory",
-	"Permission denied",
-	"Bad address",
-	"Block device required",
-	"Device busy",
-	"File exists",
-	"Cross-device link",
-	"Operation not supported by device",
-	"Not a directory",
-	"Is a directory",
-	"Invalid argument",
-	"Too many open files in system",
-	"Too many open files",
-	"Inappropriate ioctl for device",
-	"Text file busy",
-	"File too large",
-	"No space left on device",
-	"Illegal seek",
-	"Read-only file system",
-	"Too many links",
-	"Broken pipe",
-	"Numerical argument out of domain",
-	"Result too large",
-	"Resource temporarily unavailable",
-	"Operation now in progress",
-	"Operation already in progress",
-	"Socket operation on non-socket",
-	"Destination address required",
-	"Message too long",
-	"Protocol wrong type for socket",
-	"Protocol not available",
-	"Protocol not supported",
-	"Socket type not supported",
-	"Operation not supported on socket",
-	"Protocol family not supported",
-	"Address family not supported by protocol family",
-	"Address already in use",
-	"Can't assign requested address",
-	"Network is down",
-	"Network is unreachable",
-	"Network dropped connection on reset",
-	"Software caused connection abort",
-	"Connection reset by peer",
-	"No buffer space available",
-	"Socket is already connected",
-	"Socket is not connected",
-	"Can't send after socket shutdown",
-	"Too many references: can't splice",
-	"Connection timed out",
-	"Connection refused",
-	"Too many levels of symbolic links",
-	"File name too long",
-	"Host is down",
-	"No route to host",
-	"Directory not empty",
-	"Too many processes",
-	"Too many users",
-	"Disc quota exceeded",
-	"Stale NFS file handle",
-	"Too many levels of remote in path",
-	"RPC struct is bad",
-	"RPC version wrong",
-	"RPC program not available",
-	"Program version wrong",
-	"Bad procedure for program",
-	"No locks available",
-	"Function not implemented",
-	"Inappropriate file type or format",
-	"Authentication error",
-	"Need authenticator",
-	"Identifier removed",
-	"No message of the desired type.",
-	"Value too large to be stored in data type.",
-	"Encoding error detected"
-};
+	int is_negative = 0;
+	char * s = string;
+	unsigned int n;
+	size_t i,len;
+	char c;
+
+	/* We convert the error number into in an unsigned
+	   integer, so that numbers such as 0x80000000
+	   can come out of the conversion. */
+	if(number < 0)
+	{
+		is_negative = 1;
+
+		n = (-number);
+	}
+	else
+	{
+		n = number;
+	}
+
+	/* Convert the error number into a string of digits. */
+	len = 0;
+
+	do
+	{
+		(*s++) = '0' + (n % 10);
+		n /= 10;
+		len++;
+	}
+	while(n > 0 && len < string_size-1);
+
+	/* Add the sign, if necessary. */
+	if(is_negative && len < string_size-1)
+	{
+		(*s++) = '-';
+		len++;
+	}
+
+	(*s) = '\0';
+
+	/* Reverse the string in place. */
+	for(i = 0 ; i < len / 2 ; i++)
+	{
+		c				= string[len-1-i];
+		string[len-1-i]	= string[i];
+		string[i]		= c;
+	}
+}
 
 /****************************************************************************/
 
 char *
 strerror(int error_number)
 {
-	char * result;
+	static char error_message[80];
 
-	if(error_number < EPERM || error_number > EILSEQ)
+	/* NOTE: We are making the assumption that if strerror_r() fails, it
+	         will fail only because the error code is unknown, and not
+	         because the size of the supplied buffer is too small. */
+
+	if(strerror_r(error_number,error_message,sizeof(error_message)) != 0)
 	{
-		static char error_buffer[80];
-		char number[30];
-		char *s = number;
-		int is_negative = 0;
-		unsigned int n;
-		int i,len,c;
+		char number[20];
 
-		/* We convert the error number into in an unsigned
-		   integer, so that numbers such as 0x80000000
-		   can come out of the conversion. */
-		if(error_number < 0)
-		{
-			is_negative = 1;
+		number_to_string(error_number,number,sizeof(number));
 
-			n = (-error_number);
-		}
-		else
-		{
-			n = error_number;
-		}
-
-		/* Convert the error number into a string of digits. */
-		len = 0;
-
-		do
-		{
-			(*s++) = '0' + (n % 10);
-			n /= 10;
-			len++;
-		}
-		while(n > 0 && len < (int)sizeof(number)-1);
-
-		/* Add the sign, if necessary. */
-		if(is_negative && len < (int)sizeof(number)-1)
-		{
-			(*s++) = '-';
-			len++;
-		}
-
-		(*s) = '\0';
-
-		/* Reverse the string in place. */
-		for(i = 0 ; i < len / 2 ; i++)
-		{
-			c				= number[len-1-i];
-			number[len-1-i]	= number[i];
-			number[i]		= c;
-		}
-
-		strcpy(error_buffer,"Unknown error ");
-		strcat(error_buffer,number);
-
-		result = error_buffer;
-	}
-	else
-	{
-		result = error_table[error_number - EPERM];
+		strcpy(error_message,"Unknown error ");
+		strcat(error_message,number);
 	}
 
-	return(result);
+	return(error_message);
 }
