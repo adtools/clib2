@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_fpathconf.c,v 1.2 2006-09-12 14:16:44 obarthel Exp $
+ * $Id: unistd_fpathconf.c,v 1.3 2006-09-17 16:36:48 obarthel Exp $
  *
  * :ts=4
  *
@@ -51,6 +51,8 @@ long
 fpathconf(int file_descriptor,int name)
 {
 	struct FileHandle *fh;
+	BPTR default_file;
+	int error = 0;
 	long ret = -1;
 	struct fd *fd;
 
@@ -59,21 +61,28 @@ fpathconf(int file_descriptor,int name)
 	fd = __get_file_descriptor(file_descriptor);
 	if(fd == NULL)
 	{
-		__set_errno(EINVAL);
+		error = EINVAL;
 		goto out;
 	}
 
-	if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO) || FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 	{
-		__set_errno(EBADF);
+		error = EBADF;
 		goto out;
 	}
 
-	fh = BADDR(fd->fd_DefaultFile);
+	error = __get_default_file(file_descriptor,&default_file);
+	if(error != 0)
+		goto out;
 
-	ret = __pathconf(fh->fh_Type,name); /* Ok if fh->fh_Type==NULL */
+	fh = BADDR(default_file);
+
+	ret = __pathconf(fh->fh_Type,name);
 
  out:
+
+	if(ret == -1 && error != 0)
+		__set_errno(error);
 
 	RETURN(ret);
 	return(ret);

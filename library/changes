@@ -1,3 +1,6 @@
+- fpathconf() should work with the stdio streams, even in the thread-safe
+  library version, again.
+
 - Updated m68k specs file in /documentation to contain an own __CLIB2__
   define so that existing m68k compilers also have this define. In addition,
   the common "-noixemul" option can now also be specified but will do a NOP
