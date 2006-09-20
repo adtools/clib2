@@ -1,5 +1,5 @@
 /*
- * $Id: stat_convertfileinfo.c,v 1.8 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stat_convertfileinfo.c,v 1.9 2006-09-20 19:46:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,7 +81,7 @@ __convert_file_info_to_stat(
 		mode = S_IFIFO;
 	else if (fib->fib_DirEntryType == ST_SOCKET)
 		mode = S_IFSOCK;
-	else if (fib->fib_DirEntryType == ST_CONSOLE)
+	else if (fib->fib_DirEntryType == ST_CONSOLE || fib->fib_DirEntryType == ST_NIL)
 		mode = S_IFCHR;
 	else if (fib->fib_DirEntryType < 0)
 		mode = S_IFREG;

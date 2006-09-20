@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.25 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.26 2006-09-20 19:46:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -167,6 +167,9 @@ struct iob;
 
 /* The same for a console stream. */
 #define ST_CONSOLE (20050402)
+
+/* And something for NIL: */
+#define ST_NIL (20060920)
 
 /****************************************************************************/
 

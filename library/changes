@@ -1,3 +1,6 @@
+- fstat() now works with "NIL:" and "/dev/null", respectively. Not that
+  it returns much useful information, though.
+
 - The _PC_MAX_INPUT query for file handles now returns the default
   buffer size.
 
