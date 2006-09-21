@@ -1,3 +1,5 @@
+c.lib 1.201 (21.9.2006)
+
 - fstat() now works with "NIL:" and "/dev/null", respectively. Not that
   it returns much useful information, though.
 
