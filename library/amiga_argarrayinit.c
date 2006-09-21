@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_argarrayinit.c,v 1.4 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: amiga_argarrayinit.c,v 1.5 2006-09-21 09:24:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -77,7 +77,7 @@ ArgArrayInit(LONG argc, CONST_STRPTR * argv)
 		for(i = 1 ; i < argc ; i++)
 			CXLIB_argarray[i-1] = argv[i];
 
-		result = (unsigned char **)CXLIB_argarray;
+		result = (STRPTR *)CXLIB_argarray;
 	}
 	else if (IconBase != NULL)
 	{
@@ -90,7 +90,7 @@ ArgArrayInit(LONG argc, CONST_STRPTR * argv)
 		if(CXLIB_disko == NULL)
 			goto out;
 
-		result = (unsigned char **)CXLIB_disko->do_ToolTypes;
+		result = (STRPTR *)CXLIB_disko->do_ToolTypes;
 	}
 
  out:

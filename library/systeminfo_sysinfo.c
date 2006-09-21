@@ -1,5 +1,5 @@
 /*
- * $Id: systeminfo_sysinfo.c,v 1.3 2006-07-31 13:32:35 obarthel Exp $
+ * $Id: systeminfo_sysinfo.c,v 1.4 2006-09-21 09:24:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -191,7 +191,7 @@ sysinfo(int cmd,char *buf,long buflen)
 
 			#if defined(SOCKET_SUPPORT)
 			{
-				ret = snprintf(buf,buflen,"%u",gethostid());
+				ret = snprintf(buf,buflen,"%lu",gethostid());
 			}
 			#else
 			{

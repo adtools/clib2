@@ -1,5 +1,5 @@
 /*
- * $Id: stat_lstat.c,v 1.13 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stat_lstat.c,v 1.14 2006-09-21 09:24:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -271,7 +271,7 @@ lstat(const char * path_name, struct stat * st)
 		time(&mtime);
 
 		st->st_mode		= S_IFLNK | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
-		st->st_dev		= (ULONG)DeviceProc((STRPTR)path_name);
+		st->st_dev		= (dev_t)DeviceProc((STRPTR)path_name);
 		st->st_size		= link_length;
 		st->st_mtime	= mtime;
 		st->st_atime	= mtime;

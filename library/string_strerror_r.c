@@ -1,5 +1,5 @@
 /*
- * $Id: string_strerror_r.c,v 1.1 2006-09-17 17:36:42 obarthel Exp $
+ * $Id: string_strerror_r.c,v 1.2 2006-09-21 09:24:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,7 +41,7 @@
 
 /****************************************************************************/
 
-static char * error_table[EILSEQ - EPERM + 1] =
+static const char * error_table[EILSEQ - EPERM + 1] =
 {
 	"Operation not permitted",
 	"No such file or directory",
@@ -136,7 +136,7 @@ int
 strerror_r(int number,char * buffer,size_t buffer_size)
 {
 	int result = -1;
-	char * str;
+	const char * str;
 	size_t len;
 
 	if(number < EPERM || number > EILSEQ)

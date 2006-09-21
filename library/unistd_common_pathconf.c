@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_common_pathconf.c,v 1.2 2006-09-17 17:53:15 obarthel Exp $
+ * $Id: unistd_common_pathconf.c,v 1.3 2006-09-21 09:24:20 obarthel Exp $
  *
  * :ts=4
  *
@@ -173,7 +173,7 @@ __pathconf(struct MsgPort *port,int name)
 				uint32 Bufsize;
 				struct TagItem TagList[2]=
 				{
-					{DC_FHBufferR,	&Bufsize},
+					{DC_FHBufferR,	(ULONG)&Bufsize},
 					{TAG_DONE,		0}
 				};
 
