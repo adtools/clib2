@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.21 2006-01-08 12:04:25 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.22 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -1329,7 +1329,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			#if defined(NDEBUG)
 			{
 				if(output_buffer == NULL)
-					output_buffer = "";
+					output_buffer = (char *)"";
 			}
 			#else
 			{
@@ -1504,13 +1504,13 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 		/* Get ready to prefix a sign character, if required. */
 		if(FLAG_IS_SET(format_flags,FORMATF_IsNegative))
-			prefix = "-";
+			prefix = (char *)"-";
 		else if (FLAG_IS_SET(format_flags,FORMATF_ProduceSign))
-			prefix = "+";
+			prefix = (char *)"+";
 		else if (FLAG_IS_SET(format_flags,FORMATF_ProduceSpace))
-			prefix = " ";
+			prefix = (char *)" ";
 		else if (FLAG_IS_SET(format_flags,FORMATF_ZeroPrefix))
-			prefix = "0";
+			prefix = (char *)"0";
 		else
 			prefix = NULL;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: string_memset.c,v 1.7 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: string_memset.c,v 1.8 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -116,7 +116,7 @@ __memset(unsigned char * to,unsigned char value,size_t len)
 				len -= sizeof(long);
 			}		
 
-			to = (char *)_to;
+			to = (unsigned char *)_to;
 		}
 	}
 

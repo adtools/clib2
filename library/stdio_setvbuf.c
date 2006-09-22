@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_setvbuf.c,v 1.9 2006-01-08 12:04:25 obarthel Exp $
+ * $Id: stdio_setvbuf.c,v 1.10 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -154,7 +154,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	if(bufmode == IOBF_BUFFER_MODE_NONE)
 	{
 		/* Use the default buffer, which is one byte in size. */
-		new_buffer	= &file->iob_SingleByte;
+		new_buffer	= (char *)&file->iob_SingleByte;
 		size		= 1;
 	}
 	else
@@ -162,7 +162,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 		/* Replace the old buffer. */
 		if(buf != NULL)
 		{
-			new_buffer = (UBYTE *)buf;
+			new_buffer = (char *)buf;
 		}
 		else
 		{
@@ -178,7 +178,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	assert( file->iob_BufferReadBytes == 0 );
 	assert( file->iob_BufferWriteBytes == 0 );
 
-	file->iob_Buffer		= new_buffer;
+	file->iob_Buffer		= (UBYTE *)new_buffer;
 	file->iob_BufferSize	= size;
 
 	file->iob_Flags &= ~IOBF_BUFFER_MODE;

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execvp.c,v 1.5 2006-08-02 14:44:01 obarthel Exp $
+ * $Id: unistd_execvp.c,v 1.6 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -161,7 +161,7 @@ execvp(const char *command,char * const argv[])
 		while((search_prefix = local_strsep(&path,path_delimiter)) != NULL)
 		{
 			if((*search_prefix) == '\0')
-				search_prefix = ".";
+				search_prefix = (char *)".";
 
 			search_prefix_len = strlen(search_prefix);
 

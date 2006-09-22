@@ -1,5 +1,5 @@
 /* 
- * $Id: crtbegin.c,v 1.10 2005-03-18 12:38:22 obarthel Exp $
+ * $Id: crtbegin.c,v 1.11 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -24,6 +24,11 @@
  */
 static void (*__CTOR_LIST__[1]) (void) __attribute__(( used, section(".ctors"), aligned(sizeof(void (*)(void))) ));
 static void (*__DTOR_LIST__[1]) (void) __attribute__(( used, section(".dtors"), aligned(sizeof(void (*)(void))) ));
+
+/****************************************************************************/
+
+void _init(void);
+void _fini(void);
 
 /****************************************************************************/
 

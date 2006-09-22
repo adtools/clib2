@@ -1,5 +1,5 @@
 /*
- * $Id: libgen_basename.c,v 1.4 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: libgen_basename.c,v 1.5 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,7 +58,7 @@ basename(char *path)
 
 	if(path == NULL || path[0] == '\0')
 	{
-		result = ".";
+		result = (char *)".";
 	}
 	else
 	{
@@ -86,7 +86,7 @@ basename(char *path)
 		}
 		else
 		{
-			result = "/";
+			result = (char *)"/";
 		}
 	}
 

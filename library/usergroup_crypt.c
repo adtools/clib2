@@ -1,5 +1,5 @@
 /*
- * $Id: usergroup_crypt.c,v 1.4 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: usergroup_crypt.c,v 1.5 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -79,7 +79,7 @@ crypt(const char *key,const char *salt)
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
 	PROFILE_OFF();
-	result = __crypt((STRPTR)key,(STRPTR)salt);
+	result = (char *)__crypt((STRPTR)key,(STRPTR)salt);
 	PROFILE_ON();
 
 	SHOWSTRING(result);

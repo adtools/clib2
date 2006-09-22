@@ -1,5 +1,5 @@
 /*
- * $Id: libgen_dirname.c,v 1.4 2006-01-08 12:04:23 obarthel Exp $
+ * $Id: libgen_dirname.c,v 1.5 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -58,7 +58,7 @@ dirname(char *path)
 
 	if(path == NULL || path[0] == '\0')
 	{
-		result = ".";
+		result = (char *)".";
 	}
 	else
 	{
@@ -71,7 +71,7 @@ dirname(char *path)
 
 		if(len > 0)
 		{
-			result = ".";
+			result = (char *)".";
 
 			for(i = len-1 ; i >= 0 ; i--)
 			{
@@ -87,7 +87,7 @@ dirname(char *path)
 		}
 		else
 		{
-			result = "/";
+			result = (char *)"/";
 		}
 	}
 

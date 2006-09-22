@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ttyname.c,v 1.3 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_ttyname.c,v 1.4 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -136,7 +136,7 @@ ttyname(int file_descriptor)
 		goto out;
 	}
 
-	result = "CONSOLE:";
+	result = (char *)"CONSOLE:";
 
  out:
 

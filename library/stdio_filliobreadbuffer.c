@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_filliobreadbuffer.c,v 1.11 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_filliobreadbuffer.c,v 1.12 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -66,7 +66,7 @@ __fill_iob_read_buffer(struct iob * file)
 	SHOWVALUE(file->iob_BufferSize);
 
 	fam.fam_Action	= file_action_read;
-	fam.fam_Data	= file->iob_Buffer;
+	fam.fam_Data	= (char *)file->iob_Buffer;
 	fam.fam_Size	= file->iob_BufferSize;
 
 	assert( file->iob_Action != NULL );

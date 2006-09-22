@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_def_path_delimiter.c,v 1.2 2006-08-01 19:06:48 obarthel Exp $
+ * $Id: unistd_def_path_delimiter.c,v 1.3 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,4 +37,4 @@
 
 /****************************************************************************/
 
-char * __default_path_delimiter = ":";
+char * __default_path_delimiter = (char *)":";

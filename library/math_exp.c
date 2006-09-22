@@ -1,5 +1,5 @@
 /*
- * $Id: math_exp.c,v 1.7 2006-09-22 07:54:24 obarthel Exp $
+ * $Id: math_exp.c,v 1.8 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -159,7 +159,7 @@ INLINE STATIC double
 __exp(double x)
 {
 	double y,hi=0,lo=0,c,t;
-	int k,xsb;
+	int k=0,xsb;
 	unsigned int hx;
 
 	GET_HIGH_WORD(hx,x);

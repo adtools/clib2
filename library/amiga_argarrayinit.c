@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_argarrayinit.c,v 1.5 2006-09-21 09:24:20 obarthel Exp $
+ * $Id: amiga_argarrayinit.c,v 1.6 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,7 +75,7 @@ ArgArrayInit(LONG argc, CONST_STRPTR * argv)
 			goto out;
 
 		for(i = 1 ; i < argc ; i++)
-			CXLIB_argarray[i-1] = argv[i];
+			CXLIB_argarray[i-1] = (unsigned char *)argv[i];
 
 		result = (STRPTR *)CXLIB_argarray;
 	}

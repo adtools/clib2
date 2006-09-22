@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.4 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: debug.c,v 1.5 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=8
  *
@@ -160,7 +160,7 @@ _SHOWVALUE(
 {
 	if(__debug_level >= DEBUGLEVEL_Reports)
 	{
-		char *fmt;
+		const char *fmt;
 
 		switch(size)
 		{
@@ -207,7 +207,7 @@ _SHOWPOINTER(
 {
 	if(__debug_level >= DEBUGLEVEL_Reports)
 	{
-		char *fmt;
+		const char *fmt;
 
 		_INDENT();
 

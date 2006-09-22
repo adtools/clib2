@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_def_path.c,v 1.2 2006-08-01 19:06:48 obarthel Exp $
+ * $Id: unistd_def_path.c,v 1.3 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -37,4 +37,4 @@
 
 /****************************************************************************/
 
-char * __default_path = "/gcc/bin:/SDK/C:/SDK/Local/C:/C:.";
+char * __default_path = (char *)"/gcc/bin:/SDK/C:/SDK/Local/C:/C:.";

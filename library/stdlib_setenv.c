@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setenv.c,v 1.10 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: stdlib_setenv.c,v 1.11 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -220,7 +220,7 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 	}
 
 	if(value == NULL)
-		value = "";
+		value = (char *)"";
 
 	SHOWSTRING(name);
 	SHOWSTRING(value);

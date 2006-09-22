@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.30 2006-01-08 12:04:25 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.31 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -347,7 +347,7 @@ _main(void)
 	/* Try to open the libraries we need to proceed. */
 	if(CANNOT open_libraries())
 	{
-		char * error_message;
+		const char * error_message;
 
 		/* If available, use the error message provided by the client. */
 		error_message = __minimum_os_lib_error;

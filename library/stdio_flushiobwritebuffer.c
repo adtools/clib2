@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_flushiobwritebuffer.c,v 1.8 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_flushiobwritebuffer.c,v 1.9 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ __flush_iob_write_buffer(struct iob * file)
 		SHOWMSG("calling the hook");
 
 		fam.fam_Action	= file_action_write;
-		fam.fam_Data	= file->iob_Buffer;
+		fam.fam_Data	= (char *)file->iob_Buffer;
 		fam.fam_Size	= file->iob_BufferWriteBytes;
 
 		assert( file->iob_Action != NULL );

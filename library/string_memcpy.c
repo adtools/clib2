@@ -1,5 +1,5 @@
 /*
- * $Id: string_memcpy.c,v 1.7 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: string_memcpy.c,v 1.8 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -312,8 +312,8 @@ __memcpy(unsigned char * to,unsigned char * from,size_t len)
 				len -= sizeof(long);
 			}		
 
-			to		= (char *)_to;
-			from	= (char *)_from;
+			to		= (unsigned char *)_to;
+			from	= (unsigned char *)_from;
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.13 2006-09-22 07:54:25 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.14 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -146,7 +146,7 @@ ARG_CONSTRUCTOR(arg_init)
 		/* Get the shell parameter string and find out
 		   how long it is, stripping a trailing line
 		   feed and blank spaces if necessary. */
-		arg_str = GetArgStr();
+		arg_str = (unsigned char *)GetArgStr();
 
 		while(is_space(*arg_str))
 			arg_str++;
@@ -257,9 +257,9 @@ ARG_CONSTRUCTOR(arg_init)
 
 				str++;
 
-				__argv[__argc++] = str;
+				__argv[__argc++] = (char *)str;
 
-				arg = str;
+				arg = (char *)str;
 
 				/* Process the quoted string. */
 				while((*str) != '\0' && NOT is_final_quote_character(str))
@@ -314,7 +314,7 @@ ARG_CONSTRUCTOR(arg_init)
 			}
 			else
 			{
-				__argv[__argc++] = str;
+				__argv[__argc++] = (char *)str;
 
 				while((*str) != '\0' && NOT is_space(*str))
 					str++;

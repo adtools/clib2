@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializeiob.c,v 1.5 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_initializeiob.c,v 1.6 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,7 +54,7 @@ __initialize_iob(
 	memset(iob,0,sizeof(*iob));
 
 	iob->iob_CustomBuffer	= custom_buffer;
-	iob->iob_Buffer			= buffer;
+	iob->iob_Buffer			= (UBYTE *)buffer;
 	iob->iob_BufferSize		= buffer_size;
 	iob->iob_Descriptor		= file_descriptor;
 	iob->iob_SlotNumber		= slot_number;

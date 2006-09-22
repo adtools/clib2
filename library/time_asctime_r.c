@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime_r.c,v 1.8 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: time_asctime_r.c,v 1.9 2006-09-22 09:02:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -177,7 +177,7 @@ __asctime_r(const struct tm *tm,char * buffer,size_t buffer_size)
 	}
 	else
 	{
-		result = "";
+		result = (char *)"";
 	}
 
  out:
