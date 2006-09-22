@@ -1,5 +1,5 @@
 /*
- * $Id: math_kernel_expm1.c,v 1.3 2006-01-08 12:04:23 obarthel Exp $
+ * $Id: math_kernel_expm1.c,v 1.4 2006-09-22 07:54:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -67,7 +67,7 @@ Q5  =  -2.01099218183624371326e-07; /* BE8AFDB7 6E09C32D */
 
 double __expm1(double x)
 {
-	double y,hi,lo,c,t,e,hxs,hfx,r1;
+	double y,hi,lo,c=0,t,e,hxs,hfx,r1;
 	int k,xsb;
 	unsigned int hx;
 

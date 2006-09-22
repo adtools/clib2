@@ -1,5 +1,13 @@
 c.lib 1.201 (21.9.2006)
 
+- If defined, the local environment variable "DISABLE_COMMANDLINE_WILDCARD_EXPANSION"
+  will disable expansion of wildcard patterns passed on the command line.
+  Note that if the variable is not set then the global variable
+  '__expand_wildcard_args' will provide the defaults for the switch that
+  controls whether the wildcard expansion takes place. And after the
+  environment variable has been checked, the '__expand_wildcard_args_check'
+  function pointer can still be used to override the switch.
+
 - fstat() now works with "NIL:" and "/dev/null", respectively. Not that
   it returns much useful information, though.
 

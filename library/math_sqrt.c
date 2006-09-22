@@ -1,5 +1,5 @@
 /*
- * $Id: math_sqrt.c,v 1.8 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: math_sqrt.c,v 1.9 2006-09-22 07:54:24 obarthel Exp $
  *
  * :ts=4
  *
@@ -143,7 +143,7 @@ INLINE STATIC double
 __sqrt(double x)
 {
 	double z;
-	int sign = (int)0x80000000; 
+	unsigned int sign = (unsigned int)0x80000000; 
 	unsigned int r,t1,s1,ix1,q1;
 	int ix0,s0,q,m,t,i;
 

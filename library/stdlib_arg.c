@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.12 2006-09-15 06:58:16 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.13 2006-09-22 07:54:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -134,6 +134,9 @@ ARG_CONSTRUCTOR(arg_init)
 		#if defined(UNIX_PATH_SEMANTICS)
 		{
 			expand_wildcard_args = __expand_wildcard_args;
+
+			if(FindVar("DISABLE_COMMANDLINE_WILDCARD_EXPANSION",LV_VAR) != NULL)
+				expand_wildcard_args = FALSE;
 
 			if(__expand_wildcard_args_check != NULL)
 				expand_wildcard_args = (*__expand_wildcard_args_check)();

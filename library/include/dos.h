@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.25 2006-09-15 06:58:17 obarthel Exp $
+ * $Id: dos.h,v 1.26 2006-09-22 07:54:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -484,6 +484,10 @@ extern BOOL __thread_safe_errno_h_errno;
  * be available at that time, i.e. you cannot just set it differently in
  * your code lateron because by that time the startup code will have already
  * checked it.
+ *
+ * Note that the startup code will disable wildcard expansion if the local
+ * shell environment variable "DISABLE_COMMANDLINE_WILDCARD_EXPANSION"
+ * is set.
  */
 extern BOOL __expand_wildcard_args;
 

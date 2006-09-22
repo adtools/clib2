@@ -1,5 +1,5 @@
 /*
- * $Id: utsname_uname.c,v 1.5 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: utsname_uname.c,v 1.6 2006-09-22 07:54:25 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,7 +68,7 @@ uname(struct utsname *info)
 {
 	struct Library * VersionBase;
 	int Version,Revision;
-	char * version_string;
+	const char * version_string;
 	int result = ERROR;
 
 	ENTER();
