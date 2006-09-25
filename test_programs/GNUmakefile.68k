@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.14 2006-09-20 19:46:37 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.15 2006-09-25 18:20:09 obarthel Exp $
 #
 # :ts=8
 #
@@ -49,13 +49,13 @@ LIBS = -lm -lc -lgcc
 all: test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
 	fstat_stdout_test simple_sprintf date_test sscanf_64 factorial \
-	execvp_test setlocale rand fstat_test 
+	execvp_test setlocale rand fstat_test base_dir_nametest
 
 clean:
 	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test \
 		sprintf_test stack_size_test translate_test strtok_test uname \
 		simple fstat_stdout_test fstat_test simple_sprintf date_test sscanf_64 \
-		factorial execvp_test setlocale rand
+		factorial execvp_test setlocale rand base_dir_nametest
 
 ##############################################################################
 
@@ -134,6 +134,10 @@ factorial : factorial.o
 execvp_test : execvp_test.o
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) -o $@ execvp_test.o -lunix $(LIBS) -Wl,--cref,-M,-Map=$@.map
+
+base_dir_nametest : base_dir_nametest.o
+	@echo "Linking $@"
+	$(CC) $(CFLAGS) -o $@ base_dir_nametest.o -lunix $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
 rand : rand.o
 	@echo "Linking $@"
