@@ -2,6 +2,8 @@
   return a pointer to a string which can be modified. Now it does. Same
   thing for dirname().
 
+- asctime_r() now returns NULL if the buffer is too short to hold even a single
+  byte of data.
 
 c.lib 1.201 (21.9.2006)
 

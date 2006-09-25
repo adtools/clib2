@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.22 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.23 2006-09-25 13:43:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -141,7 +141,7 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 	int buffer_mode;
 	char *output_buffer;
 	int output_len;
-	char *prefix;
+	const char *prefix;
 	char prefix_buffer[8];
 	int result = EOF;
 	int len = 0;
@@ -1504,13 +1504,13 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 		/* Get ready to prefix a sign character, if required. */
 		if(FLAG_IS_SET(format_flags,FORMATF_IsNegative))
-			prefix = (char *)"-";
+			prefix = "-";
 		else if (FLAG_IS_SET(format_flags,FORMATF_ProduceSign))
-			prefix = (char *)"+";
+			prefix = "+";
 		else if (FLAG_IS_SET(format_flags,FORMATF_ProduceSpace))
-			prefix = (char *)" ";
+			prefix = " ";
 		else if (FLAG_IS_SET(format_flags,FORMATF_ZeroPrefix))
-			prefix = (char *)"0";
+			prefix = "0";
 		else
 			prefix = NULL;
 
@@ -1528,7 +1528,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 			if(prefix != NULL)
 			{
-
 				for(i = 0 ; prefix[i] != '\0' ; i++)
 				{
 					/* One less character to fill the output with. */

@@ -1,5 +1,5 @@
 /*
- * $Id: time_asctime_r.c,v 1.9 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: time_asctime_r.c,v 1.10 2006-09-25 13:43:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -74,6 +74,10 @@ char *
 __asctime_r(const struct tm *tm,char * buffer,size_t buffer_size)
 {
 	char * result = NULL;
+	size_t offset = 0;
+	struct tm copy_tm;
+	char number[16];
+	const char * b;
 
 	ENTER();
 
@@ -91,94 +95,85 @@ __asctime_r(const struct tm *tm,char * buffer,size_t buffer_size)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	if(buffer_size > 0)
+	if(buffer_size == 0)
+		goto out;
+
+	buffer_size--;
+
+	/* Fill in the week day if it's not in proper range. */
+	if(tm->tm_wday < 0 || tm->tm_wday > 6)
 	{
-		struct tm copy_tm;
-		char number[16];
-		const char * b;
-		size_t offset = 0;
+		/* We use a peculiar algorithm rather than falling back onto
+		   mktime() here in order to avoid trouble with skewed results
+		   owing to time zone influence. */
+		copy_tm = (*tm);
+		copy_tm.tm_wday = __calculate_weekday(tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
 
-		buffer_size--;
-
-		/* Fill in the week day if it's not in proper range. */
-		if(tm->tm_wday < 0 || tm->tm_wday > 6)
-		{
-			/* We use a peculiar algorithm rather than falling back onto
-			   mktime() here in order to avoid trouble with skewed results
-			   owing to time zone influence. */
-			copy_tm = (*tm);
-			copy_tm.tm_wday = __calculate_weekday(tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
-
-			tm = &copy_tm;
-		}
-
-		assert( 0 <= tm->tm_wday && tm->tm_wday <= 6 );
-
-		b = __abbreviated_week_day_names[tm->tm_wday];
-
-		add_to_string(buffer,buffer_size,b,		&offset);
-		add_to_string(buffer,buffer_size," ",	&offset);
-
-		if(0 <= tm->tm_mon && tm->tm_mon <= 11)
-			b = __abbreviated_month_names[tm->tm_mon];
-		else
-			b = "---";
-
-		add_to_string(buffer,buffer_size,b,		&offset);
-		add_to_string(buffer,buffer_size," ",	&offset);
-
-		if(1 <= tm->tm_mday && tm->tm_mday <= 31)
-			b = __number_to_string((unsigned int)tm->tm_mday,number,sizeof(number),2);
-		else
-			b = "--";
-
-		add_to_string(buffer,buffer_size,b,		&offset);
-		add_to_string(buffer,buffer_size," ",	&offset);
-
-		if(0 <= tm->tm_hour && tm->tm_hour <= 23)
-			b = __number_to_string((unsigned int)tm->tm_hour,number,sizeof(number),2);
-		else
-			b = "--";
-
-		add_to_string(buffer,buffer_size,b,		&offset);
-		add_to_string(buffer,buffer_size,":",	&offset);
-
-		if(0 <= tm->tm_min && tm->tm_min <= 59)
-			b = __number_to_string((unsigned int)tm->tm_min,number,sizeof(number),2);
-		else
-			b = "--";
-
-		add_to_string(buffer,buffer_size,b,		&offset);
-		add_to_string(buffer,buffer_size,":",	&offset);
-
-		if(0 <= tm->tm_sec && tm->tm_sec <= 59)
-			b = __number_to_string((unsigned int)tm->tm_sec,number,sizeof(number),2);
-		else
-			b = "--";
-
-		add_to_string(buffer,buffer_size,b,		&offset);
-		add_to_string(buffer,buffer_size," ",	&offset);
-
-		if(0 <= tm->tm_year)
-			b = __number_to_string((unsigned int)1900 + tm->tm_year,number,sizeof(number),0);
-		else
-			b = "----";
-
-		add_to_string(buffer,buffer_size,b,&offset);
-
-		SHOWSTRING(buffer);
-
-		add_to_string(buffer,buffer_size,"\n",&offset);
-
-		assert( offset <= buffer_size );
-		buffer[offset] = '\0';
-
-		result = buffer;
+		tm = &copy_tm;
 	}
+
+	assert( 0 <= tm->tm_wday && tm->tm_wday <= 6 );
+
+	b = __abbreviated_week_day_names[tm->tm_wday];
+
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
+
+	if(0 <= tm->tm_mon && tm->tm_mon <= 11)
+		b = __abbreviated_month_names[tm->tm_mon];
 	else
-	{
-		result = (char *)"";
-	}
+		b = "---";
+
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
+
+	if(1 <= tm->tm_mday && tm->tm_mday <= 31)
+		b = __number_to_string((unsigned int)tm->tm_mday,number,sizeof(number),2);
+	else
+		b = "--";
+
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
+
+	if(0 <= tm->tm_hour && tm->tm_hour <= 23)
+		b = __number_to_string((unsigned int)tm->tm_hour,number,sizeof(number),2);
+	else
+		b = "--";
+
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size,":",	&offset);
+
+	if(0 <= tm->tm_min && tm->tm_min <= 59)
+		b = __number_to_string((unsigned int)tm->tm_min,number,sizeof(number),2);
+	else
+		b = "--";
+
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size,":",	&offset);
+
+	if(0 <= tm->tm_sec && tm->tm_sec <= 59)
+		b = __number_to_string((unsigned int)tm->tm_sec,number,sizeof(number),2);
+	else
+		b = "--";
+
+	add_to_string(buffer,buffer_size,b,		&offset);
+	add_to_string(buffer,buffer_size," ",	&offset);
+
+	if(0 <= tm->tm_year)
+		b = __number_to_string((unsigned int)1900 + tm->tm_year,number,sizeof(number),0);
+	else
+		b = "----";
+
+	add_to_string(buffer,buffer_size,b,&offset);
+
+	SHOWSTRING(buffer);
+
+	add_to_string(buffer,buffer_size,"\n",&offset);
+
+	assert( offset <= buffer_size );
+	buffer[offset] = '\0';
+
+	result = buffer;
 
  out:
 
