@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.8 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.9 2006-09-25 15:12:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -65,6 +65,12 @@ static struct Library * RexxSysBase;
 #if defined(__amigaos4__)
 static struct RexxSysIFace * IRexxSys;
 #endif /* __amigaos4__ */
+
+/****************************************************************************/
+
+BOOL CheckRexxMsg(struct RexxMsg *message);
+LONG GetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR *buffer_pointer);
+LONG SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG length);
 
 /****************************************************************************/
 

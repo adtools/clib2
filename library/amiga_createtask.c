@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_createtask.c,v 1.5 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: amiga_createtask.c,v 1.6 2006-09-25 15:12:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -206,6 +206,10 @@ CreateTask(CONST_STRPTR name,LONG pri,CONST APTR init_pc,ULONG stack_size)
 #if defined(CreateTask)
 #undef CreateTask
 #endif /* CreateTask */
+
+/****************************************************************************/
+
+struct Task * CreateTask(CONST_STRPTR name,LONG pri,CONST APTR init_pc,ULONG stack_size);
 
 /****************************************************************************/
 

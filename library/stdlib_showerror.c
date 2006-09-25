@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_showerror.c,v 1.13 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: stdlib_showerror.c,v 1.14 2006-09-25 15:12:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -201,7 +201,7 @@ __show_error(const char * message)
 		}
 		else
 		{
-			if(GetProgramName(program_name,sizeof(program_name)))
+			if(GetProgramName((STRPTR)program_name,sizeof(program_name)))
 				title_string = FilePart((STRPTR)program_name);
 			else
 				title_string = (STRPTR)"Error";

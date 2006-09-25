@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_createport.c,v 1.4 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: amiga_createport.c,v 1.5 2006-09-25 15:12:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,6 +47,10 @@
 #if defined(CreatePort)
 #undef CreatePort
 #endif /* CreatePort */
+
+/****************************************************************************/
+
+struct MsgPort * CreatePort(CONST_STRPTR name, LONG pri);
 
 /****************************************************************************/
 

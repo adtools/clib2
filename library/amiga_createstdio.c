@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_createstdio.c,v 1.4 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: amiga_createstdio.c,v 1.5 2006-09-25 15:12:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -47,6 +47,10 @@
 #if defined(CreateStdIO)
 #undef CreateStdIO
 #endif /* CreateStdIO */
+
+/****************************************************************************/
+
+struct IOStdReq * CreateStdIO(CONST struct MsgPort * port);
 
 /****************************************************************************/
 
