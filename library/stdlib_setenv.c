@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setenv.c,v 1.11 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: stdlib_setenv.c,v 1.12 2006-09-25 14:12:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -95,8 +95,8 @@ CLIB_DESTRUCTOR(__setenv_exit)
 int
 setenv(const char *original_name, const char *original_value, int overwrite)
 {
-	char * name = (char *)original_name;
-	char * value = (char *)original_value;
+	const char * name = original_name;
+	const char * value = original_value;
 	char * name_copy = NULL;
 	struct LocalVariable * lv = NULL;
 	struct LocalVar * found;
@@ -185,7 +185,7 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 		char buffer[10];
 
 		PROFILE_OFF();
-		status = GetVar(name,buffer,sizeof(buffer),0);
+		status = GetVar((STRPTR)name,buffer,sizeof(buffer),0);
 		PROFILE_ON();
 
 		if(status != -1)
@@ -198,7 +198,7 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 	}
 
 	PROFILE_OFF();
-	found = FindVar(name,0);
+	found = FindVar((STRPTR)name,0);
 	PROFILE_ON();
 
 	if(found == NULL)
@@ -220,13 +220,13 @@ setenv(const char *original_name, const char *original_value, int overwrite)
 	}
 
 	if(value == NULL)
-		value = (char *)"";
+		value = "";
 
 	SHOWSTRING(name);
 	SHOWSTRING(value);
 
 	PROFILE_OFF();
-	status = SetVar(name,value,(LONG)strlen(value),0);
+	status = SetVar((STRPTR)name,(STRPTR)value,(LONG)strlen(value),0);
 	PROFILE_ON();
 
 	if(status == DOSFALSE)
