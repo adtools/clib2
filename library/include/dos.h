@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.26 2006-09-22 07:54:25 obarthel Exp $
+ * $Id: dos.h,v 1.27 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -509,8 +509,8 @@ extern BOOL (*__expand_wildcard_args_check)(void);
  * ("/gcc/bin:/SDK/C:/SDK/Local/C:/C:.") as used by the execvp()
  * function.
  */
-extern char * __default_path_delimiter;
-extern char * __default_path;
+extern const char * __default_path_delimiter;
+extern const char * __default_path;
 
 /****************************************************************************/
 

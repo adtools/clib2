@@ -1,5 +1,5 @@
 /*
- * $Id: locale_localeconv.c,v 1.6 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: locale_localeconv.c,v 1.7 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,18 +54,18 @@ localeconv(void)
 	monetary_locale	= __locale_table[LC_MONETARY];
 
 	/* This makes up the current locale settings from the various
-	 * components in use.
-	 */
-	loc.decimal_point		= (numeric_locale != NULL) ? ((char *)numeric_locale->loc_DecimalPoint) : (char *)".";
-	loc.thousands_sep		= (numeric_locale != NULL) ? ((char *)numeric_locale->loc_GroupSeparator) : (char *)"";
-	loc.grouping			= (numeric_locale != NULL) ? ((char *)numeric_locale->loc_Grouping) : (char *)"";
-	loc.int_curr_symbol		= (monetary_locale != NULL) ? ((char *)monetary_locale->loc_MonIntCS) : (char *)"";
-	loc.currency_symbol		= (monetary_locale != NULL) ? ((char *)monetary_locale->loc_MonCS) : (char *)"";
-	loc.mon_decimal_point	= (monetary_locale != NULL) ? ((char *)monetary_locale->loc_MonDecimalPoint) : (char *)"";
-	loc.mon_thousands_sep	= (monetary_locale != NULL) ? ((char *)monetary_locale->loc_MonGroupSeparator) : (char *)"";
-	loc.mon_grouping		= (monetary_locale != NULL) ? ((char *)monetary_locale->loc_MonGrouping) : (char *)"";
-	loc.positive_sign		= (monetary_locale != NULL) ? ((char *)monetary_locale->loc_MonPositiveSign) : (char *)"";
-	loc.negative_sign		= (monetary_locale != NULL) ? ((char *)monetary_locale->loc_MonNegativeSign) : (char *)"";
+	   components in use. */
+	loc.decimal_point		= ((numeric_locale	!= NULL) ? ((char *)numeric_locale->loc_DecimalPoint) : (char *)".");
+	loc.thousands_sep		= ((numeric_locale	!= NULL) ? ((char *)numeric_locale->loc_GroupSeparator) : (char *)"");
+	loc.grouping			= ((numeric_locale	!= NULL) ? ((char *)numeric_locale->loc_Grouping) : (char *)"");
+	loc.int_curr_symbol		= ((monetary_locale	!= NULL) ? ((char *)monetary_locale->loc_MonIntCS) : (char *)"");
+	loc.currency_symbol		= ((monetary_locale	!= NULL) ? ((char *)monetary_locale->loc_MonCS) : (char *)"");
+	loc.mon_decimal_point	= ((monetary_locale	!= NULL) ? ((char *)monetary_locale->loc_MonDecimalPoint) : (char *)"");
+	loc.mon_thousands_sep	= ((monetary_locale	!= NULL) ? ((char *)monetary_locale->loc_MonGroupSeparator) : (char *)"");
+	loc.mon_grouping		= ((monetary_locale	!= NULL) ? ((char *)monetary_locale->loc_MonGrouping) : (char *)"");
+	loc.positive_sign		= ((monetary_locale	!= NULL) ? ((char *)monetary_locale->loc_MonPositiveSign) : (char *)"");
+	loc.negative_sign		= ((monetary_locale	!= NULL) ? ((char *)monetary_locale->loc_MonNegativeSign) : (char *)"");
+
 	loc.int_frac_digits		= (monetary_locale != NULL) ? monetary_locale->loc_MonIntFracDigits : CHAR_MAX;
 	loc.frac_digits			= (monetary_locale != NULL) ? monetary_locale->loc_MonFracDigits : CHAR_MAX;
 	loc.p_cs_precedes		= (monetary_locale != NULL) ? monetary_locale->loc_MonPositiveCSPos : CHAR_MAX;

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execvp.c,v 1.6 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: unistd_execvp.c,v 1.7 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -131,9 +131,9 @@ execvp(const char *command,char * const argv[])
 	else
 	{
 		size_t command_buffer_size = 0;
-		char * path_delimiter;
+		const char * path_delimiter;
 		char * path;
-		char * search_prefix;
+		const char * search_prefix;
 		size_t search_prefix_len;
 		size_t complete_path_len;
 		int error;
@@ -143,7 +143,7 @@ execvp(const char *command,char * const argv[])
 		   lateron when we will be calling getenv() again. */
 		path = getenv("PATH");
 		if(path == NULL)
-			path = __default_path;
+			path = (char *)__default_path;
 
 		path_copy = strdup(path);
 		if(path_copy == NULL)
@@ -161,7 +161,7 @@ execvp(const char *command,char * const argv[])
 		while((search_prefix = local_strsep(&path,path_delimiter)) != NULL)
 		{
 			if((*search_prefix) == '\0')
-				search_prefix = (char *)".";
+				search_prefix = ".";
 
 			search_prefix_len = strlen(search_prefix);
 

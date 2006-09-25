@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_arg.c,v 1.14 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: stdlib_arg.c,v 1.15 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -121,12 +121,12 @@ ARG_CONSTRUCTOR(arg_init)
 	/* Shell startup? */
 	if(__WBenchMsg == NULL)
 	{
-		BOOL			expand_wildcard_args;
-		size_t			number_of_arguments;
-		unsigned char *	arg_str;
-		size_t			arg_len;
-		unsigned char *	command_line;
-		unsigned char *	str;
+		BOOL					expand_wildcard_args;
+		size_t					number_of_arguments;
+		const unsigned char *	arg_str;
+		size_t					arg_len;
+		unsigned char *			command_line;
+		unsigned char *			str;
 
 		/* Check if wildcard expansion of command line parameters
 		   should be enabled. Note that the callback function, if
@@ -146,7 +146,7 @@ ARG_CONSTRUCTOR(arg_init)
 		/* Get the shell parameter string and find out
 		   how long it is, stripping a trailing line
 		   feed and blank spaces if necessary. */
-		arg_str = (unsigned char *)GetArgStr();
+		arg_str = (const unsigned char *)GetArgStr();
 
 		while(is_space(*arg_str))
 			arg_str++;

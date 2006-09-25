@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_unsetenv.c,v 1.7 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: stdlib_unsetenv.c,v 1.8 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,11 +54,10 @@
 /****************************************************************************/
 
 void
-unsetenv(const char *original_name)
+unsetenv(const char *name)
 {
-	char * name = (char *)original_name;
 	char * name_copy = NULL;
-	unsigned i;
+	size_t i;
 
 	if(__check_abort_enabled)
 		__check_abort();
@@ -92,7 +91,7 @@ unsetenv(const char *original_name)
 	}
 
 	PROFILE_OFF();
-	DeleteVar(name,0);
+	DeleteVar((STRPTR)name,0);
 	PROFILE_ON();
 
  out:

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_strtod.c,v 1.11 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: stdlib_strtod.c,v 1.12 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -210,9 +210,9 @@ strtod(const char *str, char ** ptr)
 
 		if(__locale_table[LC_NUMERIC] != NULL)
 		{
-			char * point;
+			const char * point;
 
-			point = (char *)__locale_table[LC_NUMERIC]->loc_DecimalPoint;
+			point = (const char *)__locale_table[LC_NUMERIC]->loc_DecimalPoint;
 			if((*point) == (*str))
 			{
 				decimal_point_matches = 1;

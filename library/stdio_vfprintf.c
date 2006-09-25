@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.23 2006-09-25 13:43:06 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.24 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -1329,12 +1329,18 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			#if defined(NDEBUG)
 			{
 				if(output_buffer == NULL)
-					output_buffer = (char *)"";
+				{
+					output_buffer = buffer;
+					strcpy(output_buffer,"");
+				}
 			}
 			#else
 			{
 				if(output_buffer == NULL)
-					output_buffer = "*NULL POINTER*";
+				{
+					output_buffer = buffer;
+					strcpy(output_buffer,"*NULL POINTER*");
+				}
 			}
 			#endif /* NDEBUG */
 

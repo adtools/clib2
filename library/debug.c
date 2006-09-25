@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.5 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: debug.c,v 1.6 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=8
  *
@@ -273,7 +273,7 @@ _DPRINTF(const char *fmt,...)
 		va_list args;
 
 		va_start(args,fmt);
-		KPutFmt((char *)fmt,args);
+		KPutFmt(fmt,args);
 		va_end(args);
 
 		KPrintF("\n");
@@ -288,7 +288,7 @@ _DLOG(const char *fmt,...)
 		va_list args;
 
 		va_start(args,fmt);
-		KPutFmt((char *)fmt,args);
+		KPutFmt(fmt,args);
 		va_end(args);
 	}
 }

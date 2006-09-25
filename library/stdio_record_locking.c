@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.16 2006-04-05 08:39:45 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.17 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -75,7 +75,7 @@ struct FileLockNode
 	struct MinList	fln_LockedRegionList;	/* List of locked regions */
 
 	BPTR			fln_FileParentDir;		/* Refers to the file's parent directory */
-	UBYTE			fln_FileName[1];		/* Name of the file; together with the
+	char 			fln_FileName[1];		/* Name of the file; together with the
 											 * parent directory, this should uniquely
 											 * identify the file.
 											 */
@@ -462,7 +462,7 @@ create_file_lock_node(struct fd * fd,struct FileLockNode ** result_ptr)
 		goto out;
 	}
 
-	strcpy((char *)fln->fln_FileName,fib->fib_FileName);
+	strcpy(fln->fln_FileName,fib->fib_FileName);
 
 	NewList((struct List *)&fln->fln_LockedRegionList);
 

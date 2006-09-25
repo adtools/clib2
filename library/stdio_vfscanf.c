@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.20 2006-01-08 12:04:25 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.21 2006-09-25 14:51:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -897,9 +897,9 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 							 */
 							if(__locale_table[LC_NUMERIC] != NULL)
 							{
-								unsigned char * point;
+								const unsigned char * point;
 
-								point = (unsigned char *)__locale_table[LC_NUMERIC]->loc_DecimalPoint;
+								point = (const unsigned char *)__locale_table[LC_NUMERIC]->loc_DecimalPoint;
 
 								if(c == (*point) || c == '.')
 								{
