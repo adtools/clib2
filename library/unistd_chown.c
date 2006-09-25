@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_chown.c,v 1.11 2006-04-05 08:19:11 obarthel Exp $
+ * $Id: unistd_chown.c,v 1.12 2006-09-25 15:41:50 obarthel Exp $
  *
  * :ts=4
  *
@@ -194,7 +194,7 @@ chown(const char * path_name, uid_t owner, gid_t group)
 				memmove(&new_name->name[1],path_name,len);
 
 				PROFILE_OFF();
-				status = DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0,0);
+				status = DoPkt(dvp->dvp_Port,ACTION_SET_OWNER,0,dvp->dvp_Lock,MKBADDR(new_name),(LONG)((((ULONG)owner) << 16) | group),0);
 				PROFILE_ON();
 			}
 		}
