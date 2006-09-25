@@ -1,5 +1,5 @@
 /*
- * $Id: libgen.h,v 1.6 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: libgen.h,v 1.7 2006-09-25 13:29:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,8 +53,8 @@ extern "C" {
 
 /****************************************************************************/
 
-char * basename(char *path);
-char * dirname(char *path);
+char * basename(const char *path);
+char * dirname(const char *path);
 
 /****************************************************************************/
 

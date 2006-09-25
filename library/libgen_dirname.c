@@ -1,5 +1,5 @@
 /*
- * $Id: libgen_dirname.c,v 1.5 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: libgen_dirname.c,v 1.6 2006-09-25 13:29:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -33,6 +33,14 @@
 
 #include <string.h>
 #include <libgen.h>
+#include <stdio.h>
+#include <errno.h>
+
+/****************************************************************************/
+
+#ifndef _STDLIB_PROTOS_H
+#include "stdlib_protos.h"
+#endif /* _STDLIB_PROTOS_H */
 
 /****************************************************************************/
 
@@ -45,9 +53,12 @@
 /****************************************************************************/
 
 char *
-dirname(char *path)
+dirname(const char *path)
 {
-	char * result;
+	static char new_path[MAXPATHLEN];
+	char * result = NULL;
+	const char * str;
+	size_t len;
 
 	ENTER();
 
@@ -58,11 +69,12 @@ dirname(char *path)
 
 	if(path == NULL || path[0] == '\0')
 	{
-		result = (char *)".";
+		str = ".";
+		len = 1;
 	}
 	else
 	{
-		int len,i;
+		size_t i;
 
 		len = strlen(path);
 
@@ -71,27 +83,43 @@ dirname(char *path)
 
 		if(len > 0)
 		{
-			result = (char *)".";
+			str = ".";
 
-			for(i = len-1 ; i >= 0 ; i--)
+			for(i = len-1 ;  ; i--)
 			{
 				if(path[i] == '/')
 				{
-					path[i] = '\0';
-
-					result = path;
+					str = path;
+					len = i;
 
 					break;
 				}
+
+				if(i == 0)
+					break;
 			}
 		}
 		else
 		{
-			result = (char *)"/";
+			str = "/";
+			len = 1;
 		}
 	}
 
+	if(len + 1 > sizeof(MAXPATHLEN))
+	{
+		__set_errno(ENAMETOOLONG);
+		goto out;
+	}
+
+	memcpy(new_path,str,len);
+	new_path[len] = '\0';
+
+	result = new_path;
+
 	SHOWSTRING(result);
+
+ out:
 
 	RETURN(result);
 	return(result);

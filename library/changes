@@ -1,3 +1,8 @@
+- basename() is not supposed to modify the string it is passed and should
+  return a pointer to a string which can be modified. Now it does. Same
+  thing for dirname().
+
+
 c.lib 1.201 (21.9.2006)
 
 - If defined, the local environment variable "DISABLE_COMMANDLINE_WILDCARD_EXPANSION"
