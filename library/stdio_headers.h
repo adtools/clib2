@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.26 2006-09-20 19:46:57 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.27 2006-09-25 14:05:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -433,7 +433,7 @@ extern int NOCOMMON				__num_fd;
 
 /****************************************************************************/
 
-extern char * NOCOMMON __file_lock_semaphore_name;
+extern const char * NOCOMMON __file_lock_semaphore_name;
 
 /****************************************************************************/
 

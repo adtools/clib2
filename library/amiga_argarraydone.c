@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_argarraydone.c,v 1.3 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: amiga_argarraydone.c,v 1.4 2006-09-25 14:05:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -48,7 +48,7 @@
 
 /****************************************************************************/
 
-extern char **CXLIB_argarray;
+extern const unsigned char **CXLIB_argarray;
 
 extern struct DiskObject * CXLIB_disko;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ttyname.c,v 1.4 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: unistd_ttyname.c,v 1.5 2006-09-25 14:05:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,105 +44,17 @@
 char *
 ttyname(int file_descriptor)
 {
+	static char tty_file_name[_POSIX_TTY_NAME_MAX];
 	char * result = NULL;
-	BOOL is_tty = FALSE;
-	struct fd *fd;
 
 	ENTER();
 
-	SHOWVALUE(file_descriptor);
-
-	__stdio_lock();
-
-	fd = __get_file_descriptor(file_descriptor);
-	if(fd == NULL)
-	{
-		__set_errno(EBADF);
+	if(ttyname_r(file_descriptor,tty_file_name,sizeof(tty_file_name)) != 0)
 		goto out;
-	}
 
-	__fd_lock(fd);
-
-	#if defined(__THREAD_SAFE)
-	{
-		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
-		{
-			BPTR file;
-
-			switch(fd->fd_DefaultFile)
-			{
-				case STDIN_FILENO:
-
-					file = Input();
-					break;
-
-				case STDOUT_FILENO:
-
-					file = Output();
-					break;
-
-				case STDERR_FILENO:
-
-					#if defined(__amigaos4__)
-					{
-						file = ErrorOutput();
-					}
-					#else
-					{
-						struct Process * this_process = (struct Process *)FindTask(NULL);
-
-						file = this_process->pr_CES;
-					}
-					#endif /* __amigaos4__ */
-
-					/* The following is rather controversial; if the standard error stream
-					   is unavailable, we default to reuse the standard output stream. This
-					   is problematic if the standard output stream was redirected and should
-					   not be the same as the standard error output stream. */
-					if(file == ZERO)
-						file = Output();
-
-					break;
-
-				default:
-
-					file = ZERO;
-					break;
-			}
-
-			__fd_lock(fd);
-
-			if(file != ZERO && IsInteractive(file))
-				is_tty = TRUE;
-
-			__fd_unlock(fd);
-		}
-		else
-		{
-			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-				is_tty = TRUE;
-		}
-	}
-	#else
-	{
-		if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-			is_tty = TRUE;
-	}
-	#endif /* __THREAD_SAFE */
-
-	if(NOT is_tty)
-	{
-		__set_errno(ENOTTY);
-		goto out;
-	}
-
-	result = (char *)"CONSOLE:";
+	result = tty_file_name;
 
  out:
-
-	__fd_unlock(fd);
-
-	__stdio_unlock();
 
 	RETURN(result);
 	return(result);

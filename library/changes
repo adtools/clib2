@@ -5,6 +5,10 @@
 - asctime_r() now returns NULL if the buffer is too short to hold even a single
   byte of data.
 
+- ttyname() now calls ttyname_r(). Also, the libunix.a version of ttyname_r()
+  will produce "/CONSOLE" rather than "CONSOLE:".
+
+
 c.lib 1.201 (21.9.2006)
 
 - If defined, the local environment variable "DISABLE_COMMANDLINE_WILDCARD_EXPANSION"

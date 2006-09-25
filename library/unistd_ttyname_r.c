@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ttyname_r.c,v 1.3 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_ttyname_r.c,v 1.4 2006-09-25 14:05:31 obarthel Exp $
  *
  * :ts=4
  *
@@ -44,6 +44,7 @@
 int
 ttyname_r(int file_descriptor,char *name,size_t buflen)
 {
+	const char *tty_file_name;
 	BOOL is_tty = FALSE;
 	struct fd *fd;
 	int result;
@@ -136,13 +137,23 @@ ttyname_r(int file_descriptor,char *name,size_t buflen)
 		goto out;
 	}
 
-	if(buflen < _POSIX_TTY_NAME_MAX) /* XXX Should this be _POSIX_PATH_MAX? */
+	#if defined(UNIX_PATH_SEMANTICS)
+	{
+		tty_file_name = "/CONSOLE";
+	}
+	#else
+	{
+		tty_file_name = "CONSOLE:";
+	}
+	#endif /* UNIX_PATH_SEMANTICS */
+
+	if(buflen < strlen(tty_file_name)+1) /* XXX Should this be _POSIX_PATH_MAX? */
 	{
 		result = ERANGE;
 		goto out;
 	}
 
-	strcpy(name,"CONSOLE:"); /* The buffer is at least 9 bytes, so this is ok. */
+	strcpy(name,tty_file_name);
 
 	result = OK;
 
