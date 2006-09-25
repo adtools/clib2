@@ -1,5 +1,5 @@
 /*
- * $Id: libgen_basename.c,v 1.6 2006-09-25 13:29:47 obarthel Exp $
+ * $Id: libgen_basename.c,v 1.7 2006-09-25 18:19:44 obarthel Exp $
  *
  * :ts=4
  *
@@ -34,13 +34,6 @@
 #include <string.h>
 #include <libgen.h>
 #include <stdio.h>
-#include <errno.h>
-
-/****************************************************************************/
-
-#ifndef _STDLIB_PROTOS_H
-#include "stdlib_protos.h"
-#endif /* _STDLIB_PROTOS_H */
 
 /****************************************************************************/
 
@@ -56,8 +49,8 @@ char *
 basename(const char *path)
 {
 	static char new_path[MAXPATHLEN];
-	char * result = NULL;
 	const char * str;
+	char * result;
 	size_t len;
 
 	ENTER();
@@ -89,7 +82,7 @@ basename(const char *path)
 			{
 				if(path[i] == '/')
 				{
-					len -= i;
+					len -= i+1;
 
 					str = &path[i+1];
 					break;
@@ -99,27 +92,21 @@ basename(const char *path)
 					break;
 			}
 		}
-		else
+
+		if(len == 0)
 		{
 			str = "/";
 			len = 1;
 		}
 	}
 
-	if(len + 1 > sizeof(MAXPATHLEN))
-	{
-		__set_errno(ENAMETOOLONG);
-		goto out;
-	}
+	if(len >= sizeof(new_path))
+		len = sizeof(new_path)-1;
 
 	memcpy(new_path,str,len);
 	new_path[len] = '\0';
 
 	result = new_path;
-
-	SHOWSTRING(result);
-
- out:
 
 	RETURN(result);
 	return(result);

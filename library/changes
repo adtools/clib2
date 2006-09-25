@@ -1,3 +1,8 @@
+- basename() and dirname() can no longer return NULL. They truncate the
+  resulting path name instead. This is done so because some code that
+  calls basename() or dirname() does not check if the function's return
+  value is NULL.
+
 - The SetOwner() fall-back code for Kickstart 2.04 was passing the wrong
   parameters to the file system. The first (dp_Arg1) should have been
   zero. Ouch.
