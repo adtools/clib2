@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fwrite.c,v 1.10 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_fwrite.c,v 1.11 2006-09-25 15:38:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -104,7 +104,7 @@ fwrite(const void *ptr,size_t element_size,size_t count,FILE *stream)
 
 	if(element_size > 0 && count > 0)
 	{
-		unsigned char * data = (unsigned char *)ptr;
+		const unsigned char * data = (unsigned char *)ptr;
 		unsigned char c;
 		int buffer_mode;
 		size_t total_bytes_written = 0;

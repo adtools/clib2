@@ -1,3 +1,7 @@
+- The SetOwner() fall-back code for Kickstart 2.04 was passing the wrong
+  parameters to the file system. The first (dp_Arg1) should have been
+  zero. Ouch.
+
 - basename() is not supposed to modify the string it is passed and should
   return a pointer to a string which can be modified. Now it does. Same
   thing for dirname().

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_ioctl.c,v 1.12 2006-09-21 09:24:20 obarthel Exp $
+ * $Id: socket_ioctl.c,v 1.13 2006-09-25 15:38:21 obarthel Exp $
  *
  * :ts=4
  *
@@ -89,7 +89,7 @@ ioctl(int sockfd,int request, ... /* char *arg */)
 
 	if(result == 0)
 	{
-		int * option = (int *)param;
+		const int * option = (const int *)param;
 
 		if(request == (int)FIONBIO)
 		{
