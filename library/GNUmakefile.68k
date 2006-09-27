@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.96 2006-09-17 17:36:42 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.97 2006-09-27 09:40:05 obarthel Exp $
 #
 # :ts=8
 #
@@ -455,6 +455,7 @@ C_LIB = \
 	unistd_time_delay.o \
 	unistd_truncate.o \
 	unistd_unlink.o \
+	unistd_unlink_retries.o \
 	unistd_usleep.o \
 	utime_utime.o \
 	utsname_uname.o

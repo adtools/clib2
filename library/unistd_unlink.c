@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_unlink.c,v 1.10 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_unlink.c,v 1.11 2006-09-27 09:40:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,7 +53,6 @@
 
 /****************************************************************************/
 
-/* ZZZ unlink() must be reentrant according to POSIX.1 */
 int
 unlink(const char * path_name)
 {
@@ -120,13 +119,13 @@ unlink(const char * path_name)
 	{
 		#if defined(UNIX_PATH_SEMANTICS)
 		{
+			struct UnlinkNode * uln = NULL;
 			struct UnlinkNode * node;
-			struct UnlinkNode * uln;
 			BOOL found = FALSE;
 
 			assert( UtilityBase != NULL );
 
-			if(IoErr() != ERROR_OBJECT_IN_USE)
+			if(NOT __unlink_retries || IoErr() != ERROR_OBJECT_IN_USE)
 			{
 				__set_errno(__translate_access_io_error_to_errno(IoErr()));
 				goto out;
@@ -149,6 +148,8 @@ unlink(const char * path_name)
 
 			PROFILE_OFF();
 
+			ObtainSemaphore(&__unlink_semaphore);
+
 			assert( __unlink_list.mlh_Head != NULL );
 
 			for(node = (struct UnlinkNode *)__unlink_list.mlh_Head ;
@@ -167,16 +168,24 @@ unlink(const char * path_name)
 			if(NOT found)
 			{
 				uln = malloc(sizeof(*uln) + strlen(path_name) + 1);
-				if(uln == NULL)
-					goto out;
+				if(uln != NULL)
+				{
+					uln->uln_Lock = current_dir;
+					uln->uln_Name = (char *)(uln + 1);
 
-				uln->uln_Lock = current_dir;
-				uln->uln_Name = (char *)(uln + 1);
+					strcpy(uln->uln_Name,path_name);
+					AddTail((struct List *)&__unlink_list,(struct Node *)uln);
 
-				strcpy(uln->uln_Name,path_name);
-				AddTail((struct List *)&__unlink_list,(struct Node *)uln);
+					current_dir = ZERO;
+				}
+			}
 
-				current_dir = ZERO;
+			ReleaseSemaphore(&__unlink_semaphore);
+
+			if(NOT found && uln == NULL)
+			{
+				__set_errno(ENOMEM);
+				goto out;
 			}
 		}
 		#else

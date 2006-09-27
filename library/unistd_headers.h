@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_headers.h,v 1.11 2006-07-28 14:37:28 obarthel Exp $
+ * $Id: unistd_headers.h,v 1.12 2006-09-27 09:40:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,7 +59,8 @@ extern char NOCOMMON __current_path_name[MAXPATHLEN];
 /****************************************************************************/
 
 /* Names of files and directories to delete when shutting down. */
-extern struct MinList NOCOMMON __unlink_list;
+extern struct MinList NOCOMMON			__unlink_list;
+extern struct SignalSemaphore NOCOMMON	__unlink_semaphore;
 
 /****************************************************************************/
 

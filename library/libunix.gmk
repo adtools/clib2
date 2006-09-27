@@ -1,5 +1,5 @@
 #
-# $Id: libunix.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+# $Id: libunix.gmk,v 1.2 2006-09-27 09:40:06 obarthel Exp $
 #
 # :ts=8
 #
@@ -122,6 +122,7 @@ UNIX_LIB := \
 	unistd_ttyname_r.o \
 	unistd_unix_path_semantics.o \
 	unistd_unlink.o \
+	unistd_unlink_retries.o \
 	unistd_wildcard_expand.o \
 	utime_utime.o
 

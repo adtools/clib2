@@ -1,5 +1,5 @@
 /*
- * $Id: dos.h,v 1.27 2006-09-25 14:51:15 obarthel Exp $
+ * $Id: dos.h,v 1.28 2006-09-27 09:40:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -552,6 +552,16 @@ extern void __execve_environ_exit(char * const envp[]);
  */
 
 extern void __execve_exit(int return_code);
+
+/****************************************************************************/
+
+/*
+ * The unlink() and remove() functions in libunix.a may return success even
+ * though deletion failed because the file/directory/link in question is still
+ * reported as being "in use". This is the default behaviour. If you want the
+ * deletion to fail instead, set '__unlink_retries' to FALSE.
+ */
+extern BOOL __unlink_retries;
 
 /****************************************************************************/
 
