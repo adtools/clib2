@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ttyname_r.c,v 1.4 2006-09-25 14:05:31 obarthel Exp $
+ * $Id: unistd_ttyname_r.c,v 1.5 2006-09-27 11:54:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -111,12 +111,8 @@ ttyname_r(int file_descriptor,char *name,size_t buflen)
 					break;
 			}
 
-			__fd_lock(fd);
-
 			if(file != ZERO && IsInteractive(file))
 				is_tty = TRUE;
-
-			__fd_unlock(fd);
 		}
 		else
 		{

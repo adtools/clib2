@@ -1,4 +1,10 @@
-- Unlink is now reentrant, or at least thread-safe.
+- __get_default_file() called __fd_unlock() without having called
+  __fd_lock() first. Ouch.
+
+- Removed an unnecessary pair of __fd_lock()..__fd_unlock() calls from
+  ttyname_r().
+
+- The libunix.a unlink() function is now reentrant, or at least thread-safe.
 
 - You can now make unlink() stop after a failed deletion attempt which
   failed because the object to be deleted was reported as being "in use".

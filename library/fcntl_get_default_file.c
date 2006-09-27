@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_get_default_file.c,v 1.6 2006-09-12 14:16:44 obarthel Exp $
+ * $Id: fcntl_get_default_file.c,v 1.7 2006-09-27 11:54:54 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,7 +60,7 @@ __get_default_file(int file_descriptor,long * file_ptr)
 		goto out;
 	}
 
-	__fd_unlock(fd);
+	__fd_lock(fd);
 
 	#if defined(__THREAD_SAFE)
 	{
