@@ -1,5 +1,5 @@
 /*
- * $Id: libgen_dirname.c,v 1.7 2006-09-25 18:19:44 obarthel Exp $
+ * $Id: libgen_dirname.c,v 1.8 2006-10-02 07:15:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,16 +60,18 @@ dirname(const char *path)
 	else
 		SHOWSTRING(path);
 
+	/* An empty path always comes out as the "current directory". */
 	str = ".";
 	len = 1;
 
 	if(path != NULL && path[0] != '\0')
 	{
+		/* Strip all trailing slashes. */
 		len = strlen(path);
-
 		while(len > 1 && path[len-1] == '/')
 			len--;
 
+		/* Is there anything left? */
 		if(len > 0)
 		{
 			size_t i;
@@ -78,9 +80,15 @@ dirname(const char *path)
 			{
 				if(path[i] == '/')
 				{
+					/* Return everything up to, but not including
+					   the last slash in the path. That's usually
+					   the directory name. */
 					str = path;
 					len = i;
 
+					/* If that produces an empty string, it means
+					   that the entire string consists of slash
+					   characters. We'll return only the first. */
 					if(i == 0)
 						len++;
 
@@ -93,6 +101,9 @@ dirname(const char *path)
 		}
 	}
 
+	/* Truncate the path name we can return. This function always returns
+	   a valid pointer rather than NULL because some software expects it
+	   to do so (I blame the specifications). */
 	if(len >= sizeof(new_path))
 		len = sizeof(new_path)-1;
 

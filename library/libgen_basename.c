@@ -1,5 +1,5 @@
 /*
- * $Id: libgen_basename.c,v 1.7 2006-09-25 18:19:44 obarthel Exp $
+ * $Id: libgen_basename.c,v 1.8 2006-10-02 07:15:37 obarthel Exp $
  *
  * :ts=4
  *
@@ -60,6 +60,7 @@ basename(const char *path)
 	else
 		SHOWSTRING(path);
 
+	/* An empty path always comes out as the "current directory". */
 	if(path == NULL || path[0] == '\0')
 	{
 		str = ".";
@@ -67,15 +68,18 @@ basename(const char *path)
 	}
 	else
 	{
+		/* Strip all trailing slashes. */
 		len = strlen(path);
-
 		while(len > 0 && path[len-1] == '/')
 			len--;
 
+		/* Is there anything left? */
 		if(len > 0)
 		{
 			size_t i;
 
+			/* Return what follows the last slash in the path. That's
+			   usually a file or directory name. */
 			str = path;
 
 			for(i = len - 1 ; ; i--)
@@ -93,6 +97,9 @@ basename(const char *path)
 			}
 		}
 
+		/* If the whole operation produced an empty string, then it
+		   means that we dealt with a string which consisted entirely
+		   of slashes. And that's what we will return. */
 		if(len == 0)
 		{
 			str = "/";
@@ -100,6 +107,9 @@ basename(const char *path)
 		}
 	}
 
+	/* Truncate the path name we can return. This function always returns
+	   a valid pointer rather than NULL because some software expects it
+	   to do so (I blame the specifications). */
 	if(len >= sizeof(new_path))
 		len = sizeof(new_path)-1;
 
