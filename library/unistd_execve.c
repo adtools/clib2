@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_execve.c,v 1.12 2006-08-14 14:08:06 obarthel Exp $
+ * $Id: unistd_execve.c,v 1.13 2006-10-02 07:16:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -361,11 +361,11 @@ find_command(const char * path,struct program_info ** result_ptr)
 			if(error == 0 && !done && (io_err == ERROR_OBJECT_NOT_FOUND || io_err == ERROR_OBJECT_WRONG_TYPE || io_err == ERROR_BAD_HUNK))
 			{
 				/* Could that be an ARexx or shell script? */
-				if(get_first_script_line((STRPTR)path,&script_line) == 0)
+				if(get_first_script_line(path,&script_line) == 0)
 				{
 					if(strncmp(script_line,"/*",2) == SAME)
 					{
-						/* That's an ARexx script */
+						/* That's an ARexx script (or a 'C'/C++/Java program, but we support only ARexx here) */
 						pi->interpreter_name = strdup("RX");
 						if(pi->interpreter_name != NULL)
 							done = TRUE;
@@ -669,7 +669,7 @@ build_arg_string(char *const argv[],char * arg_string)
          command will be executed first, and when it has returned the currently
          running program will exit. Also, if you need to redirect the standard
          input/output/error streams you will have to do this using the
-         equivalent AmigaDOS functions (Open, SelectInput(), SelectOutput()
+         equivalent AmigaDOS functions (Open(), SelectInput(), SelectOutput()
          and SelectErrorOutput()), restoring these streams before your program
          exits. What this execve() function does is very similar to how the
          built-in AmigaDOS shell works, but it is much more limited in what
