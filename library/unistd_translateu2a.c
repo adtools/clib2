@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.10 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.11 2006-10-03 16:36:47 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,6 +90,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 	   perform the translation and substitution. */
 	if(strchr(name,':') == NULL)
 	{
+		char home_dir_name[sizeof(nti->substitute)];
 		char volume_name[sizeof(nti->substitute)];
 		size_t volume_name_len;
 		char * replace = nti->substitute;
@@ -107,12 +108,63 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 
 		D(("initial name = '%s'",name));
 
+		/* If the first character of the path name is a tilde, then the
+		   path should be relative to the user's home directory. */
+		if(name[0] == '~' && 0)
+		{
+			LONG home_dir_name_len;
+
+			/* If the HOME environment variable is set, it is supposed to refer
+			   to the name of the directory that will replace the tilde
+			   character. This should be a Unix-style path name and not
+			   something that makes life harder by being an Amiga path name.
+			   Absolute Amiga path names are ignore, as is the absence of
+			   the HOME variable. */
+			home_dir_name_len = GetVar("HOME",(STRPTR)home_dir_name,(LONG)sizeof(home_dir_name),0);
+			if(home_dir_name_len <= 0 || strchr(home_dir_name,':') != NULL)
+			{
+				/* Nothing useful here. Replace the tilde with the
+				   current directory. */
+				strcpy(home_dir_name,".");
+				home_dir_name_len = 1;
+			}
+
+			/* Will this fit? */
+			if(len + home_dir_name_len >= sizeof(nti->substitute)) 
+			{
+				__set_errno(ENAMETOOLONG);
+				goto out;
+			}
+
+			/* Add a path separator unless it's already there. */
+			if(home_dir_name[home_dir_name_len-1] != '/')
+				home_dir_name[home_dir_name_len++] = '/';
+
+			/* Skip the tilde and any path name separators that may follow it. */
+			name++;
+			while((*name) == '/')
+				name++;
+
+			/* Now combine the home directory name with the remainder
+			   of the path name. */
+			strcpy(&home_dir_name[home_dir_name_len],name);
+			name = home_dir_name;
+		}
+
 		/* Prepend an absolute path to the name, if such a path was previously set
 		   as the current directory. */
 		if(__translate_relative_path_name((const char **)&name,nti->substitute,sizeof(nti->substitute)) < 0)
 		{
 			SHOWMSG("relative path name could not be worked into the pattern");
 			goto out;
+		}
+
+		/* If we wound up with the expanded home directory name,
+		   put it into the substitution string. */
+		if(name == home_dir_name)
+		{
+			strcpy(replace,home_dir_name);
+			name = replace;
 		}
 
 		/* If the name was replaced, update the string length cached. */

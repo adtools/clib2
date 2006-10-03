@@ -1,3 +1,6 @@
+- Added experimental tilde expansion in Unix path names. This still needs
+  some more work.
+
 - __get_default_file() called __fd_unlock() without having called
   __fd_lock() first. Ouch.
 
