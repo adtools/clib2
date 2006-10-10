@@ -1,3 +1,12 @@
+- The internal 'struct fd' file descriptor table entry data structure
+  now has a user data field entry.
+
+- Rearranged the contents of the 'struct fd' file descriptor table entry
+  data structure in preparation for making it public. Also added a version
+  field so that user code can handle changes to it gracefully. The default
+  file is no longer a BCPL pointer to a file handle by default, but
+  both a BPTR and a socket identifier, wrapped into a union.
+
 - Added experimental tilde expansion in Unix path names. This still needs
   some more work.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.27 2006-09-25 14:05:31 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.28 2006-10-10 13:39:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -365,6 +365,7 @@ struct iob
 											   standard input/output/error streams. */
 #define FDF_TERMIOS				(1UL<<13)	/* File is under termios control.
 											   FDF_IS_INTERACTIVE should also be set. */
+
 /****************************************************************************/
 
 /* The file action function for unbuffered files. */
@@ -379,22 +380,36 @@ typedef void (*fd_cleanup_t)(struct fd * fd);
 
 struct fd
 {
-	file_action_fd_t	fd_Action;			/* Function to invoke to perform actions */
-	ULONG				fd_Flags;			/* File properties */
-	struct fd *			fd_Original;		/* NULL if this is not a dup()ed file
-											   descriptor; points to original
-											   descriptor if non-NULL */
-	struct fd *			fd_NextLink;		/* Points to next duplicate of this
-											   file descriptor; NULL for none */
-	BPTR				fd_DefaultFile;		/* A dos.library file handle */
-	ULONG				fd_Position;		/* Cached file position (seek offset). */
-	fd_cleanup_t		fd_Cleanup;			/* Cleanup function, if any. */
+	int							fd_Version;			/* Version number of this definition
+													   of the 'fd' data structure. */
+	file_action_fd_t			fd_Action;			/* Function to invoke to perform actions */
+	void *						fd_UserData;		/* To be used by custom file action
+													   functions */
+	ULONG						fd_Flags;			/* File properties */
 
-	struct SignalSemaphore * fd_Lock;		/* For thread locking */
+	union
+	{
+		BPTR					fdu_File;			/* A dos.library file handle */
+		LONG					fdu_Socket;			/* A socket identifier */
+	} fdu_Default;
 
-	void *				fd_Aux;				/* Auxilliary data for "special" files,
-											   e.g. termios support. */
+	struct SignalSemaphore *	fd_Lock;			/* For thread locking */
+	ULONG						fd_Position;		/* Cached file position (seek offset). */
+	fd_cleanup_t				fd_Cleanup;			/* Cleanup function, if any. */
+
+	struct fd *					fd_Original;		/* NULL if this is not a dup()ed file
+													   descriptor; points to original
+													   descriptor if non-NULL */
+	struct fd *					fd_NextAlias;		/* Points to next duplicate of this
+													   file descriptor; NULL for none */
+	void *						fd_Aux;				/* Auxilliary data for "special" files,
+													   e.g. termios support. */
 };
+
+/****************************************************************************/
+
+#define fd_DefaultFile	fdu_Default.fdu_File
+#define fd_Socket		fdu_Default.fdu_Socket
 
 /****************************************************************************/
 
@@ -481,7 +496,7 @@ extern BOOL NOCOMMON __no_standard_io;
 /****************************************************************************/
 
 #define __fd_is_aliased(fd) \
-	((fd)->fd_Original != NULL || (fd)->fd_NextLink != NULL)
+	((fd)->fd_Original != NULL || (fd)->fd_NextAlias != NULL)
 
 /****************************************************************************/
 

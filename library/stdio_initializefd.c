@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_initializefd.c,v 1.6 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_initializefd.c,v 1.7 2006-10-10 13:39:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -49,6 +49,7 @@ __initialize_fd(
 
 	memset(fd,0,sizeof(*fd));
 
+	fd->fd_Version		= 1;
 	fd->fd_DefaultFile	= default_file;
 	fd->fd_Flags		= flags;
 	fd->fd_Action		= action_function;

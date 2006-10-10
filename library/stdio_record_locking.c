@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.17 2006-09-25 14:51:15 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.18 2006-10-10 13:39:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -342,7 +342,7 @@ remove_locked_region_node(struct FileLockSemaphore * fls,struct fd * fd,LONG sta
 				{
 					CLEAR_FLAG(fd->fd_Flags,FDF_IS_LOCKED);
 				}
-				while((fd = fd->fd_NextLink) != NULL);
+				while((fd = fd->fd_NextAlias) != NULL);
 			}
 		}
 	}
@@ -725,7 +725,7 @@ cleanup_locked_records(struct fd * fd)
 				{
 					CLEAR_FLAG(fd->fd_Flags,FDF_IS_LOCKED);
 				}
-				while((fd = fd->fd_NextLink) != NULL);
+				while((fd = fd->fd_NextAlias) != NULL);
 			}
 
 			release_file_lock_semaphore(fls);
@@ -1086,7 +1086,7 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 		{
 			SET_FLAG(fd->fd_Flags,FDF_IS_LOCKED);
 		}
-		while((fd = fd->fd_NextLink) != NULL);
+		while((fd = fd->fd_NextAlias) != NULL);
 	}
 	else if (cmd == F_SETLK)
 	{
@@ -1164,7 +1164,7 @@ __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 		{
 			SET_FLAG(fd->fd_Flags,FDF_IS_LOCKED);
 		}
-		while((fd = fd->fd_NextLink) != NULL);
+		while((fd = fd->fd_NextAlias) != NULL);
 	}
 	else if (cmd == F_GETLK)
 	{

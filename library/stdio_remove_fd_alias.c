@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_remove_fd_alias.c,v 1.4 2006-01-08 12:04:25 obarthel Exp $
+ * $Id: stdio_remove_fd_alias.c,v 1.5 2006-10-10 13:39:26 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,36 +54,36 @@ __remove_fd_alias(struct fd * fd)
 		/* Remove this alias from the list. */
 		for(list_fd = fd->fd_Original ;
 		    list_fd != NULL ;
-		    list_fd = list_fd->fd_NextLink)
+		    list_fd = list_fd->fd_NextAlias)
 		{
-			if(list_fd->fd_NextLink == fd)
+			if(list_fd->fd_NextAlias == fd)
 			{
-				list_fd->fd_NextLink = fd->fd_NextLink;
+				list_fd->fd_NextAlias = fd->fd_NextAlias;
 				break;
 			}
 		}
 	}
-	else if (fd->fd_NextLink != NULL) /* this one has aliases attached; it is the 'original' resource */
+	else if (fd->fd_NextAlias != NULL) /* this one has aliases attached; it is the 'original' resource */
 	{
 		struct fd * first_alias;
 		struct fd * next_alias;
 		struct fd * list_fd;
 
 		/* The first link now becomes the original resource */
-		first_alias = fd->fd_NextLink;
-		next_alias = first_alias->fd_NextLink;
+		first_alias = fd->fd_NextAlias;
+		next_alias = first_alias->fd_NextAlias;
 
 		/* Structure copy... */
 		(*first_alias) = (*fd);
 
 		/* Fix up the linkage. */
-		first_alias->fd_NextLink = next_alias;
+		first_alias->fd_NextAlias = next_alias;
 		first_alias->fd_Original = NULL;
 
 		/* The resources are migrated to the first link. */
 		for(list_fd = next_alias ;
 		    list_fd != NULL ;
-		    list_fd = list_fd->fd_NextLink)
+		    list_fd = list_fd->fd_NextAlias)
 		{
 			list_fd->fd_Original = first_alias;
 		}
