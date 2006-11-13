@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.21 2006-08-02 06:49:47 obarthel Exp $
+ * $Id: unistd.h,v 1.22 2006-11-13 09:51:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -114,7 +114,7 @@ extern int chdir(const char * path_name);
 extern int lockf(int file_descriptor, int function, off_t size);
 extern unsigned int sleep(unsigned int seconds);
 extern void usleep(unsigned long microseconds);
-extern int getopt(int argc, char * argv[], char *opts);
+extern int getopt(int argc, char * const argv[], const char *opts);
 extern pid_t getpid(void);
 extern char *realpath(const char *file_name, char *resolved_name);
 extern int fsync(int file_descriptor);

@@ -1,5 +1,5 @@
 #
-# $Id: libm.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+# $Id: libm.gmk,v 1.2 2006-11-13 09:51:53 obarthel Exp $
 #
 # :ts=8
 #
@@ -109,7 +109,6 @@ MATH_LIB := \
 	math_kernel_cosf.o \
 	math_kernel_expm1.o \
 	math_kernel_rem_pio2.o \
-	math_kernel_scalbn.o \
 	math_kernel_sin.o \
 	math_kernel_sinf.o \
 	math_kernel_tan.o \

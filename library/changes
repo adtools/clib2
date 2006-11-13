@@ -1,3 +1,10 @@
+- The math kernel code no longer uses its own private scalbn() function.
+
+- Added a function prototype for the _exit() function. Note that _exit() is
+  not an ISO 'C' function.
+
+- Corrected the getopt() function prototype, as prompted by Henning Nielsen Lund.
+
 - The printf() family no longer adds a 0 or 0x prefix if the alternate
   conversion modifier is present for the %o and %x conversions and the
   value to be converted is 0 already. Put another way, printf("%#x %#o",0,0);

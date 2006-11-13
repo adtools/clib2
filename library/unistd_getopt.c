@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_getopt.c,v 1.6 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_getopt.c,v 1.7 2006-11-13 09:51:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,7 +55,7 @@ char *	optarg;
 /****************************************************************************/
 
 int
-getopt(int argc, char * argv[], char *opts)
+getopt(int argc, char * const argv[], const char *opts)
 {
 	static int sp = 1;
 	int result = EOF;

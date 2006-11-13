@@ -1,5 +1,5 @@
 /*
- * $Id: math_kernel_rem_pio2.c,v 1.6 2006-11-13 09:25:28 obarthel Exp $
+ * $Id: math_kernel_rem_pio2.c,v 1.7 2006-11-13 09:51:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -102,7 +102,7 @@ recompute:
 	}
 
     /* compute n */
-	z  = __scalbn(z,(int)q0);		/* actual value of z */
+	z  = scalbn(z,(int)q0);		/* actual value of z */
 	z -= 8.0*floor(z*0.125);		/* trim off integer >= 8 */
 	n  = (int) z;
 	z -= (double)n;
@@ -135,7 +135,7 @@ recompute:
 	    }
 	    if(ih==2) {
 		z = one - z;
-		if(carry!=0) z -= __scalbn(one,(int)q0);
+		if(carry!=0) z -= scalbn(one,(int)q0);
 	    }
 	}
 
@@ -161,7 +161,7 @@ recompute:
 	    jz -= 1; q0 -= 24;
 	    while(iq[jz]==0) { jz--; q0-=24;}
 	} else { /* break z into 24-bit if necessary */
-	    z = __scalbn(z,-(int)q0);
+	    z = scalbn(z,-(int)q0);
 	    if(z>=two24) { 
 		fw = (double)((int)(twon24*z));
 		iq[jz] = (int)(z-two24*fw);
@@ -171,7 +171,7 @@ recompute:
 	}
 
     /* convert integer "bit" chunk to floating-point value */
-	fw = __scalbn(one,(int)q0);
+	fw = scalbn(one,(int)q0);
 	for(i=jz;i>=0;i--) {
 	    q[i] = fw*(double)iq[i]; fw*=twon24;
 	}
@@ -331,7 +331,7 @@ int __rem_pio2(double x, double *y)
 	}
 	/* keep the compiler happy */
 	z = 0;
-    /* set z = __scalbn(|x|,ilogb(x)-23) */
+    /* set z = scalbn(|x|,ilogb(x)-23) */
 	GET_LOW_WORD(low,x);
 	SET_LOW_WORD(z,low);
 	e0 	= (int)((ix>>20)-1046);	/* e0 = ilogb(z)-23; */

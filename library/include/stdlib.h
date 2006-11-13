@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.17 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: stdlib.h,v 1.18 2006-11-13 09:51:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -156,6 +156,7 @@ extern long atol(const char *str);
 
 /****************************************************************************/
 
+extern void _exit(int status);
 extern int rand_r(unsigned int * seed);
 
 /****************************************************************************/

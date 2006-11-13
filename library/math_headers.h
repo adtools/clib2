@@ -1,5 +1,5 @@
 /*
- * $Id: math_headers.h,v 1.14 2006-01-08 12:04:23 obarthel Exp $
+ * $Id: math_headers.h,v 1.15 2006-11-13 09:51:53 obarthel Exp $
  *
  * :ts=4
  *
@@ -216,7 +216,6 @@ extern double __kernel_sin(double x, double y, int iy);
 extern int __rem_pio2(double x, double *y);
 extern double __kernel_tan(double x, double y, int iy);
 extern double __expm1(double x);
-extern double __scalbn(double x, int n);
 extern float __kernel_cosf(float x, float y);
 extern float __kernel_sinf(float x, float y, int iy);
 extern LONG __rem_pio2f(float x, float *y);
