@@ -1,3 +1,21 @@
+- readlink() no longer sort-of-works for files and directories. It now only
+  works for soft linked objects and returns an error for everything else.
+  This is based upon a fix by Peter Bengtsson. Thank you very much!
+
+- Moved the lstat() local Lock() function into its own separate file.
+
+- uname() now returns correct and robust information for OS version
+  numbers > 36. This integrates a fix by Peter Bengtsson. Thank you
+  very much!
+
+- Moved the crtbegin.o/crtend.o files out of the link libraries. Moving
+  them in was intended to work as a fix for the shared library build, but
+  now it seems that this has to be done at the link stage through the
+  GCC specs file...
+
+- Integrated a fix for __rem_pio2() which affects sin(), tan() and cos(),
+  contributed by Steven Solie. Thank you very much!
+
 - The internal 'struct fd' file descriptor table entry data structure
   now has a user data field entry.
 

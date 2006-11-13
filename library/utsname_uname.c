@@ -1,5 +1,5 @@
 /*
- * $Id: utsname_uname.c,v 1.6 2006-09-22 07:54:25 obarthel Exp $
+ * $Id: utsname_uname.c,v 1.7 2006-11-13 09:25:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -139,12 +139,16 @@ uname(struct utsname *info)
 		version_string = "4.0";
 	else if (Version == 45)
 		version_string = "3.9";
-	else if (Version >= 44)
+	else if (Version == 44)
 		version_string = "3.5";
-	else if (Version >= 40)
+	else if (40 <= Version && Version <= 43)
 		version_string = "3.1";
-	else if (Version >= 39)
+	else if (Version == 39)
 		version_string = "3.0";
+	else if (Version == 38)
+		version_string = "2.1";
+	else if (Version == 37)
+		version_string = "2.0";
 	else
 		version_string = "unknown";
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_readlink.c,v 1.8 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_readlink.c,v 1.9 2006-11-13 09:25:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -41,6 +41,10 @@
 #include "unistd_headers.h"
 #endif /* _UNISTD_HEADERS_H */
 
+#ifndef _STAT_HEADERS_H
+#include "stat_headers.h"
+#endif /* _STAT_HEADERS_H */
+
 /****************************************************************************/
 
 /* The following is not part of the ISO 'C' (1994) standard. */
@@ -54,9 +58,9 @@ readlink(const char * path_name, char * buffer, int buffer_size)
 	struct name_translation_info path_name_nti;
 	struct name_translation_info buffer_nti;
 	#endif /* UNIX_PATH_SEMANTICS */
-	struct DevProc * dvp = NULL;
 	BPTR lock = ZERO;
 	int result = ERROR;
+	int target_length = -1;
 
 	ENTER();
 
@@ -102,61 +106,18 @@ readlink(const char * path_name, char * buffer, int buffer_size)
 	D(("trying to get a lock on '%s'",path_name));
 
 	PROFILE_OFF();
-	lock = Lock((STRPTR)path_name,SHARED_LOCK);
+	lock = __lock((STRPTR)path_name,SHARED_LOCK,&target_length,buffer,(size_t)buffer_size);
 	PROFILE_ON();
 
 	if(lock != ZERO)
 	{
-		LONG status;
-
-		SHOWMSG("trying to obtain the absolute path");
-
-		PROFILE_OFF();	
-		status = NameFromLock(lock,buffer,buffer_size);
-		PROFILE_ON();
-
-		if(status == DOSFALSE)
-		{
-			SHOWMSG("that didn't work");
-
-			__set_errno(__translate_io_error_to_errno(IoErr()));
-			goto out;
-		}
+		__set_errno(EINVAL);
+		goto out;
 	}
-	else
+	else if (target_length <= 0) /* No a soft-link. */
 	{
-		LONG read_link_result;
-
-		PROFILE_OFF();
-		dvp = GetDeviceProc((STRPTR)path_name,NULL);
-		PROFILE_ON();
-
-		if(dvp == NULL)
-		{
-			SHOWMSG("didn't get deviceproc");
-
-			__set_errno(__translate_io_error_to_errno(IoErr()));
-			goto out;
-		}
-
-		PROFILE_OFF();
-		read_link_result = ReadLink(dvp->dvp_Port,dvp->dvp_Lock,(STRPTR)path_name,buffer,(ULONG)buffer_size);
-		PROFILE_ON();
-
-		if(read_link_result == -1)
-		{
-			SHOWMSG("couldn't read the link");
-
-			__set_errno(__translate_io_error_to_errno(IoErr()));
-			goto out;
-		}
-		else if (read_link_result == -2)
-		{
-			SHOWMSG("buffer was too short");
-
-			__set_errno(ENOBUFS);
-			goto out;
-		}
+		__set_errno(__translate_io_error_to_errno(IoErr()));
+		goto out;
 	}
 
 	#if defined(UNIX_PATH_SEMANTICS)
@@ -180,10 +141,7 @@ readlink(const char * path_name, char * buffer, int buffer_size)
  out:
 
 	PROFILE_OFF();
-
-	FreeDeviceProc(dvp);
 	UnLock(lock);
-
 	PROFILE_ON();
 
 	RETURN(result);

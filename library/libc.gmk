@@ -1,5 +1,5 @@
 #
-# $Id: libc.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
+# $Id: libc.gmk,v 1.2 2006-11-13 09:25:28 obarthel Exp $
 #
 # :ts=8
 #
@@ -21,7 +21,6 @@ LIBS += \
 
 C_LIB := \
 	c.lib_rev.o \
-	crtbegin.o \
 	ctype_isalnum.o \
 	ctype_isalpha.o \
 	ctype_isascii.o \
@@ -85,6 +84,7 @@ C_LIB := \
 	stat_fchmod.o \
 	stat_fstat.o \
 	stat_lstat.o \
+	stat_lock.o \
 	stat_mkdir.o \
 	stat_rmdir.o \
 	stat_stat.o \
@@ -359,8 +359,7 @@ C_LIB := \
 	unistd_unlink.o \
 	unistd_usleep.o \
 	utime_utime.o \
-	utsname_uname.o \
-	crtend.o
+	utsname_uname.o
 
 ##############################################################################
 

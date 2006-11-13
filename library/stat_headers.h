@@ -1,5 +1,5 @@
 /*
- * $Id: stat_headers.h,v 1.6 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stat_headers.h,v 1.7 2006-11-13 09:25:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,6 +59,7 @@ extern mode_t NOCOMMON __current_umask;
 /****************************************************************************/
 
 extern void __convert_file_info_to_stat(const struct MsgPort * file_system,const struct FileInfoBlock * fib,struct stat * st);
+extern BPTR __lock(const char *name,const int mode,int * link_length,char * real_name,size_t real_name_size);
 
 /****************************************************************************/
 

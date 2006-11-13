@@ -1,5 +1,5 @@
 /*
- * $Id: stat_lstat.c,v 1.14 2006-09-21 09:24:20 obarthel Exp $
+ * $Id: stat_lstat.c,v 1.15 2006-11-13 09:25:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -54,118 +54,6 @@
 /* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
-
-/*
- * lstat_lock(): An implementation of Lock() which remembers whether or
- *               not it resolved soft links.
- *
- * Unfortunately is is limited to 255 character names.
- */
-
-static BPTR
-lstat_lock(const char *name,const int mode,int * link_length)
-{
-	D_S(struct bcpl_name,bname);
-	const size_t name_size = sizeof(bname->name);
-	char * new_name = NULL;
-	struct DevProc * dvp = NULL;
-	BPTR lock = ZERO;
-	size_t name_len;
-	LONG error;
-
-	assert( name != NULL && link_length != NULL );
-
-	name_len = strlen(name);
-	if(name_len >= name_size)
-	{
-		SetIoErr(ERROR_LINE_TOO_LONG);
-		goto out;
-	}
-
-	/* Convert the name into a BCPL string. */
-	bname->name[0] = name_len;
-	memmove(&bname->name[1],name,name_len);
-
-	while(TRUE)
-	{
-		/* Get a handle on the device, volume or assignment name in the path. */
-		dvp = GetDeviceProc((STRPTR)name,dvp);
-		if(dvp == NULL)
-			goto out;
-
-		/* Try to obtain a lock on the object. */
-		lock = DoPkt(dvp->dvp_Port,ACTION_LOCATE_OBJECT,dvp->dvp_Lock,MKBADDR(bname),mode,0,0);
-		if(lock != ZERO)
-			break;
-
-		error = IoErr();
-
-		if(error == ERROR_OBJECT_NOT_FOUND)
-		{
-			/* If this is part of a multi-volume assignment, try the next part. */
-			if(FLAG_IS_SET(dvp->dvp_Flags,DVPF_ASSIGN))
-				continue;
-
-			/* Not much we can do here... */
-			break;
-		}
-		else if (error == ERROR_IS_SOFT_LINK)
-		{
-			LONG result;
-
-			/* For soft link resolution we need a temporary buffer to
-			   let the file system store the resolved path name in. */
-			new_name = malloc(name_size);
-			if(new_name == NULL)
-			{
-				SetIoErr(ERROR_NO_FREE_STORE);
-				goto out;
-			}
-
-			/* Now ask the file system to resolve the entire path. */
-			result = ReadLink(dvp->dvp_Port,dvp->dvp_Lock,(STRPTR)name,(STRPTR)new_name,name_size);
-
-			if(result < 0)
-			{
-				/* This will return either -1 (resolution error) or -2
-				   (buffer too small). We regard both as trouble. */
-				SetIoErr(ERROR_INVALID_COMPONENT_NAME);
-				goto out;
-			}
-
-			assert( result > 0 );
-
-			/* Remember the length of the link name. */
-			(*link_length) = result;
-
-			/* Finished for now. */
-			break;
-		}
-		else
-		{
-			/* Some other error; ask if the user wants to have another go at it. */
-			if(ErrorReport(error,REPORT_LOCK,dvp->dvp_Lock,dvp->dvp_Port) != 0)
-				break;
-		}
-
-		/* Retry the lookup. */
-		FreeDeviceProc(dvp);
-		dvp = NULL;
-	}
-
- out:
-
-	error = IoErr();
-
-	if(new_name != NULL)
-		free(new_name);
-
-	FreeDeviceProc(dvp);
-
-	SetIoErr(error);
-
-	return(lock);
-}
 
 int
 lstat(const char * path_name, struct stat * st)
@@ -247,7 +135,7 @@ lstat(const char * path_name, struct stat * st)
 	D(("trying to get a lock on '%s'",path_name));
 
 	PROFILE_OFF();
-	file_lock = lstat_lock(path_name,SHARED_LOCK,&link_length);
+	file_lock = __lock(path_name,SHARED_LOCK,&link_length,NULL,0);
 	PROFILE_ON();
 
 	if(file_lock == ZERO && link_length < 0)

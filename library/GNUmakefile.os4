@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.109 2006-09-17 17:37:27 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.110 2006-11-13 09:25:28 obarthel Exp $
 #
 # :ts=8
 #
@@ -21,28 +21,28 @@
 # These are for the cross compiler, with the operating system header files
 # stored in "/V/include" and the network header files in a local directory
 # called "netinclude".
-SDK_INCLUDE := /V/include
-NET_INCLUDE := netinclude
-CC := ppc-amigaos-gcc
-AR := ppc-amigaos-ar -q
-RANLIB := ppc-amigaos-ranlib
-COPY := cp -a
-DELETE := rm -rf
-MAKEDIR := mkdir -p
-LOG_COMMAND := 2>&1 | tee -a compiler.log
+#SDK_INCLUDE := /V/include
+#NET_INCLUDE := netinclude
+#CC := ppc-amigaos-gcc
+#AR := ppc-amigaos-ar -q
+#RANLIB := ppc-amigaos-ranlib
+#COPY := cp -a
+#DELETE := rm -rf
+#MAKEDIR := mkdir -p
+#LOG_COMMAND := 2>&1 | tee -a compiler.log
 
 # The following are for the native OS4 compiler; note that the
 # LOG_COMMAND should not be enabled unless you have a shell
 # installed which supports it.
-#SDK_INCLUDE := /SDK/Include/include_h
-#NET_INCLUDE := /SDK/Include/netinclude
-#CC := distcc gcc
-#AR := ar -q
-#RANLIB := ranlib
-#COPY := copy
-#DELETE := delete all quiet force
-#MAKEDIR := makedir all force
-#LOG_COMMAND := *>< | tee >>compiler.log
+SDK_INCLUDE := /SDK/Include/include_h
+NET_INCLUDE := /SDK/Include/netinclude
+CC := distcc gcc
+AR := ar -q
+RANLIB := ranlib
+COPY := copy
+DELETE := delete all quiet force
+MAKEDIR := makedir all force
+LOG_COMMAND := *>< | tee >>compiler.log
 
 ##############################################################################
 
@@ -91,7 +91,28 @@ include libprofile.gmk
 all-targets: \
 	lib/crt0.o \
 	lib/small-data/crt0.o \
+	lib/soft-float/crt0.o \
 	lib/baserel/crt0.o \
+	lib/crtbegin.o \
+	lib/soft-float/crtbegin.o \
+	lib/small-data/crtbegin.o \
+	lib/baserel/crtbegin.o \
+	lib/crtend.o \
+	lib/soft-float/crtend.o \
+	lib/small-data/crtend.o \
+	lib/baserel/crtend.o \
+	lib.threadsafe/crt0.o \
+	lib.threadsafe/small-data/crt0.o \
+	lib.threadsafe/soft-float/crt0.o \
+	lib.threadsafe/baserel/crt0.o \
+	lib.threadsafe/crtbegin.o \
+	lib.threadsafe/soft-float/crtbegin.o \
+	lib.threadsafe/small-data/crtbegin.o \
+	lib.threadsafe/baserel/crtbegin.o \
+	lib.threadsafe/crtend.o \
+	lib.threadsafe/soft-float/crtend.o \
+	lib.threadsafe/small-data/crtend.o \
+	lib.threadsafe/baserel/crtend.o \
 	$(LIBS)
 
 ##############################################################################
@@ -136,13 +157,57 @@ lib/%.o : AFLAGS += $(LARGEDATA)
 lib/%.o : %.S
 	@$(ASSEMBLE)
 
+lib/%.o : %.c
+	@$(COMPILE)
+
 lib/small-data/%.o : AFLAGS += $(SMALLDATA)
 lib/small-data/%.o : %.S
 	@$(ASSEMBLE)
 
+lib/small-data/%.o : %.c
+	@$(COMPILE)
+
+lib/soft-float/%.o : AFLAGS += $(SOFTFLOAT)
+lib/soft-float/%.o : %.S
+	@$(ASSEMBLE)
+
+lib/soft-float/%.o : %.c
+	@$(COMPILE)
+
 lib/baserel/%.o : AFLAGS += $(BASEREL)
 lib/baserel/%.o : %.S
 	@$(ASSEMBLE)
+
+lib/baserel/%.o : %.c
+	@$(COMPILE)
+
+lib.threadsafe/%.o : AFLAGS += $(LARGEDATA) $(THREADSAFE)
+lib.threadsafe/%.o : %.S
+	@$(ASSEMBLE)
+
+lib.threadsafe/%.o : %.c
+	@$(COMPILE)
+
+lib.threadsafe/small-data/%.o : AFLAGS += $(SMALLDATA) $(THREADSAFE)
+lib.threadsafe/small-data/%.o : %.S
+	@$(ASSEMBLE)
+
+lib.threadsafe/small-data/%.o : %.c
+	@$(COMPILE)
+
+lib.threadsafe/soft-float/%.o : AFLAGS += $(SOFTFLOAT) $(THREADSAFE)
+lib.threadsafe/soft-float/%.o : %.S
+	@$(ASSEMBLE)
+
+lib.threadsafe/soft-float/%.o : %.c
+	@$(COMPILE)
+
+lib.threadsafe/baserel/%.o : AFLAGS += $(BASEREL) $(THREADSAFE)
+lib.threadsafe/baserel/%.o : %.S
+	@$(ASSEMBLE)
+
+lib.threadsafe/baserel/%.o : %.c
+	@$(COMPILE)
 
 ##############################################################################
 
