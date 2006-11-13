@@ -1,3 +1,9 @@
+- The printf() family no longer adds a 0 or 0x prefix if the alternate
+  conversion modifier is present for the %o and %x conversions and the
+  value to be converted is 0 already. Put another way, printf("%#x %#o",0,0);
+  now prints "0 0". This required another change so that %p always includes
+  the 0x prefix even if the pointer involved is a NULL pointer.
+
 - readlink() no longer sort-of-works for files and directories. It now only
   works for soft linked objects and returns an error for everything else.
   This is based upon a fix by Peter Bengtsson. Thank you very much!
