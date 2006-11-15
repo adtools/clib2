@@ -1,3 +1,7 @@
+- Added functions which modify the callback function and the userdata pointer
+  stored in a low level unbuffered file/socket data structure. These function
+  perform the proper locking and are thus safe to use in a thread-safe environment.
+
 - The low level unbuffered file/socket now has a public equivalent, which
   is defined (along with the typedefs and flags) in <sys/clib2_io.h>. Functions
   for tinkering with it are still to come.
