@@ -1,5 +1,5 @@
 /*
- * $Id: clib2_io.h,v 1.2 2006-11-15 09:17:04 obarthel Exp $
+ * $Id: clib2_io.h,v 1.3 2006-11-15 09:21:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -103,7 +103,8 @@ typedef int (*_file_action_fd_t)(struct _fd * _fd,struct file_action_message * f
 struct _fd
 {
 	int					fd_Version;		/* Version number of this definition
-										   of the '_fd' data structure. */
+										   of the '_fd' data structure (see
+										   below). */
 	_file_action_fd_t	fd_Action;		/* Function to invoke to perform actions */
 	void *				fd_UserData;	/* To be used by custom file action
 										   functions */
@@ -115,6 +116,11 @@ struct _fd
 		LONG			fdu_Socket;		/* A socket identifier */
 	} fdu_Default;
 };
+
+/****************************************************************************/
+
+/* The version of the '_fd' data structure, covering the fields 'fd_Version'
+   through 'fdu_Default' bears version number 1. */
 
 /****************************************************************************/
 
