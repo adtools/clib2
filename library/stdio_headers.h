@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.28 2006-10-10 13:39:26 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.29 2006-11-15 08:51:07 obarthel Exp $
  *
  * :ts=4
  *
@@ -144,6 +144,12 @@
 
 /****************************************************************************/
 
+#ifndef _SYS_CLIB2_IO_H
+#include <sys/clib2_io.h>
+#endif /* _SYS_CLIB2_IO_H */
+
+/****************************************************************************/
+
 /* Forward declarations for below... */
 struct fd;
 struct iob;
@@ -170,42 +176,6 @@ struct iob;
 
 /* And something for NIL: */
 #define ST_NIL (20060920)
-
-/****************************************************************************/
-
-/* Operations that can be performed by the file action function. */
-enum file_action_t
-{
-	file_action_read,
-	file_action_write,
-	file_action_seek,
-	file_action_close,
-	file_action_set_blocking,
-	file_action_set_async,
-	file_action_examine
-};
-
-/****************************************************************************/
-
-/* A message sent to a file action function. */
-struct file_action_message
-{
-	enum file_action_t		fam_Action;		/* What to do */
-	char *					fam_Data;		/* Where to read/write the data */
-	int						fam_Size;		/* How much data to write */
-
-	long int				fam_Offset;		/* The seek offset */
-	int						fam_Mode;		/* The seek mode */
-
-	int						fam_Arg;		/* Whether or not this file should
-											   be set non-blocking or use
-											   asynchronous I/O */
-
-	struct FileInfoBlock *	fam_FileInfo;
-	struct MsgPort *		fam_FileSystem;
-
-	int						fam_Error;		/* Error code, if any... */
-};
 
 /****************************************************************************/
 
@@ -342,32 +312,6 @@ struct iob
 
 /****************************************************************************/
 
-#define FDF_READ				(1UL<<0)	/* Data can be read from this file */
-#define FDF_WRITE				(1UL<<1)	/* Data can be written to this file */
-#define FDF_APPEND				(1UL<<2)	/* Before any data is written to it,
-											   the file position must be set to the
-											   end of the file */
-#define FDF_NO_CLOSE			(1UL<<3)	/* Never close this file */
-#define FDF_NON_BLOCKING		(1UL<<4)	/* File was switched into non-blocking
-											   mode (console streams only) */
-#define FDF_IS_SOCKET			(1UL<<5)	/* This is not a disk file but a socket */
-#define FDF_IS_LOCKED			(1UL<<6)	/* This file has an advisory record lock set */
-#define FDF_IN_USE				(1UL<<7)	/* This file is in use */
-#define FDF_CREATED				(1UL<<8)	/* This file was newly created and may need
-											   to have its protection bits updated after
-											   it has been closed */
-#define FDF_CACHE_POSITION		(1UL<<9)	/* Cache the file position. */
-#define FDF_ASYNC_IO			(1UL<<10)	/* File was switched into asynchronous I/O
-											   mode (sockets only). */
-#define FDF_IS_INTERACTIVE		(1UL<<11)	/* File is attached to a console window or
-											   something like it. */
-#define FDF_STDIO				(1UL<<12)	/* File is to be attached to one of the
-											   standard input/output/error streams. */
-#define FDF_TERMIOS				(1UL<<13)	/* File is under termios control.
-											   FDF_IS_INTERACTIVE should also be set. */
-
-/****************************************************************************/
-
 /* The file action function for unbuffered files. */
 typedef int (*file_action_fd_t)(struct fd * fd,struct file_action_message * fam);
 
@@ -393,6 +337,10 @@ struct fd
 		LONG					fdu_Socket;			/* A socket identifier */
 	} fdu_Default;
 
+	/************************************************************************/
+	/* Public portion ends here                                             */
+	/************************************************************************/
+
 	struct SignalSemaphore *	fd_Lock;			/* For thread locking */
 	ULONG						fd_Position;		/* Cached file position (seek offset). */
 	fd_cleanup_t				fd_Cleanup;			/* Cleanup function, if any. */
@@ -405,11 +353,6 @@ struct fd
 	void *						fd_Aux;				/* Auxilliary data for "special" files,
 													   e.g. termios support. */
 };
-
-/****************************************************************************/
-
-#define fd_DefaultFile	fdu_Default.fdu_File
-#define fd_Socket		fdu_Default.fdu_Socket
 
 /****************************************************************************/
 
