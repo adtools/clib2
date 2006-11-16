@@ -1,5 +1,5 @@
 |
-|	$Id: nrcrt0.S,v 1.5 2006-01-08 12:04:24 obarthel Exp $
+|	$Id: nrcrt0.S,v 1.6 2006-11-16 10:09:20 obarthel Exp $
 |
 |	:ts=4
 |
@@ -56,7 +56,7 @@ MEMF_CLEAR = 65536
 
 	.text
 
-	.globl  _main			| This enforces linkage against the main() function
+	.globl	_main			| This enforces linkage against the main() function
 	.globl	__main
 	.globl	___is_resident
 
