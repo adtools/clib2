@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select_signal.c,v 1.4 2006-11-16 10:41:15 obarthel Exp $
+ * $Id: socket_select_signal.c,v 1.5 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -326,7 +326,7 @@ map_descriptor_sets(
 
 					/* Let's see if we can examine the file. Some file systems
 					   may not support this. */
-					if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
+					if(CANNOT __safe_examine_file_handle(fd->fd_File,fib))
 					{
 						SHOWMSG("file is unusable; we cannot examine the file.");
 						continue;
@@ -812,7 +812,7 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 								if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
 								{
 									/* For an interactive stream, we simply ask. */
-									if(WaitForChar(fd->fd_DefaultFile,1))
+									if(WaitForChar(fd->fd_File,1))
 										got_input = TRUE;
 								}
 								else
@@ -824,7 +824,7 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 									   unread data in the file, we will be able to read from it.
 									   For pipes, any data reported to be in the "file" indicates
 									   that there is something worth reading available. */
-									if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+									if(__safe_examine_file_handle(fd->fd_File,fib))
 									{
 										if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 										{
@@ -1010,14 +1010,14 @@ __select(int num_fds,fd_set *read_fds,fd_set *write_fds,fd_set *except_fds,struc
 
 								if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
 								{
-									if(WaitForChar(fd->fd_DefaultFile,1))
+									if(WaitForChar(fd->fd_File,1))
 										got_input = TRUE;
 								}
 								else
 								{
 									D_S(struct FileInfoBlock,fib);
 
-									if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+									if(__safe_examine_file_handle(fd->fd_File,fib))
 									{
 										if(FLAG_IS_SET(fd->fd_Flags,FDF_CACHE_POSITION))
 										{

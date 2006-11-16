@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ttyname_r.c,v 1.5 2006-09-27 11:54:54 obarthel Exp $
+ * $Id: unistd_ttyname_r.c,v 1.6 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -45,7 +45,6 @@ int
 ttyname_r(int file_descriptor,char *name,size_t buflen)
 {
 	const char *tty_file_name;
-	BOOL is_tty = FALSE;
 	struct fd *fd;
 	int result;
 
@@ -64,73 +63,16 @@ ttyname_r(int file_descriptor,char *name,size_t buflen)
 
 	__fd_lock(fd);
 
-	#if defined(__THREAD_SAFE)
+	if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_INTERACTIVE))
 	{
-		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
+		BPTR file;
+
+		file = __resolve_fd_file(fd);
+		if(file == ZERO || NOT IsInteractive(file))
 		{
-			BPTR file;
-
-			switch(fd->fd_DefaultFile)
-			{
-				case STDIN_FILENO:
-
-					file = Input();
-					break;
-
-				case STDOUT_FILENO:
-
-					file = Output();
-					break;
-
-				case STDERR_FILENO:
-
-					#if defined(__amigaos4__)
-					{
-						file = ErrorOutput();
-					}
-					#else
-					{
-						struct Process * this_process = (struct Process *)FindTask(NULL);
-
-						file = this_process->pr_CES;
-					}
-					#endif /* __amigaos4__ */
-
-					/* The following is rather controversial; if the standard error stream
-					   is unavailable, we default to reuse the standard output stream. This
-					   is problematic if the standard output stream was redirected and should
-					   not be the same as the standard error output stream. */
-					if(file == ZERO)
-						file = Output();
-
-					break;
-
-				default:
-
-					file = ZERO;
-					break;
-			}
-
-			if(file != ZERO && IsInteractive(file))
-				is_tty = TRUE;
+			result = ENOTTY;
+			goto out;
 		}
-		else
-		{
-			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-				is_tty = TRUE;
-		}
-	}
-	#else
-	{
-		if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-			is_tty = TRUE;
-	}
-	#endif /* __THREAD_SAFE */
-
-	if(NOT is_tty)
-	{
-		result = ENOTTY;
-		goto out;
 	}
 
 	#if defined(UNIX_PATH_SEMANTICS)

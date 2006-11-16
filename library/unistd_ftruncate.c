@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_ftruncate.c,v 1.14 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_ftruncate.c,v 1.15 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -107,7 +107,7 @@ ftruncate(int file_descriptor, off_t length)
 	}
 
 	/* Figure out how large the file is right now. */
-	if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
+	if(CANNOT __safe_examine_file_handle(fd->fd_File,fib))
 	{
 		SHOWMSG("couldn't examine file");
 
@@ -123,7 +123,7 @@ ftruncate(int file_descriptor, off_t length)
 		/* Remember where we started. */
 		if(NOT initial_position_valid)
 		{
-			initial_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
+			initial_position = Seek(fd->fd_File,0,OFFSET_CURRENT);
 			if(initial_position == SEEK_ERROR && IoErr() != OK)
 				goto out;
 
@@ -131,7 +131,7 @@ ftruncate(int file_descriptor, off_t length)
 		}
 
 		/* Careful: seek to a position where the file can be safely truncated. */
-		if(Seek(fd->fd_DefaultFile,length,OFFSET_BEGINNING) == SEEK_ERROR && IoErr() != OK)
+		if(Seek(fd->fd_File,length,OFFSET_BEGINNING) == SEEK_ERROR && IoErr() != OK)
 		{
 			D(("could not move to file offset %ld",length));
 
@@ -139,7 +139,7 @@ ftruncate(int file_descriptor, off_t length)
 			goto out;
 		}
 
-		if(SetFileSize(fd->fd_DefaultFile,length,OFFSET_BEGINNING) == SEEK_ERROR)
+		if(SetFileSize(fd->fd_File,length,OFFSET_BEGINNING) == SEEK_ERROR)
 		{
 			D(("could not reduce file to size %ld",length));
 
@@ -164,7 +164,7 @@ ftruncate(int file_descriptor, off_t length)
 		/* Remember where we started. */
 		if(NOT initial_position_valid)
 		{
-			initial_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
+			initial_position = Seek(fd->fd_File,0,OFFSET_CURRENT);
 			if(initial_position == SEEK_ERROR && IoErr() != OK)
 				goto out;
 
@@ -172,7 +172,7 @@ ftruncate(int file_descriptor, off_t length)
 		}
 
 		/* Move to what should be the end of the file. */
-		if(Seek(fd->fd_DefaultFile,current_file_size,OFFSET_BEGINNING) == SEEK_ERROR && IoErr() != OK)
+		if(Seek(fd->fd_File,current_file_size,OFFSET_BEGINNING) == SEEK_ERROR && IoErr() != OK)
 		{
 			D(("could not move to file offset %ld",current_file_size));
 
@@ -198,7 +198,7 @@ ftruncate(int file_descriptor, off_t length)
 	/* ftruncate() may change the size of the file, but it may
 	   not change the current file position. */
 	if(initial_position_valid)
-		Seek(fd->fd_DefaultFile,initial_position,OFFSET_CURRENT);
+		Seek(fd->fd_File,initial_position,OFFSET_CURRENT);
 
 	__fd_unlock(fd);
 

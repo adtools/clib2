@@ -1,5 +1,5 @@
 /*
- * $Id: clib2_io.h,v 1.3 2006-11-15 09:21:49 obarthel Exp $
+ * $Id: clib2_io.h,v 1.4 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -127,6 +127,7 @@ struct _fd
 /* Sneaky preprocessor tricks to make access to the file/socket IDs
    work smoothly. */
 #define fd_DefaultFile	fdu_Default.fdu_File
+#define fd_File			fdu_Default.fdu_File
 #define fd_Socket		fdu_Default.fdu_Socket
 
 /****************************************************************************/

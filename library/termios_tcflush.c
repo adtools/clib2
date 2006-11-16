@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcflush.c,v 1.4 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: termios_tcflush.c,v 1.5 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,9 +50,6 @@ tcflush(int file_descriptor,int queue)
 {
 	int result = ERROR;
 	struct fd *fd;
-	char buf[64];
-	struct termios *tios;
-	BPTR file;
 
 	ENTER();
 
@@ -80,62 +77,16 @@ tcflush(int file_descriptor,int queue)
 		goto out;
 	}
 
-	file = fd->fd_DefaultFile;
-
-	#if defined(__THREAD_SAFE)
-	{
-		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
-		{
-			switch(fd->fd_DefaultFile)
-			{
-				case STDIN_FILENO:
-
-					file = Input();
-					break;
-
-				case STDOUT_FILENO:
-
-					file = Output();
-					break;
-
-				case STDERR_FILENO:
-
-					#if defined(__amigaos4__)
-					{
-						file = ErrorOutput();
-					}
-					#else
-					{
-						struct Process * this_process = (struct Process *)FindTask(NULL);
-
-						file = this_process->pr_CES;
-					}
-					#endif /* __amigaos4__ */
-
-					/* The following is rather controversial; if the standard error stream
-					   is unavailable, we default to reuse the standard output stream. This
-					   is problematic if the standard output stream was redirected and should
-					   not be the same as the standard error output stream. */
-					if(file == ZERO)
-						file = Output();
-
-					break;
-
-				default:
-
-					file = ZERO;
-					break;
-			}
-		}
-	}
-	#endif /* __THREAD_SAFE */
-
-	tios = fd->fd_Aux;
-
 	if(queue == TCIFLUSH || queue == TCIOFLUSH)
 	{
 		LONG num_bytes_read;
+		char buf[64];
+		struct termios *tios;
+		BPTR file;
 
+		tios = fd->fd_Aux;
+
+		file = __resolve_fd_file(fd);
 		if(file == ZERO)
 		{
 			__set_errno(EBADF);
@@ -152,8 +103,8 @@ tcflush(int file_descriptor,int queue)
 
 		while(WaitForChar(file,1) != DOSFALSE)
 		{
-			if(__check_abort_enabled)
-				__check_abort();
+			if(__check_abort_enabled && FLAG_IS_SET(SetSignal(0,0),__break_signal_mask))
+				break;
 
 			/* Read away available data. (upto 8k) */
 			num_bytes_read = Read(file,buf,64);
@@ -177,6 +128,11 @@ tcflush(int file_descriptor,int queue)
 		 * For now we do the same as tcdrain().
 		 */
 		result = tcdrain(file_descriptor);
+	}
+	else
+	{
+		/* ZZZ is this the correct result? */
+		result = OK;
 	}
 
  out:

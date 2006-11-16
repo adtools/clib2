@@ -1,5 +1,5 @@
 /*
- * $Id: mount_fstatfs.c,v 1.13 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: mount_fstatfs.c,v 1.14 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -106,7 +106,7 @@ fstatfs(int file_descriptor, struct statfs *buf)
 	}
 
 	PROFILE_OFF();
-	parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile);
+	parent_dir = __safe_parent_of_file_handle(fd->fd_File);
 	PROFILE_ON();
 
 	if(parent_dir == ZERO)

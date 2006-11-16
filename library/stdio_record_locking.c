@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_record_locking.c,v 1.18 2006-10-10 13:39:26 obarthel Exp $
+ * $Id: stdio_record_locking.c,v 1.19 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -298,7 +298,7 @@ remove_locked_region_node(struct FileLockSemaphore * fls,struct fd * fd,LONG sta
 		/* Find the locked file this descriptor
 		 * buffer belongs to.
 		 */
-		if(find_file_lock_node_by_file_handle(fls,fd->fd_DefaultFile,&which_lock) == OK)
+		if(find_file_lock_node_by_file_handle(fls,fd->fd_File,&which_lock) == OK)
 		{
 			struct LockedRegionNode * lrn;
 			struct LockedRegionNode * lrn_next;
@@ -434,7 +434,7 @@ create_file_lock_node(struct fd * fd,struct FileLockNode ** result_ptr)
 	 * and the name of the file for later use in
 	 * comparisons.
 	 */
-	if(CANNOT __safe_examine_file_handle(fd->fd_DefaultFile,fib))
+	if(CANNOT __safe_examine_file_handle(fd->fd_File,fib))
 	{
 		SHOWMSG("couldn't examine file handle");
 
@@ -453,7 +453,7 @@ create_file_lock_node(struct fd * fd,struct FileLockNode ** result_ptr)
 
 	memset(fln,0,sizeof(*fln));
 
-	fln->fln_FileParentDir = __safe_parent_of_file_handle(fd->fd_DefaultFile);
+	fln->fln_FileParentDir = __safe_parent_of_file_handle(fd->fd_File);
 	if(fln->fln_FileParentDir == ZERO)
 	{
 		SHOWMSG("couldn't get parent directory");
@@ -678,7 +678,7 @@ cleanup_locked_records(struct fd * fd)
 		fls = obtain_file_lock_semaphore(FALSE);
 		if(fls != NULL)
 		{
-			BPTR file_handle = fd->fd_DefaultFile;
+			BPTR file_handle = fd->fd_File;
 			struct FileLockNode * which_lock = NULL;
 			pid_t this_task = getpid();
 			LONG error;
@@ -741,7 +741,7 @@ int
 __handle_record_locking(int cmd,struct flock * l,struct fd * fd,int * error_ptr)
 {
 	struct FileLockSemaphore * fls = NULL;
-	BPTR file_handle = fd->fd_DefaultFile;
+	BPTR file_handle = fd->fd_File;
 	struct LockedRegionNode * lrn = NULL;
 	struct FileLockNode * fln = NULL;
 	D_S(struct FileInfoBlock,fib);

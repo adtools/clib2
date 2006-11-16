@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_sync_fd.c,v 1.7 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: unistd_sync_fd.c,v 1.8 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,11 +70,11 @@ __sync_fd(struct fd * fd,int mode)
 
 	/* The mode tells us what to flush. 0 means "flush just the data", and
 	   everything else means "flush everything. */
-	Flush(fd->fd_DefaultFile);
+	Flush(fd->fd_File);
 
 	if(mode != 0)
 	{
-		struct FileHandle * fh = BADDR(fd->fd_DefaultFile);
+		struct FileHandle * fh = BADDR(fd->fd_File);
 
 		/* Verify that this file is not bound to "NIL:". */
 		if(fh->fh_Type != NULL)

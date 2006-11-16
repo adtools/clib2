@@ -1,5 +1,5 @@
 /*
- * $Id: fcntl_fcntl.c,v 1.19 2006-01-08 12:04:22 obarthel Exp $
+ * $Id: fcntl_fcntl.c,v 1.20 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 				goto out;
 			}
 
-			if(fd->fd_DefaultFile == ZERO)
+			if(fd->fd_File == ZERO)
 			{
 				__set_errno(EBADF);
 				goto out;
@@ -155,7 +155,7 @@ fcntl(int file_descriptor, int cmd, ... /* int arg */ )
 			SHOWMSG("cmd=F_SETFL");
 
 			/* If this is a file, make sure that we don't hit a zero file handle. */
-			if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET) && fd->fd_DefaultFile == ZERO)
+			if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_IS_SOCKET) && fd->fd_File == ZERO)
 			{
 				__set_errno(EBADF);
 				goto out;

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_grow_file.c,v 1.6 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_grow_file.c,v 1.7 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -70,7 +70,7 @@ __grow_file_size(struct fd * fd,int num_bytes)
 
 	assert( FLAG_IS_CLEAR(fd->fd_Flags,FDF_STDIO) );
 
-	fh = BADDR(fd->fd_DefaultFile);
+	fh = BADDR(fd->fd_File);
 	if(fh != NULL && fh->fh_Type != NULL && DoPkt(fh->fh_Type,ACTION_DISK_INFO,MKBADDR(id),0,0,0,0))
 		block_size = id->id_BytesPerBlock;
 
@@ -105,7 +105,7 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	memset(aligned_buffer,0,(size_t)buffer_size);
 
 	PROFILE_OFF();
-	seek_position = Seek(fd->fd_DefaultFile,0,OFFSET_END);
+	seek_position = Seek(fd->fd_File,0,OFFSET_END);
 	PROFILE_ON();
 
 	if(seek_position == SEEK_ERROR && IoErr() != OK)
@@ -117,7 +117,7 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	position = (off_t)seek_position;
 
 	PROFILE_OFF();
-	seek_position = Seek(fd->fd_DefaultFile,0,OFFSET_CURRENT);
+	seek_position = Seek(fd->fd_File,0,OFFSET_CURRENT);
 	PROFILE_ON();
 
 	current_position = (off_t)seek_position;
@@ -147,7 +147,7 @@ __grow_file_size(struct fd * fd,int num_bytes)
 		alignment_skip = 0;
 
 		PROFILE_OFF();
-		bytes_written = Write(fd->fd_DefaultFile,aligned_buffer,size);
+		bytes_written = Write(fd->fd_File,aligned_buffer,size);
 		PROFILE_ON();
 
 		if(bytes_written != size)

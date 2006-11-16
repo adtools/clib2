@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcsetattr.c,v 1.4 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: termios_tcsetattr.c,v 1.5 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,56 +53,7 @@ set_console_termios(struct fd *fd,struct termios *new_tios)
 	if(old_tios->type != TIOST_CONSOLE)
 		goto out;
 
-	file = fd->fd_DefaultFile;
-
-	#if defined(__THREAD_SAFE)
-	{
-		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
-		{
-			switch(fd->fd_DefaultFile)
-			{
-				case STDIN_FILENO:
-
-					file = Input();
-					break;
-
-				case STDOUT_FILENO:
-
-					file = Output();
-					break;
-
-				case STDERR_FILENO:
-
-					#if defined(__amigaos4__)
-					{
-						file = ErrorOutput();
-					}
-					#else
-					{
-						struct Process * this_process = (struct Process *)FindTask(NULL);
-
-						file = this_process->pr_CES;
-					}
-					#endif /* __amigaos4__ */
-
-					/* The following is rather controversial; if the standard error stream
-					   is unavailable, we default to reuse the standard output stream. This
-					   is problematic if the standard output stream was redirected and should
-					   not be the same as the standard error output stream. */
-					if(file == ZERO)
-						file = Output();
-
-					break;
-
-				default:
-
-					file = ZERO;
-					break;
-			}
-		}
-	}
-	#endif /* __THREAD_SAFE */
-
+	file = __resolve_fd_file(fd);
 	if(file == ZERO)
 		goto out;
 

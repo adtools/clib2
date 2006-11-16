@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.33 2006-09-20 19:46:57 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.34 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,64 +81,7 @@ __fd_hook_entry(
 
 	__fd_lock(fd);
 
-	#if defined(__THREAD_SAFE)
-	{
-		/* Check if this file should be dynamically bound to one of the
-		   three standard I/O streams. */
-		if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
-		{
-			switch(fd->fd_DefaultFile)
-			{
-				case STDIN_FILENO:
-
-					file = Input();
-					break;
-
-				case STDOUT_FILENO:
-
-					file = Output();
-					break;
-
-				case STDERR_FILENO:
-
-					#if defined(__amigaos4__)
-					{
-						file = ErrorOutput();
-					}
-					#else
-					{
-						struct Process * this_process = (struct Process *)FindTask(NULL);
-
-						file = this_process->pr_CES;
-					}
-					#endif /* __amigaos4__ */
-
-					/* The following is rather controversial; if the standard error stream
-					   is unavailable, we default to reuse the standard output stream. This
-					   is problematic if the standard output stream was redirected and should
-					   not be the same as the standard error output stream. */
-					if(file == ZERO)
-						file = Output();
-
-					break;
-
-				default:
-
-					file = ZERO;
-					break;
-			}
-		}
-		else
-		{
-			file = fd->fd_DefaultFile;
-		}
-	}
-	#else
-	{
-		file = fd->fd_DefaultFile;
-	}
-	#endif /* __THREAD_SAFE */
-
+	file = __resolve_fd_file(fd);
 	if(file == ZERO)
 	{
 		SHOWMSG("file is closed");
@@ -246,7 +189,7 @@ __fd_hook_entry(
 			{
 				/* Should we reset this file into line buffered mode? */
 				if(FLAG_IS_SET(fd->fd_Flags,FDF_NON_BLOCKING) && FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
-					SetMode(fd->fd_DefaultFile,DOSFALSE);
+					SetMode(fd->fd_File,DOSFALSE);
 
 				/* Are we allowed to close this file? */
 				if(FLAG_IS_CLEAR(fd->fd_Flags,FDF_NO_CLOSE))
@@ -265,14 +208,14 @@ __fd_hook_entry(
 
 					PROFILE_OFF();
 
-					parent_dir = __safe_parent_of_file_handle(fd->fd_DefaultFile);
+					parent_dir = __safe_parent_of_file_handle(fd->fd_File);
 					if(parent_dir != ZERO)
 					{
-						if(__safe_examine_file_handle(fd->fd_DefaultFile,fib))
+						if(__safe_examine_file_handle(fd->fd_File,fib))
 							name_and_path_valid = TRUE;
 					}
 
-					if(CANNOT Close(fd->fd_DefaultFile))
+					if(CANNOT Close(fd->fd_File))
 					{
 						fam->fam_Error = __translate_io_error_to_errno(IoErr());
 
@@ -281,7 +224,7 @@ __fd_hook_entry(
 
 					PROFILE_ON();
 
-					fd->fd_DefaultFile = ZERO;
+					fd->fd_File = ZERO;
 
 					#if defined(UNIX_PATH_SEMANTICS)
 					{

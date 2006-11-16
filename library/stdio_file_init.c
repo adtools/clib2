@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.11 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.12 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -321,7 +321,7 @@ FILE_CONSTRUCTOR(stdio_file_init)
 		if(__WBenchMsg != NULL)
 		{
 			PROFILE_OFF();
-			__fd[STDERR_FILENO]->fd_DefaultFile = Output();
+			__fd[STDERR_FILENO]->fd_File = Output();
 			PROFILE_ON();
 
 			SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
@@ -351,13 +351,13 @@ FILE_CONSTRUCTOR(stdio_file_init)
 			   Otherwise, try to duplicate the standard output stream. */
 			if(ces != ZERO)
 			{
-				__fd[STDERR_FILENO]->fd_DefaultFile = ces;
+				__fd[STDERR_FILENO]->fd_File = ces;
 
 				SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_NO_CLOSE);
 			}
 			else
 			{
-				__fd[STDERR_FILENO]->fd_DefaultFile = Open("CONSOLE:",MODE_NEWFILE);
+				__fd[STDERR_FILENO]->fd_File = Open("CONSOLE:",MODE_NEWFILE);
 			}
 		}
 
@@ -366,7 +366,7 @@ FILE_CONSTRUCTOR(stdio_file_init)
 		/* Figure out if the standard error stream is bound to a console. */
 		if(FLAG_IS_CLEAR(__fd[STDERR_FILENO]->fd_Flags,FDF_STDIO))
 		{
-			if(IsInteractive(__fd[STDERR_FILENO]->fd_DefaultFile))
+			if(IsInteractive(__fd[STDERR_FILENO]->fd_File))
 				SET_FLAG(__fd[STDERR_FILENO]->fd_Flags,FDF_IS_INTERACTIVE);
 		}
 

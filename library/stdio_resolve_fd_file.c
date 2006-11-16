@@ -1,5 +1,5 @@
 /*
- * $Id: termios_tcdrain.c,v 1.4 2006-11-16 14:39:23 obarthel Exp $
+ * $Id: stdio_resolve_fd_file.c,v 1.1 2006-11-16 14:39:23 obarthel Exp $
  *
  * :ts=4
  *
@@ -31,87 +31,85 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	_TERMIOS_HEADERS_H
-#include "termios_headers.h"
-#endif /* _TERMIOS_HEADERS_H */
+#ifndef _FCNTL_HEADERS_H
+#include "fcntl_headers.h"
+#endif /* _FCNTL_HEADERS_H */
 
 /****************************************************************************/
 
-#if defined(__amigaos4__) && !defined(Flush)
-#define Flush(fh) FFlush(fh)
-#endif /* __amigaos4__ && !Flush */
+/* The following is not part of the ISO 'C' (1994) standard. */
 
 /****************************************************************************/
 
-int
-tcdrain(int file_descriptor) 
+#if defined(__THREAD_SAFE)
+
+/****************************************************************************/
+
+#ifdef __resolve_fd_file
+#undef __resolve_fd_file
+#endif /* __resolve_fd_file */
+
+/****************************************************************************/
+
+BPTR
+__resolve_fd_file(struct fd * fd)
 {
-	int result = ERROR;
-	struct fd *fd;
+	BPTR file;
 
-	ENTER();
-
-	SHOWVALUE(file_descriptor);
-
-	if(__check_abort_enabled)
-		__check_abort();
-
-	__stdio_lock();
-
-	fd = __get_file_descriptor(file_descriptor);
-	if(fd == NULL)
+	/* Is this one the standard I/O streams for which the associated file
+	   handle should be determined dynamically? */
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_STDIO))
 	{
-		__set_errno(EBADF);
-		goto out;
-	}
-
-	__fd_lock(fd);
-
-	if(FLAG_IS_SET(fd->fd_Flags,FDF_TERMIOS))
-	{
-		struct termios *tios;
-		BPTR file;
-
-		tios = fd->fd_Aux;
-
-		switch(tios->type)
+		switch(fd->fd_File)
 		{
-			case TIOST_CONSOLE:
+			case STDIN_FILENO:
 
-				file = __resolve_fd_file(fd);
-				if(file == ZERO)
+				file = Input();
+				break;
+
+			case STDOUT_FILENO:
+
+				file = Output();
+				break;
+
+			case STDERR_FILENO:
+
+				#if defined(__amigaos4__)
 				{
-					__set_errno(EBADF);
-					goto out;
+					file = ErrorOutput();
 				}
+				#else
+				{
+					struct Process * this_process = (struct Process *)FindTask(NULL);
 
-				/* This also discards any buffered input, but it does
-				   not appear possible to drain the output buffer
-				   otherwise. (?) */
-				if(CANNOT Flush(file))
-					goto out;
+					file = this_process->pr_CES;
+				}
+				#endif /* __amigaos4__ */
+
+				/* The following is rather controversial; if the standard error stream
+				   is unavailable, we default to reuse the standard output stream. This
+				   is problematic if the standard output stream was redirected and should
+				   not be the same as the standard error output stream. */
+				if(file == ZERO)
+					file = Output();
 
 				break;
 
-			default: /* TODO: Serial port support. */
+			default:
 
-				__set_errno(ENXIO);
-				goto out;
+				file = ZERO;
+				break;
 		}
-
-		result = OK;
 	}
 	else
 	{
-		result = fdatasync(file_descriptor); /* If called on a "regular" file. */
+		/* Just return what's there. */
+		file = fd->fd_File;
 	}
 
- out:
-
-	__fd_unlock(fd);
-
-	__stdio_unlock();
-
-	RETURN(result);
-	return(result);
+	return(file);
 }
+
+/****************************************************************************/
+
+#endif /* __THREAD_SAFE */
