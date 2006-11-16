@@ -1,5 +1,5 @@
 /*
- * $Id: socket_ioctl.c,v 1.13 2006-09-25 15:38:21 obarthel Exp $
+ * $Id: socket_ioctl.c,v 1.14 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ ioctl(int sockfd,int request, ... /* char *arg */)
 	SHOWPOINTER(param);
 
 	PROFILE_OFF();
-	result = __IoctlSocket((LONG)fd->fd_DefaultFile,request,param);
+	result = __IoctlSocket(fd->fd_Socket,request,param);
 	PROFILE_ON();
 
 	if(result == 0)

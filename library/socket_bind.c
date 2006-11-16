@@ -1,5 +1,5 @@
 /*
- * $Id: socket_bind.c,v 1.7 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_bind.c,v 1.8 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ bind(int sockfd,const struct sockaddr *name,socklen_t namelen)
 		goto out;
 
 	PROFILE_OFF();
-	result = __bind((LONG)fd->fd_DefaultFile,(struct sockaddr *)name,namelen);
+	result = __bind(fd->fd_Socket,(struct sockaddr *)name,namelen);
 	PROFILE_ON();
 
  out:

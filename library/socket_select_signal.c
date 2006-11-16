@@ -1,5 +1,5 @@
 /*
- * $Id: socket_select_signal.c,v 1.3 2006-06-22 09:02:44 obarthel Exp $
+ * $Id: socket_select_signal.c,v 1.4 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -288,7 +288,7 @@ map_descriptor_sets(
 			/* Is this a socket descriptor? */
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 			{
-				int socket_fd = (int)fd->fd_DefaultFile;
+				int socket_fd = fd->fd_Socket;
 
 				D(("corresponds to socket #%ld",socket_fd));
 
@@ -415,7 +415,7 @@ remap_descriptor_sets(
 				for(output_fd = 0 ; output_fd < num_output_fds ; output_fd++)
 				{
 					fd = get_file_descriptor(output_fd);
-					if(fd != NULL && FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET) && (int)fd->fd_DefaultFile == socket_fd)
+					if(fd != NULL && FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET) && fd->fd_Socket == socket_fd)
 					{
 						assert( output_fd < num_output_fds );
 						assert( FLAG_IS_SET(__fd[output_fd]->fd_Flags,FDF_IS_SOCKET) );
@@ -480,7 +480,7 @@ get_num_descriptors_used(int num_fds,int * num_socket_used_ptr,int * num_file_us
 		{
 			if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
 			{
-				int which_socket_fd = (int)fd->fd_DefaultFile;
+				int which_socket_fd = fd->fd_Socket;
 
 				if(num_socket_used < which_socket_fd+1)
 					num_socket_used = which_socket_fd+1;

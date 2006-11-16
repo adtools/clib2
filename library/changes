@@ -1,3 +1,9 @@
+- In __obtain_daemon_message() the test to verify if the bsdsocket.library API
+  would support the server API functionality checked the wrong feature. Fixed.
+
+- Switched over the fd->fd_DefaultFile references to fd->fd_Socket where
+  sockets are used rather than file handles.
+
 - Added functions which modify the callback function and the userdata pointer
   stored in a low level unbuffered file/socket data structure. These function
   perform the proper locking and are thus safe to use in a thread-safe environment.

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_obtain_daemon.c,v 1.4 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_obtain_daemon.c,v 1.5 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -93,7 +93,7 @@ __obtain_daemon_message(VOID)
 			struct TagItem tags[2];
 
 			/* Check if it is safe to call the IsServerProcess() function. */
-			tags[0].ti_Tag	= SBTM_GETREF(SBTC_BREAKMASK);
+			tags[0].ti_Tag	= SBTM_GETREF(SBTC_HAVE_SERVER_API);
 			tags[0].ti_Data	= (ULONG)&have_server_api;
 			tags[1].ti_Tag	= TAG_END;
 

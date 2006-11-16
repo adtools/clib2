@@ -1,5 +1,5 @@
 /*
- * $Id: socket_accept.c,v 1.16 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_accept.c,v 1.17 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -95,7 +95,7 @@ accept(int sockfd,struct sockaddr *cliaddr,socklen_t *addrlen)
 		goto out;
 
 	/* Remember the socket number for later. */
-	socket_fd = (LONG)fd->fd_DefaultFile;
+	socket_fd = fd->fd_Socket;
 
 	/* Now let go of the stdio lock, so that the only locking performed
 	   will be done inside the accept() call. */

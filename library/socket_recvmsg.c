@@ -1,5 +1,5 @@
 /*
- * $Id: socket_recvmsg.c,v 1.6 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_recvmsg.c,v 1.7 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ recvmsg(int sockfd,struct msghdr *msg,int flags)
 		goto out;
 
 	PROFILE_OFF();
-	result = __recvmsg((LONG)fd->fd_DefaultFile,msg,flags);
+	result = __recvmsg(fd->fd_Socket,msg,flags);
 	PROFILE_ON();
 
  out:

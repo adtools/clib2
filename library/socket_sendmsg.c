@@ -1,5 +1,5 @@
 /*
- * $Id: socket_sendmsg.c,v 1.7 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_sendmsg.c,v 1.8 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ sendmsg(int sockfd,const struct msghdr *msg,int flags)
 		goto out;
 
 	PROFILE_OFF();
-	result = __sendmsg((LONG)fd->fd_DefaultFile,(struct msghdr *)msg,flags);
+	result = __sendmsg(fd->fd_Socket,(struct msghdr *)msg,flags);
 	PROFILE_ON();
 
  out:

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_shutdown.c,v 1.5 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_shutdown.c,v 1.6 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ shutdown(int sockfd, int how)
 		goto out;
 
 	PROFILE_OFF();
-	result = __shutdown((LONG)fd->fd_DefaultFile,how);
+	result = __shutdown(fd->fd_Socket,how);
 	PROFILE_ON();
 
  out:

@@ -1,5 +1,5 @@
 /*
- * $Id: socket_recv.c,v 1.6 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_recv.c,v 1.7 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -86,7 +86,7 @@ recv(int sockfd,void *buff,size_t nbytes,int flags)
 		goto out;
 
 	PROFILE_OFF();
-	result = __recv((LONG)fd->fd_DefaultFile,buff,(LONG)nbytes,flags);
+	result = __recv(fd->fd_Socket,buff,(LONG)nbytes,flags);
 	PROFILE_ON();
 
  out:

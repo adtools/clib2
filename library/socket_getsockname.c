@@ -1,5 +1,5 @@
 /*
- * $Id: socket_getsockname.c,v 1.7 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_getsockname.c,v 1.8 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ getsockname(int sockfd,struct sockaddr *name,socklen_t *namelen)
 		goto out;
 
 	PROFILE_OFF();
-	result = __getsockname((LONG)fd->fd_DefaultFile,name,(LONG *)namelen);
+	result = __getsockname(fd->fd_Socket,name,(LONG *)namelen);
 	PROFILE_ON();
 
  out:

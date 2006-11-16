@@ -1,5 +1,5 @@
 /*
- * $Id: socket_getpeername.c,v 1.7 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_getpeername.c,v 1.8 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -84,7 +84,7 @@ getpeername(int sockfd,struct sockaddr *name,socklen_t *namelen)
 		goto out;
 
 	PROFILE_OFF();
-	result = __getpeername((LONG)fd->fd_DefaultFile,name,(LONG *)namelen);
+	result = __getpeername(fd->fd_Socket,name,(LONG *)namelen);
 	PROFILE_ON();
 
  out:

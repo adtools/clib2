@@ -1,5 +1,5 @@
 /*
- * $Id: socket_recvfrom.c,v 1.8 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_recvfrom.c,v 1.9 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -87,7 +87,7 @@ recvfrom(int sockfd,void *buff,size_t len,int flags,struct sockaddr *from,sockle
 		goto out;
 
 	PROFILE_OFF();
-	result = __recvfrom((LONG)fd->fd_DefaultFile,buff,len,flags,from,(LONG *)fromlen);
+	result = __recvfrom(fd->fd_Socket,buff,len,flags,from,(LONG *)fromlen);
 	PROFILE_ON();
 
  out:

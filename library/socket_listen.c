@@ -1,5 +1,5 @@
 /*
- * $Id: socket_listen.c,v 1.5 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: socket_listen.c,v 1.6 2006-11-16 10:41:15 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,7 +64,7 @@ listen(int sockfd,int backlog)
 		goto out;
 
 	PROFILE_OFF();
-	result = __listen((LONG)fd->fd_DefaultFile,backlog);
+	result = __listen(fd->fd_Socket,backlog);
 	PROFILE_ON();
 
  out:
