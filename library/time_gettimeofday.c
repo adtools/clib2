@@ -1,5 +1,5 @@
 /*
- * $Id: time_gettimeofday.c,v 1.11 2006-09-27 09:40:06 obarthel Exp $
+ * $Id: time_gettimeofday.c,v 1.12 2006-12-28 14:30:57 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,23 +59,6 @@
 
 /****************************************************************************/
 
-/* A quick workaround for the timeval/timerequest->TimeVal/TimeRequest
-   change in the recent OS4 header files. */
-
-#if defined(__NEW_TIMEVAL_DEFINITION_USED__)
-
-#define timeval		TimeVal
-#define tv_secs		Seconds
-#define tv_micro	Microseconds
-
-#define timerequest	TimeRequest
-#define tr_node		Request
-#define tr_time		Time
-
-#endif /* __NEW_TIMEVAL_DEFINITION_USED__ */
-
-/****************************************************************************/
-
 int
 gettimeofday(struct timeval *tp, struct timezone *tzp)
 {
@@ -86,19 +69,37 @@ gettimeofday(struct timeval *tp, struct timezone *tzp)
 	#endif /* __amigaos4__ */
 
 	ULONG seconds,microseconds;
-	struct timeval tv;
 
 	ENTER();
 
 	/* Obtain the current system time. */
 	PROFILE_OFF();
-	GetSysTime(&tv);
+
+	#if defined(__NEW_TIMEVAL_DEFINITION_USED__)
+	{
+		struct TimeVal tv;
+
+		GetSysTime(&tv);
+
+		seconds		= tv.Seconds;
+		microseconds	= tv.Microseconds;
+	}
+	#else
+	{
+		struct timeval tv;
+
+		GetSysTime(&tv);
+
+		seconds		= tv.tv_sec;
+		microseconds	= tv.tv_usec;
+	}
+	#endif /* __NEW_TIMEVAL_DEFINITION_USED__ */
+
 	PROFILE_ON();
 
 	/* Convert the number of seconds so that they match the Unix epoch, which
 	   starts (January 1st, 1970) eight years before the AmigaOS epoch. */
-	seconds			= tv.tv_sec + UNIX_TIME_OFFSET;
-	microseconds	= tv.tv_usec;
+	seconds += UNIX_TIME_OFFSET;
 
 	__locale_lock();
 
