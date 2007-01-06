@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.110 2006-11-13 09:25:28 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.111 2007-01-06 10:09:48 obarthel Exp $
 #
 # :ts=8
 #
@@ -21,28 +21,28 @@
 # These are for the cross compiler, with the operating system header files
 # stored in "/V/include" and the network header files in a local directory
 # called "netinclude".
-#SDK_INCLUDE := /V/include
-#NET_INCLUDE := netinclude
-#CC := ppc-amigaos-gcc
-#AR := ppc-amigaos-ar -q
-#RANLIB := ppc-amigaos-ranlib
-#COPY := cp -a
-#DELETE := rm -rf
-#MAKEDIR := mkdir -p
-#LOG_COMMAND := 2>&1 | tee -a compiler.log
+SDK_INCLUDE := /V/include
+NET_INCLUDE := netinclude
+CC := ppc-amigaos-gcc
+AR := ppc-amigaos-ar -q
+RANLIB := ppc-amigaos-ranlib
+COPY := cp -a
+DELETE := rm -rf
+MAKEDIR := mkdir -p
+LOG_COMMAND := 2>&1 | tee -a compiler.log
 
 # The following are for the native OS4 compiler; note that the
 # LOG_COMMAND should not be enabled unless you have a shell
 # installed which supports it.
-SDK_INCLUDE := /SDK/Include/include_h
-NET_INCLUDE := /SDK/Include/netinclude
-CC := distcc gcc
-AR := ar -q
-RANLIB := ranlib
-COPY := copy
-DELETE := delete all quiet force
-MAKEDIR := makedir all force
-LOG_COMMAND := *>< | tee >>compiler.log
+#SDK_INCLUDE := /SDK/Include/include_h
+#NET_INCLUDE := /SDK/Include/netinclude
+#CC := distcc gcc
+#AR := ar -q
+#RANLIB := ranlib
+#COPY := copy
+#DELETE := delete all quiet force
+#MAKEDIR := makedir all force
+#LOG_COMMAND := *>< | tee >>compiler.log
 
 ##############################################################################
 

@@ -1,5 +1,5 @@
 /*
- * $Id: unistd.h,v 1.22 2006-11-13 09:51:53 obarthel Exp $
+ * $Id: unistd.h,v 1.23 2007-01-06 10:09:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,6 +50,10 @@
 #ifndef _FCNTL_H
 #include <fcntl.h>
 #endif /* _FCNTL_H */
+
+#ifndef _STDIO_H
+#include <stdio.h>
+#endif /* _STDIO_H */
 
 #if !defined(__NO_NET_API) && !defined(_SYS_SELECT_H)
 #include <sys/select.h>

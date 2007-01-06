@@ -1,5 +1,5 @@
 /*
- * $Id: math.h,v 1.21 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: math.h,v 1.22 2007-01-06 10:09:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -297,6 +297,7 @@ extern double hypot(double x,double y);
 extern double lgamma(double x);
 extern double log1p(double x);
 extern double logb(double x);
+extern long long int llrint(double x);
 extern long int lrint(double x);
 extern long int lround(double x);
 extern double nan(const char *tagp);

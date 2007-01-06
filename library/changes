@@ -1,3 +1,9 @@
+- Added llrint() function contributed by Henning Nielsen Lund. Thank you
+  very much!
+
+- <unistd.h> now also include <stdio.h>, so that the SEEK_SET, etc. macros
+  are defined for lseek() to use.
+
 - Added a wrapper function which handles the thread-safe stdio stream
   resolution.
 
