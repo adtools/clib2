@@ -1,5 +1,5 @@
 /*
- * $Id: math_log10.c,v 1.8 2006-01-08 12:04:23 obarthel Exp $
+ * $Id: math_log10.c,v 1.9 2007-11-08 11:23:53 damato Exp $
  *
  * :ts=4
  *
@@ -186,7 +186,7 @@ log10(double x)
 {
 	double result;
 
-	if(x > DBL_EPSILON)
+	if(x > 0)
 	{
 		result = __log10(x);
 	}

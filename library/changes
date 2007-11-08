@@ -1,3 +1,8 @@
+- the log() and log10() functions always returned -inf() even if the arguments
+  was within the valid range for a log() function. Using DBL_EPSILON as the
+  threshold was not correct as EPSILON is 2.2204460492503131E-16 whereas
+  values like 1E-200 are still valid double values for a log().
+
 c.lib 1.202 (16.1.2007)
 
 - Added llrint() function contributed by Henning Nielsen Lund. Thank you
