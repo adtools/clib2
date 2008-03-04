@@ -1,10 +1,18 @@
 #
-# $Id: GNUmakefile.68k,v 1.101 2007-01-06 10:09:48 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.102 2008-03-04 16:25:35 damato Exp $
 #
 # :ts=8
 #
 
 ##############################################################################
+
+############################################
+# find out the HOST operating system
+# on which this makefile is run (default to AmigaOS)
+HOST ?= $(shell uname)
+ifeq ($(HOST),)
+  HOST = AmigaOS
+endif
 
 CC = gcc
 AR = ar -q
@@ -13,6 +21,16 @@ COPY = copy clone buf=0
 DELETE = delete all quiet
 MAKEDIR = makedir
 MAKE = $(MAKE_COMMAND) -f GNUmakefile.68k
+
+# override certain things for non-native builds
+ifneq ($(HOST), AmigaOS)
+   CC = m68k-amigaos-gcc
+   AR = m68k-amigaos-ar -q
+   RANLIB = m68k-amigaos-ranlib
+   COPY = cp
+   DELETE = rm -rf
+   MAKEDIR = mkdir
+endif
 
 ##############################################################################
 
@@ -95,6 +113,22 @@ CODE_TYPE	:= -m68000
 CODE_FLAGS	:=
 endif
 
+ifeq (soft_float_020,$(TYPE))
+CODE_TYPE	:= -m68020-60 -msoft-float
+CODE_FLAGS	:= -DM68020 -DUSE_64_BIT_INTS
+endif
+
+ifeq (soft_float_data,$(TYPE))
+CODE_TYPE	:= -m68020-60 -msoft-float
+CODE_FLAGS	:= -fbaserel -DSMALL_DATA -DM68020 -DUSE_64_BIT_INTS
+endif
+
+ifeq (soft_float_data32,$(TYPE))
+CODE_TYPE	:= -m68020-60 -msoft-float
+CODE_FLAGS	:= -fbaserel32 -DSMALL_DATA32 -DM68020 -DUSE_64_BIT_INTS
+endif
+
+
 ##############################################################################
 
 WARNINGS = \
@@ -109,7 +143,7 @@ INCLUDES = -Iinclude -I. -Inetinclude
 #OPTIONS = -fno-builtin -fno-common -DNDEBUG -D__THREAD_SAFE
 #OPTIONS = -fno-builtin -fno-common -D__MEM_DEBUG
 #OPTIONS = -fno-builtin -fno-common -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG
- OPTIMIZE = -O -fomit-frame-pointer -fstrength-reduce -finline-functions
+ OPTIMIZE = -O3 -fomit-frame-pointer -funroll-loops -finline-functions
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g
 
@@ -964,10 +998,13 @@ all: \
 	lib/n32bcrt0.o \
 	lib/n32rcrt0.o \
 	lib/libm020/libm.a \
+	lib/libm020/soft-float/libm.a \
 	lib/libm.a \
 	lib/libb/libm.a \
 	lib/libb/libm020/libm.a \
-	lib/libb32/libm020/libm.a
+	lib/libb/libm020/soft-float/libm.a \
+	lib/libb32/libm020/libm.a \
+	lib/libb32/libm020/soft-float/libm.a
 
 ##############################################################################
 
@@ -980,7 +1017,7 @@ clean:
 realclean:
 	$(MAKE) clean
 	-$(DELETE) lib small_data_020 small_data small_data32 large_data_020 \
-		large_data
+		large_data soft_float_020 soft_float_data soft_float_data32
 
 ##############################################################################
 
@@ -1026,13 +1063,22 @@ lib/libb : lib
 lib/libb/libm020 : lib lib/libb
 	-$(MAKEDIR) $@
 
+lib/libb/libm020/soft-float : lib lib/libb/libm020
+	-$(MAKEDIR) $@
+
 lib/libb32/libm020 : lib lib/libb32
+	-$(MAKEDIR) $@
+
+lib/libb32/libm020/soft-float : lib lib/libb32/libm020
 	-$(MAKEDIR) $@
 
 lib/libb32 : lib
 	-$(MAKEDIR) $@
 
 lib/libm020 : lib
+	-$(MAKEDIR) $@
+
+lib/libm020/soft-float : lib lib/libm020
 	-$(MAKEDIR) $@
 
 lib/libb/libm020/libm.a: lib lib/libb/libm020
@@ -1054,6 +1100,18 @@ lib/libm020/libm.a: lib lib/libm020
 lib/libm.a: lib
 	$(MAKE) TYPE=large_data kitchen_sink
 	@$(COPY) $(foreach file,$(LIBS_68K),large_data/$(file)) lib
+
+lib/libm020/soft-float/libm.a: lib lib/libm020/soft-float
+	$(MAKE) TYPE=soft_float_020 kitchen_sink
+	@$(COPY) $(foreach file,$(LIBS_020),soft_float_020/$(file)) lib/libm020/soft-float
+
+lib/libb/libm020/soft-float/libm.a: lib lib/libb/libm020/soft-float
+	$(MAKE) TYPE=soft_float_data kitchen_sink
+	@$(COPY) $(foreach file,$(LIBS_020),soft_float_data/$(file)) lib/libb/libm020/soft-float
+
+lib/libb32/libm020/soft-float/libm.a: lib lib/libb32/libm020/soft-float
+	$(MAKE) TYPE=soft_float_data32 kitchen_sink
+	@$(COPY) $(foreach file,$(LIBS_020),soft_float_data32/$(file)) lib/libb32/libm020/soft-float
 
 lib/nrcrt0.o : lib nrcrt0.o
 	@$(COPY) nrcrt0.o lib
@@ -1265,7 +1323,7 @@ nrcrt0.o : nrcrt0.S
 
 nr32crt0.o : nrcrt0.S
 	@echo "Assembling $< [resident32]"
-	@$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c nrcrt0.S
+	@$(CC) -traditional -m68020 -msoft-float -DSMALL_DATA32 -o $@ -c nrcrt0.S
 
 nbcrt0.o : ncrt0.S
 	@echo "Assembling $< [small_data]"
@@ -1273,7 +1331,7 @@ nbcrt0.o : ncrt0.S
 
 nb32crt0.o : ncrt0.S
 	@echo "Assembling $< [small_data32]"
-	@$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c ncrt0.S
+	@$(CC) -traditional -m68020 -msoft-float -DSMALL_DATA32 -o $@ -c ncrt0.S
 
 ncrt0.o : ncrt0.S
 	@echo "Assembling $< [large_data]"

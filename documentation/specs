@@ -17,7 +17,7 @@
 
 
 *link:
-%{fbaserel:%{!resident:-m amiga_bss -fl libb}} %{resident:-m amiga_bss -amiga-datadata-reloc -fl libb} %{fbaserel32:%{!resident32:-m amiga_bss -fl libb32}} %{resident32:-m amiga_bss -amiga-datadata-reloc -fl libb32} %{g:-amiga-debug-hunk} %{m68020:-fl libm020} %{mc68020:-fl libm020} %{m68030:-fl libm020} %{m68040:-fl libm020} %{m68060:-fl libm020} %{m68020-40:-fl libm020} %{m68020-60:-fl libm020} %{noixemul:}
+%{fbaserel:%{!resident:-m amiga_bss -fl libb}} %{resident:-m amiga_bss -amiga-datadata-reloc -fl libb} %{fbaserel32:%{!resident32:-m amiga_bss -fl libb32}} %{resident32:-m amiga_bss -amiga-datadata-reloc -fl libb32} %{g:-amiga-debug-hunk} %{m68020:-fl libm020} %{mc68020:-fl libm020} %{m68030:-fl libm020} %{m68040:-fl libm020} %{m68060:-fl libm020} %{m68020-40:-fl libm020} %{m68020-60:-fl libm020} %{msoft-float:-fl soft-float} %{noixemul:}
 
 *lib:
 %{mstackextend:-lstack} -lc -lamiga -ldebug -lgcc -lc
