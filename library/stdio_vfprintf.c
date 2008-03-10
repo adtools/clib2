@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfprintf.c,v 1.25 2006-11-13 09:32:28 obarthel Exp $
+ * $Id: stdio_vfprintf.c,v 1.26 2008-03-10 15:28:11 obarthel Exp $
  *
  * :ts=4
  *
@@ -143,8 +143,12 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 	int output_len;
 	const char *prefix;
 	char prefix_buffer[8];
+	int argument_digits;
+	int argument_number;
+	int argument_index;
 	int result = EOF;
 	int len = 0;
+	int i;
 	int c;
 
  #if defined(FLOATING_POINT_SUPPORT)
@@ -201,6 +205,36 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			len++;
 
 			continue;
+		}
+
+		/* If a string of digits, terminated by a '$' character appears here,
+		   it indicates which argument should be accessed. We evaluate this
+		   data but for now will ignore it altogether. */
+		argument_index = argument_number = argument_digits = 0;
+
+		for(i = 0 ; format[i] != '\0' ; i++)
+		{
+			if(format[i] == '$')
+			{
+				if(argument_digits > 0)
+				{
+					argument_index = argument_number;
+
+					format = &format[i+1];
+				}
+
+				break;
+			}
+			else if ('0' <= format[i] && format[i] <= '9')
+			{
+				argument_number = (10 * argument_number) + (format[i] - '0');
+
+				argument_digits++;
+			}
+			else
+			{
+				break;
+			}
 		}
 
 		format_flags	= 0;
@@ -772,7 +806,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					int max_digits = -1;
 					int exponent = 0;
 					int digit;
-					int i;
 
 					/* This takes care of the sign. */
 					if(v < 0.0)
@@ -1352,8 +1385,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 			}
 			else
 			{
-				int i;
-
 				output_len = precision;
 
 				for(i = 0 ; i < precision ; i++)
@@ -1532,8 +1563,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 
 		if(FLAG_IS_SET(format_flags,FORMATF_LeftJustified))
 		{
-			int i;
-
 			if(prefix != NULL)
 			{
 				for(i = 0 ; prefix[i] != '\0' ; i++)
@@ -1590,8 +1619,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 		}
 		else
 		{
-			int i;
-
 			/* If we have to add the prefix later, make sure that
 			   we don't add too many fill characters in front of
 			   it now. */
@@ -1643,7 +1670,6 @@ vfprintf(FILE * stream,const char * format, va_list arg)
 					len++;
 				}
 			}
-
 
 			for(i = 0 ; i < output_len ; i++)
 			{

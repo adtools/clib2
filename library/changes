@@ -1,3 +1,8 @@
+- The printf() family now ignores argument specifications, as in "%2$d %1$d",
+  which are used for localization on some platforms. This is a non-standard
+  feature and the way clib2 treats it for now is just intended to avoid
+  trouble while performing the conversion.
+
 - [jlangner]: changed the GNUmakefile.68k to also build soft-float variants of all
   our libraries. In addition the specs file now also respects the -msoft-float
   option at link time and sets the default link directory accordingly.
