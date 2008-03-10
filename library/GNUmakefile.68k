@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.102 2008-03-04 16:25:35 damato Exp $
+# $Id: GNUmakefile.68k,v 1.103 2008-03-10 14:59:54 obarthel Exp $
 #
 # :ts=8
 #
@@ -68,7 +68,7 @@ $(LIBUNIX_OBJS)/%.o : %.c
 
 $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
-	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) -DIEEE_FLOATING_POINT_SUPPORT $<
+	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) -DIEEE_FLOATING_POINT_SUPPORT -msoft-float $<
 
 $(LIBM881_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m881]"
@@ -143,7 +143,8 @@ INCLUDES = -Iinclude -I. -Inetinclude
 #OPTIONS = -fno-builtin -fno-common -DNDEBUG -D__THREAD_SAFE
 #OPTIONS = -fno-builtin -fno-common -D__MEM_DEBUG
 #OPTIONS = -fno-builtin -fno-common -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG
- OPTIMIZE = -O3 -fomit-frame-pointer -funroll-loops -finline-functions
+#OPTIMIZE = -O3 -fomit-frame-pointer -funroll-loops    -finline-functions
+ OPTIMIZE = -O  -fomit-frame-pointer -fstrength-reduce -finline-functions
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g
 
@@ -998,13 +999,14 @@ all: \
 	lib/n32bcrt0.o \
 	lib/n32rcrt0.o \
 	lib/libm020/libm.a \
-	lib/libm020/soft-float/libm.a \
 	lib/libm.a \
 	lib/libb/libm.a \
 	lib/libb/libm020/libm.a \
-	lib/libb/libm020/soft-float/libm.a \
 	lib/libb32/libm020/libm.a \
-	lib/libb32/libm020/soft-float/libm.a
+
+#	lib/libm020/soft-float/libm.a \
+#	lib/libb/libm020/soft-float/libm.a \
+#	lib/libb32/libm020/soft-float/libm.a
 
 ##############################################################################
 
