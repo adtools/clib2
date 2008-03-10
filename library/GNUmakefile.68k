@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.103 2008-03-10 14:59:54 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.104 2008-03-10 16:31:56 obarthel Exp $
 #
 # :ts=8
 #
@@ -68,11 +68,11 @@ $(LIBUNIX_OBJS)/%.o : %.c
 
 $(LIBM_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m]"
-	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) -DIEEE_FLOATING_POINT_SUPPORT -msoft-float $<
+	@$(CC) -o $(LIBM_OBJS)/$*.o -c $(CFLAGS) -msoft-float -DIEEE_FLOATING_POINT_SUPPORT $<
 
 $(LIBM881_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):m881]"
-	@$(CC) -o $(LIBM881_OBJS)/$*.o -c $(CFLAGS) -DM68881_FLOATING_POINT_SUPPORT -m68881 $<
+	@$(CC) -o $(LIBM881_OBJS)/$*.o -c $(CFLAGS) -m68881 -DM68881_FLOATING_POINT_SUPPORT $<
 
 $(LIBNET_OBJS)/%.o : %.c
 	@echo "Compiling $< [$(TYPE):net]"
@@ -150,7 +150,7 @@ INCLUDES = -Iinclude -I. -Inetinclude
 
 CFLAGS = \
 	$(WARNINGS) $(OPTIMIZE) $(DEBUG) $(OPTIONS) \
-	$(CODE_FLAGS) $(CODE_TYPE) $(INCLUDES)
+	$(CODE_FLAGS) $(INCLUDES) $(CODE_TYPE)
 
 ##############################################################################
 
@@ -1325,7 +1325,7 @@ nrcrt0.o : nrcrt0.S
 
 nr32crt0.o : nrcrt0.S
 	@echo "Assembling $< [resident32]"
-	@$(CC) -traditional -m68020 -msoft-float -DSMALL_DATA32 -o $@ -c nrcrt0.S
+	@$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c nrcrt0.S
 
 nbcrt0.o : ncrt0.S
 	@echo "Assembling $< [small_data]"
@@ -1333,7 +1333,7 @@ nbcrt0.o : ncrt0.S
 
 nb32crt0.o : ncrt0.S
 	@echo "Assembling $< [small_data32]"
-	@$(CC) -traditional -m68020 -msoft-float -DSMALL_DATA32 -o $@ -c ncrt0.S
+	@$(CC) -traditional -m68020 -DSMALL_DATA32 -o $@ -c ncrt0.S
 
 ncrt0.o : ncrt0.S
 	@echo "Assembling $< [large_data]"
