@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.104 2008-03-10 16:31:56 obarthel Exp $
+# $Id: GNUmakefile.68k,v 1.105 2008-03-11 07:41:27 damato Exp $
 #
 # :ts=8
 #
@@ -113,22 +113,6 @@ CODE_TYPE	:= -m68000
 CODE_FLAGS	:=
 endif
 
-ifeq (soft_float_020,$(TYPE))
-CODE_TYPE	:= -m68020-60 -msoft-float
-CODE_FLAGS	:= -DM68020 -DUSE_64_BIT_INTS
-endif
-
-ifeq (soft_float_data,$(TYPE))
-CODE_TYPE	:= -m68020-60 -msoft-float
-CODE_FLAGS	:= -fbaserel -DSMALL_DATA -DM68020 -DUSE_64_BIT_INTS
-endif
-
-ifeq (soft_float_data32,$(TYPE))
-CODE_TYPE	:= -m68020-60 -msoft-float
-CODE_FLAGS	:= -fbaserel32 -DSMALL_DATA32 -DM68020 -DUSE_64_BIT_INTS
-endif
-
-
 ##############################################################################
 
 WARNINGS = \
@@ -144,7 +128,7 @@ INCLUDES = -Iinclude -I. -Inetinclude
 #OPTIONS = -fno-builtin -fno-common -D__MEM_DEBUG
 #OPTIONS = -fno-builtin -fno-common -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG
 #OPTIMIZE = -O3 -fomit-frame-pointer -funroll-loops    -finline-functions
- OPTIMIZE = -O  -fomit-frame-pointer -fstrength-reduce -finline-functions
+OPTIMIZE = -O  -fomit-frame-pointer -fstrength-reduce -finline-functions
 #OPTIMIZE = -O2 -fomit-frame-pointer
 #DEBUG = -g
 
@@ -1002,11 +986,7 @@ all: \
 	lib/libm.a \
 	lib/libb/libm.a \
 	lib/libb/libm020/libm.a \
-	lib/libb32/libm020/libm.a \
-
-#	lib/libm020/soft-float/libm.a \
-#	lib/libb/libm020/soft-float/libm.a \
-#	lib/libb32/libm020/soft-float/libm.a
+	lib/libb32/libm020/libm.a
 
 ##############################################################################
 
@@ -1019,7 +999,7 @@ clean:
 realclean:
 	$(MAKE) clean
 	-$(DELETE) lib small_data_020 small_data small_data32 large_data_020 \
-		large_data soft_float_020 soft_float_data soft_float_data32
+		large_data
 
 ##############################################################################
 
@@ -1065,22 +1045,13 @@ lib/libb : lib
 lib/libb/libm020 : lib lib/libb
 	-$(MAKEDIR) $@
 
-lib/libb/libm020/soft-float : lib lib/libb/libm020
-	-$(MAKEDIR) $@
-
 lib/libb32/libm020 : lib lib/libb32
-	-$(MAKEDIR) $@
-
-lib/libb32/libm020/soft-float : lib lib/libb32/libm020
 	-$(MAKEDIR) $@
 
 lib/libb32 : lib
 	-$(MAKEDIR) $@
 
 lib/libm020 : lib
-	-$(MAKEDIR) $@
-
-lib/libm020/soft-float : lib lib/libm020
 	-$(MAKEDIR) $@
 
 lib/libb/libm020/libm.a: lib lib/libb/libm020
@@ -1102,18 +1073,6 @@ lib/libm020/libm.a: lib lib/libm020
 lib/libm.a: lib
 	$(MAKE) TYPE=large_data kitchen_sink
 	@$(COPY) $(foreach file,$(LIBS_68K),large_data/$(file)) lib
-
-lib/libm020/soft-float/libm.a: lib lib/libm020/soft-float
-	$(MAKE) TYPE=soft_float_020 kitchen_sink
-	@$(COPY) $(foreach file,$(LIBS_020),soft_float_020/$(file)) lib/libm020/soft-float
-
-lib/libb/libm020/soft-float/libm.a: lib lib/libb/libm020/soft-float
-	$(MAKE) TYPE=soft_float_data kitchen_sink
-	@$(COPY) $(foreach file,$(LIBS_020),soft_float_data/$(file)) lib/libb/libm020/soft-float
-
-lib/libb32/libm020/soft-float/libm.a: lib lib/libb32/libm020/soft-float
-	$(MAKE) TYPE=soft_float_data32 kitchen_sink
-	@$(COPY) $(foreach file,$(LIBS_020),soft_float_data32/$(file)) lib/libb32/libm020/soft-float
 
 lib/nrcrt0.o : lib nrcrt0.o
 	@$(COPY) nrcrt0.o lib
