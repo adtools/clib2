@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.10 2006-09-25 18:19:44 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.11 2008-03-11 07:37:31 damato Exp $
  *
  * :ts=4
  *
@@ -142,7 +142,7 @@ CheckRexxMsg(struct RexxMsg *message)
 	if(message->rm_TaskBlock == NULL)
 		goto out;
 
-	if(NOT IsRexxMsg((struct Message *)message))
+	if(NOT IsRexxMsg(message))
 		goto out;
 
 	result = TRUE;
@@ -163,9 +163,10 @@ GetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR *buffer_pointer)
 	static TEXT buffer[256];
 	LONG result;
 
+#if defined(__amigaos4__)
 	/* The following uses a function which was added to rexxsyslib.library V45.
 	   We therefore have a minimum library version requirement. */
-	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg((struct Message *)message))
+	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg(message))
 	{
 		result = ERR10_010; /* invalid message packet */
 		goto out;
@@ -173,6 +174,9 @@ GetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR *buffer_pointer)
 
 	/* The 256 character limit isn't good. This should be done differently. */
 	result = GetRexxVarFromMsg(variable_name,buffer,message);
+#else
+	result = ERR10_015; /* function not found */
+#endif
 	if(result != 0)
 		goto out;
 
@@ -193,15 +197,19 @@ SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG lengt
 {
 	LONG result;
 
+#if defined(__amigaos4__)
 	/* The following uses a function which was added to rexxsyslib.library V45.
 	   We therefore have a minimum library version requirement. */
-	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg((struct Message *)message))
+	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg(message))
 	{
 		result = ERR10_010; /* invalid message packet */
 		goto out;
 	}
 
 	result = SetRexxVarFromMsg(variable_name,value,message);
+#else
+	result = ERR10_015; /* function not found */
+#endif
 
  out:
 

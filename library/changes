@@ -3,9 +3,9 @@
   feature and the way clib2 treats it for now is just intended to avoid
   trouble while performing the conversion.
 
-- [jlangner]: changed the GNUmakefile.68k to also build soft-float variants of all
-  our libraries. In addition the specs file now also respects the -msoft-float
-  option at link time and sets the default link directory accordingly.
+- [tboeckel]: when compiling amiga_rexxvars.c for m68k/OS3 the GetRexxVarFromMsg()
+  and SetRexxVarFromMsg() will not be used and therefore not cause linkage errors
+  with our libamiga.a stubs anymore.
 
 - [jlangner]: the log() and log10() functions always returned -inf() even if the
   arguments was within the valid range for a log() function. Using DBL_EPSILON as
