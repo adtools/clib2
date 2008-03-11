@@ -4,13 +4,14 @@
   trouble while performing the conversion.
 
 - [tboeckel]: when compiling amiga_rexxvars.c for m68k/OS3 the GetRexxVarFromMsg()
-  and SetRexxVarFromMsg() will not be used and therefore not cause linkage errors
-  with our libamiga.a stubs anymore.
+  and SetRexxVarFromMsg() can no longer cause linkage errors if the header files
+  predate the SDK for OS 3.5.
 
 - [jlangner]: the log() and log10() functions always returned -inf() even if the
   arguments was within the valid range for a log() function. Using DBL_EPSILON as
   the threshold was not correct as EPSILON is 2.2204460492503131E-16 whereas
   values like 1E-200 are still valid double values for a log().
+
 
 c.lib 1.202 (16.1.2007)
 

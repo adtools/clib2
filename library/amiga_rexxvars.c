@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.11 2008-03-11 07:37:31 damato Exp $
+ * $Id: amiga_rexxvars.c,v 1.12 2008-03-11 13:26:18 obarthel Exp $
  *
  * :ts=4
  *
@@ -55,6 +55,60 @@
 
 #define __NOLIBBASE__
 #include <proto/rexxsyslib.h>
+
+/****************************************************************************/
+
+/* This side-steps issues with very old inline header files, predating the
+   OS 3.5 SDK, when the library is built for the 68k platform. */
+#if defined(__GNUC__) && !defined(__amigaos4__)
+
+#define __GetRexxVarFromMsg(name, buffer, message) ({ \
+  STRPTR _GetRexxVarFromMsg_name = (name); \
+  STRPTR _GetRexxVarFromMsg_buffer = (buffer); \
+  struct RexxMsg * _GetRexxVarFromMsg_message = (message); \
+  LONG _GetRexxVarFromMsg__re = \
+  ({ \
+  register struct RxsLib * const __GetRexxVarFromMsg__bn __asm("a6") = (struct RxsLib *) (RexxSysBase);\
+  register LONG __GetRexxVarFromMsg__re __asm("d0"); \
+  register STRPTR __GetRexxVarFromMsg_name __asm("a0") = (_GetRexxVarFromMsg_name); \
+  register STRPTR __GetRexxVarFromMsg_buffer __asm("a1") = (_GetRexxVarFromMsg_buffer); \
+  register struct RexxMsg * __GetRexxVarFromMsg_message __asm("a2") = (_GetRexxVarFromMsg_message); \
+  __asm volatile ("jsr a6@(-492:W)" \
+  : "=r"(__GetRexxVarFromMsg__re) \
+  : "r"(__GetRexxVarFromMsg__bn), "r"(__GetRexxVarFromMsg_name), "r"(__GetRexxVarFromMsg_buffer), "r"(__GetRexxVarFromMsg_message) \
+  : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
+  __GetRexxVarFromMsg__re; \
+  }); \
+  _GetRexxVarFromMsg__re; \
+})
+
+#undef GetRexxVarFromMsg
+#define GetRexxVarFromMsg(name, buffer, message) __GetRexxVarFromMsg(name, buffer, message)
+
+#define __SetRexxVarFromMsg(name, value, message) ({ \
+  STRPTR _SetRexxVarFromMsg_name = (name); \
+  STRPTR _SetRexxVarFromMsg_value = (value); \
+  struct RexxMsg * _SetRexxVarFromMsg_message = (message); \
+  LONG _SetRexxVarFromMsg__re = \
+  ({ \
+  register struct RxsLib * const __SetRexxVarFromMsg__bn __asm("a6") = (struct RxsLib *) (RexxSysBase);\
+  register LONG __SetRexxVarFromMsg__re __asm("d0"); \
+  register STRPTR __SetRexxVarFromMsg_name __asm("a0") = (_SetRexxVarFromMsg_name); \
+  register STRPTR __SetRexxVarFromMsg_value __asm("a1") = (_SetRexxVarFromMsg_value); \
+  register struct RexxMsg * __SetRexxVarFromMsg_message __asm("a2") = (_SetRexxVarFromMsg_message); \
+  __asm volatile ("jsr a6@(-498:W)" \
+  : "=r"(__SetRexxVarFromMsg__re) \
+  : "r"(__SetRexxVarFromMsg__bn), "r"(__SetRexxVarFromMsg_name), "r"(__SetRexxVarFromMsg_value), "r"(__SetRexxVarFromMsg_message) \
+  : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
+  __SetRexxVarFromMsg__re; \
+  }); \
+  _SetRexxVarFromMsg__re; \
+})
+
+#undef SetRexxVarFromMsg
+#define SetRexxVarFromMsg(name, value, message) __SetRexxVarFromMsg(name, value, message)
+
+#endif /* __GNUC__ && !__amigaos4__ */
 
 /****************************************************************************/
 
@@ -163,7 +217,6 @@ GetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR *buffer_pointer)
 	static TEXT buffer[256];
 	LONG result;
 
-#if defined(__amigaos4__)
 	/* The following uses a function which was added to rexxsyslib.library V45.
 	   We therefore have a minimum library version requirement. */
 	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg(message))
@@ -174,9 +227,6 @@ GetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR *buffer_pointer)
 
 	/* The 256 character limit isn't good. This should be done differently. */
 	result = GetRexxVarFromMsg(variable_name,buffer,message);
-#else
-	result = ERR10_015; /* function not found */
-#endif
 	if(result != 0)
 		goto out;
 
@@ -197,7 +247,6 @@ SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG lengt
 {
 	LONG result;
 
-#if defined(__amigaos4__)
 	/* The following uses a function which was added to rexxsyslib.library V45.
 	   We therefore have a minimum library version requirement. */
 	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg(message))
@@ -207,9 +256,6 @@ SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG lengt
 	}
 
 	result = SetRexxVarFromMsg(variable_name,value,message);
-#else
-	result = ERR10_015; /* function not found */
-#endif
 
  out:
 
