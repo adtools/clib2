@@ -1,3 +1,8 @@
+- Rewrote the GetRexxVar()/SetRexxVar() functions (mostly) in 'C', using available
+  code as a reference. The 68k stubs currently only work for the 68k version of
+  the library, and a solution for the OS4 build still needs to be found. The code
+  is currently untested, but it should be complete.
+
 - The printf() family now ignores argument specifications, as in "%2$d %1$d",
   which are used for localization on some platforms. This is a non-standard
   feature and the way clib2 treats it for now is just intended to avoid
