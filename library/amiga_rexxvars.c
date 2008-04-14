@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.13 2008-04-14 15:07:37 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.14 2008-04-14 15:16:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -281,7 +281,7 @@ SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG lengt
 /****************************************************************************/
 
 /* A selection of lovingly hand-crafted 68k stub functions which call
-  into rexxsyslib.library LVOs which still used to be documented back
+  into rexxsyslib.library LVOs that still used to be documented back
   in 1987. */
 
 /****************************************************************************/
@@ -309,10 +309,12 @@ __FreeSpace:
 	moveal	sp@(4),a0
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
+	
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-120)
 	moveal	sp@+,a6
+	
 	rts
 
 ");
@@ -331,10 +333,12 @@ __GetSpace:
 
 	moveal	sp@(4),a0
 	movel	sp@(8),d0
+	
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-114)
 	moveal	sp@+,a6
+	
 	rts
 
 ");
@@ -351,12 +355,15 @@ asm("
 
 __IsSymbol:
 	moveal	sp@(4),a0
+	
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-102)
 	moveal	sp@+,a6
+	
 	moveal	sp@(8),a1
 	movel	d1,a1@
+	
 	rts
 
 ");
@@ -373,12 +380,15 @@ asm("
 
 __CurrentEnv:
 	moveal	sp@(4),a0
+	
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-108)
 	moveal	sp@+,a6
+	
 	moveal	sp@(8),a1
 	movel	a0,a1@
+	
 	rts
 
 ");
@@ -398,14 +408,17 @@ __FetchValue:
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
 	movel	sp@(16),d1
+	
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-72)
 	moveal	sp@+,a6
+	
 	moveal	sp@(20),a1
 	movel	a0,a1@
 	moveal	sp@(24),a1
 	movel	d1,a1@
+	
 	rts
 
 ");
@@ -424,10 +437,12 @@ __EnterSymbol:
 	moveal	sp@(4),a0
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
+	
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-66)
 	moveal	sp@+,a6
+	
 	rts
 
 ");
@@ -446,10 +461,12 @@ __SetValue:
 	moveal sp@(4),a0
 	moveal sp@(8),a1
 	movel sp@(12),d0
+	
 	movel a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr a6@(-84)
 	moveal sp@+,a6
+	
 	rts
 
 ");
@@ -468,12 +485,15 @@ __StrcpyN:
 	moveal sp@(4),a0
 	moveal sp@(8),a1
 	movel sp@(12),d0
+	
 	movel a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr a6@(-270)
 	moveal sp@+,a6
+	
 	moveal sp@(16),a1
 	movel d1,a1@
+	
 	rts
 
 ");
