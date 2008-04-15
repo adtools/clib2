@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.15 2008-04-15 09:33:06 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.16 2008-04-15 16:22:51 obarthel Exp $
  *
  * :ts=4
  *
@@ -240,6 +240,7 @@ SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG lengt
 
 /****************************************************************************/
 
+/* struct Environment * a0,APTR block a1,LONG d0 */
 asm("
 
 	.text
@@ -264,6 +265,7 @@ __FreeSpace:
 
 /****************************************************************************/
 
+/* struct Environment * a0,LONG d0 : APTR d0 */
 asm("
 
 	.text
@@ -287,6 +289,7 @@ __GetSpace:
 
 /****************************************************************************/
 
+/* STRPTR a0 : LONG d0, LONG d1 */
 asm("
 
 	.text
@@ -295,6 +298,7 @@ asm("
 	.globl	__IsSymbol
 
 __IsSymbol:
+
 	moveal	sp@(4),a0
 
 	movel	a6,sp@-
@@ -311,6 +315,7 @@ __IsSymbol:
 
 /****************************************************************************/
 
+/* struct RexxTask * a0 : struct Environment * a0 */
 asm("
 
 	.text
@@ -319,6 +324,7 @@ asm("
 	.globl	__CurrentEnv
 
 __CurrentEnv:
+
 	moveal	sp@(4),a0
 
 	movel	a6,sp@-
@@ -335,6 +341,7 @@ __CurrentEnv:
 
 /****************************************************************************/
 
+/* struct Environment * a0,struct NexxStr * a1,struct NexxStr * d0,struct Node * d1 : struct NexxStr * a0, LONG d1 */
 asm("
 
 	.text
@@ -343,6 +350,7 @@ asm("
 	.globl	__FetchValue
 
 __FetchValue:
+
 	moveal	sp@(4),a0
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
@@ -364,6 +372,7 @@ __FetchValue:
 
 /****************************************************************************/
 
+/* struct Environment a0, struct NexxStr *a1, struct NexxStr * d0 : struct Node * d0 */
 asm("
 
 	.text
@@ -372,6 +381,7 @@ asm("
 	.globl	__EnterSymbol
 
 __EnterSymbol:
+
 	moveal	sp@(4),a0
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
@@ -387,22 +397,24 @@ __EnterSymbol:
 
 /****************************************************************************/
 
+/* struct Environment *a0, struct NexxStr *a1, struct Node * d0 */
 asm("
 
 	.text
 	.even
 
-	.globl	__FreeSpace
+	.globl	__SetValue
 
 __SetValue:
-	moveal sp@(4),a0
-	moveal sp@(8),a1
-	movel sp@(12),d0
 
-	movel a6,sp@-
+	moveal	sp@(4),a0
+	moveal	sp@(8),a1
+	movel	sp@(12),d0
+
+	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
-	jsr a6@(-84)
-	moveal sp@+,a6
+	jsr		a6@(-84)
+	moveal	sp@+,a6
 
 	rts
 
@@ -410,25 +422,27 @@ __SetValue:
 
 /****************************************************************************/
 
+/* STRPTR a0,STRPTR a1,LONG d0 : ULONG d0 */
 asm("
 
 	.text
 	.even
 
-	.globl	__FreeSpace
+	.globl	__StrcpyN
 
 __StrcpyN:
-	moveal sp@(4),a0
-	moveal sp@(8),a1
-	movel sp@(12),d0
 
-	movel a6,sp@-
+	moveal	sp@(4),a0
+	moveal	sp@(8),a1
+	movel	sp@(12),d0
+
+	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
-	jsr a6@(-270)
-	moveal sp@+,a6
+	jsr		a6@(-270)
+	moveal	sp@+,a6
 
-	moveal sp@(16),a1
-	movel d1,a1@
+	moveal	sp@(16),a1
+	movel	d1,a1@
 
 	rts
 
@@ -454,7 +468,7 @@ FreeString(struct Environment * environment,struct NexxStr * ns)
 {
 	/* Not currently owned? */
 	if(!(ns->ns_Flags & NSF_KEEP))
-		_FreeSpace(environment,ns,sizeof(*ns) + ns->ns_Length + 1); /* struct Environment * a0,APTR block a1,LONG d0 */
+		_FreeSpace(environment,ns,sizeof(*ns) + ns->ns_Length + 1);
 }
 
 /****************************************************************************/
@@ -467,7 +481,7 @@ MakeString(struct Environment * environment,STRPTR value,LONG length)
 	struct NexxStr * ns;
 
 	/* Allocate memory for the NexxStr and the NUL-terminated string itself. */
-	ns = _GetSpace(environment,sizeof(*ns) + length + 1); /* struct Environment * a0,LONG d0 : APTR d0 */
+	ns = _GetSpace(environment,sizeof(*ns) + length + 1);
 	if(ns == NULL)
 		goto out;
 
@@ -475,7 +489,7 @@ MakeString(struct Environment * environment,STRPTR value,LONG length)
 	ns->ns_Ivalue	= 0;
 	ns->ns_Length	= length;
 	ns->ns_Flags	= NSF_STRING;
-	ns->ns_Hash		= _StrcpyN((STRPTR)ns->ns_Buff,value,length); /* STRPTR a0,STRPTR a1,LONG d0 : ULONG d0 */
+	ns->ns_Hash		= _StrcpyN((STRPTR)ns->ns_Buff,value,length);
 
 	/* Copying the string did not NUL-terminate it. */
 	ns->ns_Buff[length] = '\0';
@@ -510,8 +524,8 @@ TypeString(STRPTR variable_name,struct Environment * environment,struct NexxStr 
 		goto out;
 
 	/* Find the first dot in the variable name. Everything in front of it
-	   constitutes the 'stem' part. If there is no dot in the name, then
-	   the 'compound' and 'stem' parts are identical. */
+	   and including the dot constitutes the 'stem' part. If there is no dot
+	   in the name, then the 'compound' and 'stem' parts are identical. */
 	dot = memchr(compound->ns_Buff,'.',compound->ns_Length);
 	if(dot != NULL)
 		stem_length = ((char *)dot - (char *)compound->ns_Buff) + 1;
@@ -524,7 +538,7 @@ TypeString(STRPTR variable_name,struct Environment * environment,struct NexxStr 
 		goto out;
 
 	/* Figure out if this is a symbol after all. */
-	_IsSymbol((STRPTR)stem->ns_Buff,&symbol_length); /* STRPTR a0 : LONG d0, LONG d1 */
+	_IsSymbol((STRPTR)stem->ns_Buff,&symbol_length);
 
 	/* The entire name must match the stem part. */
 	if(symbol_length != stem->ns_Length)
@@ -574,7 +588,7 @@ GetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR * return_value)
 	}
 
 	/* Find the current storage environment. */
-	_CurrentEnv(context->rm_TaskBlock,&environment); /* struct RexxTask * a0 : struct Environment * a0 */
+	_CurrentEnv(context->rm_TaskBlock,&environment);
 
 	/* Create the stem and component parts. */
 	error = TypeString(variable_name,environment,&compound_string,&stem_string);
@@ -582,7 +596,7 @@ GetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR * return_value)
 		goto out;
 
 	/* Look up the value. NOTE: _FetchValue() will free the two 'struct NexxStr *' provided. */
-	_FetchValue(environment,stem_string,compound_string,NULL,&is_literal,&ns); /* struct Environment * a0,struct NexxStr * a1,struct NexxStr * d0,struct Node * d1 : struct NexxStr * a0, LONG d1 */
+	_FetchValue(environment,stem_string,compound_string,NULL,&is_literal,&ns);
 
 	/* If this is not a literal, return a pointer to the string. */
 	if(!is_literal)
@@ -622,7 +636,7 @@ SetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR value,LONG length
 	}
 
 	/* Find the current storage environment. */
-	_CurrentEnv(context->rm_TaskBlock,&environment); /* struct RexxTask * a0 : struct Environment * a0 */
+	_CurrentEnv(context->rm_TaskBlock,&environment);
 
 	/* Create the stem and compound parts */
 	error = TypeString(variable_name,environment,&compound_string,&stem_string);
@@ -631,7 +645,7 @@ SetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR value,LONG length
 
 	/* Locate or create the symbol node. NOTE: _EnterSymbol() will put the two 'struct NexxStr *' into
 	   the symbol table. It is not nececessary to free them. */
-	symbol_table_node = _EnterSymbol(environment,stem_string,compound_string); /* struct Environment a0, struct NexxStr *a1, struct NexxStr * d0 : struct Node * d0 */
+	symbol_table_node = _EnterSymbol(environment,stem_string,compound_string);
 	if(symbol_table_node == NULL)
 	{
 		error = ERR10_003; /* no memory available */
@@ -647,7 +661,7 @@ SetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR value,LONG length
 	}
 
 	/* Install the value string. */
-	_SetValue(environment,value_string,symbol_table_node); /* struct Environment *a0, struct NexxStr *a1, struct Node * d0 */
+	_SetValue(environment,value_string,symbol_table_node
 
 	error = 0;
 
