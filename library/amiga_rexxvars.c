@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.14 2008-04-14 15:16:03 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.15 2008-04-15 09:33:06 obarthel Exp $
  *
  * :ts=4
  *
@@ -53,66 +53,14 @@
 
 /****************************************************************************/
 
+/* This is used by the stub function prototypes. The ARexx header files
+   do not define it, though. */
 struct Environment;
 
 /****************************************************************************/
 
 #define __NOLIBBASE__
 #include <proto/rexxsyslib.h>
-
-/****************************************************************************/
-
-/* This side-steps issues with very old inline header files, predating the
-   OS 3.5 SDK, when the library is built for the 68k platform. */
-#if defined(__GNUC__) && !defined(__amigaos4__)
-
-#define __GetRexxVarFromMsg(name, buffer, message) ({ \
-  STRPTR _GetRexxVarFromMsg_name = (name); \
-  STRPTR _GetRexxVarFromMsg_buffer = (buffer); \
-  struct RexxMsg * _GetRexxVarFromMsg_message = (message); \
-  LONG _GetRexxVarFromMsg__re = \
-  ({ \
-  register struct RxsLib * const __GetRexxVarFromMsg__bn __asm("a6") = (struct RxsLib *) (RexxSysBase);\
-  register LONG __GetRexxVarFromMsg__re __asm("d0"); \
-  register STRPTR __GetRexxVarFromMsg_name __asm("a0") = (_GetRexxVarFromMsg_name); \
-  register STRPTR __GetRexxVarFromMsg_buffer __asm("a1") = (_GetRexxVarFromMsg_buffer); \
-  register struct RexxMsg * __GetRexxVarFromMsg_message __asm("a2") = (_GetRexxVarFromMsg_message); \
-  __asm volatile ("jsr a6@(-492:W)" \
-  : "=r"(__GetRexxVarFromMsg__re) \
-  : "r"(__GetRexxVarFromMsg__bn), "r"(__GetRexxVarFromMsg_name), "r"(__GetRexxVarFromMsg_buffer), "r"(__GetRexxVarFromMsg_message) \
-  : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
-  __GetRexxVarFromMsg__re; \
-  }); \
-  _GetRexxVarFromMsg__re; \
-})
-
-#undef GetRexxVarFromMsg
-#define GetRexxVarFromMsg(name, buffer, message) __GetRexxVarFromMsg(name, buffer, message)
-
-#define __SetRexxVarFromMsg(name, value, message) ({ \
-  STRPTR _SetRexxVarFromMsg_name = (name); \
-  STRPTR _SetRexxVarFromMsg_value = (value); \
-  struct RexxMsg * _SetRexxVarFromMsg_message = (message); \
-  LONG _SetRexxVarFromMsg__re = \
-  ({ \
-  register struct RxsLib * const __SetRexxVarFromMsg__bn __asm("a6") = (struct RxsLib *) (RexxSysBase);\
-  register LONG __SetRexxVarFromMsg__re __asm("d0"); \
-  register STRPTR __SetRexxVarFromMsg_name __asm("a0") = (_SetRexxVarFromMsg_name); \
-  register STRPTR __SetRexxVarFromMsg_value __asm("a1") = (_SetRexxVarFromMsg_value); \
-  register struct RexxMsg * __SetRexxVarFromMsg_message __asm("a2") = (_SetRexxVarFromMsg_message); \
-  __asm volatile ("jsr a6@(-498:W)" \
-  : "=r"(__SetRexxVarFromMsg__re) \
-  : "r"(__SetRexxVarFromMsg__bn), "r"(__SetRexxVarFromMsg_name), "r"(__SetRexxVarFromMsg_value), "r"(__SetRexxVarFromMsg_message) \
-  : "d1", "a0", "a1", "fp0", "fp1", "cc", "memory"); \
-  __SetRexxVarFromMsg__re; \
-  }); \
-  _SetRexxVarFromMsg__re; \
-})
-
-#undef SetRexxVarFromMsg
-#define SetRexxVarFromMsg(name, value, message) __SetRexxVarFromMsg(name, value, message)
-
-#endif /* __GNUC__ && !__amigaos4__ */
 
 /****************************************************************************/
 
@@ -212,7 +160,7 @@ CheckRexxMsg(struct RexxMsg *message)
 
 /****************************************************************************/
 
-#if 1
+#if defined(__amigaos4__)
 
 /****************************************************************************/
 
@@ -272,17 +220,13 @@ SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG lengt
 
 /****************************************************************************/
 
-#else
-
-/****************************************************************************/
-
-#if defined(__GNUC__) && !defined(__amigaos4__)
+#elif defined(__GNUC__) && !defined(__amigaos4__)
 
 /****************************************************************************/
 
 /* A selection of lovingly hand-crafted 68k stub functions which call
-  into rexxsyslib.library LVOs that still used to be documented back
-  in 1987. */
+   into rexxsyslib.library LVOs that still used to be documented back
+   in 1987. */
 
 /****************************************************************************/
 
@@ -301,7 +245,6 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__FreeSpace
 
 __FreeSpace:
@@ -309,12 +252,12 @@ __FreeSpace:
 	moveal	sp@(4),a0
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
-	
+
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-120)
 	moveal	sp@+,a6
-	
+
 	rts
 
 ");
@@ -326,19 +269,18 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__GetSpace
 
 __GetSpace:
 
 	moveal	sp@(4),a0
 	movel	sp@(8),d0
-	
+
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-114)
 	moveal	sp@+,a6
-	
+
 	rts
 
 ");
@@ -350,20 +292,19 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__IsSymbol
 
 __IsSymbol:
 	moveal	sp@(4),a0
-	
+
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-102)
 	moveal	sp@+,a6
-	
+
 	moveal	sp@(8),a1
 	movel	d1,a1@
-	
+
 	rts
 
 ");
@@ -375,20 +316,19 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__CurrentEnv
 
 __CurrentEnv:
 	moveal	sp@(4),a0
-	
+
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-108)
 	moveal	sp@+,a6
-	
+
 	moveal	sp@(8),a1
 	movel	a0,a1@
-	
+
 	rts
 
 ");
@@ -400,7 +340,6 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__FetchValue
 
 __FetchValue:
@@ -408,17 +347,17 @@ __FetchValue:
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
 	movel	sp@(16),d1
-	
+
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-72)
 	moveal	sp@+,a6
-	
+
 	moveal	sp@(20),a1
 	movel	a0,a1@
 	moveal	sp@(24),a1
 	movel	d1,a1@
-	
+
 	rts
 
 ");
@@ -430,19 +369,18 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__EnterSymbol
 
 __EnterSymbol:
 	moveal	sp@(4),a0
 	moveal	sp@(8),a1
 	movel	sp@(12),d0
-	
+
 	movel	a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr		a6@(-66)
 	moveal	sp@+,a6
-	
+
 	rts
 
 ");
@@ -454,19 +392,18 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__FreeSpace
 
 __SetValue:
 	moveal sp@(4),a0
 	moveal sp@(8),a1
 	movel sp@(12),d0
-	
+
 	movel a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr a6@(-84)
 	moveal sp@+,a6
-	
+
 	rts
 
 ");
@@ -478,29 +415,24 @@ asm("
 	.text
 	.even
 
-	.globl	_RexxSysBase
 	.globl	__FreeSpace
 
 __StrcpyN:
 	moveal sp@(4),a0
 	moveal sp@(8),a1
 	movel sp@(12),d0
-	
+
 	movel a6,sp@-
 	moveal	"A4(_RexxSysBase)",a6
 	jsr a6@(-270)
 	moveal sp@+,a6
-	
+
 	moveal sp@(16),a1
 	movel d1,a1@
-	
+
 	rts
 
 ");
-
-/****************************************************************************/
-
-#endif /* __GNUC__ && !__amigaos4__ */
 
 /****************************************************************************/
 
@@ -533,19 +465,23 @@ MakeString(struct Environment * environment,STRPTR value,LONG length)
 {
 	struct NexxStr * result = NULL;
 	struct NexxStr * ns;
-	
+
 	/* Allocate memory for the NexxStr and the NUL-terminated string itself. */
 	ns = _GetSpace(environment,sizeof(*ns) + length + 1); /* struct Environment * a0,LONG d0 : APTR d0 */
 	if(ns == NULL)
 		goto out;
-	
+
 	/* Fill in the NexxStr structure, copy the string and remember the hash value for it. */
+	ns->ns_Ivalue	= 0;
 	ns->ns_Length	= length;
 	ns->ns_Flags	= NSF_STRING;
 	ns->ns_Hash		= _StrcpyN((STRPTR)ns->ns_Buff,value,length); /* STRPTR a0,STRPTR a1,LONG d0 : ULONG d0 */
-	
+
+	/* Copying the string did not NUL-terminate it. */
+	ns->ns_Buff[length] = '\0';
+
 	result = ns;
-		
+
 out:
 
 	return(result);
@@ -563,52 +499,52 @@ TypeString(STRPTR variable_name,struct Environment * environment,struct NexxStr 
 	LONG stem_length;
 	LONG symbol_length;
 	STRPTR dot;
-	
+
 	(*compound_ptr)	= NULL;
 	(*stem_ptr)		= NULL;
-	
+
 	/* The 'compound' part is the entire variable name, including all dots and
-	  what's in between them. */
+	   what's in between them. */
 	compound = MakeString(environment,variable_name,strlen(variable_name));
 	if(compound == NULL)
 		goto out;
-	
+
 	/* Find the first dot in the variable name. Everything in front of it
-	  constitutes the 'stem' part. If there is no dot in the name, then
-	  the 'compound' and 'stem' parts are identical. */
+	   constitutes the 'stem' part. If there is no dot in the name, then
+	   the 'compound' and 'stem' parts are identical. */
 	dot = memchr(compound->ns_Buff,'.',compound->ns_Length);
 	if(dot != NULL)
 		stem_length = ((char *)dot - (char *)compound->ns_Buff) + 1;
 	else
 		stem_length = compound->ns_Length;
-	
+
 	/* Make a copy of the 'stem' part. */
 	stem = MakeString(environment,variable_name,stem_length);
 	if(stem == NULL)
 		goto out;
-	
+
 	/* Figure out if this is a symbol after all. */
 	_IsSymbol((STRPTR)stem->ns_Buff,&symbol_length); /* STRPTR a0 : LONG d0, LONG d1 */
-	
+
 	/* The entire name must match the stem part. */
 	if(symbol_length != stem->ns_Length)
 	{
 		error = ERR10_040; /* invalid variable name */
 		goto out;
 	}
-	
+
 	(*compound_ptr)	= compound;
 	(*stem_ptr)		= stem;
-	
+
 	error = 0;
-	
+
 out:
 
 	if(error != 0)
 	{
 		if(compound != NULL)
 			FreeString(environment,compound);
-			
+
 		if(stem != NULL)
 			FreeString(environment,stem);
 	}
@@ -628,18 +564,18 @@ GetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR * return_value)
 	struct NexxStr * stem_string;
 	LONG is_literal;
 	LONG error;
-	
+
 	(*return_value) = NULL;
-	
+
 	if(!CheckRexxMsg(context))
 	{
 		error = ERR10_010; /* invalid message packet */
 		goto out;
 	}
-	
+
 	/* Find the current storage environment. */
 	_CurrentEnv(context->rm_TaskBlock,&environment); /* struct RexxTask * a0 : struct Environment * a0 */
-	
+
 	/* Create the stem and component parts. */
 	error = TypeString(variable_name,environment,&compound_string,&stem_string);
 	if(error != 0)
@@ -647,15 +583,15 @@ GetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR * return_value)
 
 	/* Look up the value. NOTE: _FetchValue() will free the two 'struct NexxStr *' provided. */
 	_FetchValue(environment,stem_string,compound_string,NULL,&is_literal,&ns); /* struct Environment * a0,struct NexxStr * a1,struct NexxStr * d0,struct Node * d1 : struct NexxStr * a0, LONG d1 */
-	
+
 	/* If this is not a literal, return a pointer to the string. */
 	if(!is_literal)
 		(*return_value) = (STRPTR)ns->ns_Buff;
-	
+
 	error = 0;
-	
+
 out:
-	
+
 	return(error);
 }
 
@@ -671,20 +607,20 @@ SetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR value,LONG length
 	struct Node * symbol_table_node;
 	struct NexxStr *value_string;
 	LONG error;
-	
+
 	/* Make sure the value string is not too long */
 	if(length > 65535)
 	{
 		error = ERR10_009; /* symbol or string too long */
 		goto out;
 	}
-	
+
 	if(!CheckRexxMsg(context))
 	{
 		error = ERR10_010; /* invalid message packet */
 		goto out;
 	}
-	
+
 	/* Find the current storage environment. */
 	_CurrentEnv(context->rm_TaskBlock,&environment); /* struct RexxTask * a0 : struct Environment * a0 */
 
@@ -694,14 +630,14 @@ SetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR value,LONG length
 		goto out;
 
 	/* Locate or create the symbol node. NOTE: _EnterSymbol() will put the two 'struct NexxStr *' into
-	  the symbol table. It is not nececessary to free them. */
+	   the symbol table. It is not nececessary to free them. */
 	symbol_table_node = _EnterSymbol(environment,stem_string,compound_string); /* struct Environment a0, struct NexxStr *a1, struct NexxStr * d0 : struct Node * d0 */
 	if(symbol_table_node == NULL)
 	{
 		error = ERR10_003; /* no memory available */
 		goto out;
 	}
-	
+
 	/* Create the value string. */
 	value_string = MakeString(environment,value,length);
 	if(value_string == NULL)
@@ -712,14 +648,14 @@ SetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR value,LONG length
 
 	/* Install the value string. */
 	_SetValue(environment,value_string,symbol_table_node); /* struct Environment *a0, struct NexxStr *a1, struct Node * d0 */
-	
+
 	error = 0;
 
 out:
-	
+
 	return(error);
 }
 
 /****************************************************************************/
 
-#endif
+#endif /* __GNUC__ && !__amigaos4__ */
