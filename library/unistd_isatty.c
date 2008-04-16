@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_isatty.c,v 1.9 2006-11-16 14:39:23 obarthel Exp $
+ * $Id: unistd_isatty.c,v 1.10 2008-04-16 07:46:05 obarthel Exp $
  *
  * :ts=4
  *
@@ -64,6 +64,12 @@ isatty(int file_descriptor)
 	if(fd == NULL)
 	{
 		__set_errno(EBADF);
+		goto out;
+	}
+
+	if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_SOCKET))
+	{
+		__set_errno(ENOTTY);
 		goto out;
 	}
 
