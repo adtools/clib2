@@ -1,3 +1,6 @@
+- To work around a bug in the Roadshow TCP/IP stack (since fixed), the waitselect()
+  function now substitutes a 10 microsecond timeout for a zero length timeout.
+
 - isatty() no longer crashes if passed a socket rather than a file.
 
 - Rewrote the GetRexxVar()/SetRexxVar() functions (mostly) in 'C', using available
