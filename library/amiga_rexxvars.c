@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.16 2008-04-15 16:22:51 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.17 2008-04-16 07:38:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -661,7 +661,7 @@ SetRexxVar(struct RexxMsg *context,STRPTR variable_name,STRPTR value,LONG length
 	}
 
 	/* Install the value string. */
-	_SetValue(environment,value_string,symbol_table_node
+	_SetValue(environment,value_string,symbol_table_node);
 
 	error = 0;
 

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.68k,v 1.105 2008-03-11 07:41:27 damato Exp $
+# $Id: GNUmakefile.68k,v 1.106 2008-04-16 07:38:10 obarthel Exp $
 #
 # :ts=8
 #
@@ -29,7 +29,7 @@ ifneq ($(HOST), AmigaOS)
    RANLIB = m68k-amigaos-ranlib
    COPY = cp
    DELETE = rm -rf
-   MAKEDIR = mkdir
+   MAKEDIR = mkdir -p
 endif
 
 ##############################################################################

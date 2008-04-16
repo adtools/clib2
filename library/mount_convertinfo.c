@@ -1,5 +1,5 @@
 /*
- * $Id: mount_convertinfo.c,v 1.6 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: mount_convertinfo.c,v 1.7 2008-04-16 07:38:10 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,6 +39,20 @@
 
 #include <limits.h>
 #include <string.h>
+
+/****************************************************************************/
+
+#ifndef ID_BUSY_DISK
+#define ID_BUSY_DISK (0x42555359L) /* 'BUSY' */
+#endif /* ID_LONGNAME_DOS_DISK */
+
+#ifndef ID_LONGNAME_DOS_DISK
+#define ID_LONGNAME_DOS_DISK (0x444F5306L) /* 'DOS\6' */
+#endif /* ID_LONGNAME_DOS_DISK */
+
+#ifndef ID_LONGNAME_FFS_DISK
+#define ID_LONGNAME_FFS_DISK (0x444F5307L) /* 'DOS\7' */
+#endif /* ID_LONGNAME_FFS_DISK */
 
 /****************************************************************************/
 
