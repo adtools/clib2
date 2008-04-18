@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.17 2008-04-16 07:38:10 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.18 2008-04-18 10:06:07 obarthel Exp $
  *
  * :ts=4
  *
@@ -164,56 +164,128 @@ CheckRexxMsg(struct RexxMsg *message)
 
 /****************************************************************************/
 
-/* The following function works in about like the original, except that it's
-   not reentrant, does not fill in a pointer to the variable itself and
-   requires rexxsyslib.library V45. */
-LONG
-GetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR *buffer_pointer)
+#include <exec/emulation.h>
+
+/****************************************************************************/
+
+STATIC VOID
+_FreeSpace(struct Environment * env,APTR mem,LONG size)
 {
-	static TEXT buffer[256];
-	LONG result;
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFF88,0x4E75 }; /* jsr -120(a6) ; rts */
 
-	/* The following uses a function which was added to rexxsyslib.library V45.
-	   We therefore have a minimum library version requirement. */
-	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg(message))
-	{
-		result = ERR10_010; /* invalid message packet */
-		goto out;
-	}
+	EmulateTags(code,
+		ET_RegisterA0,env,
+		ET_RegisterA1,mem,
+		ET_RegisterD0,size,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
+}
 
-	/* The 256 character limit isn't good. This should be done differently. */
-	result = GetRexxVarFromMsg(variable_name,buffer,message);
-	if(result != 0)
-		goto out;
+STATIC APTR
+_GetSpace(struct Environment * env,LONG size)
+{
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFF8E,0x4E75 }; /* jsr -114(a6) ; rts */
+	APTR result;
 
-	(*buffer_pointer) = buffer;
-
- out:
+	result = (APTR)EmulateTags(code,
+		ET_RegisterA0,env,
+		ET_RegisterD0,size,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
 
 	return(result);
 }
 
-/****************************************************************************/
-
-/* The following function works in about like the original, except that it
-   ignores the length parameter (the value needs to be a NUL-terminated string)
-   and requires rexxsyslib.library V45. */
-LONG
-SetRexxVar(struct RexxMsg *message,STRPTR variable_name,STRPTR value,ULONG length)
+STATIC LONG
+_IsSymbol(STRPTR name,LONG * symbol_length_ptr)
 {
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFF9A,0x2481,0x4E75 }; /* jsr -102(a6) ; move.l d1,(a2) ; rts */
 	LONG result;
 
-	/* The following uses a function which was added to rexxsyslib.library V45.
-	   We therefore have a minimum library version requirement. */
-	if(RexxSysBase == NULL || RexxSysBase->lib_Version < 45 || NOT IsRexxMsg(message))
-	{
-		result = ERR10_010; /* invalid message packet */
-		goto out;
-	}
+	result = (LONG)EmulateTags(code,
+		ET_RegisterA0,name,
+		ET_RegisterA2,symbol_length_ptr,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
 
-	result = SetRexxVarFromMsg(variable_name,value,message);
+	return(result);
+}
 
- out:
+STATIC VOID
+_CurrentEnv(struct RexxTask *task,struct Environment ** environment_ptr);
+{
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFF94,0x2488,0x4E75 }; /* jsr -108(a6) ; move.l a0,(a2) ; rts */
+
+	EmulateTags(code,
+		ET_RegisterA0,task,
+		ET_RegisterA2,environment_ptr,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
+}
+
+STATIC struct Node *
+_FetchValue(struct Environment * env,struct NexxStr * stem,struct NexxStr * compound,struct Node *symbol_table_node,LONG * is_literal_ptr,struct NexxStr ** value_ptr);
+{
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFFB8,0x2488,0x2681,0x4E75 };	/* jsr -72(a6) ; move.l a0,(a2) ; move.l d1,(a3) ; rts */
+	struct Node * result;
+
+	result = (struct Node *)EmulateTags(code,
+		ET_RegisterA0,env,
+		ET_RegisterA1,stem,
+		ET_RegisterD0,compound,
+		ET_RegisterD1,symbol_table,
+		ET_RegisterA2,is_literal_ptr,
+		ET_RegisterA3,value_ptr,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
+
+	return(result);
+}
+
+STATIC struct Node *
+_EnterSymbol(struct Environment * env,struct NexxStr * stem,struct NexxStr * compound);
+{
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFFBE,0x4E75 }; /* jsr -66(a6) ; rts */
+	struct Node * result;
+
+	result = (struct Node *)EmulateTags(code,
+		ET_RegisterA0,env,
+		ET_RegisterA1,stem,
+		ET_RegisterD0,compound,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
+
+	return(result);
+}
+
+STATIC VOID
+_SetValue(struct Environment * env,struct NexxStr * value,struct Node * symbol_table_node);
+{
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFFAC,0x4E75 }; /* jsr -84(a6) ; rts */
+	struct Node * result;
+
+	result = (struct Node *)EmulateTags(code,
+		ET_RegisterA0,env,
+		ET_RegisterA1,value,
+		ET_RegisterD0,symbol_table_node,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
+
+	return(result);
+}
+
+STATIC VOID
+_StrcpyN(STRPTR destination,STRPTR source,LONG length)
+{
+	STATIC CONST UWORD code[] = { 0x4EAE,0xFEF2,0x4E75 }; /* jsr -270(a6) ; rts */
+	ULONG result;
+
+	result = (ULONG)EmulateTags(code,
+		ET_RegisterA0,destination,
+		ET_RegisterA1,source,
+		ET_RegisterD0,length,
+		ET_RegisterA6,RexxSysBase,
+	TAG_END);
 
 	return(result);
 }
@@ -441,9 +513,6 @@ __StrcpyN:
 	jsr		a6@(-270)
 	moveal	sp@+,a6
 
-	moveal	sp@(16),a1
-	movel	d1,a1@
-
 	rts
 
 ");
@@ -459,6 +528,10 @@ extern struct Node * _FetchValue(struct Environment * env,struct NexxStr * stem,
 extern struct Node * _EnterSymbol(struct Environment * env,struct NexxStr * stem,struct NexxStr * compound);
 extern VOID _SetValue(struct Environment * env,struct NexxStr * value,struct Node * symbol_table_node);
 extern ULONG _StrcpyN(STRPTR destination,STRPTR source,LONG length);
+
+/****************************************************************************/
+
+#endif /* __GNUC__ && !__amigaos4__ */
 
 /****************************************************************************/
 
@@ -669,7 +742,3 @@ out:
 
 	return(error);
 }
-
-/****************************************************************************/
-
-#endif /* __GNUC__ && !__amigaos4__ */
