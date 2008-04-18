@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_rexxvars.c,v 1.18 2008-04-18 10:06:07 obarthel Exp $
+ * $Id: amiga_rexxvars.c,v 1.19 2008-04-18 10:11:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -212,7 +212,7 @@ _IsSymbol(STRPTR name,LONG * symbol_length_ptr)
 }
 
 STATIC VOID
-_CurrentEnv(struct RexxTask *task,struct Environment ** environment_ptr);
+_CurrentEnv(struct RexxTask *task,struct Environment ** environment_ptr)
 {
 	STATIC CONST UWORD code[] = { 0x4EAE,0xFF94,0x2488,0x4E75 }; /* jsr -108(a6) ; move.l a0,(a2) ; rts */
 
@@ -224,7 +224,7 @@ _CurrentEnv(struct RexxTask *task,struct Environment ** environment_ptr);
 }
 
 STATIC struct Node *
-_FetchValue(struct Environment * env,struct NexxStr * stem,struct NexxStr * compound,struct Node *symbol_table_node,LONG * is_literal_ptr,struct NexxStr ** value_ptr);
+_FetchValue(struct Environment * env,struct NexxStr * stem,struct NexxStr * compound,struct Node *symbol_table_node,LONG * is_literal_ptr,struct NexxStr ** value_ptr)
 {
 	STATIC CONST UWORD code[] = { 0x4EAE,0xFFB8,0x2488,0x2681,0x4E75 };	/* jsr -72(a6) ; move.l a0,(a2) ; move.l d1,(a3) ; rts */
 	struct Node * result;
@@ -233,7 +233,7 @@ _FetchValue(struct Environment * env,struct NexxStr * stem,struct NexxStr * comp
 		ET_RegisterA0,env,
 		ET_RegisterA1,stem,
 		ET_RegisterD0,compound,
-		ET_RegisterD1,symbol_table,
+		ET_RegisterD1,symbol_table_node,
 		ET_RegisterA2,is_literal_ptr,
 		ET_RegisterA3,value_ptr,
 		ET_RegisterA6,RexxSysBase,
@@ -243,7 +243,7 @@ _FetchValue(struct Environment * env,struct NexxStr * stem,struct NexxStr * comp
 }
 
 STATIC struct Node *
-_EnterSymbol(struct Environment * env,struct NexxStr * stem,struct NexxStr * compound);
+_EnterSymbol(struct Environment * env,struct NexxStr * stem,struct NexxStr * compound)
 {
 	STATIC CONST UWORD code[] = { 0x4EAE,0xFFBE,0x4E75 }; /* jsr -66(a6) ; rts */
 	struct Node * result;
@@ -259,7 +259,7 @@ _EnterSymbol(struct Environment * env,struct NexxStr * stem,struct NexxStr * com
 }
 
 STATIC VOID
-_SetValue(struct Environment * env,struct NexxStr * value,struct Node * symbol_table_node);
+_SetValue(struct Environment * env,struct NexxStr * value,struct Node * symbol_table_node)
 {
 	STATIC CONST UWORD code[] = { 0x4EAE,0xFFAC,0x4E75 }; /* jsr -84(a6) ; rts */
 	struct Node * result;
@@ -270,11 +270,9 @@ _SetValue(struct Environment * env,struct NexxStr * value,struct Node * symbol_t
 		ET_RegisterD0,symbol_table_node,
 		ET_RegisterA6,RexxSysBase,
 	TAG_END);
-
-	return(result);
 }
 
-STATIC VOID
+STATIC ULONG
 _StrcpyN(STRPTR destination,STRPTR source,LONG length)
 {
 	STATIC CONST UWORD code[] = { 0x4EAE,0xFEF2,0x4E75 }; /* jsr -270(a6) ; rts */

@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.111 2007-01-06 10:09:48 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.112 2008-04-18 10:11:59 obarthel Exp $
 #
 # :ts=8
 #
@@ -212,19 +212,19 @@ lib.threadsafe/baserel/%.o : %.c
 ##############################################################################
 
 define COMPILE
-$(MAKEDIR) $(@D)
+-$(MAKEDIR) $(@D)
 echo "Compiling $< [$(@D)]"
 $(CC) -o $@ -c $(CFLAGS) $< $(LOG_COMMAND)
 endef
 
 define ASSEMBLE
-$(MAKEDIR) $(@D)
+-$(MAKEDIR) $(@D)
 echo "Assembling $< [$(@D)]"
 $(CC) -o $@ -c $(AFLAGS) $< $(LOG_COMMAND)
 endef
 
 define MAKELIB
-$(MAKEDIR) $@
+-$(MAKEDIR) $@
 $(DELETE) $@
 echo "Making $@"
 $(AR) $@ $^ $(LOG_COMMAND)

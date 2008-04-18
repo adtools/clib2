@@ -1,3 +1,8 @@
+- Added 68k stubs to amiga_rexxvars.c for the OS4 build to use. The new code now
+  works just about exactly like the amiga.lib RVI code used to do, which means
+  that there is no artificial length limit for the number of characters a string
+  retrieved may have, and the code is largely reentrant.
+
 - To work around a bug in the Roadshow TCP/IP stack (since fixed), the waitselect()
   function now substitutes a 10 microsecond timeout for a zero length timeout.
 
