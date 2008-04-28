@@ -1,3 +1,5 @@
+c.lib 1.203 (28.4.2008)
+
 - Added 68k stubs to amiga_rexxvars.c for the OS4 build to use. The new code now
   works just about exactly like the amiga.lib RVI code used to do, which means
   that there is no artificial length limit for the number of characters a string

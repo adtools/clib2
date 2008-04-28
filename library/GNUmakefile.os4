@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.113 2008-04-28 15:42:13 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.114 2008-04-28 15:49:25 obarthel Exp $
 #
 # :ts=8
 #
@@ -26,7 +26,7 @@ NET_INCLUDE := netinclude
 CC := ppc-amigaos-gcc
 AR := ppc-amigaos-ar -q
 RANLIB := ppc-amigaos-ranlib
-COPY := cp -p
+COPY := cp -a
 DELETE := rm -rf
 MAKEDIR := mkdir -p
 LOG_COMMAND := 2>&1 | tee -a compiler.log
