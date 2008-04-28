@@ -13,9 +13,9 @@ rm -rf $dir_name
 # Create the directory, copy all the libraries, header files
 # and release note files inside.
 mkdir $dir_name
-cp -a lib $dir_name
-cp -a lib.threadsafe $dir_name
-cp -a include $dir_name
+cp -pR lib $dir_name
+cp -pR lib.threadsafe $dir_name
+cp -pR include $dir_name
 cp changes $dir_name
 
 # Delete the CVS data from the include directory
