@@ -1,3 +1,10 @@
+- unsetenv() now returns a status value.
+
+- Corrected the function prototype for wcspbrk().
+
+- Added function prototypes for mbrtowc_l(), wcscoll_l(), wcscspn() and wcsrchr().
+
+
 c.lib 1.203 (28.4.2008)
 
 - Added 68k stubs to amiga_rexxvars.c for the OS4 build to use. The new code now

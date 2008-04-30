@@ -1,5 +1,5 @@
 /*
- * $Id: wchar.h,v 1.7 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: wchar.h,v 1.8 2008-04-30 14:34:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -97,7 +97,7 @@ extern wchar_t * wcsncpy(wchar_t *dest, const wchar_t *src, size_t n);
 extern size_t wcslen(const wchar_t *s);
 extern wchar_t * wcschr(const wchar_t *s, wchar_t c);
 extern size_t wcsspn(const wchar_t *s, const wchar_t *set);
-extern wchar_t wcspbrk(const wchar_t *s, const wchar_t *set);
+extern wchar_t *wcspbrk(const wchar_t *s, const wchar_t *set);
 extern wchar_t *wcstok(wchar_t *str, const wchar_t *set);
 extern wchar_t *wcsstr(const wchar_t *src, const wchar_t *sub);
 
@@ -178,6 +178,11 @@ extern size_t wcsftime(wchar_t *s, size_t maxsize, const wchar_t *format, const 
 
 extern long long wcstoll(const wchar_t *str, wchar_t **ptr, int base);
 extern unsigned long long wcstoull(const wchar_t *str, wchar_t **ptr, int base);
+
+extern size_t mbrtowc_l(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps, locale_t loc);
+extern int wcscoll_l(const wchar_t *ws1, const wchar_t *ws2, locale_t loc);
+extern size_t wcscspn(const wchar_t *ws1, const wchar_t *ws2);
+extern wchar_t * wcsrchr(const wchar_t *ws, wchar_t wc);
 
 #endif /* __STDC_VERSION__ && __STDC_VERSION__ >= 199901L */
 

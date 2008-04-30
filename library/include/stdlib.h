@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib.h,v 1.18 2006-11-13 09:51:53 obarthel Exp $
+ * $Id: stdlib.h,v 1.19 2008-04-30 14:34:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -195,7 +195,7 @@ extern int rand_r(unsigned int * seed);
 
 extern int setenv(const char *name, const char *value, int overwrite);
 extern int putenv(const char *string);
-extern void unsetenv(const char *name);
+extern int unsetenv(const char *name);
 extern char * mktemp(char * name_template);
 extern int mkstemp(char *name_template);
 extern char * mkdtemp(char *name_template);
