@@ -1,5 +1,5 @@
 /*
- * $Id: wctype.h,v 1.7 2006-01-08 12:06:14 obarthel Exp $
+ * $Id: wctype.h,v 1.8 2008-04-30 14:41:28 obarthel Exp $
  *
  * :ts=4
  *
@@ -68,7 +68,7 @@ extern int iswdigit(wint_t c);
 extern int iswxdigit(wint_t c);
 
 extern int iswgraph(wint_t c);
-extern int iswpunc(wint_t c);
+extern int iswpunct(wint_t c);
 extern int iswprint(wint_t c);
 
 extern int iswlower(wint_t c);
