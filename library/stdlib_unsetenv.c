@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_unsetenv.c,v 1.9 2008-04-30 14:34:03 obarthel Exp $
+ * $Id: stdlib_unsetenv.c,v 1.10 2008-04-30 16:32:49 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,6 +40,12 @@
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
+
+/****************************************************************************/
+
+#ifndef _STDIO_HEADERS_H
+#include "stdio_headers.h"
+#endif /* _STDIO_HEADERS_H */
 
 /****************************************************************************/
 
