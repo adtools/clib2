@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_popen.c,v 1.9 2006-01-08 12:04:24 obarthel Exp $
+ * $Id: stdio_popen.c,v 1.10 2008-05-07 09:33:55 obarthel Exp $
  *
  * :ts=4
  *
@@ -154,7 +154,9 @@ popen(const char *command, const char *type)
 			goto out;
 	}
 
-	/* The current PIPE: device only supports unidirectional connections. */
+	/* The current PIPE: device only supports unidirectional connections. Worse: even if
+	   a PIPE: device with bidirectional connection support were available, we would
+	   be unable to detect this property. */
 	if((type[1] == '+') || (type[1] != '\0' && type[2] == '+'))
 	{
 		D(("unsupported access mode '%s'",type));
