@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_setvbuf.c,v 1.10 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: stdio_setvbuf.c,v 1.11 2008-09-04 12:07:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -123,7 +123,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 	if(size > 0 && buf == NULL)
 	{
 		/* Allocate a little more memory than necessary. */
-		new_buffer = malloc(size + (CACHE_LINE_SIZE-1));
+		new_buffer = malloc(size + (__cache_line_size-1));
 		if(new_buffer == NULL)
 		{
 			__set_errno(ENOBUFS);
@@ -170,7 +170,7 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 			file->iob_CustomBuffer = new_buffer;
 
 			/* Align the buffer start address to a cache line boundary. */
-			new_buffer = (char *)((ULONG)(new_buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
+			new_buffer = (char *)((ULONG)(new_buffer + (__cache_line_size-1)) & ~(__cache_line_size-1));
 		}
 	}
 

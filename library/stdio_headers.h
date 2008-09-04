@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.30 2006-11-16 14:39:23 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.31 2008-09-04 12:07:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -153,18 +153,6 @@
 /* Forward declarations for below... */
 struct fd;
 struct iob;
-
-/****************************************************************************/
-
-/* CPU cache line size; used for alignment purposes with some data structures.
-   This should be determined dynamically rather than preset here. For the
-   68040/68060 the cache line size is 16 bytes, for the PowerPC G4 it's
-   32 bytes and 128 bytes (gross!) for the PowerPC G5. */
-#if defined(__PPC__)
-#define CACHE_LINE_SIZE 32UL
-#else
-#define CACHE_LINE_SIZE 16UL
-#endif /* __PPC__ */
 
 /****************************************************************************/
 
@@ -396,6 +384,11 @@ extern const char * NOCOMMON __file_lock_semaphore_name;
 /****************************************************************************/
 
 extern BOOL NOCOMMON __no_standard_io;
+
+/****************************************************************************/
+
+/* CPU cache line size; used to align I/O buffers for best performance. */
+extern ULONG __cache_line_size;
 
 /****************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_grow_file.c,v 1.7 2006-11-16 14:39:23 obarthel Exp $
+ * $Id: stdio_grow_file.c,v 1.8 2008-09-04 12:07:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -90,7 +90,7 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	/* Allocate a little more memory than required to allow for
 	 * the buffer to be aligned to a cache line boundary.
 	 */
-	buffer = malloc((size_t)buffer_size + (CACHE_LINE_SIZE-1));
+	buffer = malloc((size_t)buffer_size + (__cache_line_size-1));
 	if(buffer == NULL)
 	{
 		SHOWMSG("not enough memory for write buffer");
@@ -100,7 +100,7 @@ __grow_file_size(struct fd * fd,int num_bytes)
 	}
 
 	/* Align the buffer to a cache line boundary. */
-	aligned_buffer = (unsigned char *)(((ULONG)(buffer + (CACHE_LINE_SIZE-1))) & ~(CACHE_LINE_SIZE-1));
+	aligned_buffer = (unsigned char *)(((ULONG)(buffer + (__cache_line_size-1))) & ~(__cache_line_size-1));
 
 	memset(aligned_buffer,0,(size_t)buffer_size);
 

@@ -1,3 +1,6 @@
+- I/O buffers allocated are now aligned according to the CPU cache line size,
+  if the operating system can supply that detailed information.
+
 - unsetenv() now returns a status value.
 
 - Corrected the function prototype for wcspbrk().

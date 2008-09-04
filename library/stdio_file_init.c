@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_file_init.c,v 1.12 2006-11-16 14:39:23 obarthel Exp $
+ * $Id: stdio_file_init.c,v 1.13 2008-09-04 12:07:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -73,6 +73,11 @@ static BPTR input;
 /****************************************************************************/
 
 struct WBStartup * NOCOMMON __WBenchMsg;
+
+/****************************************************************************/
+
+/* CPU cache line size; used to align I/O buffers for best performance. */
+ULONG __cache_line_size = 32;
 
 /****************************************************************************/
 
@@ -215,6 +220,24 @@ FILE_CONSTRUCTOR(stdio_file_init)
 
 	ENTER();
 
+	/* Figure out the proper address alignment for the memory we are
+	   going to use for disk I/O. The default is 32 bytes, which should
+	   be OK for most cases. If possible, ask the operating system for
+	   its preferred alignment size. */
+	#if defined(__amigaos4__)
+	{
+		if(SysBase->lib_Version >= 50)
+		{
+			uint32 physical_alignment = 0;
+
+			GetCPUInfoTags(GCIT_CacheLineSize,&physical_alignment,TAG_DONE);
+
+			if(__cache_line_size < physical_alignment)
+				__cache_line_size = physical_alignment;
+		}
+	}
+	#endif /* __amigaos4__ */
+
 	/* If we were invoked from Workbench, set up the standard I/O streams. */
 	if(__WBenchMsg != NULL)
 	{
@@ -255,7 +278,7 @@ FILE_CONSTRUCTOR(stdio_file_init)
 		PROFILE_ON();
 
 		/* Allocate a little more memory than necessary. */
-		buffer = malloc(BUFSIZ + (CACHE_LINE_SIZE-1));
+		buffer = malloc(BUFSIZ + (__cache_line_size - 1));
 		if(buffer == NULL)
 			goto out;
 
@@ -300,7 +323,7 @@ FILE_CONSTRUCTOR(stdio_file_init)
 		#endif /* __THREAD_SAFE */
 
 		/* Align the buffer start address to a cache line boundary. */
-		aligned_buffer = (char *)((ULONG)(buffer + (CACHE_LINE_SIZE-1)) & ~(CACHE_LINE_SIZE-1));
+		aligned_buffer = (char *)((ULONG)(buffer + (__cache_line_size-1)) & ~(__cache_line_size-1));
 
 		__initialize_fd(__fd[i],__fd_hook_entry,default_file,fd_flags,fd_lock);
 
