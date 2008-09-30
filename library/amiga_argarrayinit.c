@@ -1,5 +1,5 @@
 /*
- * $Id: amiga_argarrayinit.c,v 1.6 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: amiga_argarrayinit.c,v 1.7 2008-09-30 14:09:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,6 +52,14 @@
 
 /****************************************************************************/
 
+#ifdef __amigaos4__
+#define MEMORY_TYPE MEMF_PRIVATE
+#else
+#define MEMORY_TYPE MEMF_ANY
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
 const unsigned char ** CXLIB_argarray;
 
 struct DiskObject * CXLIB_disko;
@@ -70,7 +78,7 @@ ArgArrayInit(LONG argc, CONST_STRPTR * argv)
 		if(argc == 1)
 			goto out; /* skip command name */
 
-		CXLIB_argarray = (const unsigned char **)AllocVec(sizeof(char *) * argc,MEMF_ANY|MEMF_CLEAR);
+		CXLIB_argarray = (const unsigned char **)AllocVec(sizeof(char *) * argc,MEMORY_TYPE|MEMF_CLEAR);
 		if(CXLIB_argarray == NULL)
 			goto out;
 

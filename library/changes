@@ -1,3 +1,8 @@
+- The memory allocated by malloc() and friends is now of type MEMF_PRIVATE
+  under OS4 and beyond. The AmigaOS 2.x/3.x compatible code will still
+  use MEMF_ANY in the same situation, though. Other uses of MEMF_ANY have
+  been replaced as well where MEMF_PRIVATE would have made better sense.
+
 - I/O buffers allocated are now aligned according to the CPU cache line size,
   if the operating system can supply that detailed information.
 

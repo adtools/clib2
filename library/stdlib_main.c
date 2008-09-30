@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_main.c,v 1.33 2006-09-25 14:51:15 obarthel Exp $
+ * $Id: stdlib_main.c,v 1.34 2008-09-30 14:09:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -61,6 +61,16 @@
 
 /****************************************************************************/
 
+/* On OS4 memory of type MEMF_ANY may not be paged out. Where this is desirable
+   MEMF_PRIVATE should be used instead. */
+#ifdef __amigaos4__
+#define MEMORY_TYPE MEMF_PRIVATE
+#else
+#define MEMORY_TYPE MEMF_ANY
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
 extern int main(int arg_c,char ** arg_v);
 
 /****************************************************************************/
@@ -107,7 +117,7 @@ call_main(void)
 			struct Process * this_process = (struct Process *)FindTask(NULL);
 			UBYTE * arg_str = GetArgStr();
 			size_t arg_str_len = strlen(arg_str);
-			UBYTE * arg_str_copy = AllocVec(arg_str_len+1,MEMF_ANY);
+			UBYTE * arg_str_copy = AllocVec(arg_str_len+1,MEMF_PRIVATE);
 			UBYTE current_dir_name[256];
 
 			if(arg_str_copy != NULL && NameFromLock(this_process->pr_CurrentDir,current_dir_name,sizeof(current_dir_name)))
