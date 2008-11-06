@@ -1,5 +1,5 @@
 #
-# $Id: GNUmakefile.os4,v 1.115 2008-04-28 16:12:22 obarthel Exp $
+# $Id: GNUmakefile.os4,v 1.116 2008-11-06 14:44:07 obarthel Exp $
 #
 # :ts=8
 #
@@ -30,6 +30,11 @@ COPY := cp -p
 DELETE := rm -rf
 MAKEDIR := mkdir -p
 LOG_COMMAND := 2>&1 | tee -a compiler.log
+# You may need to request a specific compiler version in order to
+# build the baserel versions of the library. At this time of
+# writing (2008-11-06) GCC 4.0.4 and below support the -mbaserel
+# feature, but more recent versions, including GCC 4.2.4, do not.
+#COMPILER_VERSION := -V4.0.2
 
 # The following are for the native OS4 compiler; note that the
 # LOG_COMMAND should not be enabled unless you have a shell
@@ -42,6 +47,7 @@ LOG_COMMAND := 2>&1 | tee -a compiler.log
 #COPY := copy
 #DELETE := delete all quiet force
 #MAKEDIR := makedir all force
+#COMPILER_VERSION := -V4.0.2
 #LOG_COMMAND := *>< | tee >>compiler.log
 
 ##############################################################################
@@ -53,14 +59,14 @@ WARNINGS := \
 #	-Wconversion -Wshadow
 
 INCLUDES   := -Iinclude -I. -I$(SDK_INCLUDE)
- OPTIONS   := -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99
+ OPTIONS   := -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-common -std=gnu99 -mcrt=clib2
 OPTIMIZE   := -DNDEBUG -O3
 
 #DEBUG     := -ggdb
 #MEMDEBUG  := -D__USE_MEM_TREES -D__MEM_DEBUG
 
-CFLAGS     := $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(MEMDEBUG) $(OPTIONS) $(INCLUDES)
-AFLAGS     := -Wa,-mregnames
+CFLAGS     := $(COMPILER_VERSION) $(WARNINGS) $(OPTIMIZE) $(DEBUG) $(MEMDEBUG) $(OPTIONS) $(INCLUDES)
+AFLAGS     := $(COMPILER_VERSION) -Wa,-mregnames
 
 LARGEDATA  := -msdata=data
 SOFTFLOAT  := -msdata=data -msoft-float
@@ -214,13 +220,13 @@ lib.threadsafe/baserel/%.o : %.c
 define COMPILE
 -$(MAKEDIR) $(@D)
 echo "Compiling $< [$(@D)]"
-$(CC) -o $@ -c $(CFLAGS) $< $(LOG_COMMAND)
+$(CC) $(CFLAGS) -o $@ -c $< $(LOG_COMMAND)
 endef
 
 define ASSEMBLE
 -$(MAKEDIR) $(@D)
 echo "Assembling $< [$(@D)]"
-$(CC) -o $@ -c $(AFLAGS) $< $(LOG_COMMAND)
+$(CC) $(AFLAGS) -o $@ -c $< $(LOG_COMMAND)
 endef
 
 define MAKELIB
