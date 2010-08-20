@@ -1,3 +1,29 @@
+- Added support for ELF shared objects and libraries. This is implemented through
+  constructor/destructor functions, which means that you can use this
+  functionality even in Amiga Exec style shared libraries, with the proper
+  library initialization code to invoke the constructor/destructor functions
+  for you.
+
+- Updated uname() to recognize AmigaOS 4.1.
+
+- The translation from Unix to Amiga path names did not properly process
+  multiple occurences of "/./" in the path name. Thanks go to Steven Solie
+  for finding the issue.
+
+- The detection of "/./" and "/../" patterns in Unix path names to be
+  translated into Amiga path names did not test if it was overrunning
+  the end of the string.
+
+- If strcmp(), strncmp() and memcmp() detect a pair of different
+  characters, then the function result must be calculated as if the
+  characters were of type "unsigned char". This is a requirement
+  according to the ISO 'C' (1994) standard. Thanks go to Georg Steger
+  for finding the issue.
+
+- The definitions for INT_MIN, INT_MAX and UINT_MAX in <limits.h> no
+  longer use long integer types, as prompted by Steven Solie.
+
+
 c.lib 1.204 (11.11.2008)
 
 - The memory allocated by malloc() and friends is now of type MEMF_PRIVATE

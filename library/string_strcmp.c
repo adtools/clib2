@@ -1,5 +1,5 @@
 /*
- * $Id: string_strcmp.c,v 1.4 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: string_strcmp.c,v 1.5 2010-08-20 15:33:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,6 +62,8 @@ strcmp(const char *s1, const char * s2)
 
 	if(s1 != s2)
 	{
+		int c1,c2;
+		
 		while((*s1) == (*s2))
 		{
 			if((*s1) == '\0')
@@ -71,7 +73,12 @@ strcmp(const char *s1, const char * s2)
 			s2++;
 		}
 
-		result = (*s1) - (*s2);
+		/* The comparison must be performed as if the
+		   characters were unsigned characters. */
+		c1 = *(unsigned char *)s1;
+		c2 = *(unsigned char *)s2;
+
+		result = c1 - c2;
 	}
 
  out:

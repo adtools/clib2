@@ -1,5 +1,5 @@
 /*
- * $Id: systeminfo_sysinfo.c,v 1.5 2006-09-22 09:02:51 obarthel Exp $
+ * $Id: systeminfo_sysinfo.c,v 1.6 2010-08-20 15:33:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -141,7 +141,7 @@ sysinfo(int cmd,char *buf,long buflen)
 
 				GetCPUInfoTags(GCIT_VectorUnit,&vecu,TAG_DONE);
 
-				if(vecu == VECTORTYPE_ALTIVEC || vecu == VECTORTYPE_VMX) /* AltiVec and VMX are the same. */
+				if(vecu == VECTORTYPE_ALTIVEC || vecu == 2 /* VECTORTYPE_VMX == 2 */) /* AltiVec and VMX are the same. */
 					s = "ppc+altivec ppc common";
 				else
 					s = "ppc common";

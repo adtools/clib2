@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.11 2006-10-03 16:36:47 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.12 2010-08-20 15:33:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -50,6 +50,7 @@
  *		././foo
  *		foo/./baz
  *		foo/./bar/./baz
+ *		foo/./././bar
  *		foo/.
  *		/.
  *		/tmp
@@ -260,7 +261,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 			D(("name = '%s' (line %ld)",name,__LINE__));
 		}
 
-		/* Ditch all embedded '/./' ('foo/./bar' -> 'foo/bar'). */
+		/* Ditch all embedded '/./' ('foo/./bar' -> 'foo/bar', 'foo/././bar' -> 'foo/bar'). */
 		if(len > 2)
 		{
 			BOOL have_slash_dot_slash = FALSE;
@@ -278,10 +279,11 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 			{
 				for(i = j = 0 ; i < len ; i++)
 				{
-					replace[j++] = name[i];
-		
-					if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '/')
+					while(i < len - 2 && name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '/')
 						i += 2;
+
+					if(i < len)
+						replace[j++] = name[i];
 				}
 		
 				len = j;
@@ -474,10 +476,10 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 			{
 				for(i = j = 0 ; i < len ; i++)
 				{
-					replace[j++] = name[i];
-
-					if(name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '.' && name[i + 3] == '/')
+					if(i < len - 3 && name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '.' && name[i + 3] == '/')
 						i += 2;
+						
+					replace[j++] = name[i];
 				}
 
 				len = j;

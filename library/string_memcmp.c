@@ -1,5 +1,5 @@
 /*
- * $Id: string_memcmp.c,v 1.7 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: string_memcmp.c,v 1.8 2010-08-20 15:33:36 obarthel Exp $
  *
  * :ts=4
  *
@@ -135,7 +135,14 @@ __memcmp(const char *m1,const char *m2,size_t len)
 	{
 		if((*m1) != (*m2))
 		{
-			result = (*m1) - (*m2);
+			int b1,b2;
+			
+			/* The comparison must be performed as if the
+			   bytes were unsigned characters. */
+			b1 = *(unsigned char *)m1;
+			b2 = *(unsigned char *)m2;
+
+			result = b1 - b2;
 			break;
 		}
 
@@ -185,7 +192,12 @@ memcmp(const void *ptr1, const void *ptr2, size_t len)
 			{
 				if((*m1) != (*m2))
 				{
-					result = (*m1) - (*m2);
+					int b1,b2;
+
+					b1 = *(unsigned char *)m1;
+					b2 = *(unsigned char *)m2;
+
+					result = b1 - b2;
 					break;
 				}
 
