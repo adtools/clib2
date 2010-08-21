@@ -1,5 +1,5 @@
 #
-# $Id: libunix.gmk,v 1.3 2006-11-13 09:25:28 obarthel Exp $
+# $Id: libunix.gmk,v 1.4 2010-08-21 10:59:34 obarthel Exp $
 #
 # :ts=8
 #
@@ -57,6 +57,7 @@ UNIX_LIB := \
 	stdlib_alloca_cleanup.o \
 	stdlib_alloca_trap.o \
 	stdlib_arg.o \
+	stdlib_dlopen.o \
 	stdlib_expand_wildcard.o \
 	stdlib_expand_wildcard_check.o \
 	stdlib_getmemstats.o \

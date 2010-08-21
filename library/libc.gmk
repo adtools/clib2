@@ -1,5 +1,5 @@
 #
-# $Id: libc.gmk,v 1.6 2010-08-21 09:57:50 obarthel Exp $
+# $Id: libc.gmk,v 1.7 2010-08-21 10:59:34 obarthel Exp $
 #
 # :ts=8
 #
@@ -205,6 +205,10 @@ C_LIB := \
 	stdlib_div.o \
 	stdlib_divsi3.o \
 	stdlib_divsi4.o \
+	stdlib_dlclose.o \
+	stdlib_dlerror.o \
+	stdlib_dlopen.o \
+	stdlib_dlsym.o \
 	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
