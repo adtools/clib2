@@ -1,5 +1,5 @@
 /*
- * $Id: dlfcn.h,v 1.1 2010-08-21 10:59:34 obarthel Exp $
+ * $Id: dlfcn.h,v 1.2 2010-08-21 11:37:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -59,10 +59,11 @@ extern "C" {
 /****************************************************************************/
 
 /* We only support a subset of the flags available on Unix systems. */
-#define RTLD_LAZY	0
-#define RTLD_NOW	0
-#define RTLD_LOCAL	4
-#define RTLD_GLOBAL	8
+#define RTLD_LAZY		1
+#define RTLD_NOW		2
+#define RTLD_LOCAL		4
+#define RTLD_GLOBAL		8
+#define RTLD_DEFAULT	((void *)0)
 
 /****************************************************************************/
 

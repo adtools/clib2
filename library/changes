@@ -1,10 +1,8 @@
 - Added dlclose(), dlerror(), dlopen() and dlsym() functions, which are
   available only under OS4. There is a variant of dlopen() in libunix.a
-  which will perform a path name conversion.
-
-- The shared object initialization has to be performed before any local
-  constructors are invoked, and after all local destructors have been
-  invoked.
+  which will perform a path name conversion. Note that these functions
+  will not work in the thread-safe variant of the library because it
+  would be unwise to tinker with the currently running program's binary.
 
 - Added support for ELF shared objects and libraries. This is implemented through
   constructor/destructor functions, which means that you can use this

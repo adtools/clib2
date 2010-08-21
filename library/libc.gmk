@@ -1,5 +1,5 @@
 #
-# $Id: libc.gmk,v 1.7 2010-08-21 10:59:34 obarthel Exp $
+# $Id: libc.gmk,v 1.8 2010-08-21 11:37:03 obarthel Exp $
 #
 # :ts=8
 #
@@ -252,6 +252,7 @@ C_LIB := \
 	stdlib_setjmp.o \
 	stdlib_set_errno.o \
 	stdlib_set_process_window.o \
+	stdlib_shared_objs.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
 	stdlib_srand.o \

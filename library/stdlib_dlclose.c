@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_dlclose.c,v 1.1 2010-08-21 10:59:34 obarthel Exp $
+ * $Id: stdlib_dlclose.c,v 1.2 2010-08-21 11:37:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,10 +52,7 @@
 /****************************************************************************/
 
 extern struct ElfIFace *	__IElf;
-extern Elf32_Handle			__elf_handle;
-
-/****************************************************************************/
-
+extern Elf32_Handle			__dl_elf_handle;
 extern Elf32_Error			__elf_error_code;
 
 /****************************************************************************/
@@ -64,12 +61,12 @@ int dlclose(void * handle)
 {
 	int result = -1;
 
-	if(__elf_handle != NULL)
+	if(__dl_elf_handle != NULL)
 	{
 		struct ElfIFace * IElf = __IElf;
 		Elf32_Error error;
 
-		error = DLClose(__elf_handle,handle);
+		error = DLClose(__dl_elf_handle,handle);
 		if(error != ELF32_NO_ERROR)
 		{
 			__elf_error_code = error;

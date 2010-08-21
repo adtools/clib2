@@ -1,5 +1,5 @@
 /* 
- * $Id: crtbegin.c,v 1.12 2010-08-21 09:57:50 obarthel Exp $
+ * $Id: crtbegin.c,v 1.13 2010-08-21 11:37:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -10,16 +10,9 @@
 
 /****************************************************************************/
 
-#ifndef _STDLIB_HEADERS_H
-#include "stdlib_headers.h"
-#endif /* _STDLIB_HEADERS_H */
-
-/****************************************************************************/
-
-#include <libraries/elf.h>
-
-#include <proto/elf.h>
-#include <proto/dos.h>
+#ifndef EXEC_TYPES_H
+#include <exec/types.h>
+#endif /* EXEC_TYPES_H */
 
 /****************************************************************************/
 
@@ -39,110 +32,10 @@ void _fini(void);
 
 /****************************************************************************/
 
-/* These are used to initialize the shared objects linked to this binary,
-   and for the dlopen(), dlclose() and dlsym() functions. */
-struct Library *	__ElfBase;
-struct ElfIFace *	__IElf;
-
-Elf32_Handle		__elf_handle;
-
-/****************************************************************************/
-
-static VOID close_elf_library(void)
-{
-	if(__IElf != NULL)
-	{
-		DropInterface((struct Interface *)__IElf);
-		__IElf = NULL;
-	}
-		
-	if(__ElfBase != NULL)
-	{
-		CloseLibrary(__ElfBase);
-		__ElfBase = NULL;
-	}
-}
-
-/****************************************************************************/
-
-static BOOL open_elf_library(void)
-{
-	BOOL success = FALSE;
-
-	/* We need elf.library V52.2 or higher. */
-	__ElfBase = OpenLibrary("elf.library",0);
-	if(__ElfBase == NULL || (__ElfBase->lib_Version < 52) || (__ElfBase->lib_Version == 52 && __ElfBase->lib_Revision < 2))
-		goto out;
-
-	__IElf = (struct ElfIFace *)GetInterface(__ElfBase,"main",1,NULL);
-	if(__IElf == NULL)
-		goto out;
-
-	success = TRUE;
-
- out:
-
-	return(success);
-}
-
-/****************************************************************************/
-
-static void shared_obj_exit(void)
-{
-	/* If we got what we wanted, trigger the destructors,
-	   etc. in the shared objects linked to this binary. */
-	if(__elf_handle != NULL)
-		InitSHLibs(__elf_handle,FALSE);
-
-	close_elf_library();
-}
-
-/****************************************************************************/
-
-static void shared_obj_init(void)
-{
-	struct ElfIFace * IElf;
-	BOOL success = FALSE;
-	BPTR segment_list;
-
-	if(!open_elf_library())
-		goto out;
-
-	/* Try to find the Elf handle associated with this
-	   program's segment list. */
-	segment_list = GetProcSegList(NULL,GPSLF_CLI | GPSLF_SEG);
-	if(segment_list == ZERO)
-		goto out;
-
-	if(GetSegListInfoTags(segment_list,
-		GSLI_ElfHandle,&__elf_handle,
-	TAG_DONE) != 1)
-	{
-		goto out;
-	}
-
-	if(__elf_handle == NULL)
-		goto out;
-
-	IElf = __IElf;
-
-	/* Trigger the constructors, etc. in the shared objects
-	   linked to this binary. */
-	InitSHLibs(__elf_handle,TRUE);
-
-	success = TRUE;
-
- out:
-
-	if(!success)
-		close_elf_library();
-}
-
-/****************************************************************************/
-
 void
 _init(void)
 {
+	extern void shared_obj_init(void);
 	int num_ctors,i;
 	int j;
 
@@ -162,6 +55,7 @@ _init(void)
 void
 _fini(void)
 {
+	extern void shared_obj_exit(void);
 	int num_dtors,i;
 	static int j;
 

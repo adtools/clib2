@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_dlopen.c,v 1.1 2010-08-21 10:59:34 obarthel Exp $
+ * $Id: stdlib_dlopen.c,v 1.2 2010-08-21 11:37:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,7 +52,7 @@
 /****************************************************************************/
 
 extern struct ElfIFace *	__IElf;
-extern Elf32_Handle			__elf_handle;
+extern Elf32_Handle			__dl_elf_handle;
 
 /****************************************************************************/
 
@@ -88,20 +88,21 @@ void * dlopen(const char * path_name,int mode)
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
-	if(__elf_handle != NULL)
+	if(__dl_elf_handle != NULL)
 	{
 		struct ElfIFace * IElf = __IElf;
-		uint32 flags;
+		uint32 flags = 0;
 
 		if(mode & RTLD_LOCAL)
 			flags = ELF32_RTLD_LOCAL;
-		else if (mode & RTLD_GLOBAL)
-			flags = ELF32_RTLD_GLOBAL;
-		else
-			flags = 0;
 
-		result = DLOpen(__elf_handle,path_name,flags);
+		if(mode & RTLD_GLOBAL)
+			flags = ELF32_RTLD_GLOBAL;
+
+		result = DLOpen(__dl_elf_handle,path_name,flags);
 	}
+
+ out:
 
 	return(result);
 }

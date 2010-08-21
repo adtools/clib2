@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_dlerror.c,v 1.1 2010-08-21 10:59:34 obarthel Exp $
+ * $Id: stdlib_dlerror.c,v 1.2 2010-08-21 11:37:03 obarthel Exp $
  *
  * :ts=4
  *
@@ -62,6 +62,7 @@ const char * dlerror(void)
 	{
 		case ELF32_NO_ERROR:
 
+			result = NULL;
 			break;
 
 		case ELF32_OUT_OF_MEMORY:
@@ -111,7 +112,7 @@ const char * dlerror(void)
 
 		case ELF32_REQUIRED_OBJECT_MISSING:
 
-			result = required object missing";
+			result = "required object missing";
 			break;
 
 		default:
@@ -120,6 +121,7 @@ const char * dlerror(void)
 			break;
 	}
 
+	/* Calling dlerror() will clear the error code. */
 	__elf_error_code = ELF32_NO_ERROR;
 
 	return(result);
