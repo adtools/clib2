@@ -1,3 +1,7 @@
+- The shared object initialization has to be performed before any local
+  constructors are invoked, and after all local destructors have been
+  invoked.
+
 - Added support for ELF shared objects and libraries. This is implemented through
   constructor/destructor functions, which means that you can use this
   functionality even in Amiga Exec style shared libraries, with the proper
