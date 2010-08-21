@@ -1,3 +1,5 @@
+c.lib 1.205 (21.8.2010)
+
 - Added dlclose(), dlerror(), dlopen() and dlsym() functions, which are
   available only under OS4. There is a variant of dlopen() in libunix.a
   which will perform a path name conversion. Note that these functions
