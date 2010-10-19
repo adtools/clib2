@@ -1,5 +1,5 @@
 /*
- * $Id: stdio.h,v 1.22 2006-03-06 08:43:48 obarthel Exp $
+ * $Id: stdio.h,v 1.23 2010-10-19 09:35:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -287,9 +287,9 @@ extern char *tmpnam(char *buf);
 	 (((FILE *)(f))->num_write_bytes < ((FILE *)(f))->size)) ? \
 	  (((FILE *)(f))->buffer[((FILE *)(f))->num_write_bytes++] = (c), \
 	  (((((FILE *)(f))->flags & __FILE_BUFFER_MASK) == _IOLBF && \
-	  ((FILE *)(f))->buffer[((FILE *)(f))->num_write_bytes-1] == '\n') ? \
+	  (c) == '\n') ? \
 	   __flush(f) : \
-	   (((FILE *)(f))->buffer[((FILE *)(f))->num_write_bytes-1]))) : \
+	   (c))) : \
 	   fputc((c),(f)))
 
 /****************************************************************************/

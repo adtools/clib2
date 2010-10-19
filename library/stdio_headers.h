@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_headers.h,v 1.31 2008-09-04 12:07:58 obarthel Exp $
+ * $Id: stdio_headers.h,v 1.32 2010-10-19 09:35:16 obarthel Exp $
  *
  * :ts=4
  *
@@ -279,10 +279,9 @@ struct iob
 #define __putc(c,f,m) \
 	(((((struct iob *)(f))->iob_BufferWriteBytes < ((struct iob *)(f))->iob_BufferSize)) ? \
 	  (((struct iob *)(f))->iob_Buffer[((struct iob *)(f))->iob_BufferWriteBytes++] = (c), \
-	  (((m) == IOBF_BUFFER_MODE_LINE && \
-	  ((struct iob *)(f))->iob_Buffer[((struct iob *)(f))->iob_BufferWriteBytes-1] == '\n') ? \
+	  (((m) == IOBF_BUFFER_MODE_LINE && (c) == '\n') ? \
 	   __flush(f) : \
-	   (((struct iob *)(f))->iob_Buffer[((struct iob *)(f))->iob_BufferWriteBytes-1]))) : \
+	   (c))) : \
 	  __fputc((c),(f),(m)))
 
 #define __putc_fully_buffered(c,f) \
