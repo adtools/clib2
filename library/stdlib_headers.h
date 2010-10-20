@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_headers.h,v 1.21 2006-01-08 12:04:25 obarthel Exp $
+ * $Id: stdlib_headers.h,v 1.22 2010-10-20 13:50:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -162,21 +162,7 @@ extern unsigned int NOCOMMON (* __get_default_stack_size)(void);
 
 /****************************************************************************/
 
-extern unsigned int NOCOMMON	__stack_size;
-extern UBYTE * NOCOMMON			__stk_limit;
-extern UBYTE * NOCOMMON			__base;
-
-/****************************************************************************/
-
-extern ULONG NOCOMMON __stk_extensions;
-extern ULONG NOCOMMON __stk_maxsize;
-
-/****************************************************************************/
-
-extern ULONG NOCOMMON __stk_argbytes;
-extern ULONG NOCOMMON __stk_safezone;
-extern ULONG NOCOMMON __stk_size;
-extern ULONG NOCOMMON __stk_minframe;
+extern unsigned int NOCOMMON __stack_size;
 
 /****************************************************************************/
 

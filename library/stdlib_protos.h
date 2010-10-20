@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_protos.h,v 1.17 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: stdlib_protos.h,v 1.18 2010-10-20 13:50:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -165,11 +165,6 @@ extern int _main(void);
 
 /* stdlib_assertion_failure.c */
 extern void __assertion_failure(const char *file_name,int line_number,const char *expression);
-
-/****************************************************************************/
-
-/* stdlib_stackoverflow.c */
-extern void __stkovf(void);
 
 /****************************************************************************/
 

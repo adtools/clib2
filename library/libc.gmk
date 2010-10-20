@@ -1,5 +1,5 @@
 #
-# $Id: libc.gmk,v 1.8 2010-08-21 11:37:03 obarthel Exp $
+# $Id: libc.gmk,v 1.9 2010-10-20 13:50:17 obarthel Exp $
 #
 # :ts=8
 #
@@ -256,10 +256,6 @@ C_LIB := \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
 	stdlib_srand.o \
-	stdlib_stackargbytes.o \
-	stdlib_stackcheck.o \
-	stdlib_stackoverflow.o \
-	stdlib_stacksafezone.o \
 	stdlib_stacksize.o \
 	stdlib_stack_usage.o \
 	stdlib_arg.o \

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_stack_usage.c,v 1.7 2006-01-08 12:04:26 obarthel Exp $
+ * $Id: stdlib_stack_usage.c,v 1.8 2010-10-20 13:50:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -40,11 +40,6 @@
 /****************************************************************************/
 
 static struct StackSwapStruct stack_swap_struct;
-
-/****************************************************************************/
-
-ULONG __stk_extensions;	/* number of stack extensions performed */
-ULONG __stk_maxsize;	/* maximum amount of memory allocated for stack extension */	
 
 /****************************************************************************/
 
@@ -95,17 +90,6 @@ __stack_usage_exit(void)
 
 		stack_swap_struct.stk_Lower = NULL;
 		stack_swap_struct.stk_Upper = 0;
-	}
-
-	if(__stk_maxsize == 0)
-	{
-		kprintf("[%s] no stack extension was performed\n",
-			__program_name);
-	}
-	else
-	{
-		kprintf("[%s] maximum size of extended stack = %ld bytes, stack was extended %ld times\n",
-			__program_name,__stk_maxsize,__stk_extensions);
 	}
 }
 

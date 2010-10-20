@@ -9,6 +9,11 @@
   also zaps the fd pointer itself after cleaning up the file descriptor
   table entry.
 
+- Removed the remains of all the stack extension and stack overflow/underflow
+  checking code. It never actually worked. The bit that does work is the stack
+  usage measurement code, plus the bit that sets up the the custom stack
+  according to local setting or by calling a query function.
+
 
 c.lib 1.205 (21.8.2010)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: stdlib_setjmp.c,v 1.5 2006-11-16 10:09:20 obarthel Exp $
+ * $Id: stdlib_setjmp.c,v 1.6 2010-10-20 13:50:17 obarthel Exp $
  *
  * :ts=4
  *
@@ -81,55 +81,6 @@ l0:	moveq	#0,d0						| always return 0							\n\
 
 /****************************************************************************/
 
-#if defined(STACK_EXTENSION)
-
-/****************************************************************************/
-
-asm("																							\n\
-																								\n\
-AFB_68881 = 4																					\n\
-AttnFlags = 297																					\n\
-																								\n\
-	.text																						\n\
-	.even																						\n\
-																								\n\
-	.globl	_longjmp																			\n\
-	.globl	___stkrst																			\n\
-																								\n\
-_longjmp:																						\n\
-																								\n\
-	moveal	sp@(4),a0					| (struct __jmp_buf *) env								\n\
-	movel	sp@(8),d2					| (int) status											\n\
-																								\n\
-	tstl	d2																					\n\
-	bne		l1							| skip the following if result is non-zero				\n\
-																								\n\
-	moveq	#1,d2						| make sure that the result is always non-zero			\n\
-																								\n\
-l1:	movel	a0@(60:W),d0				| get the stack pointer address to restore				\n\
-	jbsr	___stkrst					| restore the stack frame								\n\
-	movel	d2,d0						| get the return code back								\n\
-																								\n\
-	moveal	"A4(_SysBase)",a1																	\n\
-	btst	#AFB_68881,a1@(AttnFlags:W)	| is there an FPU installed?							\n\
-	beq		l2							| skip the following if not								\n\
-																								\n\
-	fmovemx	a0@(64:W),fp0-fp7			| restore all floating point registers					\n\
-																								\n\
-l2:	moveml	a0@(4:W),d1-d7				| restore all data registers							\n\
-	moveml	a0@(36:W),a1-a7				| restore almost all address registers, except for A0	\n\
-	movel	a0@,sp@						| restore A0											\n\
-	moveal	a0@(32:W),a0				| and return to the address setjmp() was called from	\n\
-	rts																							\n\
-																								\n\
-");
-
-/****************************************************************************/
-
-#else
-
-/****************************************************************************/
-
 asm("																							\n\
 																								\n\
 AFB_68881 = 4																					\n\
@@ -166,10 +117,6 @@ l2:	moveml	a0@(4:W),d1-d7				| restore all data registers							\n\
 
 /****************************************************************************/
 
-#endif /* STACK_EXTENSION */
-
-/****************************************************************************/
-
 #elif defined(__mc68000__) 
 
 /****************************************************************************/
@@ -193,46 +140,6 @@ _setjmp:																\n\
 	rts																	\n\
 																		\n\
 ");
-
-/****************************************************************************/
-
-#if defined(STACK_EXTENSION)
-
-/****************************************************************************/
-
-asm("																				\n\
-																					\n\
-	.text																			\n\
-	.even																			\n\
-																					\n\
-	.globl	_longjmp																\n\
-	.globl	___stkrst																\n\
-																					\n\
-_longjmp:																			\n\
-																					\n\
-	moveal	sp@(4),a0		| (struct __jmp_buf *) env								\n\
-	movel	sp@(8),d2		| (int) status											\n\
-																					\n\
-	tstl	d2																		\n\
-	bne		l1				| skip the following if result is non-zero				\n\
-																					\n\
-	moveq	#1,d2			| make sure that the result is always non-zero			\n\
-																					\n\
-l1:	movel	a0@(60:W),d0	| get the stack pointer address to restore				\n\
-	jbsr	___stkrst		| restore the stack frame								\n\
-	movel	d2,d0			| get the return code back								\n\
-																					\n\
-	moveml	a0@(4:W),d1-d7	| restore all data registers							\n\
-	moveml	a0@(36:W),a1-a7	| restore almost all address registers, except for A0	\n\
-	movel	a0@,sp@			| restore A0											\n\
-	moveal	a0@(32:W),a0	| and return to the address setjmp() was called from	\n\
-	rts																				\n\
-																					\n\
-");
-
-/****************************************************************************/
-
-#else
 
 /****************************************************************************/
 
@@ -263,23 +170,7 @@ l1:	moveml	a0@(4:W),d1-d7	| restore all data registers							\n\
 
 /****************************************************************************/
 
-#endif /* STACK_EXTENSION */
-
-/****************************************************************************/
-
 #elif defined(__PPC__)
-
-/****************************************************************************/
-
-#if defined(STACK_EXTENSION)
-
-/****************************************************************************/
-
-#error "STACK_EXTENSION is not supported on the PowerPC"
-
-/****************************************************************************/
-
-#else
 
 /****************************************************************************/
 
@@ -402,8 +293,6 @@ longjmp:					\n\
 ");
 
 #endif /* defined PPC_FLOATING_POINT_SUPPORT */
-
-#endif /* defined STACK_EXTENSION */
 
 /****************************************************************************/
 
