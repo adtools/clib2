@@ -1,5 +1,5 @@
 /*
- * $Id: termios_console_fdhookentry.c,v 1.5 2006-11-16 14:39:23 obarthel Exp $
+ * $Id: termios_console_fdhookentry.c,v 1.6 2010-10-20 13:12:59 obarthel Exp $
  *
  * :ts=4
  *
@@ -474,6 +474,7 @@ __termios_console_hook(
 
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));
+			fd = NULL;
 
 			break;
 

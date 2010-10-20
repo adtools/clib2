@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fwrite.c,v 1.11 2006-09-25 15:38:21 obarthel Exp $
+ * $Id: stdio_fwrite.c,v 1.12 2010-10-20 13:12:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -134,7 +134,7 @@ fwrite(const void *ptr,size_t element_size,size_t count,FILE *stream)
 			{
 				c = (*data++);
 
-				if(__putc_line_buffered(c,(FILE *)file) < 0)
+				if(__putc_line_buffered(c,(FILE *)file) == EOF)
 					goto out;
 
 				total_bytes_written++;
@@ -146,7 +146,7 @@ fwrite(const void *ptr,size_t element_size,size_t count,FILE *stream)
 			{
 				c = (*data++);
 
-				if(__putc_fully_buffered(c,(FILE *)file) < 0)
+				if(__putc_fully_buffered(c,(FILE *)file) == EOF)
 					goto out;
 
 				total_bytes_written++;

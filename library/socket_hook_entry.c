@@ -1,5 +1,5 @@
 /*
- * $Id: socket_hook_entry.c,v 1.17 2006-11-16 10:41:15 obarthel Exp $
+ * $Id: socket_hook_entry.c,v 1.18 2010-10-20 13:12:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -144,6 +144,8 @@ __socket_hook_entry(
 
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));
+
+			fd = NULL;
 
 			break;
 

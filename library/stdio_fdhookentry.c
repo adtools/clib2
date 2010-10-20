@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_fdhookentry.c,v 1.34 2006-11-16 14:39:23 obarthel Exp $
+ * $Id: stdio_fdhookentry.c,v 1.35 2010-10-20 13:12:58 obarthel Exp $
  *
  * :ts=4
  *
@@ -367,6 +367,7 @@ __fd_hook_entry(
 
 			/* And that's the last for this file descriptor. */
 			memset(fd,0,sizeof(*fd));
+			fd = NULL;
 
 			break;
 

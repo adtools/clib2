@@ -1,3 +1,15 @@
+- Reworked the __putc() and putc() macros to reference the 'c' input
+  parameter only once, and to be free of side-effects when tinkering
+  with the buffer position.
+
+- isatty() had the __fd_lock() call in the wrong place, which could have
+  led to cleanup problems later.
+
+- The close action in the stdio, socket and termios hook code now
+  also zaps the fd pointer itself after cleaning up the file descriptor
+  table entry.
+
+
 c.lib 1.205 (21.8.2010)
 
 - Added dlclose(), dlerror(), dlopen() and dlsym() functions, which are
