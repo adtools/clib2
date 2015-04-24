@@ -1,4 +1,0 @@
-This is a collection of programs I'm using to test the library. These
-are functional tests: the library is supposed to do something, and produce
-a particular result. For example, "printf_test" exercises a bunch of
-output formatting rules.
