@@ -1,3 +1,11 @@
+m.lib 1.206 (24.4.2015)
+
+- The fscanf() family failed to parse and convert %f parameters correctly
+  if the respective number did not begin with a digit, but a decimal
+  point. Hence ".7" would not be processed, but "0.7" would.
+
+c.lib 1.206 (24.4.2015)
+
 - Reworked the __putc() and putc() macros to reference the 'c' input
   parameter only once, and to be free of side-effects when tinkering
   with the buffer position.
