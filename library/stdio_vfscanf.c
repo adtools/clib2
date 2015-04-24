@@ -1,5 +1,5 @@
 /*
- * $Id: stdio_vfscanf.c,v 1.21 2006-09-25 14:51:15 obarthel Exp $
+ * $Id: stdio_vfscanf.c,v 1.22 2015-04-24 13:00:12 obarthel Exp $
  *
  * :ts=4
  *
@@ -775,6 +775,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 					/* Check if there's a hex prefix introducing this number. */
 					if(maximum_field_width != 0 && (c = __getc(stream)) != EOF)
 					{
+						D(("c = '%lc'",c));
+
 						if(c == '0')
 						{
 							/* Use the leading zero as is. */
@@ -889,6 +891,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 						c = __getc(stream);
 						if(c != EOF)
 						{
+							D(("c = '%lc'",c));
+
 							__locale_lock();
 
 							/* Did we find the decimal point? We accept both the
@@ -963,6 +967,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 							int digit;
 
 							SHOWMSG("found a decimal point");
+							num_chars_processed++;
 
 							/* Process all digits following the decimal point. */
 							while(maximum_field_width != 0 && (c = __getc(stream)) != EOF)
@@ -1004,6 +1009,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 									}
 
 									total_num_chars_read++;
+									num_chars_processed++;
 
 									if(maximum_field_width > 0)
 										maximum_field_width--;
@@ -1014,6 +1020,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 									SHOWMSG("found an exponent specifier");
 
 									total_num_chars_read++;
+									num_chars_processed++;
 
 									if(maximum_field_width > 0)
 										maximum_field_width--;
@@ -1056,12 +1063,15 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 								{
 									int digit;
 
+									D(("c = '%lc'",c));
+
 									/* Skip the sign. */
 									if(c == '-')
 									{
 										exponent_is_negative = TRUE;
 
 										total_num_chars_read++;
+										num_chars_processed++;
 
 										if(maximum_field_width > 0)
 											maximum_field_width--;
@@ -1069,6 +1079,7 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 									else if (c == '+')
 									{
 										total_num_chars_read++;
+										num_chars_processed++;
 
 										if(maximum_field_width > 0)
 											maximum_field_width--;
@@ -1097,6 +1108,8 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 											new_exponent = (exponent_radix * exponent) + digit;
 											if(new_exponent < exponent) /* overflow? */
 											{
+												SHOWMSG("overflow!");
+
 												if(ungetc(c,stream) == EOF)
 												{
 													SHOWMSG("couldn't push this character back");
@@ -1109,12 +1122,15 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 											exponent = new_exponent;
 
 											total_num_chars_read++;
+											num_chars_processed++;
 
 											if(maximum_field_width > 0)
 												maximum_field_width--;
 										}
 										else
 										{
+											SHOWMSG("invalid digit");
+
 											if(ungetc(c,stream) == EOF)
 											{
 												SHOWMSG("couldn't push this character back");
@@ -1178,9 +1194,17 @@ vfscanf(FILE *stream, const char *format, va_list arg)
 						}
 
 						num_assignments++;
+
+						D(("number of assignments = %ld\n", num_assignments));
 					}
 
 					num_conversions++;
+
+					D(("number of conversions = %ld\n", num_conversions));
+				}
+				else
+				{
+					SHOWMSG("no characters were actually processed");
 				}
 			}
 			#else
