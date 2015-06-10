@@ -4,7 +4,7 @@
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
+ * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@
 
 #ifndef ID_CON
 #define ID_CON (0x434F4E00L) /* 'CON\0' */
-#endif /* ID_CON */
+#endif /* ID_CON */
 
 #ifndef ID_RAWCON
 #define ID_RAWCON (0x52415700L) /* 'RAW\0' */

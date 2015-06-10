@@ -5,7 +5,7 @@
 ** $Id: skeleton.h,v 1.2 2006-01-08 12:06:14 obarthel Exp $
 **
 ** Prototype/inline/pragma header file combo
-** Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
+** Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
 ** All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without

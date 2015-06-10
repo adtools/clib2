@@ -4,7 +4,7 @@
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
+ * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -184,7 +184,7 @@ extern void __bcopy(const void *src,void *dst,size_t len);
 
 /****************************************************************************/
 
-/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
+/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
    memcmp/memcpy/memset functions instead of 'size_t'. This can produce warnings
    where none are necessary. */
 #if defined(__GNUC__) && (__GNUC__ < 3)
@@ -324,7 +324,7 @@ __memcpy(unsigned char * to,unsigned char * from,size_t len)
 
 /****************************************************************************/
 
-/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
+/* This is ugly: GCC 2.95.x assumes that 'unsigned long' is used in the built-in
    memcmp/memcpy/memset functions instead of 'size_t'. This can produce warnings
    where none are necessary. */
 #if defined(__GNUC__) && (__GNUC__ < 3)

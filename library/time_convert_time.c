@@ -4,7 +4,7 @@
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
+ * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ __convert_time_to_datestamp(time_t time_value,struct DateStamp * ds)
 
 	__locale_lock();
 
-	/* If possible, adjust the time to match the local time zone settings. */
+	/* If possible, adjust the time to match the local time zone settings. */
 	if(__default_locale != NULL)
 		time_value -= 60 * __default_locale->loc_GMTOffset;
 

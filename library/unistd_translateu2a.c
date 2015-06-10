@@ -4,7 +4,7 @@
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2006 by Olaf Barthel <olsen (at) sourcery.han.de>
+ * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -168,7 +168,7 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 			name = replace;
 		}
 
-		/* If the name was replaced, update the string length cached. */
+		/* If the name was replaced, update the string length cached. */
 		if(name != (*name_ptr))
 		{
 			D(("name after relative path replacement = '%s'",name));
