@@ -2,16 +2,16 @@
 
 ## What is this?
 
-This is my attempt to get Samba 2.2.x ported to the Amiga. My first Amiga port required SAS/C and a number of strange tricks had to be pulled to get it to support the kind of environment Samba needed. But with the introduction of Samba 2.2.x many of those tricks did not work any more, which is why I decided to attack the problem at the root, namely the runtime library.
+This is my attempt to get Samba 2.2.x ported to the Amiga. My first Amiga port required *SAS/C* and a number of strange tricks had to be pulled to get it to support the kind of environment Samba needed. But with the introduction of Samba 2.2.x many of those tricks did not work any more, which is why I decided to attack the problem at the root, namely the runtime library.
 
-Because it was no longer possible to build Samba with SAS/C on the new Amiga platform, the idea came up to move development to the GNU 'C' compiler. This turned out to be a challenge due to its somewhat underdeveloped runtime library and header files. Eventually, I decided to rewrite that library from scratch.
+Because it was no longer possible to build Samba with *SAS/C* on the new Amiga platform, the idea came up to move development to the GNU 'C' compiler. This turned out to be a challenge due to its somewhat underdeveloped runtime library and header files. Eventually, I decided to rewrite that library from scratch.
 
 
 ## What does it do?
 
 Using *'C' - A reference manual* (4th edition) as a reference I wrote a set of header files, then proceeded to implement each single function referenced in them. With few exceptions in the area of wide character support, the result should be a feature complete implementation of the ISO 'C' (1994) runtime library. The library was subsequently updated to offer functionality defined in *ISO/IEC 9899:1999*, also known as *C99*.
 
-Because Samba needs a few POSIX-like routines to be supported, the library functionality is complemented by a set of routines described in *Advanced programming in the Unix environent*.
+Because Samba needs a few POSIX-like routines to be supported, the library functionality is complemented by a set of routines described in *Advanced programming in the Unix environment*.
 
 This is not a portable implementation of the library in the sense that you could move it from one 'C' compiler on one operating system to another. This is an Amiga specific implementation.
 
@@ -21,27 +21,27 @@ For the PowerPC platform, the library uses code borrowed from <a href="http://ww
 
 ## What does it not do?
 
-This library is a departure from the typical 'C' runtime environments of the past which had to run on all AmigaOS releases, down to Kickstart 1.1. This very library was designed to take advantage of the routines available since Kickstart 2.04 was introduced and virtually nobody ever put to use. This helps to cut the code size, and it also helps to keep bugs out of the library by falling back onto well-tested implementations. However, the catch is that the code won't run under Kickstart 1.3 and below. But then these operating system releases have been obsolete for more than a decade, and you can always go back to a compiler environment which supports them.
+This library is a departure from the typical 'C' runtime environments of the past which had to run on all AmigaOS releases, down to *Kickstart 1.1*. This very library was designed to take advantage of the routines available since *Kickstart 2.04* was introduced and virtually nobody ever put to use. This helps to cut the code size, and it also helps to keep bugs out of the library by falling back onto well-tested implementations. However, the catch is that the code won't run under *Kickstart 1.3* and below. But then these operating system releases have been obsolete for more than a decade, and you can always go back to a compiler environment which supports them.
 
-There is very little support for `amiga.lib` functionality. There is `NewList()`, `HookEntry()`, `CallHook()`, `CallHookA()`, the `DoMethod()` family, the RexxVars family, but that's all. If you need more, you would have to implement it yourself. Put another way, if you absolutely need functionality that is only found in `amiga.lib`, you really shouldn't need it in the first place.
+There is very little support for `amiga.lib` functionality. There is `NewList()`, `HookEntry()`, `CallHook()`, `CallHookA()`, the `DoMethod()` family, the *RexxVars* family, but that's all. If you need more, you would have to implement it yourself. Put another way, if you absolutely need functionality that is only found in `amiga.lib`, you really shouldn't need it in the first place.
 
 
 ## Where does the source code come from?
 
 I originally thought that it might be helpful to piece this library together from various sources, such as the BSD libc. It turned out that this code was so 'portable' that it became much more complex than it ought to be. Also, some side-effects were present which considerably changed the behaviour of the library. For example, the BSD libc uses `bcopy()` as an alias for `memcpy()`, and unlike `memcpy()` is documented to, `bcopy()` supports overlapping copies.
 
-Eventually, I wrote virtually all the code myself, borrowing algorithmic ideas from the BSD libc and the Manx Aztec 'C' runtime library. Because I don't know much about the environment GCC expects, I borrowed code snippets from libnix, which was written by Matthias Fleischer and Gunther Nikl. This in particular concerns the integer and floating point math support, the `setjmp`/`longjmp` routines and the startup code. The M68881 inline math code comes from the `<math-68881.h>` file written by Matthew Self `(self [at] bayes.arc.nasa.gov)`.
+Eventually, I wrote virtually all the code myself, borrowing algorithmic ideas from the BSD libc and the *Manx Aztec 'C'* runtime library. Because I don't know much about the environment *GCC* expects, I borrowed code snippets from *libnix*, which was written by Matthias Fleischer and Gunther Nikl. This in particular concerns the integer and floating point math support, the `setjmp`/`longjmp` routines and the startup code. The M68881 inline math code comes from the `<math-68881.h>` file written by Matthew Self `(self [at] bayes.arc.nasa.gov)`.
 
 
 ## Limitations and caveats
 
-There is hardly any documentation on the code I wrote. In part this is due to the fact that the code itself is very simple in design. It should speak for itself. However, to make a usable runtime library you have to have a user documentation as in man pages or AutoDocs. We will eventually have to have autodocs for this library.
+There is hardly any documentation on the code I wrote. In part this is due to the fact that the code itself is very simple in design. It should speak for itself. However, to make a usable runtime library you have to have a user documentation as in *man pages* or *AutoDocs*. We will eventually have to have *AutoDocs* for this library.
 
 The exception handling in the math code is not particularly effective. For one part this is due to the fact that there is no exception handler installed by the runtime library when it starts up which could catch and process the error conditions the CPU or FPU generates. The idea was to provide for a portable runtime library with little to no assembly language involved. To make the exception handling complete, such code would be necessary.
 
-The library currently builds under SAS/C, but because the 'normal' program startup code is not utilized, the base relative (A4) addressing does not work. If you are going to test it, use the `data=faronly` option to compile the library and the programs.
+The library currently builds under *SAS/C*, but because the 'normal' program startup code is not utilized, the base relative (A4) addressing does not work. If you are going to test it, use the `data=faronly` option to compile the library and the programs.
 
-Different build makefiles are supplied for use with GCC. There is a `GNUmakefile.68k` for the 68k platform and a `GNUmakefile.os4` for the AmigaOS4 PowerPC version.
+Different build *Makefiles* are supplied for use with *GCC*. There is a `GNUmakefile.68k` for the 68k platform and a `GNUmakefile.os4` for the AmigaOS4 PowerPC version.
 
 ### Floating point math and functions (`scanf()`, `printf()`, etc.)
 
@@ -54,7 +54,7 @@ To link the floating point support code with your software, use the `-lm` compil
 
 Thread-safety does not imply that you can have multiple callers access and close the same file. There is no resource tracking to that degree yet. All that the thread-safety tries to afford you is not to get into big trouble if simultaneous and overlapping accesses to files, memory allocation and other resources are taking place.
 
-The library code is supposed to be thread-safe if built with the `__THREAD_SAFE` preprocesssor symbol defined. Note that 'thread-safe' does **not** mean 'reentrant'. Multiple callers for certain library functions are permitted, but not for all of them. For example, `mkdtemp()` is not thread-safe, and neither is `rand()` or `localtime()`. But as per *POSIX 1003.1c-1995* there are thread-safe variants of `rand()` and `localtime()` called `rand_r()`, `localtime_r()`, and others.
+The library code is supposed to be thread-safe if built with the `__THREAD_SAFE` preprocessor symbol defined. Note that 'thread-safe' does **not** mean 'reentrant'. Multiple callers for certain library functions are permitted, but not for all of them. For example, `mkdtemp()` is not thread-safe, and neither is `rand()` or `localtime()`. But as per *POSIX 1003.1c-1995* there are thread-safe variants of `rand()` and `localtime()` called `rand_r()`, `localtime_r()`, and others.
 
 The use of the socket I/O functions is problematic because the underlying `bsdsocket.library` API is not supposed to be used by any process other than the one which opened it. While one TCP/IP stack (my own "Roadshow") allows you to share the library base among different processes, if so configured, it is the exception. No other TCP/IP stack available for the Amiga robustly supports a similar feature. If the TCP/IP stack supports this feature, then the global variable `__can_share_socket_library_base` will be set to a non-zero value.
 
@@ -66,7 +66,7 @@ Also take care with file I/O involving the `stdin`/`stdout`/`stderr` streams; re
 
 ### Using gmon (PowerPC only)
 
-To use profiling, two steps are required. First of all, your program must be compiled with the gcc command line option `-pg`. This instructs the compiler to generate special profiling code in the prologue and epilogue of each function. Additionally, the program must be linked with `libprofile.a`. To do this, either manually add `-lprofile` to the linker command line, or modify the specs file as follows. Find the lines that look like this (it may actually differ slightly from your specs file, but the important thing is that the line before the line to be modified reads `lib:`):
+To use profiling, two steps are required. First of all, your program must be compiled with the *GCC* command line option `-pg`. This instructs the compiler to generate special profiling code in the prologue and epilogue of each function. Additionally, the program must be linked against `libprofile.a`. To do this, either manually add `-lprofile` to the linker command line, or modify the specs file as follows. Find the lines that look like this (it may actually differ slightly from your specs file, but the important thing is that the line before the line to be modified reads `lib:`):
 
 ```
 lib:
@@ -82,7 +82,7 @@ lib:
 
 Normally, the `specs` file is located at the compiler's installation directory. For cross-compilers, this is `/usr/local/amiga/lib/gcc/ppc-amigaos/*compiler-version*/specs`. For a native compiler, it's in `gcc:lib/gcc/ppc-amigaos/*compiler-version*/specs`. Most likely, your compiler will already have this added to it's `specs` file.
 
-Profiling makes use of a special PowerPC facility called the *Performance Monitor*. It allows to "mark" tasks and count only during while a marked task is running. This allows performance analysis to be made independant of the actual system load. The *Performance Monitor* is available on all PowerPC models supported by AmigaOS 4 except for the *603e*, and embedded versions of the PowerPC like the *405* and *440* series. Consult the manual of the appropriate chip for more information.
+Profiling makes use of a special PowerPC facility called the *Performance Monitor*. It allows to "mark" tasks and count only during while a marked task is running. This allows performance analysis to be made independent of the actual system load. The *Performance Monitor* is available on all PowerPC models supported by AmigaOS 4 except for the *603e*, and embedded versions of the PowerPC like the *405* and *440* series. Consult the manual of the appropriate chip for more information.
 
 ### Implementation defined behaviour
 
@@ -98,11 +98,11 @@ The current locale is derived from the current Amiga operating system locale set
 
 ##### Floating-point
 
-The 68k version of clib2 supports single and double precision floating point numbers, according to the *IEEE 754* standard. The software floating point number support is built upon the Amiga operating system libraries `mathieeesingbas.library`, `mathieeedoubbas.library` and `mathieeedoubtrans.library`. The hardware floating point number support uses the M68881/M68882/M68040/M68060 floating point unit intead.
+The 68k version of *clib2* supports single and double precision floating point numbers, according to the *IEEE 754* standard. The software floating point number support is built upon the Amiga operating system libraries `mathieeesingbas.library`, `mathieeedoubbas.library` and `mathieeedoubtrans.library`. The hardware floating point number support uses the M68881/M68882/M68040/M68060 floating point unit instead.
 
-The PowerPC version of clib2 supports only double precision floating point numbers, according to the *IEEE 754* standard, because that is exactly what the PowerPC CPU supports. Single precision numbers may be implicitly converted to double precision numbers. This also means that the *C99* data type `long double` is identical to the `double` data type. Because there is no difference between these two, the library omits support for *C99* functions specifically designed to operate on `long double` data types, such as `rintl()`.
+The PowerPC version of *clib2* supports only double precision floating point numbers, according to the *IEEE 754* standard, because that is exactly what the PowerPC CPU supports. Single precision numbers may be implicitly converted to double precision numbers. This also means that the *C99* data type `long double` is identical to the `double` data type. Because there is no difference between these two, the library omits support for *C99* functions specifically designed to operate on `long double` data types, such as `rintl()`.
 
-Both the 68k and the PowerPC versions of clib2 may call software floating point support routines in order to perform double and single precision operations that go beyond simple addition and multiplication, such as `sqrt()`. These functions come from Sun Microsystems *fdlibm 5.3* library.
+Both the 68k and the PowerPC versions of *clib2* may call software floating point support routines in order to perform double and single precision operations that go beyond simple addition and multiplication, such as `sqrt()`. These functions come from Sun Microsystems <a href="http://www.netlib.org/fdlibm/">fdlibm 5.3</a> library.
 
 Unless your software is linked against `libm.a` no floating point functions will be available to it, possibly causing a linker error. When using the GNU 'C' compiler, you will want to add the option `-lm -lc` to the linker command line.
 
@@ -153,7 +153,7 @@ Processing of the `Ctrl+C` event involves the internal `__check_abort()` functio
 
 No new line characters are written unless specifically requested.
 
-Space characters in a text stream before a new line character are read in and not discarded.
+Space characters in a text stream before a new line character are read in and are not discarded.
 
 When data is read from a file, the last character does not have to be a new line character.
 
@@ -244,13 +244,13 @@ By default all library routines follow the ISO 'C' conventions in that where imp
 
 ## The startup code
 
-There are three program startup files provided. The most simplistic is in `startup.c` which I use for SAS/C. It just invokes the setup routine which eventually calls `main()` and drops straight into `exit()`.
+There are three program startup files provided. The most simplistic is in `startup.c` which I use for *SAS/C*. It just invokes the setup routine which eventually calls `main()` and drops straight into `exit()`.
 
-The `ncrt0.S` file was adapted from the libnix startup code which sets up the base relative data area, if necessary (the `SMALL_DATA` preprocessor symbol must be defined).
+The `ncrt0.S` file was adapted from the *libnix* startup code which sets up the base relative data area, if necessary (the `SMALL_DATA` preprocessor symbol must be defined).
 
-The `nrcrt0.S` file was adapted from libnix startup code, too, and sets up the base relative data area for programs to be made resident. Note that the `geta4()` stub is missing here; it wouldn't work in a resident program anyway.
+The `nrcrt0.S` file was adapted from *libnix* startup code, too, and sets up the base relative data area for programs to be made resident. Note that the `geta4()` stub is missing here; it wouldn't work in a resident program anyway.
 
-The `ncrt0.S` and `nrcrt0.S` files are considerably smaller and less complex than the libnix code they are based on. This is because in this library design all the more complex tasks are performed in the `stdlib_main.c` file rather than in assembly language.
+The `ncrt0.S` and `nrcrt0.S` files are considerably smaller and less complex than the *libnix* code they are based on. This is because in this library design all the more complex tasks are performed in the `stdlib_main.c` file rather than in assembly language.
 
 
 ## Documentation
