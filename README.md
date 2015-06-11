@@ -17,7 +17,7 @@ This is not a portable implementation of the library in the sense that you could
 
 The library supports floating point math, which, for the 68k platform, is limited to IEEE single and double precision or M68881 inline math. There is no support for the fast floating point (FFP) format or exclusive IEEE single precision. You either get double precision (IEEE math) or extended precision (M68881 inline math). What it is that you get is determined at compile time. Use the `IEEE_FLOATING_POINT_SUPPORT` preprocessor symbol to activate IEEE math code and the `M68881_FLOATING_POINT_SUPPORT` symbol for M68881 inline math.
 
-For the PowerPC platform, the library uses code borrowed from *fdlibm 5.3*, which is a portable library of arithmetic functions developed by Sun Microsystems which, for example, is also used within the Java platform.
+For the PowerPC platform, the library uses code borrowed from <a href="http://www.netlib.org/fdlibm/">fdlibm 5.3</a>, which is a portable library of arithmetic functions developed by Sun Microsystems which, for example, is also used within the Java platform.
 
 ## What does it not do?
 
@@ -66,7 +66,7 @@ Also take care with file I/O involving the `stdin`/`stdout`/`stderr` streams; re
 
 ### Using gmon (PowerPC only)
 
-To use profiling, two steps are required. First of all, your program must be compiled with the gcc command line option `-pg`. This instructs the compiler to generate special profiling code in the prologue and epilogue of each function. Additionally, the program must be linked with `libprofile.a`. To do this, either manually add `-lprofile` to the linker command line, or modify the specs file as follows. Find the lines that look like this (it may actually differ silghtily from your specs file, but the important thing is that the line before the line to be modified reads `lib:`):
+To use profiling, two steps are required. First of all, your program must be compiled with the gcc command line option `-pg`. This instructs the compiler to generate special profiling code in the prologue and epilogue of each function. Additionally, the program must be linked with `libprofile.a`. To do this, either manually add `-lprofile` to the linker command line, or modify the specs file as follows. Find the lines that look like this (it may actually differ slightly from your specs file, but the important thing is that the line before the line to be modified reads `lib:`):
 
 ```
 lib:
@@ -80,9 +80,9 @@ lib:
 %{pg: -lprofile} --start-group -lc --end-group
 ```
 
-Normally, the specs file is located at the compilers installation directory. For cross-compilers, this is `/usr/local/amiga/lib/gcc/ppc-amigaos/*compiler-version*/specs`. For a native compiler, it's in `gcc:lib/gcc/ppc-amigaos/*compiler-version*/specs`. Most likely, your compiler will already have this added to it's specs file.
+Normally, the `specs` file is located at the compiler's installation directory. For cross-compilers, this is `/usr/local/amiga/lib/gcc/ppc-amigaos/*compiler-version*/specs`. For a native compiler, it's in `gcc:lib/gcc/ppc-amigaos/*compiler-version*/specs`. Most likely, your compiler will already have this added to it's `specs` file.
 
-Profiling makes use of a special PowerPC facility called the Performance Monitor. It allows to "mark" tasks and count only during while a marked task is running. This allows performance analysis to be made independant of the actual system load. The Performace Monitor is available on all PowerPC models supported by AmigaOS 4 except for the `603e`, and embedded versions of the PowerPC like the `405` and `440` series. Consult the manual of the appropriate chip for more information.
+Profiling makes use of a special PowerPC facility called the *Performance Monitor*. It allows to "mark" tasks and count only during while a marked task is running. This allows performance analysis to be made independant of the actual system load. The *Performance Monitor* is available on all PowerPC models supported by AmigaOS 4 except for the *603e*, and embedded versions of the PowerPC like the *405* and *440* series. Consult the manual of the appropriate chip for more information.
 
 ### Implementation defined behaviour
 
@@ -126,8 +126,7 @@ where:
 
 Label | Meaning
 ----- | -------
-program name | Optional program name; if the program name is not yet known, then the
-entire text enclosed in square brackets will be omitted.
+program name | Optional program name; if the program name is not yet known, then the entire text enclosed in square brackets will be omitted.
 file | The value of the `__FILE__` symbol at the location of the `assert()` call.
 line | The value of the `__LINE__` symbol at the location of the `assert()` call.
 condition | The condition passed to the `assert()` function.
@@ -146,7 +145,7 @@ Only the minimum of required signals are supported by this library. These are `S
 
 As of this writing `SIGFPE` is never called by the floating point library functions.
 
-The `Ctrl+C` event is translated into `SIGINT`. Signal delivery may be delayed until a library function which polls for the signal examines it. This means, for example, that a runaway program caught in an infinite loop cannot be aborted by sending it a `Ctrl+C` event unless special code is added which tests for the presence of the signal and calls the `__check_abort()` all on its own.
+The `Ctrl+C` event is translated into `SIGINT`. Signal delivery may be delayed until a library function which polls for the signal examines it. This means, for example, that a runaway program caught in an infinite loop cannot be aborted by sending it a `Ctrl+C` event unless special code is added which tests for the presence of the signal and calls the `__check_abort()` function on its own accord.
 
 Processing of the `Ctrl+C` event involves the internal `__check_abort()` function which polls for the presence of the event and which will call `raise(SIGINT);`. The `__check_abort()` function may be replaced by user code.
 
@@ -218,7 +217,7 @@ If the `command` parameter is not NULL and the `system()` function returns, then
 
 ##### Time
 
-The default time zone is derived from the Amiga operating system locale settings and takes the form `GMT+*hh*` or `GMT-*hh*`, respectively, in which *hh* stands for the difference between the local time zone and Greenwich Mean Time.
+The default time zone is derived from the Amiga operating system locale settings and takes the form `GMT+*hh*` or `GMT-*hh*`, respectively, in which *hh* stands for the difference between the local time zone and Greenwich Mean Time (actually, this is not GMT but UTC).
 
 The `clock_t` and `time_t` types are unsigned 32 bit integers. The `time_t` epoch starts with midnight January 1st, 1970.
 
@@ -232,7 +231,7 @@ The direction of printing is from left to right.
 
 The period (.) is the decimal-point character.
 
-The `strftime()` behaviour follows the Amiga operating system locale settings. If the 'C' locale is in effect, then the output generated by the `%Z` takes the form `GMT+*hh*` or `GMT-*hh*`, respectively, in which *hh* stands for the difference between the local time zone and Greenwich Mean Time.
+The `strftime()` behaviour follows the Amiga operating system locale settings. If the 'C' locale is in effect, then the output generated by the `%Z` takes the form `GMT+*hh*` or `GMT-*hh*`, respectively, in which *hh* stands for the difference between the local time zone and Greenwich Mean Time (this is really UTC).
 
 ## Conventions and design issues
 
