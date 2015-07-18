@@ -74,6 +74,12 @@
 
 /****************************************************************************/
 
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
 #ifndef CLIB_ALIB_PROTOS_H
 #include <clib/alib_protos.h>
 #endif /* CLIB_ALIB_PROTOS_H */
