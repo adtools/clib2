@@ -71,6 +71,12 @@
 
 /****************************************************************************/
 
+#if defined(__amigaos4__)
+#include <dos/obsolete.h>
+#endif /* __amigaos4__ */
+
+/****************************************************************************/
+
 #ifndef WORKBENCH_STARTUP_H
 #include <workbench/startup.h>
 #endif /* WORKBENCH_STARTUP_H */
