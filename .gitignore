@@ -1,0 +1,4 @@
+*.o
+*.a
+/library/compiler.log
+/library/netinclude
