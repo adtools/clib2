@@ -144,6 +144,10 @@ extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int lin
 
 /****************************************************************************/
 
+extern void __free_unused_slabs(void);
+
+/****************************************************************************/
+
 struct MemoryNode
 {
 	struct MinNode		mn_MinNode;
@@ -187,6 +191,97 @@ struct MemoryTree
 };
 
 #endif /* __USE_MEM_TREES */
+
+/****************************************************************************/
+
+/* This keeps track of individual slabs. Each slab begins with this
+ * header and is followed by the memory it manages. The size of that
+ * memory "slab" is fixed and matches what is stored in
+ * SlabData.sd_MaxSlabSize.
+ *
+ * Each slab manages allocations of a specific maximum size, e.g. 8, 16, 32,
+ * 64, etc. bytes. Multiple slabs can exist which manage allocations of the same
+ * size, in case one such slab is not enough. Allocations are made from chunks,
+ * and for each slab, all chunks are the same size.
+ */
+struct SlabNode
+{
+	struct MinNode	sn_MinNode;
+
+	/* If this slab is empty, it goes into a list of slabs to be
+	 * purged when memory is tight, or if it has stuck around long
+	 * enough without getting purged. This is what the sn_EmptyDecay
+	 * field is for. sn_EmptyDecay is decreased whenever an allocation
+	 * suceeds which did not use this slab, and when sn_EmptyDecay
+	 * reaches 0, the empty slab is purged.
+	 */
+	struct MinNode	sn_EmptyLink;
+	ULONG			sn_EmptyDecay;
+
+	/* How many chunks of memory does this slab contain? */
+	ULONG			sn_Count;
+	/* How large are the individual chunks? */
+	ULONG			sn_ChunkSize;
+	/* How many chunks of this slab are currently in use? */
+	ULONG			sn_UseCount;
+
+	/* This contains all the chunks of memory which are available
+	 * for allocation.
+	 */
+	struct MinList	sn_FreeList;
+};
+
+/* This is the global bookkeeping information for managing
+ * memory allocations from the slab data structure.
+ */
+struct SlabData
+{
+	/* This table contains slabs which manage memory chunks
+	 * which are a power of 2 bytes in size, e.g. 8, 16, 32,
+	 * 64, 128 bytes. Hence, sd_Slabs[3] keeps track of the slabs
+	 * which are 8 bytes in size, sd_Slabs[4] is for 16 byte
+	 * chunks, etc. The minimum chunk size is 8, which is why
+	 * lists 0..2 are not used. Currently, there is an upper limit
+	 * of 2^31 bytes per chunk, but you should not be using slab
+	 * chunks much larger than 4096 bytes.
+	 */
+	struct MinList	sd_Slabs[31];
+
+	/* Memory allocations which are larger than the limit
+	 * found in the sd_MaxSlabSize field are kept in this list.
+	 * They are never associated with a slab.
+	 */
+	struct MinList	sd_SingleAllocations;
+
+	/* All slabs which currently are empty, i.e. none of their
+	 * memory is being used, are registered in this list.
+	 * The list linkage uses the SlabNode.sn_EmptyLink field.
+	 */
+	struct MinList	sd_EmptySlabs;
+
+	/* This is the maximum size of a memory allocation which may
+	 * be made from a slab that can accommodate it. This number
+	 * is initialized from the __slab_max_size global variable,
+	 * if > 0, and unless it already is a power of two, it will
+	 * be rounded up to the next largest power of two.
+	 */
+	size_t			sd_MaxSlabSize;
+
+	/* This field keeps track of how many entries there are in
+	 * the sd_SingleAllocations list.
+	 */
+	ULONG			sd_NumSingleAllocations;
+
+	/* If this is set to TRUE, then memory allocations will be
+	 * be managed through slabs.
+	 */
+	BOOL			sd_InUse;
+};
+
+/****************************************************************************/
+
+extern struct SlabData NOCOMMON	__slab_data;
+extern ULONG NOCOMMON			__slab_max_size;
 
 /****************************************************************************/
 

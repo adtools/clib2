@@ -546,6 +546,7 @@ STDLIB_OBJ = \
 	stdlib_set_process_window.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
+	stdlib_slab_max_size.o \
 	stdlib_srand.o \
 	stdlib_arg.o \
 	stdlib_stack_usage.o \

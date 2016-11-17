@@ -72,6 +72,47 @@ struct MinList	NOCOMMON __memory_list;
 
 /****************************************************************************/
 
+struct SlabData NOCOMMON __slab_data;
+
+/****************************************************************************/
+
+/* Free all currently unused slabs, regardless of whether they
+ * are ready to be purged (SlabNode.sn_EmptyDecay == 0).
+ */
+void
+__free_unused_slabs(void)
+{
+	struct MinNode * free_node;
+	struct MinNode * free_node_next;
+	struct SlabNode * sn;
+
+	__memory_lock();
+
+	for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ; 
+	    free_node->mln_Succ != NULL ;
+	    free_node = free_node_next)
+	{
+		free_node_next = (struct MinNode *)free_node->mln_Succ;
+
+		/* free_node points to SlabNode.sn_EmptyLink, which
+		 * directly follows the SlabNode.sn_MinNode.
+		 */
+		sn = (struct SlabNode *)&free_node[-1];
+
+		/* Unlink from list of empty slabs. */
+		Remove((struct Node *)free_node);
+
+		/* Unlink from list of slabs of the same size. */
+		Remove((struct Node *)sn);
+
+		FreeVec(sn);
+	}
+
+	__memory_unlock();
+}
+
+/****************************************************************************/
+
 size_t
 __get_allocation_size(size_t size)
 {
@@ -142,7 +183,195 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 	}
 	#endif /* __MEM_DEBUG */
 
-	if(__memory_pool != NULL)
+	/* Are we using the slab allocator? */
+	if (__slab_data.sd_InUse)
+	{
+		mn = NULL;
+
+		assert( __slab_data.sd_MaxSlabSize > 0 );
+
+		/* Number of bytes to allocate exceeds the slab size?
+		 * If so, allocate this memory chunk separately and
+		 * keep track of it.
+		 */
+		if(allocation_size > __slab_data.sd_MaxSlabSize)
+		{
+			struct MinNode * single_allocation;
+
+			#if defined(__amigaos4__)
+			{
+				single_allocation = AllocVec(sizeof(*single_allocation) + allocation_size,MEMF_PRIVATE);
+			}
+			#else
+			{
+				single_allocation = AllocVec(sizeof(*single_allocation) + allocation_size,MEMF_ANY);
+			}
+			#endif /* __amigaos4__ */
+
+			if(single_allocation != NULL)
+			{
+				AddTail((struct List *)&__slab_data.sd_SingleAllocations,(struct Node *)single_allocation);
+				__slab_data.sd_NumSingleAllocations++;
+
+				mn = (struct MemoryNode *)&single_allocation[1];
+			}
+		}
+		/* Otherwise allocate a chunk from a slab. */
+		else
+		{
+			struct MinList * slab_list = NULL;
+			ULONG entry_size;
+			ULONG chunk_size;
+			int slab_index;
+
+			/* Chunks must be at least as small as a MinNode, because
+			 * that's what we use for keeping track of the chunks which
+			 * are available for allocation within each slab.
+			 */
+			entry_size = allocation_size;
+			if(entry_size < sizeof(struct MinNode))
+				entry_size = sizeof(struct MinNode);
+
+			/* Find a slab which keeps track of chunks that are no
+			 * larger than the amount of memory which needs to be
+			 * allocated. We end up picking the smallest chunk
+			 * size that still works.
+			 */
+			for(slab_index = 0, chunk_size = (1UL << slab_index) ;
+			    slab_index < 31 ;
+			    slab_index++, chunk_size += chunk_size)
+			{
+				assert( (chunk_size % sizeof(LONG)) == 0);
+				
+				if(entry_size <= chunk_size)
+				{
+					slab_list = &__slab_data.sd_Slabs[slab_index];
+					break;
+				}
+			}
+
+			if(slab_list != NULL)
+			{
+				struct SlabNode * sn;
+
+				/* Find the first slab which has a free chunk and use it. */
+				for(sn = (struct SlabNode *)slab_list->mlh_Head ;
+				    sn->sn_MinNode.mln_Succ != NULL ;
+				    sn = (struct SlabNode *)sn->sn_MinNode.mln_Succ)
+				{
+					assert( sn->sn_ChunkSize == chunk_size );
+					
+					mn = (struct MemoryNode *)RemHead((struct List *)&sn->sn_FreeList);
+					if(mn != NULL)
+					{
+						/* Was this slab empty before we began using it again? */
+						if(sn->sn_UseCount == 0)
+						{
+							/* Mark it as no longer empty. */
+							Remove((struct Node *)&sn->sn_EmptyLink);
+							sn->sn_EmptyDecay = 0;
+						}
+
+						sn->sn_UseCount++;
+						break;
+					}
+				}
+
+				/* There is no slab with a free chunk? Then we might have to
+				 * allocate a new one.
+				 */
+				if(mn == NULL)
+				{
+					struct MinNode * free_node;
+					struct MinNode * free_node_next;
+					struct SlabNode * new_sn = NULL;
+
+					/* Try to recycle an empty (unused) slab, if possible. */
+					for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ; 
+					    free_node->mln_Succ != NULL ;
+					    free_node = free_node_next)
+					{
+						free_node_next = (struct MinNode *)free_node->mln_Succ;
+
+						/* free_node points to SlabNode.sn_EmptyLink, which
+						 * directly follows the SlabNode.sn_MinNode.
+						 */
+						sn = (struct SlabNode *)&free_node[-1];
+
+						/* Is this empty slab ready to be reused? */
+						if(sn->sn_EmptyDecay == 0)
+						{
+							/* Unlink from list of empty slabs. */
+							Remove((struct Node *)free_node);
+
+							/* Unlink from list of slabs which keep chunks
+							 * of the same size.
+							 */
+							Remove((struct Node *)sn);
+							
+							new_sn = sn;
+							break;
+						}
+					}
+
+					/* We couldn't reuse an empty slab? Then we'll have to allocate
+					 * memory for another one.
+					 */
+					if(new_sn == NULL)
+					{
+						#if defined(__amigaos4__)
+						{
+							new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_MaxSlabSize,MEMF_PRIVATE);
+						}
+						#else
+						{
+							new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_MaxSlabSize,MEMF_ANY);
+						}
+						#endif /* __amigaos4__ */
+					}
+
+					if(new_sn != NULL)
+					{
+						struct MinNode * free_chunk;
+						ULONG num_free_chunks = 0;
+						BYTE * first_byte;
+						BYTE * last_byte;
+
+						/* Split up the slab memory into individual chunks
+						 * of the same size and keep track of them
+						 * in the free list. The memory managed by
+						 * this slab immediately follows the
+						 * SlabNode header.
+						 */
+						first_byte	= (BYTE *)&new_sn[1];
+						last_byte	= &first_byte[__slab_data.sd_MaxSlabSize - chunk_size];
+
+						for(free_chunk = (struct MinNode *)first_byte ;
+						    free_chunk <= (struct MinNode *)last_byte;
+						    free_chunk = (struct MinNode *)(((BYTE *)free_chunk) + chunk_size))
+						{
+							AddTail((struct List *)&new_sn->sn_FreeList, (struct Node *)free_chunk);
+							num_free_chunks++;
+						}
+
+						/* Grab the first free chunk (there has to be one). */
+						mn = (struct MemoryNode *)RemHead((struct List *)&new_sn->sn_FreeList);
+						
+						assert( mn != NULL );
+
+						/* Set up the new slab and put it where it belongs. */
+						new_sn->sn_EmptyDecay	= 0;
+						new_sn->sn_UseCount		= 1;
+						new_sn->sn_Count		= num_free_chunks;
+						new_sn->sn_ChunkSize	= chunk_size;
+
+						AddHead((struct List *)slab_list,(struct Node *)&new_sn);
+					}
+				}
+			}
+		}
+	}
+	else if (__memory_pool != NULL)
 	{
 		mn = AllocPooled(__memory_pool,allocation_size);
 	}
@@ -352,29 +581,66 @@ STDLIB_DESTRUCTOR(stdlib_memory_exit)
 	}
 	#endif /* __MEM_DEBUG */
 
-	if(__memory_pool != NULL)
+	/* Is the slab memory allocator enabled? */
+	if (__slab_data.sd_InUse)
+	{
+		struct SlabNode * sn;
+		struct SlabNode * sn_next;
+		struct MinNode * mn;
+		struct MinNode * mn_next;
+		int i;
+
+		/* Free the memory allocated for each slab. */
+		for(i = 0 ; i < 31 ; i++)
+		{
+			for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
+			    sn->sn_MinNode.mln_Succ != NULL ;
+			    sn = sn_next)
+			{
+				sn_next = (struct SlabNode *)sn->sn_MinNode.mln_Succ;
+
+				FreeVec(sn);
+			}
+
+			NewList((struct List *)&__slab_data.sd_Slabs[i]);
+		}
+
+		/* Free the memory allocated for each allocation which did not
+		 * go into a slab.
+		 */
+		for(mn = __slab_data.sd_SingleAllocations.mlh_Head ; mn->mln_Succ != NULL ; mn = mn_next)
+		{
+			mn_next = mn->mln_Succ;
+
+			FreeVec(mn);
+		}
+
+		NewList((struct List *)&__slab_data.sd_SingleAllocations);
+
+		NewList((struct List *)&__slab_data.sd_EmptySlabs);
+
+		__slab_data.sd_InUse = FALSE;
+	}
+	else if (__memory_pool != NULL)
 	{
 		NewList((struct List *)&__memory_list);
 
 		DeletePool(__memory_pool);
 		__memory_pool = NULL;
 	}
-	else
+	else if (__memory_list.mlh_Head != NULL)
 	{
-		if(__memory_list.mlh_Head != NULL)
+		#ifdef __MEM_DEBUG
 		{
-			#ifdef __MEM_DEBUG
-			{
-				while(NOT IsListEmpty((struct List *)&__memory_list))
-					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
-			}
-			#else
-			{
-				while(NOT IsListEmpty((struct List *)&__memory_list))
-					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,NULL,0);
-			}
-			#endif /* __MEM_DEBUG */
+			while(NOT IsListEmpty((struct List *)&__memory_list))
+				__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
 		}
+		#else
+		{
+			while(NOT IsListEmpty((struct List *)&__memory_list))
+				__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,NULL,0);
+		}
+		#endif /* __MEM_DEBUG */
 	}
 
 	#if defined(__THREAD_SAFE)
@@ -411,16 +677,57 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 
 	NewList((struct List *)&__memory_list);
 
-	#if defined(__amigaos4__)
+	/* Enable the slab memory allocator? */
+	if(__slab_max_size > 0)
 	{
-		__memory_pool = CreatePool(MEMF_PRIVATE,(ULONG)__default_pool_size,(ULONG)__default_puddle_size);
+		size_t size;
+
+		/* If the maximum allocation size to be made from the slab
+		 * is not already a power of 2, round it up. We do not
+		 * support allocations larger than 2^31, and the maximum
+		 * allocation size should be much smaller.
+		 *
+		 * Note that the maximum allocation size also defines the
+		 * amount of memory which each slab manages.
+		 */
+		size = sizeof(struct MinNode);
+		while(size < __slab_max_size && (size & 0x80000000) == 0)
+			size += size;
+		
+		/* If the slab size looks sound, enable the slab memory allocator. */
+		if((size & 0x80000000) == 0)
+		{
+			int i;
+
+			assert( size <= __slab_max_size );
+
+			/* Start with an empty slab list. */
+			for(i = 0 ; i < 31 ; i++)
+				NewList((struct List *)&__slab_data.sd_Slabs[i]);
+
+			NewList((struct List *)&__slab_data.sd_SingleAllocations);
+			NewList((struct List *)&__slab_data.sd_EmptySlabs);
+
+			__slab_data.sd_MaxSlabSize	= size;
+			__slab_data.sd_InUse		= TRUE;
+		}
 	}
-	#else
+	else
 	{
-		if(((struct Library *)SysBase)->lib_Version >= 39)
-			__memory_pool = CreatePool(MEMF_ANY,(ULONG)__default_pool_size,(ULONG)__default_puddle_size);
+		#if defined(__amigaos4__)
+		{
+			__memory_pool = CreatePool(MEMF_PRIVATE,(ULONG)__default_pool_size,(ULONG)__default_puddle_size);
+		}
+		#else
+		{
+			/* There is no support for memory pools in the operating system
+			 * prior to Kickstart 3.0 (V39).
+			 */
+			if(((struct Library *)SysBase)->lib_Version >= 39)
+				__memory_pool = CreatePool(MEMF_ANY,(ULONG)__default_pool_size,(ULONG)__default_puddle_size);
+		}
+		#endif /* __amigaos4__ */
 	}
-	#endif /* __amigaos4__ */
 
 	success = TRUE;
 
