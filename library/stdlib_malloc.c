@@ -273,6 +273,19 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 						}
 
 						sn->sn_UseCount++;
+
+						/* Is this slab now fully utilized? Move it to the
+						 * end of the queue so that it will not be checked
+						 * before other slabs of the same size have been
+						 * tested. Those at the front of the queue should
+						 * still have room left.
+						 */
+						if(sn->sn_UseCount == sn->sn_Count && sn != (struct SlabNode *)slab_list->mlh_TailPred)
+						{
+							Remove((struct Node *)sn);
+							AddTail((struct List *)slab_list, (struct Node *)sn);
+						}
+
 						break;
 					}
 				}
@@ -366,6 +379,38 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 						new_sn->sn_ChunkSize	= chunk_size;
 
 						AddHead((struct List *)slab_list,(struct Node *)&new_sn);
+					}
+
+					/* Mark unused slabs for purging, and purge those which
+					 * are ready to be purged.
+					 */
+					for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ; 
+					    free_node->mln_Succ != NULL ;
+					    free_node = free_node_next)
+					{
+						free_node_next = (struct MinNode *)free_node->mln_Succ;
+
+						/* free_node points to SlabNode.sn_EmptyLink, which
+						 * directly follows the SlabNode.sn_MinNode.
+						 */
+						sn = (struct SlabNode *)&free_node[-1];
+
+						/* Is this empty slab ready to be purged? */
+						if(sn->sn_EmptyDecay == 0)
+						{
+							/* Unlink from list of empty slabs. */
+							Remove((struct Node *)free_node);
+
+							/* Unlink from list of slabs of the same size. */
+							Remove((struct Node *)sn);
+
+							FreeVec(sn);
+						}
+						/* Give it another chance. */
+						else
+						{
+							sn->sn_EmptyDecay--;
+						}
 					}
 				}
 			}
