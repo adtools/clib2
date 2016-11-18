@@ -117,7 +117,7 @@ fstat_test : fstat_test.o
 
 simple_sprintf : simple_sprintf.o
 	@echo "Linking $@"
-	$(CC) -nostdlib $(CFLAGS) -o $@ simple_sprintf.o -lc -Wl,--cref,-M,-Map=$@.map
+	$(CC) -nostdlib $(CFLAGS) -o $@ simple_sprintf.o -lc -lgcc -Wl,--cref,-M,-Map=$@.map
 
 date_test : date_test.o
 	@echo "Linking $@"
