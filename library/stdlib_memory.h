@@ -61,6 +61,14 @@
 /****************************************************************************/
 
 /*
+ * Uncomment this to enable the slab allocator.
+ */
+#define __USE_SLAB_ALLOCATOR
+
+
+/****************************************************************************/
+
+/*
  * Memory debugging parameters; note that the head/tail size must be
  * multiples of four, or you will break code that depends upon malloc()
  * and friends to return long word aligned data structures! Better
@@ -141,10 +149,6 @@ extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int lin
 #define __malloc(size,file,line) malloc(size)
 
 #endif /* __MEM_DEBUG */
-
-/****************************************************************************/
-
-extern void __free_unused_slabs(void);
 
 /****************************************************************************/
 
@@ -282,6 +286,14 @@ struct SlabData
 
 extern struct SlabData NOCOMMON	__slab_data;
 extern ULONG NOCOMMON			__slab_max_size;
+
+/****************************************************************************/
+
+extern void __free_unused_slabs(void);
+extern void * __slab_allocate(size_t allocation_size);
+extern void __slab_free(void * address,size_t allocation_size);
+extern void __slab_init(size_t slab_size);
+extern void __slab_exit(void);
 
 /****************************************************************************/
 

@@ -326,6 +326,7 @@ C_LIB = \
 	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
+	stdlib_free_unused_slabs.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
 	stdlib_getmemstats.o \
@@ -368,6 +369,7 @@ C_LIB = \
 	stdlib_set_process_window.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
+	stdlib_slab.o \
 	stdlib_slab_max_size.o \
 	stdlib_srand.o \
 	stdlib_stacksize.o \
@@ -1127,6 +1129,10 @@ $(LIBC_OBJS)/stdlib_calloc.o : stdlib_calloc.c stdlib_memory.h
 $(LIBC_OBJS)/stdlib_free.o : stdlib_free.c stdlib_memory.h
 
 $(LIBC_OBJS)/stdlib_malloc.o : stdlib_malloc.c stdlib_memory.h
+
+$(LIBC_OBJS)/stdlib_slab.o : stdlib_slab.c stdlib_memory.h
+
+$(LIBC_OBJS)/stdlib_free_unused_slabs.o : stdlib_free_unused_slabs.c stdlib_memory.h
 
 $(LIBC_OBJS)/stdlib_realloc.o : stdlib_realloc.c stdlib_memory.h
 

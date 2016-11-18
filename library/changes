@@ -1,3 +1,17 @@
+c.lib 1.207 (18.11.2016)
+
+- Added a slab allocator which replaces the use of memory pools or the
+  plain AllocMem() operations, respectively. In order to activate the
+  slab allocator, choose a slab size (e.g. 2048 bytes or 4096 bytes)
+  and declare a global variable like this:
+
+     ULONG __slab_max_size = 2048;
+
+  Memory allocations smaller than the slab size will be made from
+  "slabs", i.e. large chunks of memory of the given size. Larger
+  allocations will be managed separately.
+
+
 m.lib 1.206 (24.4.2015)
 
 - The fscanf() family failed to parse and convert %f parameters correctly

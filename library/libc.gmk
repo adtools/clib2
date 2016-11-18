@@ -212,6 +212,7 @@ C_LIB := \
 	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
+	stdlib_free_unused_slabs.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
 	stdlib_getmemstats.o \
@@ -255,6 +256,7 @@ C_LIB := \
 	stdlib_shared_objs.o \
 	stdlib_shell_escape.o \
 	stdlib_showerror.o \
+	stdlib_slab.o \
 	stdlib_slab_max_size.o \
 	stdlib_srand.o \
 	stdlib_stacksize.o \

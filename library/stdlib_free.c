@@ -367,111 +367,24 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 	}
 	#endif /* __MEM_DEBUG */
 
-	/* Are we using the slab allocator? */
-	if (__slab_data.sd_InUse)
+	#if defined(__USE_SLAB_ALLOCATOR)
 	{
-		assert( __slab_data.sd_MaxSlabSize > 0 );
-
-		/* Number of bytes to allocate exceeds the slab size?
-		 * Then the chunk was allocated separately.
-		 */
-		if(allocation_size > __slab_data.sd_MaxSlabSize)
-		{
-			Remove((struct Node *)&mn[-1]);
-			__slab_data.sd_NumSingleAllocations--;
-		}
-		/* Otherwise the allocation should have come from a slab. */
+		/* Are we using the slab allocator? */
+		if (__slab_data.sd_InUse)
+			__slab_free(mn,allocation_size);
+		else if (__memory_pool != NULL)
+			FreePooled(__memory_pool,mn,allocation_size);
 		else
-		{
-			struct MinList * slab_list = NULL;
-			size_t entry_size;
-			ULONG chunk_size;
-			int slab_index;
-
-			/* Chunks must be at least as small as a MinNode, because
-			 * that's what we use for keeping track of the chunks which
-			 * are available for allocation within each slab.
-			 */
-			entry_size = allocation_size;
-			if(entry_size < sizeof(struct MinNode))
-				entry_size = sizeof(struct MinNode);
-
-			/* Find a slab which keeps track of chunks that are no
-			 * larger than the amount of memory which needs to be
-			 * released. We end up picking the smallest chunk
-			 * size that still works.
-			 */
-			for(slab_index = 0, chunk_size = (1UL << slab_index) ;
-			    slab_index < 31 ;
-			    slab_index++, chunk_size += chunk_size)
-			{
-				assert( (chunk_size % sizeof(LONG)) == 0);
-
-				if(entry_size <= chunk_size)
-				{
-					slab_list = &__slab_data.sd_Slabs[slab_index];
-					break;
-				}
-			}
-
-			/* Find the slab which contains the memory chunk. */
-			if(slab_list != NULL)
-			{
-				struct SlabNode * sn;
-				BYTE * first_byte;
-				BYTE * last_byte;
-
-				for(sn = (struct SlabNode *)slab_list->mlh_Head ;
-				    sn->sn_MinNode.mln_Succ != NULL ;
-				    sn = (struct SlabNode *)sn->sn_MinNode.mln_Succ)
-				{
-					assert( sn->sn_ChunkSize == chunk_size );
-
-					first_byte	= (BYTE *)&sn[1];
-					last_byte	= &first_byte[__slab_data.sd_MaxSlabSize - chunk_size];
-					
-					/* Is this where the chunk belongs? */
-					if(first_byte <= (BYTE *)mn && (BYTE *)mn <= last_byte)
-					{
-						AddTail((struct List *)&sn->sn_FreeList, (struct Node *)mn);
-
-						assert( sn->sn_UseCount > 0 );
-
-						sn->sn_UseCount--;
-
-						/* If this slab is empty, mark it as unused and
-						 * allow it to be purged.
-						 */
-						if(sn->sn_UseCount == 0)
-						{
-							AddTail((struct List *)&__slab_data.sd_EmptySlabs,(struct Node *)&sn->sn_EmptyLink);
-							sn->sn_EmptyDecay = 1;
-						}
-
-						/* This slab now has room. Move it to front of the list
-						 * so that searching for a free chunk will pick it
-						 * first.
-						 */
-						if(sn != (struct SlabNode *)slab_list->mlh_Head)
-						{
-							Remove((struct Node *)sn);
-							AddHead((struct List *)slab_list, (struct Node *)sn);
-						}
-
-						break;
-					}
-				}
-			}
-		}
+			FreeMem(mn,allocation_size);
 	}
-	else if (__memory_pool != NULL)
+	#else
 	{
-		FreePooled(__memory_pool,mn,allocation_size);
+		if (__memory_pool != NULL)
+			FreePooled(__memory_pool,mn,allocation_size);
+		else
+			FreeMem(mn,allocation_size);
 	}
-	else
-	{
-		FreeMem(mn,allocation_size);
-	}
+	#endif /* __USE_SLAB_ALLOCATOR */
 
 	__current_memory_allocated -= allocation_size;
 	__current_num_memory_chunks_allocated--;
