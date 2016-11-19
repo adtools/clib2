@@ -35,4 +35,4 @@
 
 /****************************************************************************/
 
-ULONG NOCOMMON __slab_max_size;
+unsigned long __slab_max_size;

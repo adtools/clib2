@@ -41,38 +41,62 @@
 
 /****************************************************************************/
 
-/* Free all currently unused slabs, regardless of whether they
- * are ready to be purged (SlabNode.sn_EmptyDecay == 0).
- */
 void
-__free_unused_slabs(void)
+__get_slab_usage(__slab_usage_callback callback)
 {
 	if(__slab_data.sd_InUse)
 	{
-		struct MinNode * free_node;
-		struct MinNode * free_node_next;
+		struct __slab_usage_information sui;
 		struct SlabNode * sn;
+		BOOL stop;
+		int i;
+
+		memset(&sui,0,sizeof(sui));
 
 		__memory_lock();
 
-		for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ; 
-		    free_node->mln_Succ != NULL ;
-		    free_node = free_node_next)
+		sui.sui_slab_size						= __slab_data.sd_MaxSlabSize;
+		sui.sui_num_single_allocations			= __slab_data.sd_NumSingleAllocations;
+		sui.sui_total_single_allocation_size	= __slab_data.sd_TotalSingleAllocationSize;
+
+		for(i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
 		{
-			free_node_next = (struct MinNode *)free_node->mln_Succ;
+			for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
+			    sn->sn_MinNode.mln_Succ != NULL ;
+			    sn = (struct SlabNode *)sn->sn_MinNode.mln_Succ)
+			{
+				if (sn->sn_UseCount == 0)
+					sui.sui_num_empty_slabs++;
+				else if (sn->sn_Count == sn->sn_UseCount)
+					sui.sui_num_full_slabs++;
 
-			/* free_node points to SlabNode.sn_EmptyLink, which
-			 * directly follows the SlabNode.sn_MinNode.
-			 */
-			sn = (struct SlabNode *)&free_node[-1];
+				sui.sui_num_slabs++;
 
-			/* Unlink from list of empty slabs. */
-			Remove((struct Node *)free_node);
+				sui.sui_total_slab_allocation_size += sizeof(*sn) + __slab_data.sd_MaxSlabSize;
+			}
+		}
 
-			/* Unlink from list of slabs of the same size. */
-			Remove((struct Node *)sn);
+		if(sui.sui_num_slabs > 0)
+		{
+			for(i = 0, stop = FALSE ; NOT stop && i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
+			{
+				for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
+				    sn->sn_MinNode.mln_Succ != NULL ;
+				    sn = (struct SlabNode *)sn->sn_MinNode.mln_Succ)
+				{
+					sui.sui_chunk_size		= sn->sn_ChunkSize;
+					sui.sui_num_chunks		= sn->sn_Count;
+					sui.sui_num_chunks_used	= sn->sn_UseCount;
 
-			FreeVec(sn);
+					sui.sui_slab_index++;
+
+					if((*callback)(&sui) != 0)
+					{
+						stop = TRUE;
+						break;
+					}
+				}
+			}
 		}
 
 		__memory_unlock();

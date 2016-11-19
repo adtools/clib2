@@ -84,6 +84,7 @@ __slab_allocate(size_t allocation_size)
 			AddTail((struct List *)&__slab_data.sd_SingleAllocations,(struct Node *)single_allocation);
 
 			__slab_data.sd_NumSingleAllocations++;
+			__slab_data.sd_TotalSingleAllocationSize += sizeof(*single_allocation) + allocation_size;
 
 			allocation = &single_allocation[1];
 
@@ -118,7 +119,7 @@ __slab_allocate(size_t allocation_size)
 		 * size that still works.
 		 */
 		for(slab_index = 2, chunk_size = (1UL << slab_index) ;
-		    slab_index < 31 ;
+		    slab_index < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ;
 		    slab_index++, chunk_size += chunk_size)
 		{
 			if(entry_size <= chunk_size)
@@ -374,6 +375,10 @@ __slab_free(void * address,size_t allocation_size)
 
 		__slab_data.sd_NumSingleAllocations--;
 
+		assert( __slab_data.sd_TotalSingleAllocationSize <= sizeof(*mn) + allocation_size );
+
+		__slab_data.sd_TotalSingleAllocationSize -= sizeof(*mn) + allocation_size;
+
 		D(("number of single allocations = %ld", __slab_data.sd_NumSingleAllocations));
 	}
 	/* Otherwise the allocation should have come from a slab. */
@@ -400,7 +405,7 @@ __slab_free(void * address,size_t allocation_size)
 		 * size that still works.
 		 */
 		for(slab_index = 2, chunk_size = (1UL << slab_index) ;
-		    slab_index < 31 ;
+		    slab_index < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ;
 		    slab_index++, chunk_size += chunk_size)
 		{
 			if(entry_size <= chunk_size)
@@ -517,10 +522,12 @@ __slab_init(size_t slab_size)
 
 		D(("activating slab allocator"));
 
+		memset(&__slab_data,0,sizeof(__slab_data));
+
 		assert( size <= slab_size );
 
 		/* Start with an empty list of slabs for each chunk size. */
-		for(i = 0 ; i < 31 ; i++)
+		for(i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
 			NewList((struct List *)&__slab_data.sd_Slabs[i]);
 
 		NewList((struct List *)&__slab_data.sd_SingleAllocations);
@@ -536,48 +543,51 @@ __slab_init(size_t slab_size)
 void
 __slab_exit(void)
 {
-	struct SlabNode * sn;
-	struct SlabNode * sn_next;
-	struct MinNode * mn;
-	struct MinNode * mn_next;
-	int i;
-
 	ENTER();
 
-	D(("freeing slabs"));
-
-	/* Free the memory allocated for each slab. */
-	for(i = 0 ; i < 31 ; i++)
+	if(__slab_data.sd_InUse)
 	{
-		if(__slab_data.sd_Slabs[i].mlh_Head->mln_Succ != NULL)
-			D(("freeing slab #%ld (%lu bytes per chunk)", i, (1UL << i)));
+		struct SlabNode * sn;
+		struct SlabNode * sn_next;
+		struct MinNode * mn;
+		struct MinNode * mn_next;
+		int i;
 
-		for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
-		    sn->sn_MinNode.mln_Succ != NULL ;
-		    sn = sn_next)
+		D(("freeing slabs"));
+
+		/* Free the memory allocated for each slab. */
+		for(i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
 		{
-			sn_next = (struct SlabNode *)sn->sn_MinNode.mln_Succ;
+			if(__slab_data.sd_Slabs[i].mlh_Head->mln_Succ != NULL)
+				D(("freeing slab #%ld (%lu bytes per chunk)", i, (1UL << i)));
 
-			FreeVec(sn);
+			for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
+			    sn->sn_MinNode.mln_Succ != NULL ;
+			    sn = sn_next)
+			{
+				sn_next = (struct SlabNode *)sn->sn_MinNode.mln_Succ;
+
+				FreeVec(sn);
+			}
 		}
+
+		if(__slab_data.sd_SingleAllocations.mlh_Head->mln_Succ != NULL)
+			D(("freeing single allocations"));
+
+		/* Free the memory allocated for each allocation which did not
+		 * go into a slab.
+		 */
+		for(mn = __slab_data.sd_SingleAllocations.mlh_Head ;
+		    mn->mln_Succ != NULL ;
+		    mn = mn_next)
+		{
+			mn_next = mn->mln_Succ;
+
+			FreeVec(mn);
+		}
+
+		__slab_data.sd_InUse = FALSE;
 	}
-
-	if(__slab_data.sd_SingleAllocations.mlh_Head->mln_Succ != NULL)
-		D(("freeing single allocations"));
-
-	/* Free the memory allocated for each allocation which did not
-	 * go into a slab.
-	 */
-	for(mn = __slab_data.sd_SingleAllocations.mlh_Head ;
-	    mn->mln_Succ != NULL ;
-	    mn = mn_next)
-	{
-		mn_next = mn->mln_Succ;
-
-		FreeVec(mn);
-	}
-
-	__slab_data.sd_InUse = FALSE;
 
 	LEAVE();
 }

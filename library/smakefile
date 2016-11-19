@@ -518,6 +518,8 @@ STDLIB_OBJ = \
 	stdlib_getenv.o \
 	stdlib_getmemstats.o \
 	stdlib_getsp.o \
+	stdlib_get_errno.o \
+	stdlib_get_slab_usage.o \
 	stdlib_isresident.o \
 	stdlib_labs.o \
 	stdlib_ldiv.o \
@@ -800,6 +802,8 @@ stdlib_malloc.o : stdlib_malloc.c stdlib_memory.h
 stdlib_slab.o : stdlib_slab.c stdlib_memory.h
 
 stdlib_free_unused_slabs.o : stdlib_free_unused_slabs.c stdlib_memory.h
+
+stdlib_get_slab_usage.o : stdlib_get_slab_usage.c stdlib_memory.h
 
 stdlib_realloc.o : stdlib_realloc.c stdlib_memory.h
 

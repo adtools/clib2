@@ -65,7 +65,6 @@
  */
 #define __USE_SLAB_ALLOCATOR
 
-
 /****************************************************************************/
 
 /*
@@ -271,10 +270,12 @@ struct SlabData
 	 */
 	size_t			sd_MaxSlabSize;
 
-	/* This field keeps track of how many entries there are in
-	 * the sd_SingleAllocations list.
+	/* These fields kees track of how many entries there are in
+	 * the sd_SingleAllocations list, and how much memory these
+	 * allocations occupy.
 	 */
-	ULONG			sd_NumSingleAllocations;
+	size_t			sd_NumSingleAllocations;
+	size_t			sd_TotalSingleAllocationSize;
 
 	/* If this is set to TRUE, then memory allocations will be
 	 * be managed through slabs.
@@ -285,7 +286,7 @@ struct SlabData
 /****************************************************************************/
 
 extern struct SlabData NOCOMMON	__slab_data;
-extern ULONG NOCOMMON			__slab_max_size;
+extern unsigned long NOCOMMON	__slab_max_size;
 
 /****************************************************************************/
 
