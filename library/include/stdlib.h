@@ -162,6 +162,104 @@ extern int rand_r(unsigned int * seed);
 /****************************************************************************/
 
 /*
+ * You can switch the built-in memory allocator, which is a thin wrapper
+ * around the AmigaOS built-in memory management system, to use a slab
+ * allocator. For this to work, you need to declare a global variable
+ * and set it to the size of the slabs to be used. This variable must
+ * be initialized at load time when the clib2 startup code runs:
+ *
+ * unsigned long __slab_max_size = 4096;
+ */
+
+extern unsigned long __slab_max_size;
+
+/****************************************************************************/
+
+/*
+ * If you are using the slab allocator and need to quickly release the
+ * memory of all slabs which are currently unused, you can call the
+ * following function to do so.
+ *
+ * Please note that this function works within the context of the memory
+ * allocation system and may not be safe to call from interrupt code.
+ */
+extern void __free_unused_slabs(void);
+
+/****************************************************************************/
+
+/*
+ * You can obtain runtime statistics about the slab allocator by
+ * invoking the __get_slab_usage() function which in turn invokes
+ * your callback function for each single slab currently in play.
+ *
+ * Your callback function must return 0 if it wants to be called again,
+ * for the next slab, or return -1 to stop. Note that your callback
+ * function may not be called if the slab allocator is currently
+ * not operational.
+ *
+ * Please note that this function works within the context of the memory
+ * allocation system and may not be safe to call from interrupt code.
+ */
+
+/****************************************************************************/
+
+/* This is what your callback function will see when it is invoked. */
+struct __slab_usage_information
+{
+	/* The size of all slabs, in bytes. */
+	size_t	sui_slab_size;
+
+	/* Number of allocations which are not managed by slabs, but
+	 * are handled separate.
+	 */
+	size_t	sui_num_single_allocations;
+
+	/* Total number of bytes allocated for memory not managed
+	 * by slabs.
+	 */
+	size_t	sui_total_single_allocation_size;
+
+	/* Number of slabs currently in play. This can be 0. */
+	size_t	sui_num_slabs;
+
+	/* Number of currently unused slabs which contain no data. */
+	size_t	sui_num_empty_slabs;
+
+	/* Number of slabs in use which are completely filled with data. */
+	size_t	sui_num_full_slabs;
+
+	/* Total number of bytes allocated for all slabs. */
+	size_t	sui_total_slab_allocation_size;
+
+	/*
+	 * The following data is updated for each slab which
+	 * your callback function sees.
+	 */
+
+	/* Index number of the slab being reported (0 = no slabs are in use). */
+	int		sui_slab_index;
+
+	/* How large are the memory chunks managed by this slab? */
+	size_t	sui_chunk_size;
+
+	/* How many memory chunks fit into this slab? */
+	size_t	sui_num_chunks;
+
+	/* How many memory chunks in this slab are being used? */
+	size_t	sui_num_chunks_used;
+};
+
+/****************************************************************************/
+
+typedef int (*__slab_usage_callback)(const struct __slab_usage_information * sui);
+
+/****************************************************************************/
+
+void __get_slab_usage(__slab_usage_callback callback);
+
+/****************************************************************************/
+
+/*
  * You can request to use the alloca() variant that actually does allocate
  * memory from the system rather than the current stack frame, which will
  * ease stack requirements but may not release allocate memory immediately.
