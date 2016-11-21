@@ -55,7 +55,7 @@ __get_slab_usage(__slab_usage_callback callback)
 
 		__memory_lock();
 
-		sui.sui_slab_size						= __slab_data.sd_MaxSlabSize;
+		sui.sui_slab_size						= __slab_data.sd_StandardSlabSize;
 		sui.sui_num_single_allocations			= __slab_data.sd_NumSingleAllocations;
 		sui.sui_total_single_allocation_size	= __slab_data.sd_TotalSingleAllocationSize;
 
@@ -72,7 +72,7 @@ __get_slab_usage(__slab_usage_callback callback)
 
 				sui.sui_num_slabs++;
 
-				sui.sui_total_slab_allocation_size += sizeof(*sn) + __slab_data.sd_MaxSlabSize;
+				sui.sui_total_slab_allocation_size += sizeof(*sn) + __slab_data.sd_StandardSlabSize;
 			}
 		}
 

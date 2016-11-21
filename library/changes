@@ -1,3 +1,13 @@
+c.lib 1.209 (21.11.2016)
+
+- The maximum slab size is now 2^17 bytes (= 131072). If you request
+  a slab size larger than this, you will get slab sizes of 131072
+  bytes instead.
+
+- Enabling the memory management debugging code no longer produces
+  compiler errors.
+
+
 c.lib 1.208 (19.11.2016)
 
 - Updated <stdlib.h> with new functions and data structures for

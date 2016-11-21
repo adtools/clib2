@@ -54,17 +54,17 @@ __slab_allocate(size_t allocation_size)
 
 	D(("allocating %lu bytes of memory",allocation_size));
 
-	assert( __slab_data.sd_MaxSlabSize > 0 );
+	assert( __slab_data.sd_StandardSlabSize > 0 );
 
 	/* Number of bytes to allocate exceeds the slab size?
 	 * If so, allocate this memory chunk separately and
 	 * keep track of it.
 	 */
-	if(allocation_size > __slab_data.sd_MaxSlabSize)
+	if(allocation_size > __slab_data.sd_StandardSlabSize)
 	{
 		struct MinNode * single_allocation;
 
-		D(("allocation size is > %ld; this will be stored separately",__slab_data.sd_MaxSlabSize));
+		D(("allocation size is > %ld; this will be stored separately",__slab_data.sd_StandardSlabSize));
 		D(("allocating %ld (MinNode) + %ld = %ld bytes",sizeof(*single_allocation),allocation_size,sizeof(*single_allocation) + allocation_size));
 
 		#if defined(__amigaos4__)
@@ -103,7 +103,7 @@ __slab_allocate(size_t allocation_size)
 		ULONG chunk_size;
 		int slab_index;
 
-		D(("allocation size is <= %ld; this will be allocated from a slab",__slab_data.sd_MaxSlabSize));
+		D(("allocation size is <= %ld; this will be allocated from a slab",__slab_data.sd_StandardSlabSize));
 
 		/* Chunks must be at least as small as a MinNode, because
 		 * that's what we use for keeping track of the chunks which
@@ -230,15 +230,15 @@ __slab_allocate(size_t allocation_size)
 				 */
 				if(new_sn == NULL)
 				{
-					D(("no slab is available for reuse; allocating a new slab (%lu bytes)",sizeof(*sn) + __slab_data.sd_MaxSlabSize));
+					D(("no slab is available for reuse; allocating a new slab (%lu bytes)",sizeof(*sn) + __slab_data.sd_StandardSlabSize));
 
 					#if defined(__amigaos4__)
 					{
-						new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_MaxSlabSize,MEMF_PRIVATE);
+						new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_StandardSlabSize,MEMF_PRIVATE);
 					}
 					#else
 					{
-						new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_MaxSlabSize,MEMF_ANY);
+						new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_StandardSlabSize,MEMF_ANY);
 					}
 					#endif /* __amigaos4__ */
 
@@ -257,7 +257,7 @@ __slab_allocate(size_t allocation_size)
 
 					D(("setting up slab 0x%08lx", new_sn));
 
-					assert( chunk_size <= __slab_data.sd_MaxSlabSize );
+					assert( chunk_size <= __slab_data.sd_StandardSlabSize );
 
 					memset(new_sn,0,sizeof(*new_sn));
 
@@ -270,7 +270,7 @@ __slab_allocate(size_t allocation_size)
 					 * SlabNode header.
 					 */
 					first_byte	= (BYTE *)&new_sn[1];
-					last_byte	= &first_byte[__slab_data.sd_MaxSlabSize - chunk_size];
+					last_byte	= &first_byte[__slab_data.sd_StandardSlabSize - chunk_size];
 
 					for(free_chunk = (struct MinNode *)first_byte ;
 					    free_chunk <= (struct MinNode *)last_byte;
@@ -356,16 +356,16 @@ __slab_free(void * address,size_t allocation_size)
 {
 	D(("freeing allocation at 0x%08lx, %lu bytes",address,allocation_size));
 
-	assert( __slab_data.sd_MaxSlabSize > 0 );
+	assert( __slab_data.sd_StandardSlabSize > 0 );
 
 	/* Number of bytes allocated exceeds the slab size?
 	 * Then the chunk was allocated separately.
 	 */
-	if(allocation_size > __slab_data.sd_MaxSlabSize)
+	if(allocation_size > __slab_data.sd_StandardSlabSize)
 	{
 		struct MinNode * mn = address;
 
-		D(("allocation size is > %ld; this was stored separately",__slab_data.sd_MaxSlabSize));
+		D(("allocation size is > %ld; this was stored separately",__slab_data.sd_StandardSlabSize));
 
 		Remove((struct Node *)&mn[-1]);
 
@@ -389,7 +389,7 @@ __slab_free(void * address,size_t allocation_size)
 		ULONG chunk_size;
 		int slab_index;
 
-		D(("allocation size is <= %ld; this was allocated from a slab",__slab_data.sd_MaxSlabSize));
+		D(("allocation size is <= %ld; this was allocated from a slab",__slab_data.sd_StandardSlabSize));
 
 		/* Chunks must be at least as small as a MinNode, because
 		 * that's what we use for keeping track of the chunks which
@@ -422,13 +422,13 @@ __slab_free(void * address,size_t allocation_size)
 		/* Find the slab which contains the memory chunk. */
 		if(slab_list != NULL)
 		{
-			const size_t usable_range = __slab_data.sd_MaxSlabSize - chunk_size;
+			const size_t usable_range = __slab_data.sd_StandardSlabSize - chunk_size;
 			struct SlabNode * sn;
 			BYTE * first_byte;
 			BYTE * last_byte;
 			BOOL freed = FALSE;
 
-			assert( chunk_size <= __slab_data.sd_MaxSlabSize );
+			assert( chunk_size <= __slab_data.sd_StandardSlabSize );
 
 			for(sn = (struct SlabNode *)slab_list->mlh_Head ;
 			    sn->sn_MinNode.mln_Succ != NULL ;
@@ -495,15 +495,22 @@ __slab_free(void * address,size_t allocation_size)
 void
 __slab_init(size_t slab_size)
 {
+	const size_t max_slab_size = (1UL << (NUM_ENTRIES(__slab_data.sd_Slabs)));
 	size_t size;
 
 	SETDEBUGLEVEL(2);
 
 	D(("slab_size = %ld",slab_size));
 
+	/* Do not allow for a slab size that is larger than
+	 * what we support.
+	 */
+	if(slab_size > max_slab_size)
+		slab_size = max_slab_size;
+
 	/* If the maximum allocation size to be made from the slab
 	 * is not already a power of 2, round it up. We do not
-	 * support allocations larger than 2^31, and the maximum
+	 * support allocations larger than 2^17, and the maximum
 	 * allocation size should be much smaller.
 	 *
 	 * Note that the maximum allocation size also defines the
@@ -533,8 +540,8 @@ __slab_init(size_t slab_size)
 		NewList((struct List *)&__slab_data.sd_SingleAllocations);
 		NewList((struct List *)&__slab_data.sd_EmptySlabs);
 
-		__slab_data.sd_MaxSlabSize	= size;
-		__slab_data.sd_InUse		= TRUE;
+		__slab_data.sd_StandardSlabSize	= size;
+		__slab_data.sd_InUse			= TRUE;
 	}
 }
 

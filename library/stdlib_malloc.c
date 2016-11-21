@@ -92,7 +92,7 @@ __get_allocation_size(size_t size)
 /****************************************************************************/
 
 void *
-__allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,int UNUSED unused_line)
+__allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_name,int UNUSED debug_line_number)
 {
 	struct MemoryNode * mn;
 	size_t allocation_size;
@@ -215,8 +215,8 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 		mn->mn_AlreadyFree		= FALSE;
 		mn->mn_Allocation		= body;
 		mn->mn_AllocationSize	= allocation_size;
-		mn->mn_File				= (char *)file;
-		mn->mn_Line				= line;
+		mn->mn_File				= (char *)debug_file_name;
+		mn->mn_Line				= debug_line_number;
 		mn->mn_FreeFile			= NULL;
 		mn->mn_FreeLine			= 0;
 
@@ -228,7 +228,7 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 		{
 			kprintf("[%s] + %10ld 0x%08lx [",__program_name,size,body);
 
-			kprintf("allocated at %s:%ld]\n",file,line);
+			kprintf("allocated at %s:%ld]\n",debug_file_name,debug_line_number);
 		}
 		#endif /* __MEM_DEBUG_LOG */
 
@@ -264,7 +264,7 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED unused_file,in
 		{
 			kprintf("[%s] + %10ld 0x%08lx [",__program_name,size,NULL);
 
-			kprintf("FAILED: allocated at %s:%ld]\n",file,line);
+			kprintf("FAILED: allocated at %s:%ld]\n",debug_file_name,debug_line_number);
 		}
 	}
 	#endif /* __MEM_DEBUG_LOG */

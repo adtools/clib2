@@ -200,7 +200,7 @@ struct MemoryTree
 /* This keeps track of individual slabs. Each slab begins with this
  * header and is followed by the memory it manages. The size of that
  * memory "slab" is fixed and matches what is stored in
- * SlabData.sd_MaxSlabSize.
+ * SlabData.sd_StandardSlabSize.
  *
  * Each slab manages allocations of a specific maximum size, e.g. 8, 16, 32,
  * 64, etc. bytes. Multiple slabs can exist which manage allocations of the same
@@ -245,13 +245,13 @@ struct SlabData
 	 * which are 8 bytes in size, sd_Slabs[4] is for 16 byte
 	 * chunks, etc. The minimum chunk size is 8, which is why
 	 * lists 0..2 are not used. Currently, there is an upper limit
-	 * of 2^31 bytes per chunk, but you should not be using slab
+	 * of 2^17 bytes per chunk, but you should not be using slab
 	 * chunks much larger than 4096 bytes.
 	 */
-	struct MinList	sd_Slabs[31];
+	struct MinList	sd_Slabs[17];
 
 	/* Memory allocations which are larger than the limit
-	 * found in the sd_MaxSlabSize field are kept in this list.
+	 * found in the sd_StandardSlabSize field are kept in this list.
 	 * They are never associated with a slab.
 	 */
 	struct MinList	sd_SingleAllocations;
@@ -262,13 +262,13 @@ struct SlabData
 	 */
 	struct MinList	sd_EmptySlabs;
 
-	/* This is the maximum size of a memory allocation which may
+	/* This is the standard size of a memory allocation which may
 	 * be made from a slab that can accommodate it. This number
 	 * is initialized from the __slab_max_size global variable,
 	 * if > 0, and unless it already is a power of two, it will
 	 * be rounded up to the next largest power of two.
 	 */
-	size_t			sd_MaxSlabSize;
+	size_t			sd_StandardSlabSize;
 
 	/* These fields kees track of how many entries there are in
 	 * the sd_SingleAllocations list, and how much memory these
