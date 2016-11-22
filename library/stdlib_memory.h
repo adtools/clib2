@@ -234,6 +234,15 @@ struct SlabNode
 	struct MinList	sn_FreeList;
 };
 
+/* Memory allocations which are not part of a slab are
+ * tracked using this data structure.
+ */
+struct SlabSingleAllocation
+{
+	struct MinNode	ssa_MinNode;
+	ULONG			ssa_Size;
+};
+
 /* This is the global bookkeeping information for managing
  * memory allocations from the slab data structure.
  */

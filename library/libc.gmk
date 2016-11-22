@@ -219,6 +219,7 @@ C_LIB := \
 	stdlib_getsp.o \
 	stdlib_get_errno.o \
 	stdlib_get_slab_usage.o \
+	stdlib_get_slab_allocations.o \
 	stdlib_isresident.o \
 	stdlib_labs.o \
 	stdlib_llabs.o \

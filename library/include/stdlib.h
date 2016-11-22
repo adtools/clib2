@@ -181,7 +181,8 @@ extern unsigned long __slab_max_size;
  * following function to do so.
  *
  * Please note that this function works within the context of the memory
- * allocation system and may not be safe to call from interrupt code.
+ * allocation system and is not safe to call from interrupt code. It may
+ * break a Forbid() or Disable() condition.
  */
 extern void __free_unused_slabs(void);
 
@@ -198,7 +199,8 @@ extern void __free_unused_slabs(void);
  * not operational.
  *
  * Please note that this function works within the context of the memory
- * allocation system and may not be safe to call from interrupt code.
+ * allocation system and is not safe to call from interrupt code. It may
+ * break a Forbid() or Disable() condition.
  */
 
 /****************************************************************************/
@@ -215,7 +217,8 @@ struct __slab_usage_information
 	size_t	sui_num_single_allocations;
 
 	/* Total number of bytes allocated for memory not managed
-	 * by slabs.
+	 * by slabs. This includes the management overhead for
+	 * each allocation.
 	 */
 	size_t	sui_total_single_allocation_size;
 
@@ -256,6 +259,68 @@ typedef int (*__slab_usage_callback)(const struct __slab_usage_information * sui
 /****************************************************************************/
 
 void __get_slab_usage(__slab_usage_callback callback);
+
+/****************************************************************************/
+
+/*
+ * You can obtain runtime statistics about the memory allocations
+ * which the slab allocator did not fit into slabs. This works
+ * just like __get_slab_usage() in that the callback function
+ * you provide will be called for each single allocation that
+ * is not part of a slab.
+ *
+ * Your callback function must return 0 if it wants to be called again,
+ * for the next slab, or return -1 to stop. Note that your callback
+ * function may not be called if the slab allocator did not
+ * allocate memory outside of slabs.
+ *
+ * Please note that this function works within the context of the memory
+ * allocation system and is not safe to call from interrupt code. It may
+ * break a Forbid() or Disable() condition.
+ */
+
+/* This is what your callback function will see when it is invoked. */
+struct __slab_allocation_information
+{
+	/* Number of allocations which are not managed by slabs, but
+	 * are handled separate.
+	 */
+	size_t	sai_num_single_allocations;
+
+	/* Total number of bytes allocated for memory not managed
+	 * by slabs. This includes the management overhead for
+	 * each allocation.
+	 */
+	size_t	sai_total_single_allocation_size;
+
+	/*
+	 * The following data is updated for each slab which
+	 * your callback function sees.
+	 */
+
+	/* Index number of the allocation being reported (0 = no allocations
+	 * outside of slabs are in use).
+	 */
+	int		sai_allocation_index;
+
+	/* Size of this allocation, as requested by the program which
+	 * called malloc(), realloc() or alloca().
+	 */
+	size_t	sai_allocation_size;
+
+	/* Total size of this allocation, including management data
+	 * structure overhead.
+	 */
+	size_t	sai_total_allocation_size;
+};
+
+/****************************************************************************/
+
+typedef int (*__slab_allocation_callback)(const struct __slab_allocation_information * sui);
+
+/****************************************************************************/
+
+void __get_slab_allocations(__slab_allocation_callback callback);
 
 /****************************************************************************/
 

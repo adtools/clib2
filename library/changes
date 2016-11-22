@@ -1,3 +1,24 @@
+c.lib 1.210 (22.11.2016)
+
+- Added __get_slab_allocations() function which will report information
+  about each memory allocation made by the slab allocator which does
+  not come from a slab.
+
+- If the first slab in the list of slabs which share the same chunk
+  size has no more room, it means that all other slabs following
+  it have no room either. This speeds up the test to find a slab with
+  free space, which can now abort and directly proceed to allocate
+  memory for a new slab.
+
+- If an empty slab's decay count hits zero, it is moved to the front
+  of the empty slab list to be reclaimed more quickly.
+
+- Allocations made from the slab now carry a pointer back to the
+  slab which they are a part of. This speeds up deallocation but
+  has the downside of making the smallest usable slab chunk size
+  64 bytes, which is double what used to be the minimum before.
+
+
 c.lib 1.209 (21.11.2016)
 
 - The maximum slab size is now 2^17 bytes (= 131072). If you request

@@ -47,7 +47,7 @@ __get_slab_usage(__slab_usage_callback callback)
 	if(__slab_data.sd_InUse)
 	{
 		struct __slab_usage_information sui;
-		struct SlabNode * sn;
+		const struct SlabNode * sn;
 		BOOL stop;
 		int i;
 
@@ -97,6 +97,10 @@ __get_slab_usage(__slab_usage_callback callback)
 					}
 				}
 			}
+		}
+		else
+		{
+			(*callback)(&sui);
 		}
 
 		__memory_unlock();

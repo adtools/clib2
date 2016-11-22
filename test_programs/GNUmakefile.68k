@@ -31,7 +31,7 @@ WARNINGS = \
 
 INCLUDE = -I../library/include
 LIB = -L../library/lib
- OPTIONS = -DNDEBUG -fno-builtin -fwritable-strings -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT
+ OPTIONS = -DNDEBUG -fno-builtin -fwritable-strings -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT -DVERBOSE
 #OPTIONS = -D__MEM_DEBUG -fno-builtin
 #OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O
@@ -49,13 +49,15 @@ LIBS = -lm -lc -lgcc
 all: test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
 	fstat_stdout_test simple_sprintf date_test sscanf_64 factorial \
-	execvp_test setlocale rand fstat_test base_dir_nametest
+	execvp_test setlocale rand fstat_test base_dir_nametest \
+	malloc-test
 
 clean:
 	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test \
 		sprintf_test stack_size_test translate_test strtok_test uname \
 		simple fstat_stdout_test fstat_test simple_sprintf date_test sscanf_64 \
-		factorial execvp_test setlocale rand base_dir_nametest
+		factorial execvp_test setlocale rand base_dir_nametest \
+		malloc-test
 
 ##############################################################################
 
@@ -140,6 +142,10 @@ base_dir_nametest : base_dir_nametest.o
 	$(CC) $(CFLAGS) -o $@ base_dir_nametest.o -lunix $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
 rand : rand.o
+	@echo "Linking $@"
+	$(CC) $(CFLAGS) -o $@ rand.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
+
+malloc-test: malloc-test.o
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) -o $@ rand.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
