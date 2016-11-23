@@ -31,6 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*#define DEBUG*/
+
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
@@ -69,25 +71,6 @@ struct MemoryTree NOCOMMON __memory_tree;
 
 APTR			NOCOMMON __memory_pool;
 struct MinList	NOCOMMON __memory_list;
-
-/****************************************************************************/
-
-size_t
-__get_allocation_size(size_t size)
-{
-	#ifndef __MEM_DEBUG
-	{
-		size_t total_allocation_size;
-
-		total_allocation_size = sizeof(struct MemoryNode) + size;
-
-		/* Round up the allocation size to the physical allocation granularity. */
-		size += ((total_allocation_size + MEM_BLOCKMASK) & ~((ULONG)MEM_BLOCKMASK)) - total_allocation_size;
-	}
-	#endif /* __MEM_DEBUG */
-
-	return(size);
-}
 
 /****************************************************************************/
 
@@ -135,12 +118,31 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_nam
 	}
 	#else
 	{
-		/* Round up the allocation size to the physical allocation granularity. */
-		size = __get_allocation_size(size);
+		/* Round up allocation to a multiple of 32 bits. */
+		if((size & 3) != 0)
+			size += 4 - (size & 3);
 
 		allocation_size = sizeof(*mn) + size;
 	}
 	#endif /* __MEM_DEBUG */
+
+	/* Integer overflow has occured? */
+	if(size == 0 || allocation_size < size)
+	{
+		__set_errno(ENOMEM);
+		goto out;
+	}
+
+	/* We reuse the MemoryNode.mn_Size field to mark
+	 * allocations are not suitable for use with
+	 * free() and realloc(). This limits allocation
+	 * sizes to a little less than 2 GBytes.
+	 */
+	if(allocation_size & MN_SIZE_NEVERFREE)
+	{
+		__set_errno(ENOMEM);
+		goto out;
+	}
 
 	#if defined(__USE_SLAB_ALLOCATOR)
 	{
@@ -155,15 +157,27 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_nam
 		}
 		else
 		{
-			#if defined(__amigaos4__)
-			{
-				mn = AllocMem(allocation_size,MEMF_PRIVATE);
-			}
-			#else
+			#ifdef __MEM_DEBUG
 			{
 				mn = AllocMem(allocation_size,MEMF_ANY);
 			}
-			#endif /* __amigaos4__ */
+			#else
+			{
+				struct MinNode * mln;
+
+				mln = AllocMem(sizeof(*mln) + allocation_size,MEMF_ANY);
+				if(mln != NULL)
+				{
+					AddTail((struct List *)&__memory_list,(struct Node *)mln);
+
+					mn = (struct MemoryNode *)&mln[1];
+				}
+				else
+				{
+					mn = NULL;
+				}
+			}
+			#endif /* __MEM_DEBUG */
 		}
 	}
 	#else
@@ -174,15 +188,27 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_nam
 		}
 		else
 		{
-			#if defined(__amigaos4__)
-			{
-				mn = AllocMem(allocation_size,MEMF_PRIVATE);
-			}
-			#else
+			#ifdef __MEM_DEBUG
 			{
 				mn = AllocMem(allocation_size,MEMF_ANY);
 			}
-			#endif /* __amigaos4__ */
+			#else
+			{
+				struct MinNode * mln;
+
+				mln = AllocMem(sizeof(*mln) + allocation_size,MEMF_ANY);
+				if(mln != NULL)
+				{
+					AddTail((struct List *)&__memory_list,(struct Node *)mln);
+
+					mn = (struct MemoryNode *)&mln[1];
+				}
+				else
+				{
+					mn = NULL;
+				}
+			}
+			#endif /* __MEM_DEBUG */
 		}
 	}
 	#endif /* __USE_SLAB_ALLOCATOR */
@@ -193,10 +219,10 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_nam
 		goto out;
 	}
 
-	mn->mn_Size			= size;
-	mn->mn_NeverFree	= never_free;
+	mn->mn_Size = size;
 
-	AddTail((struct List *)&__memory_list,(struct Node *)mn);
+	if(never_free)
+		SET_FLAG(mn->mn_Size, MN_SIZE_NEVERFREE);
 
 	__current_memory_allocated += allocation_size;
 	if(__maximum_memory_allocated < __current_memory_allocated)
@@ -211,6 +237,8 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_nam
 		char * head = (char *)(mn + 1);
 		char * body = head + MALLOC_HEAD_SIZE;
 		char * tail = body + size;
+
+		AddTail((struct List *)&__memory_list,(struct Node *)mn);
 
 		mn->mn_AlreadyFree		= FALSE;
 		mn->mn_Allocation		= body;

@@ -59,42 +59,57 @@ __slab_allocate(size_t allocation_size)
 {
 	struct SlabChunk * chunk;
 	void * allocation = NULL;
+	size_t allocation_size_with_chunk_header;
 
 	D(("allocating %lu bytes of memory",allocation_size));
 
 	assert( __slab_data.sd_StandardSlabSize > 0 );
 
+	/* Check for integer overflow. */
+	allocation_size_with_chunk_header = sizeof(*chunk) + allocation_size;
+	if(allocation_size_with_chunk_header < allocation_size)
+		return(NULL);
+
 	/* Number of bytes to allocate exceeds the slab size?
 	 * If so, allocate this memory chunk separately and
 	 * keep track of it.
 	 */
-	if(allocation_size + sizeof(*chunk) > __slab_data.sd_StandardSlabSize)
+	if(allocation_size_with_chunk_header > __slab_data.sd_StandardSlabSize)
 	{
-		struct SlabSingleAllocation * single_allocation;
-		ULONG total_single_allocation_size = sizeof(*single_allocation) + allocation_size;
+		struct SlabSingleAllocation * ssa;
+		ULONG total_single_allocation_size = sizeof(*ssa) + allocation_size;
 
 		D(("allocation size is > %ld; this will be stored separately",__slab_data.sd_StandardSlabSize));
-		D(("allocating %ld (MinNode+Size) + %ld = %ld bytes",sizeof(*single_allocation),allocation_size,total_single_allocation_size));
+		D(("allocating %ld (MinNode+Size) + %ld = %ld bytes",sizeof(*ssa),allocation_size,total_single_allocation_size));
 
-		#if defined(__amigaos4__)
+		/* No integer overflow? */
+		if(allocation_size < total_single_allocation_size)
 		{
-			single_allocation = AllocMem(total_single_allocation_size,MEMF_PRIVATE);
+			#if defined(__amigaos4__)
+			{
+				ssa = AllocMem(total_single_allocation_size,MEMF_PRIVATE);
+			}
+			#else
+			{
+				ssa = AllocMem(total_single_allocation_size,MEMF_ANY);
+			}
+			#endif /* __amigaos4__ */
 		}
-		#else
+		/* Integer overflow has occured. */
+		else
 		{
-			single_allocation = AllocMem(total_single_allocation_size,MEMF_ANY);
+			ssa = NULL;
 		}
-		#endif /* __amigaos4__ */
 
-		if(single_allocation != NULL)
+		if(ssa != NULL)
 		{
-			single_allocation->ssa_Size = total_single_allocation_size;
+			ssa->ssa_Size = total_single_allocation_size;
 
-			allocation = &single_allocation[1];
+			allocation = &ssa[1];
 
 			D(("single allocation = 0x%08lx",allocation));
 
-			AddTail((struct List *)&__slab_data.sd_SingleAllocations,(struct Node *)single_allocation);
+			AddTail((struct List *)&__slab_data.sd_SingleAllocations,(struct Node *)ssa);
 
 			__slab_data.sd_NumSingleAllocations++;
 			__slab_data.sd_TotalSingleAllocationSize += total_single_allocation_size;
@@ -116,18 +131,19 @@ __slab_allocate(size_t allocation_size)
 
 		D(("allocation size is <= %ld; this will be allocated from a slab",__slab_data.sd_StandardSlabSize));
 
+		/* Add room for a pointer back to the slab which
+		 * the chunk belongs to.
+		 */
+		entry_size = sizeof(*chunk) + allocation_size;
+
 		/* Chunks must be at least as small as a MinNode, because
 		 * that's what we use for keeping track of the chunks which
 		 * are available for allocation within each slab.
 		 */
-		entry_size = allocation_size;
 		if(entry_size < sizeof(struct MinNode))
 			entry_size = sizeof(struct MinNode);
 
-		/* Add room for a pointer back to the slab which
-		 * the chunk belongs to.
-		 */
-		entry_size += sizeof(*chunk);
+		D(("final entry size prior to picking slab size = %ld bytes",entry_size));
 
 		/* Find a slab which keeps track of chunks that are no
 		 * larger than the amount of memory which needs to be
@@ -184,9 +200,8 @@ __slab_allocate(size_t allocation_size)
 					{
 						D(("slab is no longer empty"));
 
-						/* Mark it as no longer empty. */
+						/* Pull it out of the list of slabs available for reuse. */
 						Remove((struct Node *)&sn->sn_EmptyLink);
-						sn->sn_EmptyDecay = 0;
 					}
 
 					sn->sn_UseCount++;
@@ -238,7 +253,8 @@ __slab_allocate(size_t allocation_size)
 						Remove((struct Node *)free_node);
 
 						/* Unlink from list of slabs which keep chunks
-						 * of the same size.
+						 * of the same size. It will be added there
+						 * again, at a different position.
 						 */
 						Remove((struct Node *)sn);
 
@@ -254,21 +270,26 @@ __slab_allocate(size_t allocation_size)
 				 */
 				if(new_sn == NULL)
 				{
-					D(("no slab is available for reuse; allocating a new slab (%lu bytes)",sizeof(*sn) + __slab_data.sd_StandardSlabSize));
+					D(("no slab is available for reuse; allocating a new slab (%lu bytes)",sizeof(*new_sn) + __slab_data.sd_StandardSlabSize));
 
 					#if defined(__amigaos4__)
 					{
-						new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_StandardSlabSize,MEMF_PRIVATE);
+						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize,MEMF_PRIVATE);
 					}
 					#else
 					{
-						new_sn = (struct SlabNode *)AllocVec(sizeof(*sn) + __slab_data.sd_StandardSlabSize,MEMF_ANY);
+						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize,MEMF_ANY);
 					}
 					#endif /* __amigaos4__ */
 
 					if(new_sn == NULL)
 						D(("slab allocation failed"));
 
+					/* If this allocation went well, try to free all currently unused
+					 * slabs which are ready for purging. This is done so that we don't
+					 * keep allocating new memory all the time without cutting back on
+					 * unused slabs.
+					 */
 					purge = TRUE;
 				}
 
@@ -369,7 +390,7 @@ __slab_allocate(size_t allocation_size)
 							if(sn->sn_EmptyDecay == 0)
 							{
 								/* Move it to the front of the list, so that
-								 * will be collected as soon as possible.
+								 * it will be collected as soon as possible.
 								 */
 								if(free_node != (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head)
 								{
@@ -405,32 +426,53 @@ __slab_free(void * address,size_t allocation_size)
 	/* Number of bytes allocated exceeds the slab size?
 	 * Then the chunk was allocated separately.
 	 */
-	if(allocation_size + sizeof(*chunk) > __slab_data.sd_StandardSlabSize)
+	if(sizeof(*chunk) + allocation_size > __slab_data.sd_StandardSlabSize)
 	{
-		struct SlabSingleAllocation * single_allocation = address;
+		struct SlabSingleAllocation * ssa = address;
 		ULONG size;
 
 		D(("allocation size is > %ld; this was stored separately",__slab_data.sd_StandardSlabSize));
 
+		assert( __slab_data.sd_NumSingleAllocations > 0 );
+
 		/* Management information (MinNode linkage, size in bytes) precedes
 		 * the address returned by malloc(), etc.
 		 */
-		single_allocation--;
+		ssa--;
 
-		size = single_allocation->ssa_Size;
+		/* Verify that the allocation is really on the list we
+		 * will remove it from.
+		 */
+		#if DEBUG
+		{
+			struct MinNode * mln;
+			BOOL found_allocation_in_list = FALSE;
 
-		assert( sizeof(*single_allocation) + allocation_size == size );
+			for(mln = __slab_data.sd_SingleAllocations.mlh_Head ;
+			    mln->mln_Succ != NULL ;
+			    mln = mln->mln_Succ)
+			{
+				if(mln == (struct MinNode *)ssa)
+				{
+					found_allocation_in_list = TRUE;
+					break;
+				}
+			}
 
-		Remove((struct Node *)single_allocation);
+			assert( found_allocation_in_list );
+		}
+		#endif /* DEBUG */
 
-		FreeMem(single_allocation, size);
+		size = ssa->ssa_Size;
 
-		assert( __slab_data.sd_NumSingleAllocations > 0 );
-
-		__slab_data.sd_NumSingleAllocations--;
-
+		assert( size > 0 );
+		assert( sizeof(*ssa) + allocation_size == size );
 		assert( size <= __slab_data.sd_TotalSingleAllocationSize );
 
+		Remove((struct Node *)ssa);
+		FreeMem(ssa, size);
+
+		__slab_data.sd_NumSingleAllocations--;
 		__slab_data.sd_TotalSingleAllocationSize -= size;
 
 		D(("number of single allocations = %ld", __slab_data.sd_NumSingleAllocations));
@@ -445,18 +487,17 @@ __slab_free(void * address,size_t allocation_size)
 
 		D(("allocation size is <= %ld; this was allocated from a slab",__slab_data.sd_StandardSlabSize));
 
+		/* Add room for a pointer back to the slab which
+		 * the chunk belongs to.
+		 */
+		entry_size = sizeof(*chunk) + allocation_size;
+
 		/* Chunks must be at least as small as a MinNode, because
 		 * that's what we use for keeping track of the chunks which
 		 * are available for allocation within each slab.
 		 */
-		entry_size = allocation_size;
 		if(entry_size < sizeof(struct MinNode))
 			entry_size = sizeof(struct MinNode);
-
-		/* Add room for a pointer back to the slab which
-		 * the chunk belongs to.
-		 */
-		entry_size += sizeof(*chunk);
 
 		/* Find a slab which keeps track of chunks that are no
 		 * larger than the amount of memory which needs to be
@@ -494,13 +535,79 @@ __slab_free(void * address,size_t allocation_size)
 
 			sn = chunk->sc_Parent;
 
+			#if DEBUG
+			{
+				struct SlabNode * other_sn;
+				BOOL slab_found = FALSE;
+				BOOL chunk_found = FALSE;
+
+				for(other_sn = (struct SlabNode *)slab_list->mlh_Head ;
+				    other_sn->sn_MinNode.mln_Succ != NULL ;
+				    other_sn = (struct SlabNode *)other_sn->sn_MinNode.mln_Succ)
+				{
+					if(other_sn == sn)
+					{
+						slab_found = TRUE;
+						break;
+					}
+				}
+
+				assert( slab_found );
+
+				if(slab_found)
+				{
+					struct MinNode * free_chunk;
+					BYTE * first_byte;
+					BYTE * last_byte;
+
+					first_byte	= (BYTE *)&sn[1];
+					last_byte	= &first_byte[__slab_data.sd_StandardSlabSize - chunk_size];
+
+					for(free_chunk = (struct MinNode *)first_byte ;
+					    free_chunk <= (struct MinNode *)last_byte;
+					    free_chunk = (struct MinNode *)(((BYTE *)free_chunk) + chunk_size))
+					{
+						if(free_chunk == (struct MinNode *)chunk)
+						{
+							chunk_found = TRUE;
+							break;
+						}
+					}
+				}
+
+				assert( chunk_found );
+			}
+			#endif /* DEBUG */
+
 			SHOWVALUE(sn->sn_ChunkSize);
+
+			assert( sn->sn_ChunkSize != 0 );
 
 			assert( sn->sn_ChunkSize == chunk_size );
 
 			D(("allocation is part of slab 0x%08lx (slab use count = %ld)",sn,sn->sn_UseCount));
 
-			AddTail((struct List *)&sn->sn_FreeList, (struct Node *)address);
+			#if DEBUG
+			{
+				struct MinNode * mln;
+				BOOL chunk_already_free = FALSE;
+
+				for(mln = sn->sn_FreeList.mlh_Head ;
+				    mln->mln_Succ != NULL ;
+				    mln = mln->mln_Succ)
+				{
+					if(mln == (struct MinNode *)chunk)
+					{
+						chunk_already_free = TRUE;
+						break;
+					}
+				}
+
+				assert( NOT chunk_already_free );
+			}
+			#endif /* DEBUG */
+
+			AddHead((struct List *)&sn->sn_FreeList, (struct Node *)chunk);
 
 			assert( sn->sn_UseCount > 0 );
 
@@ -600,7 +707,7 @@ __slab_exit(void)
 
 	if(__slab_data.sd_InUse)
 	{
-		struct SlabSingleAllocation * single_allocation;
+		struct SlabSingleAllocation * ssa;
 		struct SlabNode * sn;
 		struct SlabNode * sn_next;
 		struct MinNode * mn;
@@ -637,9 +744,9 @@ __slab_exit(void)
 		{
 			mn_next = mn->mln_Succ;
 
-			single_allocation = (struct SlabSingleAllocation *)mn;
+			ssa = (struct SlabSingleAllocation *)mn;
 
-			FreeMem(single_allocation, single_allocation->ssa_Size);
+			FreeMem(ssa, ssa->ssa_Size);
 		}
 
 		__slab_data.sd_InUse = FALSE;

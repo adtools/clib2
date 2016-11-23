@@ -124,7 +124,6 @@
 #define __find_memory_node __find_memory_node_debug
 #define __free_memory_node __free_memory_node_debug
 
-#define __get_allocation_size __get_allocation_size_debug
 #define __allocate_memory __allocate_memory_debug
 
 #define __memory_pool __memory_pool_debug
@@ -151,16 +150,24 @@ extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int lin
 
 /****************************************************************************/
 
+/* If this flag is set in mn_Size, then this memory allocation
+ * cannot be released with free() or used with realloc(). This
+ * flag is set by alloca().
+ */
+#define MN_SIZE_NEVERFREE (0x80000000UL)
+
+/* This obtains the allocation size from a memory node, ignoring
+ * the "never free" flag altogether.
+ */
+#define GET_MN_SIZE(mn) ((mn)->mn_Size & ~MN_SIZE_NEVERFREE)
+
 struct MemoryNode
 {
-	struct MinNode		mn_MinNode;
-	size_t				mn_Size;
-
-	UBYTE				mn_NeverFree;
-
 #ifdef __MEM_DEBUG
+	struct MinNode		mn_MinNode;
+
 	UBYTE				mn_AlreadyFree;
-	UBYTE				mn_Pad0[2];
+	UBYTE				mn_Pad0[3];
 
 	void *				mn_Allocation;
 	size_t				mn_AllocationSize;
@@ -179,9 +186,9 @@ struct MemoryNode
 	UBYTE				mn_Pad1[3];
 #endif /* __USE_MEM_TREES */
 
-#else
-	UBYTE				mn_Pad0[3];
 #endif /* __MEM_DEBUG */
+
+	ULONG				mn_Size;
 };
 
 #ifdef __USE_MEM_TREES

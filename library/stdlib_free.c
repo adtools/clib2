@@ -31,6 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*#define DEBUG*/
+
 #ifndef _STDLIB_HEADERS_H
 #include "stdlib_headers.h"
 #endif /* _STDLIB_HEADERS_H */
@@ -165,7 +167,7 @@ dump_memory(unsigned char * m,int size,int ignore)
 STATIC VOID
 check_memory_node(struct MemoryNode * mn,const char * file,int line)
 {
-	size_t size = mn->mn_Size;
+	ULONG size = GET_MN_SIZE(mn);
 	unsigned char * head = (unsigned char *)(mn + 1);
 	unsigned char * body = head + MALLOC_HEAD_SIZE;
 	unsigned char * tail = body + size;
@@ -227,10 +229,12 @@ check_memory_node(struct MemoryNode * mn,const char * file,int line)
 
 	if(mn->mn_AlreadyFree)
 	{
-		for(i = 0 ; i < size ; i++)
+		ULONG j;
+
+		for(j = 0 ; j < size ; j++)
 		{
-			if(body[i] != MALLOC_FREE_FILL)
-				max_body_damage = i+1;
+			if(body[j] != MALLOC_FREE_FILL)
+				max_body_damage = j+1;
 		}
 
 		if(max_body_damage > 0)
@@ -345,17 +349,17 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 
 	__memory_lock();
 
-	Remove((struct Node *)mn);
-
-	#if defined(__USE_MEM_TREES) && defined(__MEM_DEBUG)
+	#if defined(__MEM_DEBUG)
 	{
-		__red_black_tree_remove(&__memory_tree,mn);
-	}
-	#endif /* __USE_MEM_TREES && __MEM_DEBUG */
+		Remove((struct Node *)mn);
 
-	#ifdef __MEM_DEBUG
-	{
-		allocation_size = sizeof(*mn) + MALLOC_HEAD_SIZE + mn->mn_Size + MALLOC_TAIL_SIZE;
+		#if defined(__USE_MEM_TREES)
+		{
+			__red_black_tree_remove(&__memory_tree,mn);
+		}
+		#endif /* __USE_MEM_TREES */
+
+		allocation_size = sizeof(*mn) + MALLOC_HEAD_SIZE + GET_MN_SIZE(mn) + MALLOC_TAIL_SIZE;
 
 		assert( allocation_size == mn->mn_AllocationSize );
 
@@ -363,7 +367,7 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 	}
 	#else
 	{
-		allocation_size = sizeof(*mn) + mn->mn_Size;
+		allocation_size = sizeof(*mn) + GET_MN_SIZE(mn);
 	}
 	#endif /* __MEM_DEBUG */
 
@@ -371,18 +375,56 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 	{
 		/* Are we using the slab allocator? */
 		if (__slab_data.sd_InUse)
+		{
 			__slab_free(mn,allocation_size);
+		}
 		else if (__memory_pool != NULL)
+		{
 			FreePooled(__memory_pool,mn,allocation_size);
+		}
 		else
-			FreeMem(mn,allocation_size);
+		{
+			#if defined(__MEM_DEBUG)
+			{
+				FreeMem(mn,allocation_size);
+			}
+			#else
+			{
+				struct MinNode * mln = (struct MinNode *)mn;
+
+				mln--;
+
+				Remove((struct Node *)mln);
+
+				FreeMem(mln,sizeof(*mln) + allocation_size);
+			}
+			#endif /* __MEM_DEBUG */
+		}
 	}
 	#else
 	{
 		if (__memory_pool != NULL)
+		{
 			FreePooled(__memory_pool,mn,allocation_size);
+		}
 		else
-			FreeMem(mn,allocation_size);
+		{
+			#if defined(__MEM_DEBUG)
+			{
+				FreeMem(mn,allocation_size);
+			}
+			#else
+			{
+				struct MinNode * mln = (struct MinNode *)mn;
+
+				mln--;
+
+				Remove((struct Node *)mln);
+
+				FreeMem(mln,sizeof(*mln) + allocation_size);
+			}
+			#endif /* __MEM_DEBUG */
+		}
 	}
 	#endif /* __USE_SLAB_ALLOCATOR */
 
@@ -401,7 +443,7 @@ __free_memory_node(struct MemoryNode * mn,const char * UNUSED file,int UNUSED li
 
 	#ifdef __MEM_DEBUG
 	{
-		size_t size = mn->mn_Size;
+		ULONG size = GET_MN_SIZE(mn);
 
 		check_memory_node(mn,file,line);
 
@@ -409,7 +451,7 @@ __free_memory_node(struct MemoryNode * mn,const char * UNUSED file,int UNUSED li
 		{
 			#ifdef __MEM_DEBUG_LOG
 			{
-				kprintf("[%s] - %10ld 0x%08lx [",__program_name,mn->mn_Size,mn->mn_Allocation);
+				kprintf("[%s] - %10ld 0x%08lx [",__program_name,size,mn->mn_Allocation);
 
 				if(mn->mn_File != NULL)
 					kprintf("allocated at %s:%ld, ",mn->mn_File,mn->mn_Line);
@@ -436,14 +478,14 @@ __free_memory_node(struct MemoryNode * mn,const char * UNUSED file,int UNUSED li
 		{
 			#ifdef __MEM_DEBUG_LOG
 			{
-				kprintf("[%s] - %10ld 0x%08lx [",__program_name,mn->mn_Size,mn->mn_Allocation);
+				kprintf("[%s] - %10ld 0x%08lx [",__program_name,size,mn->mn_Allocation);
 
 				kprintf("FAILED]\n");
 			}
 			#endif /* __MEM_DEBUG_LOG */
 
 			kprintf("[%s] %s:%ld:Allocation at address 0x%08lx, size %ld",
-				__program_name,file,line,mn->mn_Allocation,mn->mn_Size);
+				__program_name,file,line,mn->mn_Allocation,size);
 
 			if(mn->mn_File != NULL)
 				kprintf(", allocated at %s:%ld",mn->mn_File,mn->mn_Line);
@@ -467,6 +509,9 @@ __free_memory(void * ptr,BOOL force,const char * file,int line)
 
 	assert(ptr != NULL);
 
+	SHOWPOINTER(ptr);
+	SHOWVALUE(force);
+
 	#ifdef __MEM_DEBUG
 	{
 		/*if((rand() % 16) == 0)
@@ -480,7 +525,7 @@ __free_memory(void * ptr,BOOL force,const char * file,int line)
 	{
 		if(mn != NULL)
 		{
-			if(force || (NOT mn->mn_NeverFree))
+			if(force || FLAG_IS_CLEAR(mn->mn_Size, MN_SIZE_NEVERFREE))
 				__free_memory_node(mn,file,line);
 		}
 		else
@@ -502,7 +547,9 @@ __free_memory(void * ptr,BOOL force,const char * file,int line)
 	{
 		assert( mn != NULL );
 
-		if(mn != NULL && (force || (NOT mn->mn_NeverFree)))
+		SHOWVALUE(mn->mn_Size);
+
+		if(mn != NULL && (force || FLAG_IS_CLEAR(mn->mn_Size, MN_SIZE_NEVERFREE)))
 			__free_memory_node(mn,file,line);
 	}
 	#endif /* __MEM_DEBUG */

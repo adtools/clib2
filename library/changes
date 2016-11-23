@@ -1,3 +1,34 @@
+c.lib 1.211 (23.11.2016)
+
+- Added more consistency checking to the slab allocator, which is
+  built if DEBUG is defined in "stdlib_slab.c".
+
+- Memory allocations are no longer guaranteed to be aligned to
+  64 bit word boundaries. In fact, this has not even worked
+  reliably in the past 10 years.
+
+- Memory allocation request sizes are now rounded to multiples of
+  32 bit words (the size of an address pointer) instead to the
+  size of a 64 bit word.
+
+- Reduced the memory footprint of the memory allocation management
+  data structures by reusing the most significant bit of the
+  memory allocation size. This allows many more allocations to fit
+  into the 32 byte chunk slabs, but limits the maximum memory
+  allocation size to a little less than 2 GBytes.
+
+- Added integer overflow checks to the memory management code.
+
+- Reduced the memory management overhead further. This cuts an
+  additional 8 bytes per allocation, unless neither the slab
+  allocator nor memory pools are available. With this reduction
+  the slab allocator is able to use 16 byte chunks, which cover
+  memory allocation requests of 1..8 bytes.
+
+- Fixed a bug caused by returning an allocation back to a slab
+  which passed the wrong pointer.
+
+
 c.lib 1.210 (22.11.2016)
 
 - Added __get_slab_allocations() function which will report information
