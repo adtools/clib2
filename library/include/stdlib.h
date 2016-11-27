@@ -173,6 +173,19 @@ extern int rand_r(unsigned int * seed);
 
 extern unsigned long __slab_max_size;
 
+/*
+ * The slab allocator will periodically free all currently unused memory.
+ * You can control how much memory should be released, instead of
+ * releasing everything.
+ *
+ * This would make the slab allocator release only up to 512 KBytes of
+ * unused memory at a time:
+ *
+ * unsigned long __slab_purge_threshold = 512 * 1024;
+ */
+
+extern unsigned long __slab_purge_threshold;
+
 /****************************************************************************/
 
 /*
@@ -250,6 +263,11 @@ struct __slab_usage_information
 
 	/* How many memory chunks in this slab are being used? */
 	size_t	sui_num_chunks_used;
+
+	/* How many time was this slab reused without reinitializing
+	 * it all over again from scratch?
+	 */
+	size_t	sui_num_reused;
 };
 
 /****************************************************************************/
@@ -321,6 +339,31 @@ typedef int (*__slab_allocation_callback)(const struct __slab_allocation_informa
 /****************************************************************************/
 
 void __get_slab_allocations(__slab_allocation_callback callback);
+
+/****************************************************************************/
+
+/*
+ * You can obtain information about the memory managed by the slab allocator,
+ * as well as additional information about the slab allocator's performance
+ * in JSON format. This format can be used for more detailed analysis.
+ *
+ * You supply a function which will be called for each line of the JSON
+ * data produced. You can store this data in a file, or in the clipboard,
+ * for later use. Your function must return 0 if it wants to be called
+ * again, or return -1 if it wants to stop (e.g. if an error occured
+ * when writing the JSON data to disk). The same "user_data" pointer which
+ * you pass to __get_slab_stats() will be passed to your callback function.
+ *
+ * Please note that this function works within the context of the memory
+ * allocation system and is not safe to call from interrupt code. It may
+ * break a Forbid() or Disable() condition.
+ */
+
+typedef int (* __slab_status_callback)(void * user_data, const char * line, size_t line_length);
+
+/****************************************************************************/
+
+extern void __get_slab_stats(void * user_data, __slab_status_callback callback);
 
 /****************************************************************************/
 

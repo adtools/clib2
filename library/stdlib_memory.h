@@ -235,6 +235,11 @@ struct SlabNode
 	/* How many chunks of this slab are currently in use? */
 	ULONG			sn_UseCount;
 
+	/* How many times was this slab reused instead of allocating
+	 * it from system memory?
+	 */
+	ULONG			sn_NumReused;
+
 	/* This contains all the chunks of memory which are available
 	 * for allocation.
 	 */
@@ -286,7 +291,7 @@ struct SlabData
 	 */
 	size_t			sd_StandardSlabSize;
 
-	/* These fields kees track of how many entries there are in
+	/* These fields keep track of how many entries there are in
 	 * the sd_SingleAllocations list, and how much memory these
 	 * allocations occupy.
 	 */
@@ -303,6 +308,7 @@ struct SlabData
 
 extern struct SlabData NOCOMMON	__slab_data;
 extern unsigned long NOCOMMON	__slab_max_size;
+extern unsigned long NOCOMMON	__slab_purge_threshold;
 
 /****************************************************************************/
 

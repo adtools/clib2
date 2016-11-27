@@ -13,7 +13,7 @@ DELETE = delete all quiet
 
 .c.o:
 	@echo "Compiling $<"
-	@$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 ##############################################################################
 
@@ -31,7 +31,7 @@ WARNINGS = \
 
 INCLUDE = -I../library/include
 LIB = -L../library/lib
- OPTIONS = -DNDEBUG -fno-builtin -fwritable-strings -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT -DVERBOSE
+ OPTIONS = -DNDEBUG -fno-builtin -fwritable-strings -DNO_INLINE_STDARG -DIEEE_FLOATING_POINT_SUPPORT -DVERBOSE=1
 #OPTIONS = -D__MEM_DEBUG -fno-builtin
 #OPTIONS = -DDEBUG -D__MEM_DEBUG -DNO_INLINE_STDARG -fno-builtin
  OPTIMIZE = -O
@@ -50,14 +50,14 @@ all: test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
 	fstat_stdout_test simple_sprintf date_test sscanf_64 factorial \
 	execvp_test setlocale rand fstat_test base_dir_nametest \
-	malloc-test
+	malloc-test slab-test
 
 clean:
 	$(DELETE) #?.o #?.map test fgets_test iotest sscanf_test printf_test \
 		sprintf_test stack_size_test translate_test strtok_test uname \
 		simple fstat_stdout_test fstat_test simple_sprintf date_test sscanf_64 \
 		factorial execvp_test setlocale rand base_dir_nametest \
-		malloc-test
+		malloc-test slab-test
 
 ##############################################################################
 
@@ -145,9 +145,13 @@ rand : rand.o
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) -o $@ rand.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
-malloc-test: malloc-test.o
+malloc-test : malloc-test.o
 	@echo "Linking $@"
-	$(CC) $(CFLAGS) -o $@ rand.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
+	$(CC) $(CFLAGS) -o $@ malloc-test.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
+
+slab-test : slab-test.o
+	@echo "Linking $@"
+	$(CC) $(CFLAGS) -o $@ slab-test.o $(LIBS) -Wl,--cref,-M,-Map=$@.map
 
 ##############################################################################
 

@@ -1,3 +1,15 @@
+c.lib 1.212 (27.11.2016)
+
+- Unused slabs which get recycled are no longer reinitialized from
+  scratch if their chunk size matches what the allocator needed.
+  If the chunk size matches, the list of available chunks is
+  left unchanged, and just the various counters are reset.
+
+- Added __get_slab_stats() function.
+
+- Added support for global __slab_purge_threshold tuning variable.
+
+
 c.lib 1.211 (23.11.2016)
 
 - Added more consistency checking to the slab allocator, which is

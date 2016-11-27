@@ -87,6 +87,7 @@ __get_slab_usage(__slab_usage_callback callback)
 					sui.sui_chunk_size		= sn->sn_ChunkSize;
 					sui.sui_num_chunks		= sn->sn_Count;
 					sui.sui_num_chunks_used	= sn->sn_UseCount;
+					sui.sui_num_reused		= sn->sn_NumReused;
 
 					sui.sui_slab_index++;
 

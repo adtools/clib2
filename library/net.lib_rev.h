@@ -1,6 +1,6 @@
 #define VERSION		1
-#define REVISION	211
-#define DATE		"23.11.2016"
-#define VERS		"net.lib 1.211"
-#define VSTRING		"net.lib 1.211 (23.11.2016)\r\n"
-#define VERSTAG		"\0$VER: net.lib 1.211 (23.11.2016)"
+#define REVISION	212
+#define DATE		"27.11.2016"
+#define VERS		"net.lib 1.212"
+#define VSTRING		"net.lib 1.212 (27.11.2016)\r\n"
+#define VERSTAG		"\0$VER: net.lib 1.212 (27.11.2016)"

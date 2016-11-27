@@ -503,7 +503,7 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 	#if defined(__USE_SLAB_ALLOCATOR)
 	{
 		/* ZZZ this is just for the purpose of testing */
-		#if 0
+		#if 1
 		{
 			TEXT slab_size_var[20];
 
