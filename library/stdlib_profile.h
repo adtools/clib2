@@ -45,8 +45,8 @@
 
 /****************************************************************************/
 
-extern void ASM _PROLOG(REG(a0,char *));
-extern void ASM _EPILOG(REG(a0,char *));
+extern void __asm _PROLOG(register __a0 char *);
+extern void __asm _EPILOG(register __a0 char *);
 
 #if _PROFILE
 #define PROFILE_OFF()	_PROLOG(0L)
