@@ -41,9 +41,13 @@
 
 /****************************************************************************/
 
+#include <setjmp.h>
+
+/****************************************************************************/
+
 struct context
 {
-	int						status;
+	jmp_buf					abort_buf;
 	void *					user_data;
 	__slab_status_callback	callback;
 	char *					buffer;
@@ -54,23 +58,21 @@ struct context
 
 static void print(struct context * ct, const char * format, ...)
 {
-	if(ct->status == 0)
-	{
-		va_list args;
-		int len;
+	va_list args;
+	int len;
 
-		va_start(args,format);
-		len = vsnprintf(ct->buffer, ct->buffer_size, format, args);
-		va_end(args);
+	va_start(args,format);
+	len = vsnprintf(ct->buffer, ct->buffer_size, format, args);
+	va_end(args);
 
-		/* This shouldn't happen: the buffer ought to be large enough
-		 * to hold every single line.
-		 */
-		if(len >= (int)ct->buffer_size)
-			len = strlen(ct->buffer);
+	/* This shouldn't happen: the buffer ought to be large enough
+	 * to hold every single line.
+	 */
+	if(len >= (int)ct->buffer_size)
+		len = strlen(ct->buffer);
 
-		ct->status = (*ct->callback)(ct->user_data, ct->buffer, len);
-	}
+	if((*ct->callback)(ct->user_data, ct->buffer, len) != 0)
+		longjmp(ct->abort_buf,-1);
 }
 
 /****************************************************************************/
@@ -83,11 +85,11 @@ __get_slab_stats(void * user_data, __slab_status_callback callback)
 		static int times_checked = 1;
 
 		const struct SlabNode * sn;
-		size_t num_empty_slabs = 0;
-		size_t num_full_slabs = 0;
-		size_t num_slabs = 0;
-		size_t slab_allocation_size = 0;
-		size_t total_slab_allocation_size = 0;
+		volatile size_t num_empty_slabs = 0;
+		volatile size_t num_full_slabs = 0;
+		volatile size_t num_slabs = 0;
+		volatile size_t slab_allocation_size = 0;
+		volatile size_t total_slab_allocation_size = 0;
 		struct context ct;
 		char line[1024];
 		char time_buffer[40];
@@ -104,96 +106,100 @@ __get_slab_stats(void * user_data, __slab_status_callback callback)
 
 		__memory_lock();
 
-		now = time(NULL);
-		localtime_r(&now, &when);
-
-		strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%dT%H:%M:%S", &when);
-
-		print(&ct,"{\n");
-
-		print(&ct,"\t\"when\": \"%s\",\n", time_buffer);
-		print(&ct,"\t\"times_checked\": %d,\n", times_checked++);
-		print(&ct,"\t\"slab_size\": %zu,\n", __slab_data.sd_StandardSlabSize);
-		print(&ct,"\t\"num_single_allocations\": %zu,\n", __slab_data.sd_NumSingleAllocations);
-		print(&ct,"\t\"total_single_allocation_size\": %zu,\n", __slab_data.sd_TotalSingleAllocationSize);
-
-		if(__slab_data.sd_SingleAllocations.mlh_Head->mln_Succ != NULL)
+		if(setjmp(ct.abort_buf) == 0)
 		{
-			const struct SlabSingleAllocation * ssa;
+			now = time(NULL);
+			localtime_r(&now, &when);
 
-			print(&ct,"\t\"single_allocations\": [\n");
+			strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%dT%H:%M:%S", &when);
 
-			for(ssa = (struct SlabSingleAllocation *)__slab_data.sd_SingleAllocations.mlh_Head ;
-			    ssa->ssa_MinNode.mln_Succ != NULL && ct.status == 0 ;
-			    ssa = (struct SlabSingleAllocation *)ssa->ssa_MinNode.mln_Succ)
+			print(&ct,"{\n");
+
+			print(&ct,"\t\"when\": \"%s\",\n", time_buffer);
+			print(&ct,"\t\"times_checked\": %d,\n", times_checked++);
+			print(&ct,"\t\"slab_size\": %zu,\n", __slab_data.sd_StandardSlabSize);
+			print(&ct,"\t\"num_single_allocations\": %zu,\n", __slab_data.sd_NumSingleAllocations);
+			print(&ct,"\t\"total_single_allocation_size\": %zu,\n", __slab_data.sd_TotalSingleAllocationSize);
+
+			if(__slab_data.sd_SingleAllocations.mlh_Head->mln_Succ != NULL)
 			{
-				print(&ct,"\t\t{ \"size\": %lu, \"total_size\": %lu }%s\n",
-					ssa->ssa_Size - sizeof(*ssa), ssa->ssa_Size,
-					ssa->ssa_MinNode.mln_Succ->mln_Succ != NULL ? "," : "");
+				const struct SlabSingleAllocation * ssa;
+
+				print(&ct,"\t\"single_allocations\": [\n");
+
+				for(ssa = (struct SlabSingleAllocation *)__slab_data.sd_SingleAllocations.mlh_Head ;
+				    ssa->ssa_MinNode.mln_Succ != NULL ;
+				    ssa = (struct SlabSingleAllocation *)ssa->ssa_MinNode.mln_Succ)
+				{
+					print(&ct,"\t\t{ \"size\": %lu, \"total_size\": %lu }%s\n",
+						ssa->ssa_Size - sizeof(*ssa), ssa->ssa_Size,
+						ssa->ssa_MinNode.mln_Succ->mln_Succ != NULL ? "," : "");
+				}
+
+				print(&ct,"\t],\n");
+			}
+			else
+			{
+				print(&ct,"\t\"single_allocations\": [],\n");
 			}
 
-			print(&ct,"\t],\n");
-		}
-		else
-		{
-			print(&ct,"\t\"single_allocations\": [],\n");
-		}
-
-		for(i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
-		{
-			for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
-			    sn->sn_MinNode.mln_Succ != NULL ;
-			    sn = (struct SlabNode *)sn->sn_MinNode.mln_Succ)
-			{
-				if (sn->sn_UseCount == 0)
-					num_empty_slabs++;
-				else if (sn->sn_UseCount == sn->sn_Count)
-					num_full_slabs++;
-
-				num_slabs++;
-
-				slab_allocation_size += sn->sn_ChunkSize * sn->sn_UseCount;
-				total_slab_allocation_size += sizeof(*sn) + __slab_data.sd_StandardSlabSize;
-			}
-		}
-
-		print(&ct,"\t\"num_slabs\": %zu,\n", num_slabs);
-		print(&ct,"\t\"num_empty_slabs\": %zu,\n", num_empty_slabs);
-		print(&ct,"\t\"num_full_slabs\": %zu,\n", num_full_slabs);
-		print(&ct,"\t\"slab_allocation_size\": %zu,\n", slab_allocation_size);
-		print(&ct,"\t\"total_slab_allocation_size\": %zu,\n", total_slab_allocation_size);
-
-		if(num_slabs > 0)
-		{
-			const char * eol = "";
-
-			print(&ct,"\t\"slabs\": [\n");
-
-			for(i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) && ct.status == 0 ; i++)
+			for(i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
 			{
 				for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
-				    sn->sn_MinNode.mln_Succ != NULL && ct.status == 0 ;
+				    sn->sn_MinNode.mln_Succ != NULL ;
 				    sn = (struct SlabNode *)sn->sn_MinNode.mln_Succ)
 				{
-					print(&ct,"%s\t\t{ \"size\": %lu, \"chunks\": %lu, \"chunks_in_use\": %lu, \"times_reused\": %lu }",
-						eol,
-						sn->sn_ChunkSize,
-						sn->sn_Count,
-						sn->sn_UseCount,
-						sn->sn_NumReused);
+					if (sn->sn_UseCount == 0)
+						num_empty_slabs++;
+					else if (sn->sn_UseCount == sn->sn_Count)
+						num_full_slabs++;
 
-					eol = ",\n";
+					num_slabs++;
+
+					slab_allocation_size += sn->sn_ChunkSize * sn->sn_UseCount;
+					total_slab_allocation_size += sizeof(*sn) + __slab_data.sd_StandardSlabSize;
 				}
 			}
 
-			print(&ct,"\n\t]\n");
-		}
-		else
-		{
-			print(&ct,"\t\"slabs\": []\n");
-		}
+			print(&ct,"\t\"num_slabs\": %zu,\n", num_slabs);
+			print(&ct,"\t\"num_empty_slabs\": %zu,\n", num_empty_slabs);
+			print(&ct,"\t\"num_full_slabs\": %zu,\n", num_full_slabs);
+			print(&ct,"\t\"slab_allocation_size\": %zu,\n", slab_allocation_size);
+			print(&ct,"\t\"total_slab_allocation_size\": %zu,\n", total_slab_allocation_size);
 
-		print(&ct,"}\n");
+			if(num_slabs > 0)
+			{
+				const char * eol = "";
+	
+				print(&ct,"\t\"slabs\": [\n");
+	
+				for(i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
+				{
+					for(sn = (struct SlabNode *)__slab_data.sd_Slabs[i].mlh_Head ;
+					    sn->sn_MinNode.mln_Succ != NULL ;
+					    sn = (struct SlabNode *)sn->sn_MinNode.mln_Succ)
+					{
+						print(&ct,"%s\t\t{ \"size\": %lu, \"chunks\": %lu, \"chunks_in_use\": %lu, \"times_reused\": %lu, \"empty_decay\": %lu }",
+							eol,
+							sn->sn_ChunkSize,
+							sn->sn_Count,
+							sn->sn_UseCount,
+							sn->sn_NumReused,
+							sn->sn_EmptyDecay);
+	
+						eol = ",\n";
+					}
+				}
+	
+				print(&ct,"\n\t]\n");
+			}
+			else
+			{
+				print(&ct,"\t\"slabs\": []\n");
+			}
+	
+			print(&ct,"}\n");
+		}
 
 		__memory_unlock();
 	}
