@@ -1,3 +1,37 @@
+c.lib 1.213 (4.12.2016)
+
+- Added the __decay_unused_slabs() function which brings all currently
+  empty slabs which are still protected from reuse closer to getting
+  reused or released.
+
+- The slab-test program now exercises the memory allocation functions
+  to a greater degree. Memory is allocated in random chunk sizes,
+  the allocations are resized (to other random chunk sizes),
+  33% of all allocations are randomly freed, empty slabs readied for
+  reuse then discarded. The output in JSON format now shows a bit
+  more information as to what is being done.
+
+- Rewrote __get_slab_stats() to use setjmp() and longjmp() in the
+  print() callback invocation.
+  
+- __get_slab_stats() now reports how many times a slab was reused
+  after having stuck around in the "empty slab" list.
+  
+- Changing the slab size through an environment variable is now
+  a feature of the debug build.
+
+- Small changes to allow the library to be built with SAS/C again.
+  This includes adding code to disable/re-enable profiling,
+  fixing "stdlib_profile.h" and updating the smakefiles.
+
+- Still not sure what it does, but _CXV45 now sits along with _CX25
+  and _CX35 in "sas_cxv.asm". "sas_cxv54.asm" is not needed any
+  more.
+
+- Found the last use of MEMF_PRIVATE which should have been compiled
+  only for the OS4 version.
+
+
 c.lib 1.212 (27.11.2016)
 
 - Unused slabs which get recycled are no longer reinitialized from
