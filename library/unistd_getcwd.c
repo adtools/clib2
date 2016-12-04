@@ -184,7 +184,6 @@ __getcwd(char * buffer,size_t buffer_size,const char *file,int line)
 			if(__unix_path_semantics)
 			{
 				const char * path_name = buffer;
-				size_t len;
 
 				if(__translate_amiga_to_unix_path_name(&path_name,&buffer_nti) != 0)
 					goto out;
