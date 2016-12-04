@@ -147,56 +147,73 @@ __allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_nam
 	#if defined(__USE_SLAB_ALLOCATOR)
 	{
 		/* Are we using the slab allocator? */
-		if (__slab_data.sd_InUse)
+		if(__slab_data.sd_InUse)
 		{
 			mn = __slab_allocate(allocation_size);
 		}
-		else if (__memory_pool != NULL)
-		{
-			mn = AllocPooled(__memory_pool,allocation_size);
-		}
 		else
 		{
-			#ifdef __MEM_DEBUG
+			if (__memory_pool != NULL)
 			{
-				mn = AllocMem(allocation_size,MEMF_ANY);
+				PROFILE_OFF();
+				mn = AllocPooled(__memory_pool,allocation_size);
+				PROFILE_ON();
 			}
-			#else
+			else
 			{
-				struct MinNode * mln;
-
-				mln = AllocMem(sizeof(*mln) + allocation_size,MEMF_ANY);
-				if(mln != NULL)
+				#ifdef __MEM_DEBUG
 				{
-					AddTail((struct List *)&__memory_list,(struct Node *)mln);
-
-					mn = (struct MemoryNode *)&mln[1];
+					PROFILE_OFF();
+					mn = AllocMem(allocation_size,MEMF_ANY);
+					PROFILE_ON();
 				}
-				else
+				#else
 				{
-					mn = NULL;
+					struct MinNode * mln;
+
+					PROFILE_OFF();
+					mln = AllocMem(sizeof(*mln) + allocation_size,MEMF_ANY);
+					PROFILE_ON();
+
+					if(mln != NULL)
+					{
+						AddTail((struct List *)&__memory_list,(struct Node *)mln);
+
+						mn = (struct MemoryNode *)&mln[1];
+					}
+					else
+					{
+						mn = NULL;
+					}
 				}
+				#endif /* __MEM_DEBUG */
 			}
-			#endif /* __MEM_DEBUG */
 		}
 	}
 	#else
 	{
 		if(__memory_pool != NULL)
 		{
+			PROFILE_OFF();
 			mn = AllocPooled(__memory_pool,allocation_size);
+			PROFILE_ON();
 		}
 		else
 		{
 			#ifdef __MEM_DEBUG
 			{
+				PROFILE_OFF();
 				mn = AllocMem(allocation_size,MEMF_ANY);
+				PROFILE_ON();
 			}
 			#else
 			{
 				struct MinNode * mln;
 
+				PROFILE_OFF();
 				mln = AllocMem(sizeof(*mln) + allocation_size,MEMF_ANY);
+				PROFILE_ON();
+
 				if(mln != NULL)
 				{
 					AddTail((struct List *)&__memory_list,(struct Node *)mln);
@@ -355,8 +372,12 @@ static struct SignalSemaphore * memory_semaphore;
 void
 __memory_lock(void)
 {
+	PROFILE_OFF();
+
 	if(memory_semaphore != NULL)
 		ObtainSemaphore(memory_semaphore);
+
+	PROFILE_ON();
 }
 
 /****************************************************************************/
@@ -364,8 +385,12 @@ __memory_lock(void)
 void
 __memory_unlock(void)
 {
+	PROFILE_OFF();
+
 	if(memory_semaphore != NULL)
 		ReleaseSemaphore(memory_semaphore);
+
+	PROFILE_ON();
 }
 
 /****************************************************************************/
@@ -503,7 +528,7 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 	#if defined(__USE_SLAB_ALLOCATOR)
 	{
 		/* ZZZ this is just for the purpose of testing */
-		#if 1
+		#if DEBUG
 		{
 			TEXT slab_size_var[20];
 
