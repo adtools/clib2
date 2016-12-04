@@ -262,9 +262,8 @@ STATIC VOID
 _SetValue(struct Environment * env,struct NexxStr * value,struct Node * symbol_table_node)
 {
 	STATIC CONST UWORD code[] = { 0x4EAE,0xFFAC,0x4E75 }; /* jsr -84(a6) ; rts */
-	struct Node * result;
 
-	result = (struct Node *)EmulateTags(code,
+	EmulateTags(code,
 		ET_RegisterA0,env,
 		ET_RegisterA1,value,
 		ET_RegisterD0,symbol_table_node,
