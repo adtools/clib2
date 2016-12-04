@@ -77,6 +77,8 @@ main(int argc,char ** argv)
 	long n,r;
 	char time_buffer[100];
 
+	free(malloc(4));
+
 	for(i = 0 ; i < argc ; i++)
 		printf("%2d) \"%s\"\n",i,argv[i]);
 
