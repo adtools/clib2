@@ -85,6 +85,8 @@ __slab_allocate(size_t allocation_size)
 		/* No integer overflow? */
 		if(allocation_size < total_single_allocation_size)
 		{
+			PROFILE_OFF();
+
 			#if defined(__amigaos4__)
 			{
 				ssa = AllocMem(total_single_allocation_size,MEMF_PRIVATE);
@@ -94,6 +96,8 @@ __slab_allocate(size_t allocation_size)
 				ssa = AllocMem(total_single_allocation_size,MEMF_ANY);
 			}
 			#endif /* __amigaos4__ */
+
+			PROFILE_ON();
 		}
 		/* Integer overflow has occured. */
 		else
@@ -203,6 +207,9 @@ __slab_allocate(size_t allocation_size)
 
 						/* Pull it out of the list of slabs available for reuse. */
 						Remove((struct Node *)&sn->sn_EmptyLink);
+
+						sn->sn_EmptyDecay = 0;
+						sn->sn_NumReused++;
 					}
 
 					sn->sn_UseCount++;
@@ -272,6 +279,8 @@ __slab_allocate(size_t allocation_size)
 
 						D(("reusing a slab"));
 
+						sn->sn_NumReused++;
+
 						new_sn = sn;
 						break;
 					}
@@ -284,6 +293,8 @@ __slab_allocate(size_t allocation_size)
 				{
 					D(("no slab is available for reuse; allocating a new slab (%lu bytes)",sizeof(*new_sn) + __slab_data.sd_StandardSlabSize));
 
+					PROFILE_OFF();
+
 					#if defined(__amigaos4__)
 					{
 						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize,MEMF_PRIVATE);
@@ -293,6 +304,8 @@ __slab_allocate(size_t allocation_size)
 						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize,MEMF_ANY);
 					}
 					#endif /* __amigaos4__ */
+
+					PROFILE_ON();
 
 					if(new_sn == NULL)
 						D(("slab allocation failed"));
@@ -354,8 +367,6 @@ __slab_allocate(size_t allocation_size)
 					/* This slab was reused and need not be reinitialized from scratch. */
 					else
 					{
-						new_sn->sn_NumReused++;
-
 						assert( new_sn->sn_FreeList.mlh_Head != NULL );
 						assert( new_sn->sn_ChunkSize == chunk_size );
 						assert( new_sn->sn_Count == 0 );
@@ -409,7 +420,9 @@ __slab_allocate(size_t allocation_size)
 							/* Unlink from list of slabs of the same size. */
 							Remove((struct Node *)sn);
 
+							PROFILE_OFF();
 							FreeVec(sn);
+							PROFILE_ON();
 
 							total_purged += sizeof(*sn) + __slab_data.sd_StandardSlabSize;
 
@@ -509,7 +522,10 @@ __slab_free(void * address,size_t allocation_size)
 		assert( size <= __slab_data.sd_TotalSingleAllocationSize );
 
 		Remove((struct Node *)ssa);
+
+		PROFILE_OFF();
 		FreeMem(ssa, size);
+		PROFILE_ON();
 
 		__slab_data.sd_NumSingleAllocations--;
 		__slab_data.sd_TotalSingleAllocationSize -= size;
@@ -804,7 +820,9 @@ __slab_exit(void)
 				total_slab_size += sizeof(*sn) + __slab_data.sd_StandardSlabSize;
 				slab_count++;
 
+				PROFILE_OFF();
 				FreeVec(sn);
+				PROFILE_ON();
 			}
 		}
 
@@ -830,7 +848,9 @@ __slab_exit(void)
 			total_single_allocation_size += ssa->ssa_Size;
 			single_allocation_count++;
 
+			PROFILE_OFF();
 			FreeMem(ssa, ssa->ssa_Size);
+			PROFILE_ON();
 		}
 
 		if(single_allocation_count > 0)
