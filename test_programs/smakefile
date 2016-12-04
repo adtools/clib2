@@ -1,6 +1,4 @@
 #
-# $Id: smakefile,v 1.9 2006-01-02 13:11:39 obarthel Exp $
-#
 # :ts=8
 #
 
@@ -9,6 +7,10 @@
 .c.o:
 	@echo "Compiling $<"
 	@sc nover $(CFLAGS) $<
+
+.c.mo:
+	@echo "Compiling $<"
+	@sc nover $(CFLAGS) objname=$*.mo math=IEEE $<
 
 .asm.o:
 	@echo "Assembling $<"
@@ -19,30 +21,31 @@
 # You might want to change this to the directory where your operating system
 # header files are stored. On my system, that's "V:include", but you might
 # get lucky with "sc:include" instead, which is the default for SAS/C.
-INCLUDE_DIR = V:include
-#INCLUDE_DIR = sc:include
+#INCLUDE_DIR = V:include
+INCLUDE_DIR = sc:include
 
 ##############################################################################
 
 # This is where the header files, the startup code and the c.lib files are
 # stored; see below how this prefix is used.
-LIB = /library/
+LIB = /library
+
+STARTUP = $(LIB)/startup.o
+LIBS = $(LIB)/amiga.lib $(LIB)/c.lib $(LIB)/debug.lib
+MATH_LIBS = $(LIB)/math.lib $(LIBS)
 
 ##############################################################################
 
  OPTIMIZE	= optimize opttime optschedule optinline 
 #DEBUG		= debug=line noopt define=CHECK_FOR_NULL_POINTERS
 #DEBUG		= debug=line
-#DEBUG		= debug=line define=NDEBUG
- DEBUG		= debug=sf noopt
+ DEBUG		= debug=line define=NDEBUG
+#DEBUG		= debug=sf noopt
 #DEBUG		= debug=sf noopt define=CHECK_FOR_NULL_POINTERS
 #PROFILE	= profile
  DATA		= data=faronly
 #CODE		= code=far
- CPU		= cpu=060
-MATH		= define=IEEE_FLOATING_POINT_SUPPORT math=IEEE
-SUPPORT		= define=UNIX_PATH_SEMANTICS define=SOCKET_SUPPORT define=USERGROUP_SUPPORT \
-		  define=__C_MACROS__
+ CPU		= cpu=030
 
 ##############################################################################
 
@@ -55,8 +58,9 @@ CFLAGS = \
 	nostackcheck \
 	stringmerge \
 	errorrexx \
-	$(PROFILE) $(OPTIMIZE) $(CODE) $(DATA) $(CPU) $(MATH) \
-	$(SUPPORT) $(DEBUG)
+	$(PROFILE) $(OPTIMIZE) $(CODE) $(DATA) $(CPU) $(DEBUG) \
+	math=ieee \
+	define=VERBOSE
 
 AFLAGS = \
 	-d -m2
@@ -68,19 +72,23 @@ all: \
 	test fgets_test iotest sscanf_test printf_test sprintf_test \
 	stack_size_test translate_test strtok_test uname simple \
 	fstat_stdout_test simple_sprintf date_test factorial \
+	execvp_test setlocale rand fstat_test base_dir_nametest \
+	malloc-test slab-test \
 	cleanup
 
 clean:
-	-delete \#?.o \#?.map \
+	-delete \#?.o \#?.mo \#?.map \
 		test fgets_test iotest sscanf_test printf_test sprintf_test \
 		stack_size_test translate_test strtok_test uname simple \
-		simple_sprintf date_test factorial
+		fstat_stdout_test simple_sprintf date_test factorial \
+		execvp_test setlocale rand fstat_test base_dir_nametest \
+		malloc-test slab-test
 
 ##############################################################################
 
 setup:
 	@echo "Setting up include: assignment"
-	@assign include: $(LIB)include V:include
+	@assign include: $(LIB)/include $(INCLUDE_DIR)
 
 cleanup:
 	@echo "Cleaning up include: assignment"
@@ -90,77 +98,112 @@ cleanup:
 
 test: test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 date_test: date_test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o date_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 fgets_test: fgets_test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o fgets_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 strtok_test: strtok_test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o strtok_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 iotest: iotest.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o iotest.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
-sscanf_test: sscanf_test.o
+sscanf_test: sscanf_test.mo
 	@echo "Linking $@"
-	@slink $(LIB)startup.o sscanf_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.mo to $@ lib $(MATH_LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
-printf_test: printf_test.o
+printf_test: printf_test.mo
 	@echo "Linking $@"
-	@slink $(LIB)startup.o printf_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.mo to $@ lib $(MATH_LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 sprintf_test: sprintf_test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o sprintf_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 stack_size_test: stack_size_test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o stack_size_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 translate_test: translate_test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o translate_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIB)/unix.lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 uname: uname.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o uname.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 simple: simple.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o simple.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 fstat_stdout_test: fstat_stdout_test.o
 	@echo "Linking $@"
-	@slink $(LIB)startup.o fstat_stdout_test.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 simple_sprintf: simple_sprintf.o
 	@echo "Linking $@"
-	@slink simple_sprintf.o to $@ lib $(LIB)c.lib addsym \
+	@slink $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
-factorial: factorial.o
+factorial: factorial.mo
 	@echo "Linking $@"
-	@slink $(LIB)startup.o factorial.o to $@ lib $(LIB)c.lib addsym \
+	@slink $(STARTUP) $*.mo to $@ lib $(MATH_LIBS) addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+execvp_test: execvp_test.o
+	@echo "Linking $@"
+	@slink $(STARTUP) $*.o to $@ lib $(LIB)/unix.lib $(LIBS) addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+setlocale: setlocale.o
+	@echo "Linking $@"
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+rand: rand.o
+	@echo "Linking $@"
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+fstat_test: fstat_test.o
+	@echo "Linking $@"
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+base_dir_nametest: base_dir_nametest.o
+	@echo "Linking $@"
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+malloc-test: malloc-test.mo
+	@echo "Linking $@"
+	@slink $(STARTUP) $*.mo to $@ lib $(MATH_LIBS) addsym \
+		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
+
+slab-test: slab-test.o
+	@echo "Linking $@"
+	@slink $(STARTUP) $*.o to $@ lib $(LIBS) addsym \
 		map $@.map,fhx fwidth 32 pwidth 32 swidth 32
 
 ##############################################################################
