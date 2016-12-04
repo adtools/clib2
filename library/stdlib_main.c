@@ -117,8 +117,19 @@ call_main(void)
 			struct Process * this_process = (struct Process *)FindTask(NULL);
 			UBYTE * arg_str = GetArgStr();
 			size_t arg_str_len = strlen(arg_str);
-			UBYTE * arg_str_copy = AllocVec(arg_str_len+1,MEMF_PRIVATE);
+			UBYTE * arg_str_copy;
 			UBYTE current_dir_name[256];
+
+			#if defined(__amigaos4__)
+			{
+				arg_str_copy = AllocVec(arg_str_len+1,MEMF_PRIVATE);
+			}
+			#else
+			{
+				arg_str_copy = AllocVec(arg_str_len+1,MEMF_ANY);
+			}
+			#endif /* __amigaos4__ */
+
 
 			if(arg_str_copy != NULL && NameFromLock(this_process->pr_CurrentDir,current_dir_name,sizeof(current_dir_name)))
 			{
