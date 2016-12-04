@@ -374,44 +374,57 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 	#if defined(__USE_SLAB_ALLOCATOR)
 	{
 		/* Are we using the slab allocator? */
-		if (__slab_data.sd_InUse)
+		if(__slab_data.sd_InUse)
 		{
 			__slab_free(mn,allocation_size);
 		}
-		else if (__memory_pool != NULL)
-		{
-			FreePooled(__memory_pool,mn,allocation_size);
-		}
 		else
 		{
-			#if defined(__MEM_DEBUG)
+			if(__memory_pool != NULL)
 			{
-				FreeMem(mn,allocation_size);
+				PROFILE_OFF();
+				FreePooled(__memory_pool,mn,allocation_size);
+				PROFILE_ON();
 			}
-			#else
+			else
 			{
-				struct MinNode * mln = (struct MinNode *)mn;
+				#if defined(__MEM_DEBUG)
+				{
+					PROFILE_OFF();
+					FreeMem(mn,allocation_size);
+					PROFILE_ON();
+				}
+				#else
+				{
+					struct MinNode * mln = (struct MinNode *)mn;
 
-				mln--;
+					mln--;
 
-				Remove((struct Node *)mln);
+					Remove((struct Node *)mln);
 
-				FreeMem(mln,sizeof(*mln) + allocation_size);
+					PROFILE_OFF();
+					FreeMem(mln,sizeof(*mln) + allocation_size);
+					PROFILE_ON();
+				}
+				#endif /* __MEM_DEBUG */
 			}
-			#endif /* __MEM_DEBUG */
 		}
 	}
 	#else
 	{
-		if (__memory_pool != NULL)
+		if(__memory_pool != NULL)
 		{
+			PROFILE_OFF();
 			FreePooled(__memory_pool,mn,allocation_size);
+			PROFILE_ON();
 		}
 		else
 		{
 			#if defined(__MEM_DEBUG)
 			{
+				PROFILE_OFF();
 				FreeMem(mn,allocation_size);
+				PROFILE_ON();
 			}
 			#else
 			{
@@ -421,7 +434,9 @@ remove_and_free_memory_node(struct MemoryNode * mn)
 
 				Remove((struct Node *)mln);
 
+				PROFILE_OFF();
 				FreeMem(mln,sizeof(*mln) + allocation_size);
+				PROFILE_ON();
 			}
 			#endif /* __MEM_DEBUG */
 		}

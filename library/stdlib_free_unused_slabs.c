@@ -72,7 +72,9 @@ __free_unused_slabs(void)
 			/* Unlink from list of slabs of the same size. */
 			Remove((struct Node *)sn);
 
+			PROFILE_OFF();
 			FreeVec(sn);
+			PROFILE_ON();
 		}
 
 		__memory_unlock();

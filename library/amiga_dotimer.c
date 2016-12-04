@@ -79,6 +79,8 @@ DoTimer(struct timeval *tv,LONG unit,LONG command)
 	struct MsgPort * mp;
 	LONG error;
 
+	PROFILE_OFF();
+
 	assert( tv != NULL );
 
 	#if defined(__amigaos4__)
@@ -129,13 +131,9 @@ DoTimer(struct timeval *tv,LONG unit,LONG command)
 	tr->tr_time.tv_secs		= tv->tv_secs;
 	tr->tr_time.tv_micro	= tv->tv_micro;
 
-	PROFILE_OFF();
-
 	SetSignal(0,(1UL << mp->mp_SigBit));
 
 	error = DoIO((struct IORequest *)tr);
-
-	PROFILE_ON();
 
 	tv->tv_secs		= tr->tr_time.tv_secs;
 	tv->tv_micro	= tr->tr_time.tv_micro;
@@ -160,6 +158,8 @@ DoTimer(struct timeval *tv,LONG unit,LONG command)
 		FreeVec(mp);
 	}
 	#endif /* __amigaos4__ */
+
+	PROFILE_ON();
 
 	return(error);
 }
