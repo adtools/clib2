@@ -54,7 +54,8 @@ LOG_COMMAND := 2>&1 | tee -a compiler.log
 
 WARNINGS := \
 	-Wall -W -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
-	-Wundef -Wbad-function-cast -Wmissing-declarations -Wunused -Wwrite-strings
+	-Wundef -Wbad-function-cast -Wmissing-declarations -Wunused -Wwrite-strings \
+	-Wno-deprecated-declarations \
 
 #	-Wconversion -Wshadow
 
