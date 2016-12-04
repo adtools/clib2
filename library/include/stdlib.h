@@ -202,6 +202,21 @@ extern void __free_unused_slabs(void);
 /****************************************************************************/
 
 /*
+ * You can accelerate the reuse of currently unused slabs by calling
+ * the __decay_unused_slabs() function. Each call decrements the decay
+ * counter until it reaches 0, at which point an unused slab can be
+ * reused instead of allocating a new slab. Also, at 0 unused slabs
+ * will be freed by the allocator.
+ *
+ * Please note that this function works within the context of the memory
+ * allocation system and is not safe to call from interrupt code. It may
+ * break a Forbid() or Disable() condition.
+ */
+extern void __decay_unused_slabs(void);
+
+/****************************************************************************/
+
+/*
  * You can obtain runtime statistics about the slab allocator by
  * invoking the __get_slab_usage() function which in turn invokes
  * your callback function for each single slab currently in play.
