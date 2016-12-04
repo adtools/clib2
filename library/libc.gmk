@@ -212,6 +212,7 @@ C_LIB := \
 	stdlib_dosbase.o \
 	stdlib_exit.o \
 	stdlib_free.o \
+	stdlib_decay_unused_slabs.o \
 	stdlib_free_unused_slabs.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \

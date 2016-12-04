@@ -327,6 +327,7 @@ C_LIB = \
 	stdlib_exit.o \
 	stdlib_free.o \
 	stdlib_free_unused_slabs.o \
+	stdlib_decay_unused_slabs.o \
 	stdlib_getdefstacksize.o \
 	stdlib_getenv.o \
 	stdlib_getmemstats.o \
@@ -1141,6 +1142,8 @@ $(LIBC_OBJS)/stdlib_slab_purge_threshold.o : stdlib_slab_purge_threshold.c stdli
 $(LIBC_OBJS)/stdlib_get_slab_stats.o : stdlib_get_slab_stats.c stdlib_memory.h include/stdlib.h
 
 $(LIBC_OBJS)/stdlib_free_unused_slabs.o : stdlib_free_unused_slabs.c stdlib_memory.h include/stdlib.h
+
+$(LIBC_OBJS)/stdlib_decay_unused_slabs.o : stdlib_decay_unused_slabs.c stdlib_memory.h include/stdlib.h
 
 $(LIBC_OBJS)/stdlib_get_slab_usage.o : stdlib_get_slab_usage.c stdlib_memory.h include/stdlib.h
 
