@@ -1,7 +1,7 @@
 #
 # $Id: libamiga.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
 #
-# :ts=8
+# vim:ts=8 ft=make:
 #
 # -*- mode: makefile; -*-
 
@@ -19,39 +19,8 @@ LIBS += \
 
 ##############################################################################
 
-AMIGA_LIB = \
-	amiga.lib_rev.o \
-	amiga_acrypt.o \
-	amiga_addtof.o \
-	amiga_argarraydone.o \
-	amiga_argarrayinit.o \
-	amiga_argint.o \
-	amiga_argstring.o \
-	amiga_beginio.o \
-	amiga_callhooka.o \
-	amiga_coercemethod.o \
-	amiga_createextio.o \
-	amiga_createport.o \
-	amiga_createstdio.o \
-	amiga_createtask.o \
-	amiga_deleteextio.o \
-	amiga_deleteport.o \
-	amiga_deletestdio.o \
-	amiga_deletetask.o \
-	amiga_domethod.o \
-	amiga_dosupermethod.o \
-	amiga_dotimer.o \
-	amiga_fastrand.o \
-	amiga_freeievents.o \
-	amiga_hotkey.o \
-	amiga_invertstring.o \
-	amiga_newlist.o \
-	amiga_rangerand.o \
-	amiga_remtof.o \
-	amiga_rexxvars.o \
-	amiga_setsuperattrs.o \
-	amiga_timedelay.o \
-	amiga_waitbeam.o
+include libamiga.obj.gmk
+AMIGA_LIB = $(sort $(AMIGA_LIB_COMMON) $(AMIGA_LIB_OS4))
 
 ##############################################################################
 

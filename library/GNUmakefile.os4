@@ -1,7 +1,7 @@
 #
 # $Id: GNUmakefile.os4,v 1.116 2008-11-06 14:44:07 obarthel Exp $
 #
-# :ts=8
+# vim:ts=8 ft=make:
 #
 # -*- mode: makefile; -*-
 

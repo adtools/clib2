@@ -1,7 +1,7 @@
 #
 # $Id: libdebug.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
 #
-# :ts=8
+# vim:ts=8 ft=make:
 #
 # -*- mode: makefile; -*-
 
@@ -19,36 +19,7 @@ LIBS += \
 
 ##############################################################################
 
-DEBUG_LIB = \
-	debug.lib_rev.o \
-	debug.o \
-	debug_cmpstrexec.o \
-	debug_kcmpstr.o \
-	debug_kdofmt.o \
-	debug_kgetc.o \
-	debug_kgetch1.o \
-	debug_kgetch2.o \
-	debug_kgetchar1.o \
-	debug_kgetchar2.o \
-	debug_kgetnum1.o \
-	debug_kgetnum2.o \
-	debug_kmaygetch.o \
-	debug_kmaygetchar.o \
-	debug_kprintf1.o \
-	debug_kprintf2.o \
-	debug_kputc.o \
-	debug_kputch1.o \
-	debug_kputch2.o \
-	debug_kputchar1.o \
-	debug_kputchar2.o \
-	debug_kputfmt.o \
-	debug_kputs1.o \
-	debug_kputs2.o \
-	debug_kputstr1.o \
-	debug_kputstr2.o \
-	debug_kvprintf1.o \
-	debug_kvprintf2.o \
-	debug_level.o
+include libdebug.obj.gmk
 
 ##############################################################################
 

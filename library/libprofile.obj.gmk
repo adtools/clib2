@@ -1,0 +1,8 @@
+# vim:ts=8 ft=make:
+#
+# -*- mode: makefile; -*-
+
+PROFILE_LIB = \
+	profile__mcount.o \
+	profile_gmon.o \
+	profile_mcount.o

@@ -1,7 +1,7 @@
 #
 # $Id: libprofile.gmk,v 1.1 2006-09-17 17:37:27 obarthel Exp $
 #
-# :ts=8
+# vim:ts=8 ft=make:
 #
 # -*- mode: makefile; -*-
 
@@ -19,10 +19,7 @@ LIBS += \
 
 ##############################################################################
 
-PROFILE_LIB = \
-	profile__mcount.o \
-	profile_gmon.o \
-	profile_mcount.o
+include libprofile.obj.gmk
 
 ##############################################################################
 
