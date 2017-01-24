@@ -95,32 +95,45 @@ include libdebug.gmk
 include libamiga.gmk
 include libprofile.gmk
 
-all-targets: \
-	lib/crt0.o \
-	lib/small-data/crt0.o \
-	lib/soft-float/crt0.o \
-	lib/baserel/crt0.o \
-	lib/crtbegin.o \
-	lib/soft-float/crtbegin.o \
-	lib/small-data/crtbegin.o \
-	lib/baserel/crtbegin.o \
-	lib/crtend.o \
-	lib/soft-float/crtend.o \
-	lib/small-data/crtend.o \
-	lib/baserel/crtend.o \
-	lib.threadsafe/crt0.o \
-	lib.threadsafe/small-data/crt0.o \
-	lib.threadsafe/soft-float/crt0.o \
-	lib.threadsafe/baserel/crt0.o \
-	lib.threadsafe/crtbegin.o \
-	lib.threadsafe/soft-float/crtbegin.o \
-	lib.threadsafe/small-data/crtbegin.o \
-	lib.threadsafe/baserel/crtbegin.o \
-	lib.threadsafe/crtend.o \
-	lib.threadsafe/soft-float/crtend.o \
-	lib.threadsafe/small-data/crtend.o \
-	lib.threadsafe/baserel/crtend.o \
-	$(LIBS)
+##############################################################################
+
+# General build rules for all object files and the individual libraries
+
+define generic_rule
+
+LIBS += lib/$(1)crt0.o \
+	lib/$(1)crtbegin.o \
+	lib/$(1)crtend.o \
+	lib.threadsafe/$(1)crt0.o \
+	lib.threadsafe/$(1)crtbegin.o \
+	lib.threadsafe/$(1)crtend.o
+
+lib/$(1)%.o : AFLAGS += $(2)
+lib/$(1)%.o : %.S
+	@$$(ASSEMBLE)
+
+lib/$(1)%.o : CFLAGS += $(2)
+lib/$(1)%.o : %.c
+	@$$(COMPILE)
+
+lib.threadsafe/$(1)%.o : AFLAGS += $(THREADSAFE) $(2)
+lib.threadsafe/$(1)%.o : %.S
+	@$$(ASSEMBLE)
+
+lib.threadsafe/$(1)%.o : CFLAGS += $(THREADSAFE) $(2)
+lib.threadsafe/$(1)%.o : %.c
+	@$$(COMPILE)
+
+endef
+
+$(eval $(call generic_rule,,$(LARGEDATA)))
+$(eval $(call generic_rule,small-data/,$(SMALLDATA)))
+$(eval $(call generic_rule,soft-float/,$(SOFTFLOAT)))
+$(eval $(call generic_rule,baserel/,$(BASEREL)))
+
+##############################################################################
+
+all-targets: $(LIBS)
 
 ##############################################################################
 
@@ -155,66 +168,6 @@ version:
 # Tag all files with a certain version number
 cvs-tag:
 	cvs -q tag V1_`cat c.lib_rev.rev`
-
-##############################################################################
-
-# General build rules for all object files and the individual libraries
-
-lib/%.o : AFLAGS += $(LARGEDATA)
-lib/%.o : %.S
-	@$(ASSEMBLE)
-
-lib/%.o : %.c
-	@$(COMPILE)
-
-lib/small-data/%.o : AFLAGS += $(SMALLDATA)
-lib/small-data/%.o : %.S
-	@$(ASSEMBLE)
-
-lib/small-data/%.o : %.c
-	@$(COMPILE)
-
-lib/soft-float/%.o : AFLAGS += $(SOFTFLOAT)
-lib/soft-float/%.o : %.S
-	@$(ASSEMBLE)
-
-lib/soft-float/%.o : %.c
-	@$(COMPILE)
-
-lib/baserel/%.o : AFLAGS += $(BASEREL)
-lib/baserel/%.o : %.S
-	@$(ASSEMBLE)
-
-lib/baserel/%.o : %.c
-	@$(COMPILE)
-
-lib.threadsafe/%.o : AFLAGS += $(LARGEDATA) $(THREADSAFE)
-lib.threadsafe/%.o : %.S
-	@$(ASSEMBLE)
-
-lib.threadsafe/%.o : %.c
-	@$(COMPILE)
-
-lib.threadsafe/small-data/%.o : AFLAGS += $(SMALLDATA) $(THREADSAFE)
-lib.threadsafe/small-data/%.o : %.S
-	@$(ASSEMBLE)
-
-lib.threadsafe/small-data/%.o : %.c
-	@$(COMPILE)
-
-lib.threadsafe/soft-float/%.o : AFLAGS += $(SOFTFLOAT) $(THREADSAFE)
-lib.threadsafe/soft-float/%.o : %.S
-	@$(ASSEMBLE)
-
-lib.threadsafe/soft-float/%.o : %.c
-	@$(COMPILE)
-
-lib.threadsafe/baserel/%.o : AFLAGS += $(BASEREL) $(THREADSAFE)
-lib.threadsafe/baserel/%.o : %.S
-	@$(ASSEMBLE)
-
-lib.threadsafe/baserel/%.o : %.c
-	@$(COMPILE)
 
 ##############################################################################
 

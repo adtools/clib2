@@ -7,90 +7,38 @@
 
 ##############################################################################
 
-LIBS += \
-	lib/libamiga.a \
-	lib/soft-float/libamiga.a \
-	lib/small-data/libamiga.a \
-	lib/baserel/libamiga.a \
-	lib.threadsafe/libamiga.a \
-	lib.threadsafe/soft-float/libamiga.a \
-	lib.threadsafe/small-data/libamiga.a \
-	lib.threadsafe/baserel/libamiga.a
-
-##############################################################################
-
 include libamiga.obj.gmk
 AMIGA_LIB = $(sort $(AMIGA_LIB_COMMON) $(AMIGA_LIB_OS4))
 
 ##############################################################################
 
+define libamiga_rule
+
+LIBS += lib/$(1).a lib.threadsafe/$(1).a
+
 # Dependencies to rebuild if the library version changes
+obj/$(1)/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj.threadsafe/$(1)/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
 
-obj/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
-obj/soft-float/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
-obj/small-data/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
-obj/baserel/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
-obj.threadsafe/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
-obj.threadsafe/soft-float/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
-obj.threadsafe/small-data/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
-obj.threadsafe/baserel/libamiga/amiga.lib_rev.o : amiga.lib_rev.c amiga.lib_rev.h
+obj/$(1)/%.o : CFLAGS += $(2)
+obj/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-##############################################################################
+obj.threadsafe/$(1)/%.o : CFLAGS += $(THREADSAFE) $(2)
+obj.threadsafe/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-obj/libamiga/%.o : CFLAGS += $(LARGEDATA)
-obj/libamiga/%.o : %.c
-	@$(COMPILE)
+lib/$(1).a : $$(addprefix obj/$(1)/,$$(AMIGA_LIB))
+	@$$(MAKELIB)
 
-obj/soft-float/libamiga/%.o : CFLAGS += $(SOFTFLOAT)
-obj/soft-float/libamiga/%.o : %.c
-	@$(COMPILE)
+lib.threadsafe/$(1).a : $$(addprefix obj.threadsafe/$(1)/,$$(AMIGA_LIB))
+	@$$(MAKELIB)
 
-obj/small-data/libamiga/%.o : CFLAGS += $(SMALLDATA)
-obj/small-data/libamiga/%.o : %.c
-	@$(COMPILE)
-
-obj/baserel/libamiga/%.o : CFLAGS += $(BASEREL)
-obj/baserel/libamiga/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/libamiga/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA)
-obj.threadsafe/libamiga/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/soft-float/libamiga/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT)
-obj.threadsafe/soft-float/libamiga/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/small-data/libamiga/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA)
-obj.threadsafe/small-data/libamiga/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/baserel/libamiga/%.o : CFLAGS += $(THREADSAFE) $(BASEREL)
-obj.threadsafe/baserel/libamiga/%.o : %.c
-	@$(COMPILE)
+endef
 
 ##############################################################################
 
-lib/libamiga.a : $(addprefix obj/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
-
-lib/soft-float/libamiga.a : $(addprefix obj/soft-float/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
-
-lib/small-data/libamiga.a : $(addprefix obj/small-data/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
-
-lib/baserel/libamiga.a : $(addprefix obj/baserel/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/libamiga.a : $(addprefix obj.threadsafe/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/soft-float/libamiga.a : $(addprefix obj.threadsafe/soft-float/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/small-data/libamiga.a : $(addprefix obj.threadsafe/small-data/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/baserel/libamiga.a : $(addprefix obj.threadsafe/baserel/libamiga/,$(AMIGA_LIB))
-	@$(MAKELIB)
+$(eval $(call libamiga_rule,libamiga,$(LARGEDATA)))
+$(eval $(call libamiga_rule,soft-float/libamiga,$(SOFTFLOAT)))
+$(eval $(call libamiga_rule,small-data/libamiga,$(SMALLDATA)))
+$(eval $(call libamiga_rule,baserel/libamiga,$(BASEREL)))

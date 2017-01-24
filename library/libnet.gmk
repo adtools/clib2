@@ -7,89 +7,41 @@
 
 ##############################################################################
 
-LIBS += \
-	lib/libnet.a \
-	lib/soft-float/libnet.a \
-	lib/small-data/libnet.a \
-	lib/baserel/libnet.a \
-	lib.threadsafe/libnet.a \
-	lib.threadsafe/soft-float/libnet.a \
-	lib.threadsafe/small-data/libnet.a \
-	lib.threadsafe/baserel/libnet.a
-
-##############################################################################
-
 include libnet.obj.gmk
 
 ##############################################################################
 
+define libnet_rule
+
+LIBS += lib/$(1).a lib.threadsafe/$(1).a
+
 # Dependencies to rebuild if the library version changes
+obj/$(1)/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj.threadsafe/$(1)/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
 
-obj/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
-obj/soft-float/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
-obj/small-data/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
-obj/baserel/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
-obj.threadsafe/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
-obj.threadsafe/soft-float/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
-obj.threadsafe/small-data/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
-obj.threadsafe/baserel/libnet/net.lib_rev.o : net.lib_rev.c net.lib_rev.h
+obj/$(1)/%.o : CFLAGS += $(2)
+obj/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-##############################################################################
+obj.threadsafe/$(1)/%.o : CFLAGS += $(THREADSAFE) $(2)
+obj.threadsafe/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-obj/libnet/%.o : CFLAGS += $(LARGEDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj/libnet/%.o : %.c
-	@$(COMPILE)
+lib/$(1).a : $$(addprefix obj/$(1)/,$$(NET_LIB))
+	@$$(MAKELIB)
 
-obj/soft-float/libnet/%.o : CFLAGS += $(SOFTFLOAT) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj/soft-float/libnet/%.o : %.c
-	@$(COMPILE)
+lib.threadsafe/$(1).a : $$(addprefix obj.threadsafe/$(1)/,$$(NET_LIB))
+	@$$(MAKELIB)
 
-obj/small-data/libnet/%.o : CFLAGS += $(SMALLDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj/small-data/libnet/%.o : %.c
-	@$(COMPILE)
-
-obj/baserel/libnet/%.o : CFLAGS += $(BASEREL) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj/baserel/libnet/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/libnet/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj.threadsafe/libnet/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/soft-float/libnet/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj.threadsafe/soft-float/libnet/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/small-data/libnet/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj.threadsafe/small-data/libnet/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/baserel/libnet/%.o : CFLAGS += $(THREADSAFE) $(BASEREL) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT
-obj.threadsafe/baserel/libnet/%.o : %.c
-	@$(COMPILE)
+endef
 
 ##############################################################################
 
-lib/libnet.a : $(addprefix obj/libnet/,$(NET_LIB))
-	@$(MAKELIB)
-
-lib/soft-float/libnet.a : $(addprefix obj/soft-float/libnet/,$(NET_LIB))
-	@$(MAKELIB)
-
-lib/small-data/libnet.a : $(addprefix obj/small-data/libnet/,$(NET_LIB))
-	@$(MAKELIB)
-
-lib/baserel/libnet.a : $(addprefix obj/baserel/libnet/,$(NET_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/libnet.a : $(addprefix obj.threadsafe/libnet/,$(NET_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/soft-float/libnet.a : $(addprefix obj.threadsafe/soft-float/libnet/,$(NET_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/small-data/libnet.a : $(addprefix obj.threadsafe/small-data/libnet/,$(NET_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/baserel/libnet.a : $(addprefix obj.threadsafe/baserel/libnet/,$(NET_LIB))
-	@$(MAKELIB)
+$(eval $(call libnet_rule,libnet, \
+	$(LARGEDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT))
+$(eval $(call libnet_rule,soft-float/libnet, \
+	 $(SOFTFLOAT) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT))
+$(eval $(call libnet_rule,small-data/libnet, \
+        $(SMALLDATA) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT))
+$(eval $(call libnet_rule,baserel/libnet, \
+        $(BASEREL) -I$(NET_INCLUDE) -DSOCKET_SUPPORT -DUSERGROUP_SUPPORT))

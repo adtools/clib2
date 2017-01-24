@@ -7,90 +7,37 @@
 
 ##############################################################################
 
-LIBS += \
-	lib/libdebug.a \
-	lib/soft-float/libdebug.a \
-	lib/small-data/libdebug.a \
-	lib/baserel/libdebug.a \
-	lib.threadsafe/libdebug.a \
-	lib.threadsafe/soft-float/libdebug.a \
-	lib.threadsafe/small-data/libdebug.a \
-	lib.threadsafe/baserel/libdebug.a
-
-##############################################################################
-
 include libdebug.obj.gmk
 
 ##############################################################################
 
+define libdebug_rule
+
+LIBS += lib/$(1).a lib.threadsafe/$(1).a
+
 # Dependencies to rebuild if the library version changes
+obj/$(1)/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj.threadsafe/$(1)/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
 
-obj/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
-obj/soft-float/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
-obj/small-data/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
-obj/baserel/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
-obj.threadsafe/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
-obj.threadsafe/soft-float/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
-obj.threadsafe/small-data/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
-obj.threadsafe/baserel/libdebug/debug.lib_rev.o : debug.lib_rev.c debug.lib_rev.h
+obj/$(1)/%.o : CFLAGS += $(2)
+obj/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-##############################################################################
+obj.threadsafe/$(1)/%.o : CFLAGS += $(THREADSAFE) $(2)
+obj.threadsafe/$(1)/%.o : %.c
+	@$$(COMPILE)
 
+lib/$(1).a : $$(addprefix obj/$(1)/,$$(DEBUG_LIB))
+	@$$(MAKELIB)
 
-obj/libdebug/%.o : CFLAGS += $(LARGEDATA)
-obj/libdebug/%.o : %.c
-	@$(COMPILE)
+lib.threadsafe/$(1).a : $$(addprefix obj.threadsafe/$(1)/,$$(DEBUG_LIB))
+	@$$(MAKELIB)
 
-obj/soft-float/libdebug/%.o : CFLAGS += $(SOFTFLOAT)
-obj/soft-float/libdebug/%.o : %.c
-	@$(COMPILE)
-
-obj/small-data/libdebug/%.o : CFLAGS += $(SMALLDATA)
-obj/small-data/libdebug/%.o : %.c
-	@$(COMPILE)
-
-obj/baserel/libdebug/%.o : CFLAGS += $(BASEREL)
-obj/baserel/libdebug/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/libdebug/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA)
-obj.threadsafe/libdebug/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/soft-float/libdebug/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT)
-obj.threadsafe/soft-float/libdebug/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/small-data/libdebug/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA)
-obj.threadsafe/small-data/libdebug/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/baserel/libdebug/%.o : CFLAGS += $(THREADSAFE) $(BASEREL)
-obj.threadsafe/baserel/libdebug/%.o : %.c
-	@$(COMPILE)
+endef
 
 ##############################################################################
 
-lib/libdebug.a : $(addprefix obj/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
-
-lib/soft-float/libdebug.a : $(addprefix obj/soft-float/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
-
-lib/small-data/libdebug.a : $(addprefix obj/small-data/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
-
-lib/baserel/libdebug.a : $(addprefix obj/baserel/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/libdebug.a : $(addprefix obj.threadsafe/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/soft-float/libdebug.a : $(addprefix obj.threadsafe/soft-float/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/small-data/libdebug.a : $(addprefix obj.threadsafe/small-data/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/baserel/libdebug.a : $(addprefix obj.threadsafe/baserel/libdebug/,$(DEBUG_LIB))
-	@$(MAKELIB)
+$(eval $(call libdebug_rule,libdebug,$(LARGEDATA)))
+$(eval $(call libdebug_rule,soft-float/libdebug,$(SOFTFLOAT)))
+$(eval $(call libdebug_rule,small-data/libdebug,$(SMALLDATA)))
+$(eval $(call libdebug_rule,baserel/libdebug,$(BASEREL)))

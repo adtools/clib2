@@ -7,90 +7,38 @@
 
 ##############################################################################
 
-LIBS += \
-	lib/libc.a \
-	lib/soft-float/libc.a \
-	lib/small-data/libc.a \
-	lib/baserel/libc.a \
-	lib.threadsafe/libc.a \
-	lib.threadsafe/soft-float/libc.a \
-	lib.threadsafe/small-data/libc.a \
-	lib.threadsafe/baserel/libc.a
-
-##############################################################################
-
 include libc.obj.gmk
 C_LIB := $(sort $(C_LIB_COMMON) $(C_LIB_OS4))
 
 ##############################################################################
 
+define libc_rule
+
+LIBS += lib/$(1).a lib.threadsafe/$(1).a
+
 # Dependencies to rebuild if the library version changes
+obj/$(1)/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj.threadsafe/$(1)/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
 
-obj/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
-obj/soft-float/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
-obj/small-data/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
-obj/baserel/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
-obj.threadsafe/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
-obj.threadsafe/soft-float/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
-obj.threadsafe/small-data/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
-obj.threadsafe/baserel/libc/c.lib_rev.o : c.lib_rev.c c.lib_rev.h
+obj/$(1)/%.o : CFLAGS += $(2)
+obj/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-##############################################################################
+obj.threadsafe/$(1)/%.o : CFLAGS += $(THREADSAFE) $(2)
+obj.threadsafe/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-obj/libc/%.o : CFLAGS += $(LARGEDATA)
-obj/libc/%.o : %.c
-	@$(COMPILE)
+lib/$(1).a : $$(addprefix obj/$(1)/,$$(C_LIB))
+	@$$(MAKELIB)
 
-obj/soft-float/libc/%.o : CFLAGS += $(SOFTFLOAT)
-obj/soft-float/libc/%.o : %.c
-	@$(COMPILE)
+lib.threadsafe/$(1).a : $$(addprefix obj.threadsafe/$(1)/,$$(C_LIB))
+	@$$(MAKELIB)
 
-obj/small-data/libc/%.o : CFLAGS += $(SMALLDATA)
-obj/small-data/libc/%.o : %.c
-	@$(COMPILE)
-
-obj/baserel/libc/%.o : CFLAGS += $(BASEREL)
-obj/baserel/libc/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/libc/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA)
-obj.threadsafe/libc/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/soft-float/libc/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT)
-obj.threadsafe/soft-float/libc/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/small-data/libc/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA)
-obj.threadsafe/small-data/libc/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/baserel/libc/%.o : CFLAGS += $(THREADSAFE) $(BASEREL)
-obj.threadsafe/baserel/libc/%.o : %.c
-	@$(COMPILE)
+endef
 
 ##############################################################################
 
-lib/libc.a : $(addprefix obj/libc/,$(C_LIB))
-	@$(MAKELIB)
-
-lib/soft-float/libc.a : $(addprefix obj/soft-float/libc/,$(C_LIB))
-	@$(MAKELIB)
-
-lib/small-data/libc.a : $(addprefix obj/small-data/libc/,$(C_LIB))
-	@$(MAKELIB)
-
-lib/baserel/libc.a : $(addprefix obj/baserel/libc/,$(C_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/libc.a : $(addprefix obj.threadsafe/libc/,$(C_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/soft-float/libc.a : $(addprefix obj.threadsafe/soft-float/libc/,$(C_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/small-data/libc.a : $(addprefix obj.threadsafe/small-data/libc/,$(C_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/baserel/libc.a : $(addprefix obj.threadsafe/baserel/libc/,$(C_LIB))
-	@$(MAKELIB)
+$(eval $(call libc_rule,libc,$(LARGEDATA)))
+$(eval $(call libc_rule,soft-float/libc,$(SOFTFLOAT)))
+$(eval $(call libc_rule,small-data/libc,$(SMALLDATA)))
+$(eval $(call libc_rule,baserel/libc,$(BASEREL)))

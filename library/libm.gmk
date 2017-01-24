@@ -7,90 +7,42 @@
 
 ##############################################################################
 
-LIBS += \
-	lib/libm.a \
-	lib/soft-float/libm.a \
-	lib/small-data/libm.a \
-	lib/baserel/libm.a \
-	lib.threadsafe/libm.a \
-	lib.threadsafe/soft-float/libm.a \
-	lib.threadsafe/small-data/libm.a \
-	lib.threadsafe/baserel/libm.a
-
-##############################################################################
-
 include libm.obj.gmk
 MATH_LIB := $(sort $(MATH_LIB_COMMON) $(MATH_LIB_OS4))
 
 ##############################################################################
 
+define libm_rule
+
+LIBS += lib/$(1).a lib.threadsafe/$(1).a
+
 # Dependencies to rebuild if the library version changes
+obj/$(1)/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
+obj.threadsafe/$(1)/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
 
-obj/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
-obj/soft-float/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
-obj/small-data/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
-obj/baserel/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
-obj.threadsafe/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
-obj.threadsafe/soft-float/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
-obj.threadsafe/small-data/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
-obj.threadsafe/baserel/libm/m.lib_rev.o : m.lib_rev.c m.lib_rev.h
+obj/$(1)/%.o : CFLAGS += $(2)
+obj/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-##############################################################################
+obj.threadsafe/$(1)/%.o : CFLAGS += $(THREADSAFE) $(2)
+obj.threadsafe/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-obj/libm/%.o : CFLAGS += $(LARGEDATA) -DPPC_FLOATING_POINT_SUPPORT
-obj/libm/%.o : %.c
-	@$(COMPILE)
+lib/$(1).a : $$(addprefix obj/$(1)/,$$(MATH_LIB))
+	@$$(MAKELIB)
 
-obj/soft-float/libm/%.o : CFLAGS += $(SOFTFLOAT)
-obj/soft-float/libm/%.o : %.c
-	@$(COMPILE)
+lib.threadsafe/$(1).a : $$(addprefix obj.threadsafe/$(1)/,$$(MATH_LIB))
+	@$$(MAKELIB)
 
-obj/small-data/libm/%.o : CFLAGS += $(SMALLDATA) -DPPC_FLOATING_POINT_SUPPORT
-obj/small-data/libm/%.o : %.c
-	@$(COMPILE)
-
-obj/baserel/libm/%.o : CFLAGS += $(BASEREL) -DPPC_FLOATING_POINT_SUPPORT
-obj/baserel/libm/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/libm/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA) -DPPC_FLOATING_POINT_SUPPORT
-obj.threadsafe/libm/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/soft-float/libm/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT)
-obj.threadsafe/soft-float/libm/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/small-data/libm/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA) -DPPC_FLOATING_POINT_SUPPORT
-obj.threadsafe/small-data/libm/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/baserel/libm/%.o : CFLAGS += $(THREADSAFE) $(BASEREL) -DPPC_FLOATING_POINT_SUPPORT
-obj.threadsafe/baserel/libm/%.o : %.c
-	@$(COMPILE)
+endef
 
 ##############################################################################
 
-lib/libm.a : $(addprefix obj/libm/,$(MATH_LIB))
-	@$(MAKELIB)
-
-lib/soft-float/libm.a : $(addprefix obj/soft-float/libm/,$(MATH_LIB))
-	@$(MAKELIB)
-
-lib/small-data/libm.a : $(addprefix obj/small-data/libm/,$(MATH_LIB))
-	@$(MAKELIB)
-
-lib/baserel/libm.a : $(addprefix obj/baserel/libm/,$(MATH_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/libm.a : $(addprefix obj.threadsafe/libm/,$(MATH_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/soft-float/libm.a : $(addprefix obj.threadsafe/soft-float/libm/,$(MATH_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/small-data/libm.a : $(addprefix obj.threadsafe/small-data/libm/,$(MATH_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/baserel/libm.a : $(addprefix obj.threadsafe/baserel/libm/,$(MATH_LIB))
-	@$(MAKELIB)
+$(eval $(call libm_rule,libm, \
+        $(LARGEDATA) -DPPC_FLOATING_POINT_SUPPORT))
+$(eval $(call libm_rule,soft-float/libm, \
+        $(SOFTFLOAT)))
+$(eval $(call libm_rule,small-data/libm, \
+        $(SMALLDATA) -DPPC_FLOATING_POINT_SUPPORT))
+$(eval $(call libm_rule,baserel/libm, \
+        $(BASEREL) -DPPC_FLOATING_POINT_SUPPORT))

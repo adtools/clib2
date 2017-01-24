@@ -7,91 +7,42 @@
 
 ##############################################################################
 
-LIBS += \
-	lib/libunix.a \
-	lib/soft-float/libunix.a \
-	lib/small-data/libunix.a \
-	lib/baserel/libunix.a \
-	lib.threadsafe/libunix.a \
-	lib.threadsafe/soft-float/libunix.a \
-	lib.threadsafe/small-data/libunix.a \
-	lib.threadsafe/baserel/libunix.a
-
-##############################################################################
-
 include libunix.obj.gmk
 UNIX_LIB := $(sort $(UNIX_LIB_COMMON) $(UNIX_LIB_OS4))
 
 ##############################################################################
 
+define libunix_rule
+
+LIBS += lib/$(1).a lib.threadsafe/$(1).a
+
 # Dependencies to rebuild if the library version changes
+obj/$(1)/unix.lib_rev.o : unix.lib_rev.c unix.lib_rev.h
+obj.threadsafe/$(1)/unix.lib_rev.o : unix.lib_rev.c unix.lib_rev.h
 
-obj/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
-obj/soft-float/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
-obj/small-data/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
-obj/baserel/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
-obj.threadsafe/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
-obj.threadsafe/soft-float/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
-obj.threadsafe/small-data/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
-obj.threadsafe/baserel/libunix/unit.lib_rev.o : unit.lib_rev.c unit.lib_rev.h
+obj/$(1)/%.o : CFLAGS += $(2)
+obj/$(1)/%.o : %.c
+	@$$(COMPILE)
 
-##############################################################################
+obj.threadsafe/$(1)/%.o : CFLAGS += $(THREADSAFE) $(2)
+obj.threadsafe/$(1)/%.o : %.c
+	@$$(COMPILE)
 
+lib/$(1).a : $$(addprefix obj/$(1)/,$$(UNIX_LIB))
+	@$$(MAKELIB)
 
-obj/libunix/%.o : CFLAGS += $(LARGEDATA) -DUNIX_PATH_SEMANTICS
-obj/libunix/%.o : %.c
-	@$(COMPILE)
+lib.threadsafe/$(1).a : $$(addprefix obj.threadsafe/$(1)/,$$(UNIX_LIB))
+	@$$(MAKELIB)
 
-obj/soft-float/libunix/%.o : CFLAGS += $(SOFTFLOAT) -DUNIX_PATH_SEMANTICS
-obj/soft-float/libunix/%.o : %.c
-	@$(COMPILE)
-
-obj/small-data/libunix/%.o : CFLAGS += $(SMALLDATA) -DUNIX_PATH_SEMANTICS
-obj/small-data/libunix/%.o : %.c
-	@$(COMPILE)
-
-obj/baserel/libunix/%.o : CFLAGS += $(BASEREL) -DUNIX_PATH_SEMANTICS
-obj/baserel/libunix/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/libunix/%.o : CFLAGS += $(THREADSAFE) $(LARGEDATA) -DUNIX_PATH_SEMANTICS
-obj.threadsafe/libunix/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/soft-float/libunix/%.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT) -DUNIX_PATH_SEMANTICS
-obj.threadsafe/soft-float/libunix/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/small-data/libunix/%.o : CFLAGS += $(THREADSAFE) $(SMALLDATA) -DUNIX_PATH_SEMANTICS
-obj.threadsafe/small-data/libunix/%.o : %.c
-	@$(COMPILE)
-
-obj.threadsafe/baserel/libunix/%.o : CFLAGS += $(THREADSAFE) $(BASEREL) -DUNIX_PATH_SEMANTICS
-obj.threadsafe/baserel/libunix/%.o : %.c
-	@$(COMPILE)
+endef
 
 ##############################################################################
 
-lib/libunix.a : $(addprefix obj/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
-
-lib/soft-float/libunix.a : $(addprefix obj/soft-float/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
-
-lib/small-data/libunix.a : $(addprefix obj/small-data/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
-
-lib/baserel/libunix.a : $(addprefix obj/baserel/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/libunix.a : $(addprefix obj.threadsafe/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/soft-float/libunix.a : $(addprefix obj.threadsafe/soft-float/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/small-data/libunix.a : $(addprefix obj.threadsafe/small-data/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
-
-lib.threadsafe/baserel/libunix.a : $(addprefix obj.threadsafe/baserel/libunix/,$(UNIX_LIB))
-	@$(MAKELIB)
+$(eval $(call libunix_rule,libunix, \
+        $(LARGEDATA) -DUNIX_PATH_SEMANTICS))
+$(eval $(call libunix_rule,soft-float/libunix, \
+        $(SOFTFLOAT) -DUNIX_PATH_SEMANTICS))
+$(eval $(call libunix_rule,small-data/libunix, \
+        $(SMALLDATA) -DUNIX_PATH_SEMANTICS))
+$(eval $(call libunix_rule,baserel/libunix, \
+        $(BASEREL) -DUNIX_PATH_SEMANTICS))
