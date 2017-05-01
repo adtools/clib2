@@ -1,3 +1,13 @@
+c.lib 1.214 (27.4.2017)
+
+- Added integer overflow test to calloc().
+
+- Tiny change in getopt_long() so that the value pointed to by longindex
+  is always initialized to an invalid index position (that being -1),
+  instead of 0. The value of 0 can break some shell commands, most notably
+  GNU wget.
+
+
 c.lib 1.213 (4.12.2016)
 
 - Added the __decay_unused_slabs() function which brings all currently

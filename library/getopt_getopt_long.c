@@ -296,7 +296,7 @@ static int getopt_long_internal(int argc, const char **argv, const char *optstri
 		optp = strchr(optstring, c);
 
 		/* We never find a long option in a compound option */
-		*longindex = 0;
+		*longindex = -1;
 
 		/* Check if it's legal */
 		if (c == ':' || (optp == NULL))
