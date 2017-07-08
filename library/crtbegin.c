@@ -1,5 +1,5 @@
 /*
- * $Id: crtbegin.c,v 1.13 2010-08-21 11:37:03 obarthel Exp $
+ * crtbegin.c
  *
  * :ts=4
  *
@@ -48,7 +48,12 @@
  * Dummy constructor and destructor array. The linker script will put these at the
  * very beginning of section ".ctors" and ".dtors". crtend.o contains a similar entry
  * with a NULL pointer entry and is put at the end of the sections. This way, the init
- * code can find the global constructor/destructor pointers
+ * code can find the global constructor/destructor pointers.
+ *
+ * WARNING:
+ * This hack does not work correctly with GCC 5 and higher. The optimizer
+ * will see a one element array and act appropriately. The current workaround
+ * is to use -fno-aggressive-loop-optimizations when compiling this file.
  */
 static void (*__CTOR_LIST__[1]) (void) __attribute__(( used, section(".ctors"), aligned(sizeof(void (*)(void))) ));
 static void (*__DTOR_LIST__[1]) (void) __attribute__(( used, section(".dtors"), aligned(sizeof(void (*)(void))) ));
