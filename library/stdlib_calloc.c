@@ -59,13 +59,25 @@ __calloc(size_t num_elements,size_t element_size,const char * file,int line)
 	}
 	#endif /* __MEM_DEBUG */
 
+	/* This might overflow. */
 	total_size = num_elements * element_size;
-
-	result = __malloc(total_size,file,line);
-	if(result != NULL)
-		memset(result,0,total_size);
+	
+	/* No arithmetic overflow? */
+	if(total_size >= num_elements)
+	{
+		result = __malloc(total_size,file,line);
+		if(result != NULL)
+			memset(result,0,total_size);
+		else
+			SHOWMSG("memory allocation failure");
+	}
+	/* Multiplying the number and size of elements overflows
+	 * the size_t range.
+	 */
 	else
-		SHOWMSG("memory allocation failure");
+	{
+		D(("calloc(num_elements=%ld, element_size=%ld) overflow"));
+	}
 
 	return(result);
 }
