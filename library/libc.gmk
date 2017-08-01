@@ -310,6 +310,7 @@ C_LIB := \
 	string_strncat.o \
 	string_strncmp.o \
 	string_strncpy.o \
+	string_strnlen.o \
 	string_strpbrk.o \
 	string_strrchr.o \
 	string_strspn.o \
