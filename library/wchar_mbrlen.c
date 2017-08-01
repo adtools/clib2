@@ -37,9 +37,12 @@
 
 /****************************************************************************/
 
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 size_t
 mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps)
 {
 	/* ZZZ unimplemented */
 	return(0);
 }
+#endif /* __STDC_VERSION__ && __STDC_VERSION__ >= 199901L */
+

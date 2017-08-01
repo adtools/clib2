@@ -81,7 +81,9 @@ typedef long mbstate_t;
 extern wint_t btowc(int c);
 extern int wctob(wint_t c);
 extern int mbsinit(const mbstate_t *ps);
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 extern size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
+#endif /* __STDC_VERSION__ && __STDC_VERSION__ >= 199901L */
 extern size_t wcrtomb(char *s, wchar_t wc, mbstate_t *ps);
 extern size_t mbsrtowcs(wchar_t *pwcs, const char **src, size_t n, mbstate_t *ps);
 extern size_t wcsrtombs(char *s, const wchar_t **src, size_t n, mbstate_t *ps);
