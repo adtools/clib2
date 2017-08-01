@@ -447,6 +447,11 @@ extern lldiv_t lldiv(long long n,long long d);
 
 /****************************************************************************/
 
+extern int mbtowc(wchar_t *restrict pwc, const char *restrict s, size_t n);
+extern int wctomb(char *s, wchar_t wchar);
+
+/****************************************************************************/
+
 #endif /* __GNUC__ || (__STDC_VERSION__ && __STDC_VERSION__ >= 199901L) */
 
 /****************************************************************************/

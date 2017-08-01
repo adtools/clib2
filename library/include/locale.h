@@ -59,6 +59,10 @@ extern "C" {
 
 /****************************************************************************/
 
+typedef void *locale_t;
+
+/****************************************************************************/
+
 struct lconv
 {
 	char *	decimal_point;		/* Decimal point character (non-monetary). */

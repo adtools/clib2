@@ -59,6 +59,10 @@
 #include <time.h>
 #endif /* _TIME_H */
 
+#ifndef _LOCALE_H
+#include <locale.h>
+#endif /* _LOCALE_H */
+
 /****************************************************************************/
 
 #ifdef __cplusplus
@@ -81,9 +85,6 @@ typedef long mbstate_t;
 extern wint_t btowc(int c);
 extern int wctob(wint_t c);
 extern int mbsinit(const mbstate_t *ps);
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
-extern size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
-#endif /* __STDC_VERSION__ && __STDC_VERSION__ >= 199901L */
 extern size_t wcrtomb(char *s, wchar_t wc, mbstate_t *ps);
 extern size_t mbsrtowcs(wchar_t *pwcs, const char **src, size_t n, mbstate_t *ps);
 extern size_t wcsrtombs(char *s, const wchar_t **src, size_t n, mbstate_t *ps);
@@ -178,13 +179,19 @@ extern size_t wcsftime(wchar_t *s, size_t maxsize, const wchar_t *format, const 
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 
+extern size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
+extern size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
+extern int mbsinit(const mbstate_t *ps);
+extern size_t mbsnrtowcs(wchar_t *restrict dst, const char **restrict src, size_t nmc, size_t len, mbstate_t *restrict ps);
+extern size_t mbsrtowcs(wchar_t *restrict dst, const char **restrict src, size_t len, mbstate_t *restrict ps);
+
+extern size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);extern int wcscoll_l(const wchar_t *ws1, const wchar_t *ws2, locale_t loc);
+extern size_t wcscspn(const wchar_t *ws1, const wchar_t *ws2);
+extern size_t wcsnrtombs(char *restrict dst, const wchar_t **restrict src, size_t nwc, size_t len, mbstate_t *restrict ps);
+extern wchar_t * wcsrchr(const wchar_t *ws, wchar_t wc);
+extern size_t wcsrtombs(char *restrict dst, const wchar_t **restrict src, size_t len, mbstate_t *restrict ps);
 extern long long wcstoll(const wchar_t *str, wchar_t **ptr, int base);
 extern unsigned long long wcstoull(const wchar_t *str, wchar_t **ptr, int base);
-
-extern size_t mbrtowc_l(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps, locale_t loc);
-extern int wcscoll_l(const wchar_t *ws1, const wchar_t *ws2, locale_t loc);
-extern size_t wcscspn(const wchar_t *ws1, const wchar_t *ws2);
-extern wchar_t * wcsrchr(const wchar_t *ws, wchar_t wc);
 
 #endif /* __STDC_VERSION__ && __STDC_VERSION__ >= 199901L */
 
