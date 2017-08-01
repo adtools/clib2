@@ -38,7 +38,7 @@
 /****************************************************************************/
 
 size_t
-mbrlen(wchar_t *pwc, const char * s, size_t n, mbstate_t *ps)
+mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps)
 {
 	/* ZZZ unimplemented */
 	return(0);
