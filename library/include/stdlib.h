@@ -48,7 +48,7 @@
 #endif /* _STDDEF_H */
 
 #ifndef _SYS_CLIB2_STDC_H
-#include <clib2_stdc.h>
+#include <sys/clib2_stdc.h>
 #endif /* _SYS_CLIB2_STDC_H */
 
 /****************************************************************************/
