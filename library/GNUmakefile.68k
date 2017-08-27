@@ -449,6 +449,7 @@ C_LIB = \
 	time_numbertostring.o \
 	time_strftime.o \
 	time_time.o \
+	time_tzset.o \
 	time_weekday.o \
 	uio_readv.o \
 	uio_writev.o \
