@@ -359,7 +359,7 @@ extern unsigned int (* __get_default_stack_size)(void);
 /*
  * This library falls back onto locale.library to perform string collation
  * in strcoll(), character conversion in toupper() and various other
- * functions. This may not your intention. To restrict the library to use
+ * functions. This may not be your intention. To restrict the library to use
  * only the "C" language locale, declare the following variable in your
  * code and set it to FALSE, so that it overrides the default settings.
  * The variable value is checked during program startup and, if set to
