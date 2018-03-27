@@ -37,7 +37,7 @@
 
 /****************************************************************************/
 
-wchar_t
+wchar_t *
 wcspbrk(const wchar_t *s, const wchar_t *set)
 {
 	/* ZZZ unimplemented */
