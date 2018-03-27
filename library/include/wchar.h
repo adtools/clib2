@@ -181,7 +181,7 @@ extern size_t wcsftime(wchar_t *s, size_t maxsize, const wchar_t *format, const 
 
 /****************************************************************************/
 
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) || defined(__cplusplus)
 
 extern size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
 extern size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
