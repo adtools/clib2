@@ -190,6 +190,7 @@ extern size_t mbsnrtowcs(wchar_t *restrict dst, const char **restrict src, size_
 extern size_t mbsrtowcs(wchar_t *restrict dst, const char **restrict src, size_t len, mbstate_t *restrict ps);
 
 extern size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);
+extern int wcscoll(const wchar_t *ws1, const wchar_t *ws2);
 extern int wcscoll_l(const wchar_t *ws1, const wchar_t *ws2, locale_t loc);
 extern size_t wcscspn(const wchar_t *ws1, const wchar_t *ws2);
 extern size_t wcsnrtombs(char *restrict dst, const wchar_t **restrict src, size_t nwc, size_t len, mbstate_t *restrict ps);
