@@ -37,9 +37,10 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 int
 iswalnum(wint_t c)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	return iswdigit(c) || iswalpha(c);
 }

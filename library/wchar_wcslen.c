@@ -37,9 +37,12 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 size_t
 wcslen(const wchar_t *s)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	const wchar_t *a;
+	for (a=s; *s; s++);
+	return s-a;
 }

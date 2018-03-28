@@ -40,6 +40,7 @@
 wchar_t *
 wcscpy(wchar_t *dest, const wchar_t *src)
 {
-	/* ZZZ unimplemented */
-	return(NULL);
+	wchar_t *a = dest;
+	while ((*dest++ = *src++));
+	return a;
 }

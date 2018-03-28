@@ -37,9 +37,11 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 int
 wmemcmp(const wchar_t *ptr1, const wchar_t *ptr2, size_t len)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	for (; len && *ptr1==*ptr2; len--, ptr1++, ptr2++);
+	return len ? *ptr1-*ptr2 : 0;
 }

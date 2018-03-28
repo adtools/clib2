@@ -37,9 +37,11 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 wchar_t *
 wmemchr(const wchar_t *ptr, wchar_t val, size_t len)
 {
-	/* ZZZ unimplemented */
-	return(NULL);
+	for (; len && *ptr != val; len--, ptr++);
+	return len ? (wchar_t *)ptr : 0;
 }

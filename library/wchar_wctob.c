@@ -40,6 +40,6 @@
 int
 wctob(wint_t c)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	if (c < 128U) return c;
+	return EOF;
 }
