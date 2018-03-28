@@ -168,7 +168,7 @@ extern int swprintf(wchar_t *s, const wchar_t *format, ...);
 
 extern int vfwprintf(FILE *stream,const wchar_t *format,va_list arg);
 extern int vwprintf(const wchar_t *format,va_list arg);
-extern int vswprintf(char *s, const wchar_t *format,va_list arg);
+extern int vswprintf(wchar_t *s, size_t maxlen, const wchar_t *format, va_list arg);
 
 /****************************************************************************/
 
