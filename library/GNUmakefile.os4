@@ -29,7 +29,11 @@ RANLIB := ppc-amigaos-ranlib
 COPY := cp -p
 DELETE := rm -rf
 MAKEDIR := mkdir -p
-LOG_COMMAND := 2>&1 | tee -a compiler.log
+# Enabling the LOG_COMMAND has the consequence that a rule will not
+# fail on an error because only the exit status from the tee command
+# will be considered
+#LOG_COMMAND := 2>&1 | tee -a compiler.log
+LOG_COMMAND :=
 # You may need to request a specific compiler version in order to
 # build the baserel versions of the library. At this time of
 # writing (2008-11-06) GCC 4.0.4 and below support the -mbaserel
