@@ -387,6 +387,7 @@ C_LIB := \
 	wchar_getwc.o \
 	wchar_getwchar.o \
 	wchar_mbrlen.o \
+	wchar_mbrtowc.o \
 	wchar_mbsinit.o \
 	wchar_mbsrtowcs.o \
 	wchar_putwc.o \
