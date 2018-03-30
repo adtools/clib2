@@ -61,7 +61,11 @@ extern "C" {
 
 typedef int ptrdiff_t;
 typedef unsigned int size_t;
+
+/* wchar_t is a built-in type in C++ */
+#ifndef __cplusplus
 typedef unsigned short wchar_t;
+#endif
 
 /****************************************************************************/
 
