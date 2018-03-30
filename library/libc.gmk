@@ -409,6 +409,7 @@ C_LIB := \
 	wchar_wcsncat.o \
 	wchar_wcsncmp.o \
 	wchar_wcsncpy.o \
+	wchar_wscoll.o \
 	wchar_wcspbrk.o \
 	wchar_wcsrtombs.o \
 	wchar_wcsspn.o \
