@@ -1,3 +1,11 @@
+c.lib 1.216 (xxx)
+
+- Add some wchar and multbyte-string related functions to allow gcc
+  building a libstdc++ library with wide char support. For now, the
+  functions are mostly stub ones only. They can be implemented on
+  demand.
+
+
 c.lib 1.215 (26.6.2017)
 
 - Added -fno-aggressive-loop-optimizations option when building crtbegin.c
