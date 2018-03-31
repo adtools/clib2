@@ -35,11 +35,14 @@
 #include <wctype.h>
 #endif /* _WCTYPE_HEADERS_H */
 
+#include <ctype.h>
+
 /****************************************************************************/
+
+/* Implementation based on musl */
 
 int
 iswblank(wint_t c)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	return isblank(c);
 }

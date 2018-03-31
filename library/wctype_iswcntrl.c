@@ -35,11 +35,12 @@
 #include <wctype.h>
 #endif /* _WCTYPE_HEADERS_H */
 
+#include <ctype.h>
+
 /****************************************************************************/
 
 int
 iswcntrl(wint_t c)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	return iscntrl(c);
 }

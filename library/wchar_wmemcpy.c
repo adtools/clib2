@@ -37,9 +37,12 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 wchar_t *
 wmemcpy(wchar_t *dest, const wchar_t *src, size_t len)
 {
-	/* ZZZ unimplemented */
-	return(NULL);
+	wchar_t *a = dest;
+	while (len--) *dest++ = *src++;
+	return a;
 }

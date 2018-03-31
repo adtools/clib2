@@ -234,6 +234,7 @@ C_LIB := \
 	stdlib_main_stub.o \
 	stdlib_malloc.o \
 	stdlib_math.o \
+	stdlib_mbtowc.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
@@ -374,7 +375,78 @@ C_LIB := \
 	unistd_unlink.o \
 	unistd_usleep.o \
 	utime_utime.o \
-	utsname_uname.o
+	utsname_uname.o \
+	wchar_btowc.o \
+	wchar_fgetwc.o \
+	wchar_fgetws.o \
+	wchar_fputwc.o \
+	wchar_fputws.o \
+	wchar_fwide.o \
+	wchar_fwprintf.o \
+	wchar_fwscanf.o \
+	wchar_getwc.o \
+	wchar_getwchar.o \
+	wchar_mbrlen.o \
+	wchar_mbrtowc.o \
+	wchar_mbsinit.o \
+	wchar_mbsrtowcs.o \
+	wchar_putwc.o \
+	wchar_putwchar.o \
+	wchar_swprintf.o \
+	wchar_swscanf.o \
+	wchar_ungetwc.o \
+	wchar_vfwprintf.o \
+	wchar_vswprintf.o \
+	wchar_vwprintf.o \
+	wchar_wcrtomb.o \
+	wchar_wcscat.o \
+	wchar_wcschr.o \
+	wchar_wcscmp.o \
+	wchar_wcscpy.o \
+	wchar_wcscspn.o \
+	wchar_wcsftime.o \
+	wchar_wcslen.o \
+	wchar_wcsncat.o \
+	wchar_wcsncmp.o \
+	wchar_wcsncpy.o \
+	wchar_wscoll.o \
+	wchar_wcspbrk.o \
+	wchar_wcsrtombs.o \
+	wchar_wcsspn.o \
+	wchar_wcstod.o \
+	wchar_wcstok.o \
+	wchar_wcstol.o \
+	wchar_wcstoll.o \
+	wchar_wcstoul.o \
+	wchar_wcstoull.o \
+	wchar_wcsxfrm.o \
+	wchar_wctob.o \
+	wchar_wmemchr.o \
+	wchar_wmemcmp.o \
+	wchar_wmemcpy.o \
+	wchar_wmemmove.o \
+	wchar_wmemset.o \
+	wchar_wprintf.o \
+	wchar_wscanf.o \
+	wchar_wscoll.o \
+	wctype_iswalnum.o \
+	wctype_iswalpha.o \
+	wctype_iswblank.o \
+	wctype_iswcntrl.o \
+	wctype_iswctype.o \
+	wctype_iswdigit.o \
+	wctype_iswgraph.o \
+	wctype_iswlower.o \
+	wctype_iswprint.o \
+	wctype_iswpunc.o \
+	wctype_iswspace.o \
+	wctype_iswupper.o \
+	wctype_iswxdigit.o \
+	wctype_towctrans.o \
+	wctype_towlower.o \
+	wctype_towupper.o \
+	wctype_wctrans.o \
+	wctype_wctype.o
 
 ##############################################################################
 

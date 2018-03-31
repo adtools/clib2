@@ -37,11 +37,9 @@
 
 /****************************************************************************/
 
-/* Implementation based on musl */
-
-wchar_t *
-wmemchr(const wchar_t *ptr, wchar_t val, size_t len)
+int
+wctob(wint_t c)
 {
-	for (; len && *ptr != val; len--, ptr++);
-	return len ? (wchar_t *)ptr : 0;
+	if (c < 128U) return c;
+	return EOF;
 }

@@ -37,13 +37,13 @@
 
 /****************************************************************************/
 
-#if defined(defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 
 int
 mbtowc(wchar_t *restrict pwc, const char *restrict s, size_t n)
 {
-	/* ZZZ unimplemented */
-	return(-1);
+	errno = EILSEQ;
+	return -1;
 }
 
 #endif

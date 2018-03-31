@@ -37,9 +37,12 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 wchar_t *
 wmemset(wchar_t *ptr, int val, size_t len)
 {
-	/* ZZZ unimplemented */
-	return(NULL);
+	wchar_t *ret = ptr;
+	while (len--) *ptr++ = val;
+	return ret;
 }

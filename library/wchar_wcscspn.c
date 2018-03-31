@@ -1,5 +1,5 @@
 /*
- * $Id: wchar_wmemchr.c,v 1.3 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: wchar_wcsspn.c,v 1.3 2006-01-08 12:04:27 obarthel Exp $
  *
  * :ts=4
  *
@@ -39,9 +39,12 @@
 
 /* Implementation based on musl */
 
-wchar_t *
-wmemchr(const wchar_t *ptr, wchar_t val, size_t len)
+size_t
+wcscspn(const wchar_t *s, const wchar_t *c)
 {
-	for (; len && *ptr != val; len--, ptr++);
-	return len ? (wchar_t *)ptr : 0;
+	const wchar_t *a;
+	if (!c[0]) return wcslen(s);
+	if (!c[1]) return (s=wcschr(a=s, *c)) ? (size_t)(s-a) : wcslen(a);
+	for (a=s; *s && !wcschr(c, *s); s++);
+	return s-a;
 }

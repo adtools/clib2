@@ -43,6 +43,10 @@
 
 /****************************************************************************/
 
+#ifndef _SYS_CLIB2_STDC_H
+#include <sys/clib2_stdc.h>
+#endif /* _SYS_CLIB2_STDC_H */
+
 #ifndef _STDDEF_H
 #include <stddef.h>
 #endif /* _STDDEF_H */
@@ -63,6 +67,10 @@
 #include <locale.h>
 #endif /* _LOCALE_H */
 
+#ifndef _STDINT_H
+#include <stdint.h>
+#endif
+
 /****************************************************************************/
 
 #ifdef __cplusplus
@@ -72,8 +80,6 @@ extern "C" {
 /****************************************************************************/
 
 #define WEOF (-1)
-#define WCHAR_MAX 65535
-#define WCHAR_MIN 0
 
 /****************************************************************************/
 
@@ -164,7 +170,7 @@ extern int swprintf(wchar_t *s, const wchar_t *format, ...);
 
 extern int vfwprintf(FILE *stream,const wchar_t *format,va_list arg);
 extern int vwprintf(const wchar_t *format,va_list arg);
-extern int vswprintf(char *s, const wchar_t *format,va_list arg);
+extern int vswprintf(wchar_t *s, size_t maxlen, const wchar_t *format, va_list arg);
 
 /****************************************************************************/
 
@@ -177,7 +183,7 @@ extern size_t wcsftime(wchar_t *s, size_t maxsize, const wchar_t *format, const 
 
 /****************************************************************************/
 
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) || defined(__cplusplus)
 
 extern size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
 extern size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
@@ -186,8 +192,9 @@ extern size_t mbsnrtowcs(wchar_t *restrict dst, const char **restrict src, size_
 extern size_t mbsrtowcs(wchar_t *restrict dst, const char **restrict src, size_t len, mbstate_t *restrict ps);
 
 extern size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);
+extern int wcscoll(const wchar_t *ws1, const wchar_t *ws2);
 extern int wcscoll_l(const wchar_t *ws1, const wchar_t *ws2, locale_t loc);
-extern size_t wcscspn(const wchar_t *ws1, const wchar_t *ws2);
+extern size_t wcscspn(const wchar_t *s, const wchar_t *c);
 extern size_t wcsnrtombs(char *restrict dst, const wchar_t **restrict src, size_t nwc, size_t len, mbstate_t *restrict ps);
 extern wchar_t * wcsrchr(const wchar_t *ws, wchar_t wc);
 extern size_t wcsrtombs(char *restrict dst, const wchar_t **restrict src, size_t len, mbstate_t *restrict ps);

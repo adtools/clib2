@@ -38,7 +38,7 @@
 /****************************************************************************/
 
 int
-vswprintf(char *s, const wchar_t *format,va_list arg)
+vswprintf(wchar_t *s, size_t maxlen, const wchar_t *format, va_list arg)
 {
 	/* ZZZ unimplemented */
 	return(0);

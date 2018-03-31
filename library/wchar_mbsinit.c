@@ -40,6 +40,5 @@
 int
 mbsinit(const mbstate_t *ps)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	return !ps || !*(unsigned *)ps;
 }

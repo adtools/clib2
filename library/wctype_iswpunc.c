@@ -35,11 +35,12 @@
 #include <wctype.h>
 #endif /* _WCTYPE_HEADERS_H */
 
+#include <ctype.h>
+
 /****************************************************************************/
 
 int
-iswpunc(wint_t c)
+iswpunct(wint_t c)
 {
-	/* ZZZ unimplemented */
-	return(0);
+	return ispunct(c);
 }

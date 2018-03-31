@@ -37,9 +37,12 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 wchar_t *
 wcschr(const wchar_t *s, wchar_t c)
 {
-	/* ZZZ unimplemented */
-	return(NULL);
+	if (!c) return (wchar_t *)s + wcslen(s);
+	for (; *s && *s != c; s++);
+	return *s ? (wchar_t *)s : 0;
 }

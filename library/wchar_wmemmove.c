@@ -37,9 +37,15 @@
 
 /****************************************************************************/
 
+/* Implementation based on musl */
+
 wchar_t *
 wmemmove(wchar_t *dest, const wchar_t * src, size_t len)
 {
-	/* ZZZ unimplemented */
-	return(NULL);
+	wchar_t *d0 = dest;
+	if ((size_t)(dest-src) < len)
+		while (len--) dest[len] = src[len];
+	else
+		while (len--) *dest++ = *src++;
+	return d0;
 }
