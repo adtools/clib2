@@ -58,10 +58,10 @@ LOG_COMMAND :=
 
 WARNINGS := \
 	-Wall -W -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
-	-Wundef -Wbad-function-cast -Wmissing-declarations -Wunused -Wwrite-strings \
+	-Wundef -Wmissing-declarations -Wunused -Wwrite-strings \
 	-Wno-deprecated-declarations \
 
-#	-Wconversion -Wshadow
+#	-Wconversion -Wshadow -Wbad-function-cast
 
 INCLUDES   := -Iinclude -I. -I$(SDK_INCLUDE)
  OPTIONS   := -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-builtin -fno-common -std=c99 -mcrt=clib2
