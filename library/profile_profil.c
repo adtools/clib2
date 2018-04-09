@@ -136,7 +136,7 @@ profil(unsigned short *buffer, size_t bufSize, size_t offset, unsigned int scale
 	ProfileData.CounterStart = GetCounterStart();
 
 	/* Set interrupt vector */
-	CounterInt.is_Code = (void (*)())CounterIntFn;
+	CounterInt.is_Code = (void (*)(void))CounterIntFn;
 	CounterInt.is_Data = &ProfileData;
 	IPM->SetInterruptVector(1, &CounterInt);
 
