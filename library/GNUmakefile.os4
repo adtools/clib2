@@ -59,7 +59,7 @@ LOG_COMMAND :=
 WARNINGS := \
 	-Wall -W -Wpointer-arith -Wsign-compare -Wmissing-prototypes \
 	-Wundef -Wmissing-declarations -Wunused -Wwrite-strings \
-	-Wno-deprecated-declarations \
+	-Wno-deprecated-declarations -Wno-unused-label \
 
 #	-Wconversion -Wshadow -Wbad-function-cast
 
