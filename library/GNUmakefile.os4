@@ -64,7 +64,7 @@ WARNINGS := \
 #	-Wconversion -Wshadow -Wbad-function-cast
 
 INCLUDES   := -Iinclude -I. -I$(SDK_INCLUDE)
- OPTIONS   := -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-builtin -fno-common -std=c99 -mcrt=clib2
+ OPTIONS   := -DUSE_64_BIT_INTS -D__USE_INLINE__ -Wa,-mregnames -fno-builtin -fno-common -std=c99 -nostdlib
 OPTIMIZE   := -DNDEBUG -O3
 
 #DEBUG     := -ggdb
