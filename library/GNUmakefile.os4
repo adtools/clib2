@@ -274,7 +274,7 @@ $(CC) $(AFLAGS) -o $@ -c $< $(LOG_COMMAND)
 endef
 
 define MAKELIB
--$(MAKEDIR) $@
+-$(MAKEDIR) $(@D)
 $(DELETE) $@
 echo "Making $@"
 $(AR) $@ $^ $(LOG_COMMAND)
