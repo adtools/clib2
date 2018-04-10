@@ -196,7 +196,7 @@ opendir(const char * path_name)
 				UnLockDosList(LDF_VOLUMES|LDF_READ);
 
 				/* Bail out if we cannot present anything. */
-				if(IsListEmpty((struct List *)&dh->dh_VolumeList))
+				if(IsMinListEmpty(&dh->dh_VolumeList))
 				{
 					__set_errno(ENOMEM);
 					goto out;

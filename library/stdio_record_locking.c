@@ -327,7 +327,7 @@ remove_locked_region_node(struct FileLockSemaphore * fls,struct fd * fd,LONG sta
 			/* Check if there are any locked regions left.
 			 * If not, mark the entire file as unlocked.
 			 */
-			if(IsListEmpty((struct List *)&which_lock->fln_LockedRegionList))
+			if(IsMinListEmpty(&which_lock->fln_LockedRegionList))
 			{
 				SHOWMSG("no more regions are locked; removing the file lock node");
 
@@ -705,7 +705,7 @@ cleanup_locked_records(struct fd * fd)
 					}
 				}
 
-				if(IsListEmpty((struct List *)&which_lock->fln_LockedRegionList))
+				if(IsMinListEmpty(&which_lock->fln_LockedRegionList))
 				{
 					SHOWMSG("no more regions are locked; removing the file lock node");
 

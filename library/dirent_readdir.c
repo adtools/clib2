@@ -93,7 +93,7 @@ readdir(DIR * directory_pointer)
 
 				assert( (((ULONG)name) & 3) == 0 );
 
-				if(dh->dh_VolumeNode == NULL && NOT IsListEmpty((struct List *)&dh->dh_VolumeList))
+				if(dh->dh_VolumeNode == NULL && NOT IsMinListEmpty(&dh->dh_VolumeList))
 					dh->dh_VolumeNode = (struct Node *)dh->dh_VolumeList.mlh_Head;
 
 				strcpy(name,"\1:"); /* BSTR for ":" */

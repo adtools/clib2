@@ -94,7 +94,7 @@ alloca_cleanup(const char * file,int line)
 		NewList((struct List *)&alloca_memory_list);
 
 	/* Is this worth cleaning up? */
-	if(NOT IsListEmpty((struct List *)&alloca_memory_list))
+	if(NOT IsMinListEmpty(&alloca_memory_list))
 	{
 		struct MemoryContextNode * mcn_prev;
 		struct MemoryContextNode * mcn;
@@ -120,7 +120,7 @@ alloca_cleanup(const char * file,int line)
 
 		/* Drop the cleanup callback if there's nothing to be cleaned
 		   up any more. */
-		if(IsListEmpty((struct List *)&alloca_memory_list))
+		if(IsMinListEmpty(&alloca_memory_list))
 			__alloca_cleanup = NULL;
 	}
 

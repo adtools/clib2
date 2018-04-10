@@ -69,7 +69,7 @@ CLIB_DESTRUCTOR(unistd_exit)
 
 	PROFILE_OFF();
 
-	if(__unlink_list.mlh_Head != NULL && NOT IsListEmpty((struct List *)&__unlink_list))
+	if(__unlink_list.mlh_Head != NULL && NOT IsMinListEmpty(&__unlink_list))
 	{
 		struct UnlinkNode * uln;
 		BPTR old_dir;

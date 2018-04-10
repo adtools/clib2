@@ -125,7 +125,7 @@ CLIB_DESTRUCTOR(dirent_exit)
 
 	if(__directory_list.mlh_Head != NULL)
 	{
-		while(NOT IsListEmpty((struct List *)&__directory_list))
+		while(NOT IsMinListEmpty(&__directory_list))
 			closedir((DIR *)__directory_list.mlh_Head);
 	}
 

@@ -93,6 +93,13 @@
 
 /****************************************************************************/
 
+#ifndef IsMinListEmpty
+#define IsMinListEmpty(ml) \
+    ((struct MinList *)((ml)->mlh_TailPred) == (struct MinList *)(ml))
+#endif
+
+/****************************************************************************/
+
 #ifndef AMIGA_COMPILER_H
 
 #ifdef __SASC

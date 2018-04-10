@@ -75,14 +75,15 @@ struct MinList	NOCOMMON __memory_list;
 /****************************************************************************/
 
 void *
-__allocate_memory(size_t size,BOOL never_free,const char * UNUSED debug_file_name,int UNUSED debug_line_number)
+__allocate_memory(size_t size,BOOL never_free,const char *debug_file_name UNUSED,int debug_line_number UNUSED)
 {
 	struct MemoryNode * mn;
 	size_t allocation_size;
 	void * result = NULL;
-	size_t original_size;
 
 	#if defined(UNIX_PATH_SEMANTICS)
+	size_t original_size;
+
 	{
 		original_size = size;
 
@@ -417,7 +418,7 @@ STDLIB_DESTRUCTOR(stdlib_memory_exit)
 
 		if(__memory_list.mlh_Head != NULL)
 		{
-			while(NOT IsListEmpty((struct List *)&__memory_list))
+			while(NOT IsMinListEmpty(&__memory_list))
 			{
 				((struct MemoryNode *)__memory_list.mlh_Head)->mn_AlreadyFree = FALSE;
 
@@ -453,12 +454,12 @@ STDLIB_DESTRUCTOR(stdlib_memory_exit)
 			{
 				#ifdef __MEM_DEBUG
 				{
-					while(NOT IsListEmpty((struct List *)&__memory_list))
+					while(NOT IsMinListEmpty(&__memory_list))
 						__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
 				}
 				#else
 				{
-					while(NOT IsListEmpty((struct List *)&__memory_list))
+					while(NOT IsMinListEmpty(&__memory_list))
 						__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,NULL,0);
 				}
 				#endif /* __MEM_DEBUG */
@@ -478,12 +479,12 @@ STDLIB_DESTRUCTOR(stdlib_memory_exit)
 		{
 			#ifdef __MEM_DEBUG
 			{
-				while(NOT IsListEmpty((struct List *)&__memory_list))
+				while(NOT IsMinListEmpty(&__memory_list))
 					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,__FILE__,__LINE__);
 			}
 			#else
 			{
-				while(NOT IsListEmpty((struct List *)&__memory_list))
+				while(NOT IsMinListEmpty(&__memory_list))
 					__free_memory_node((struct MemoryNode *)__memory_list.mlh_Head,NULL,0);
 			}
 			#endif /* __MEM_DEBUG */
