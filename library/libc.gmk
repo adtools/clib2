@@ -402,6 +402,7 @@ C_LIB := \
 	wchar_wcscat.o \
 	wchar_wcschr.o \
 	wchar_wcscmp.o \
+	wchar_wcscoll.o \
 	wchar_wcscpy.o \
 	wchar_wcscspn.o \
 	wchar_wcsftime.o \
