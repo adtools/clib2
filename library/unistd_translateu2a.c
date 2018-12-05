@@ -1,5 +1,5 @@
 /*
- * $Id: unistd_translateu2a.c,v 1.12 2010-08-20 15:33:36 obarthel Exp $
+ * $Id: unistd_translateu2a.c,v 1.13 2015-06-26 11:22:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -477,7 +477,10 @@ __translate_unix_to_amiga_path_name(char const ** name_ptr,struct name_translati
 				for(i = j = 0 ; i < len ; i++)
 				{
 					if(i < len - 3 && name[i] == '/' && name[i + 1] == '.' && name[i + 2] == '.' && name[i + 3] == '/')
-						i += 2;
+					{
+						replace[j++] = '/';
+						i += 3;
+					}
 						
 					replace[j++] = name[i];
 				}
