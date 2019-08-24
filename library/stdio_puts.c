@@ -1,10 +1,8 @@
 /*
- * $Id: stdio_puts.c,v 1.8 2006-01-08 12:04:25 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2019 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +44,8 @@
 int
 puts(const char *s)
 {
-	struct iob * file = (struct iob *)stdout;
+	FILE * stream = stdout;
+	struct iob * file = (struct iob *)stream;
 	int result = EOF;
 	int buffer_mode;
 	int c;
@@ -60,7 +59,7 @@ puts(const char *s)
 	if(__check_abort_enabled)
 		__check_abort();
 
-	flockfile(stdout);
+	flockfile(stream);
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
@@ -76,20 +75,33 @@ puts(const char *s)
 	assert( FLAG_IS_SET(file->iob_Flags,IOBF_IN_USE) );
 	assert( file->iob_BufferSize > 0 );
 
+	/* If buffering is disabled for an interactive stream
+	   switch to line buffering to improve the readability of
+	   the output: instead of pumping out the entire buffer
+	   break it up into individual lines. */
 	buffer_mode = (file->iob_Flags & IOBF_BUFFER_MODE);
 	if(buffer_mode == IOBF_BUFFER_MODE_NONE)
-		buffer_mode = IOBF_BUFFER_MODE_LINE;
+	{
+		struct fd * fd = __fd[file->iob_Descriptor];
 
-	if(__fputc_check(stdout) < 0)
+		__fd_lock(fd);
+
+		if(FLAG_IS_SET(fd->fd_Flags,FDF_IS_INTERACTIVE))
+			buffer_mode = IOBF_BUFFER_MODE_LINE;
+
+		__fd_unlock(fd);
+	}
+
+	if(__fputc_check(stream) < 0)
 		goto out;
 
 	while((c = (*s++)) != '\0')
 	{
-		if(__putc(c,stdout,buffer_mode) == EOF)
+		if(__putc(c,stream,buffer_mode) == EOF)
 			goto out;
 	}
 
-	if(__putc('\n',stdout,buffer_mode) == EOF)
+	if(__putc('\n',stream,buffer_mode) == EOF)
 		goto out;
 
 	result = OK;
@@ -100,7 +112,7 @@ puts(const char *s)
 	   may have buffered data around, queued to be printed right now.
 	   This is intended to improve performance as it takes more effort
 	   to write a single character to a file than to write a bunch. */
-	if(result == 0 && (file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
+ if(result == 0 && (file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
 	{
 		if(__iob_write_buffer_is_valid(file) && __flush_iob_write_buffer(file) < 0)
 		{
@@ -109,7 +121,7 @@ puts(const char *s)
 		}
 	}
 
-	funlockfile(stdout);
+	funlockfile(stream);
 
 	RETURN(result);
 	return(result);
