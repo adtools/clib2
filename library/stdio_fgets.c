@@ -1,10 +1,8 @@
 /*
- * $Id: stdio_fgets.c,v 1.6 2006-01-08 12:04:24 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2019 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +44,7 @@
 char *
 fgets(char *s,int n,FILE *stream)
 {
+	struct iob * file = (struct iob *)stream;
 	char * result = s;
 	int c;
 
@@ -98,8 +97,54 @@ fgets(char *s,int n,FILE *stream)
 	/* One off for the terminating '\0'. */
 	n--;
 
-	while(n-- > 0)
+	while(n > 0)
 	{
+		/* If there is data in the buffer, try to copy it directly
+		   into the string buffer. If there is a line feed in the
+		   buffer, too, try to conclude the read operation. */
+		if(file->iob_BufferPosition < file->iob_BufferReadBytes)
+		{
+			const unsigned char * buffer = &file->iob_Buffer[file->iob_BufferPosition];
+			size_t num_bytes_in_buffer;
+			const unsigned char * lf;
+
+			/* Copy only as much data as will fit into the string buffer. */
+			num_bytes_in_buffer = file->iob_BufferReadBytes - file->iob_BufferPosition;
+			if(num_bytes_in_buffer > (size_t)n)
+				num_bytes_in_buffer = n;
+
+			/* Try to find a line feed character which could conclude
+			   the read operation if the remaining buffer data, including
+			   the line feed character, fit into the string buffer. */
+			lf = (unsigned char *)memchr(buffer, '\n', num_bytes_in_buffer);
+			if(lf != NULL)
+			{
+				size_t num_characters_in_line = lf + 1 - buffer;
+
+				/* Copy the remainder of the read buffer into the
+				   string buffer, including the terminating line
+				   feed character. */
+				memmove(s, buffer, num_characters_in_line);
+
+				file->iob_BufferPosition += num_characters_in_line;
+
+				/* And that concludes the line read operation. */
+				break;
+			}
+
+			memmove(s, buffer, num_bytes_in_buffer);
+			s += num_bytes_in_buffer;
+
+			file->iob_BufferPosition += num_bytes_in_buffer;
+
+			/* Stop if the string buffer has been filled. */
+			n -= num_bytes_in_buffer;
+			if(n == 0)
+				break;
+		}
+
+		/* Read the next buffered character; this will refill the read
+		   buffer, if necessary. */
 		c = __getc(stream);
 		if(c == EOF)
 		{
@@ -124,6 +169,8 @@ fgets(char *s,int n,FILE *stream)
 
 		if(c == '\n')
 			break;
+
+		n--;
 	}
 
 	(*s) = '\0';
