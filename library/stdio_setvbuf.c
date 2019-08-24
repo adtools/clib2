@@ -1,10 +1,8 @@
 /*
- * $Id: stdio_setvbuf.c,v 1.11 2008-09-04 12:07:58 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2019 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -114,20 +112,26 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 		goto out;
 	}
 
-	/* A buffer size of 0 bytes defaults to unbuffered operation. */
+	/* A buffer size of 0 bytes will cause the default buffer size to be used. */
 	if(size == 0)
-		bufmode = IOBF_BUFFER_MODE_NONE;
-
-	/* If a certain buffer size is requested but no buffer was provided,
-	   allocate some memory for it. */
-	if(size > 0 && buf == NULL)
 	{
-		/* Allocate a little more memory than necessary. */
-		new_buffer = malloc(size + (__cache_line_size-1));
-		if(new_buffer == NULL)
+		size = BUFSIZ;
+		buf = NULL;
+	}
+
+	if(bufmode != IOBF_BUFFER_MODE_NONE)
+	{
+		/* If a certain buffer size is requested but no buffer was provided,
+		   allocate some memory for it. */
+		if(size > 0 && buf == NULL)
 		{
-			__set_errno(ENOBUFS);
-			goto out;
+			/* Allocate a little more memory than necessary. */
+			new_buffer = malloc(size + (__cache_line_size-1));
+			if(new_buffer == NULL)
+			{
+				__set_errno(ENOBUFS);
+				goto out;
+			}
 		}
 	}
 
