@@ -114,7 +114,7 @@ fwrite(const void *ptr,size_t element_size,size_t count,FILE *stream)
 		if(__fputc_check((FILE *)file) < 0)
 			goto out;
 
-		/* If this is an unbuffered interactiv stream, we will switch
+		/* If this is an unbuffered interactive stream, we will switch
 		   to line buffered mode in order to improve readability of
 		   the output. */
 		buffer_mode = (file->iob_Flags & IOBF_BUFFER_MODE);
