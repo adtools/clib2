@@ -1,5 +1,5 @@
 /*
- * $Id: time_mktime.c,v 1.10 2006-01-08 12:04:27 obarthel Exp $
+ * $Id: time_mktime.c,v 1.11 2015-06-26 11:22:00 obarthel Exp $
  *
  * :ts=4
  *
@@ -52,9 +52,10 @@ mktime(struct tm *tm)
 {
 	DECLARE_UTILITYBASE();
 	struct ClockData clock_data;
-	ULONG seconds, delta;
+	ULONG seconds;
 	time_t result = (time_t)-1;
-	int max_month_days;
+	LONG combined_seconds;
+	int month, year;
 
 	ENTER();
 
@@ -73,116 +74,63 @@ mktime(struct tm *tm)
 	}
 	#endif /* CHECK_FOR_NULL_POINTERS */
 
-	/* The month must be valid. */
-	if(tm->tm_mon < 0 || tm->tm_mon > 11)
+	/* Normalize the year and month. */
+	year = tm->tm_year + 1900;
+	month = tm->tm_mon + 1;
+
+	if(month < 0 || month > 12)
 	{
-		SHOWVALUE(tm->tm_mon);
-		SHOWMSG("invalid month");
-		goto out;
+		int y;
+
+		y = month / 12;
+
+		month -= y * 12;
+		year += y;
 	}
 
-	/* The day of the month must be valid. */
-	if(tm->tm_mday < 1 || tm->tm_mday > 31)
+	if(month < 1)
 	{
-		SHOWVALUE(tm->tm_mday);
-		SHOWMSG("invalid day of month");
-		goto out;
+		month += 12;
+		year -= 1;
 	}
 
-	/* The year must be valid. */
-	if(tm->tm_year < 78)
+	/* The year must be valid. Amiga time begins with January 1st, 1978. */
+	if(year < 1978)
 	{
-		SHOWVALUE(tm->tm_year);
+		SHOWVALUE(year);
 		SHOWMSG("invalid year");
 		goto out;
 	}
 
-	/* Is this the month of February? */
-	if(tm->tm_mon == 1)
-	{
-		int year;
-
-		/* We need to have the full year number for the
-		   leap year calculation below. */
-		year = tm->tm_year + 1900;
-
-		/* Now for the famous leap year calculation rules... In
-		   the given year, how many days are there in the month
-		   of February? */
-		if((year % 4) != 0)
-			max_month_days = 28;
-		else if ((year % 400) == 0)
-			max_month_days = 29;
-		else if ((year % 100) == 0)
-			max_month_days = 28;
-		else
-			max_month_days = 29;
-	}
-	else
-	{
-		static const char days_per_month[12] =
-		{
-			31, 0,31,
-			30,31,30,
-			31,31,30,
-			31,30,31
-		};
-
-		max_month_days = days_per_month[tm->tm_mon];
-	}
-
-	/* The day of the month must be valid. */
-	if(tm->tm_mday < 0 || tm->tm_mday > max_month_days)
-	{
-		SHOWVALUE(tm->tm_mday);
-		SHOWMSG("invalid day of month");
-		goto out;
-	}
-
-	/* The hour must be valid. */
-	if(tm->tm_hour < 0 || tm->tm_hour > 23)
-	{
-		SHOWVALUE(tm->tm_hour);
-		SHOWMSG("invalid hour");
-		goto out;
-	}
-
-	/* The minute must be valid. */
-	if(tm->tm_min < 0 || tm->tm_min > 59)
-	{
-		SHOWVALUE(tm->tm_min);
-		SHOWMSG("invalid minute");
-		goto out;
-	}
-
-	/* Note: the number of seconds can be larger than 59
-	         in order to account for leap seconds. */
-	if(tm->tm_sec < 0 || tm->tm_sec > 60)
-	{
-		SHOWVALUE(tm->tm_sec);
-		SHOWMSG("invalid seconds");
-		goto out;
-	}
-
-	clock_data.sec		= (tm->tm_sec > 59) ? 59 : tm->tm_sec;
-	clock_data.min		= tm->tm_min;
-	clock_data.hour		= tm->tm_hour;
-	clock_data.mday		= tm->tm_mday;
-	clock_data.month	= tm->tm_mon + 1;
-	clock_data.year		= tm->tm_year + 1900;
-
-	seconds = Date2Amiga(&clock_data) + (tm->tm_sec - 59);
-
-	/* The AmigaOS "epoch" starts with January 1st, 1978, which was
-	   a Sunday. */
-	tm->tm_wday	= (seconds / (24 * 60 * 60)) % 7;
-
+	/* Convert the first day of the month in the given year
+	   into the corresponding number of seconds. */
+	memset(&clock_data, 0, sizeof(clock_data));
+	
 	clock_data.mday		= 1;
-	clock_data.month	= 1;
+	clock_data.month	= month;
+	clock_data.year		= year;
 
-	delta = Date2Amiga(&clock_data);
+	seconds = Date2Amiga(&clock_data);
 
-	tm->tm_yday	= (seconds - delta) / (24 * 60 * 60);
+	/* Put the combined number of seconds involved together,
+	   covering the seconds/minutes/hours of the day as well
+	   as the number of days of the month. This will be added
+	   to the number of seconds for the date. */
+	combined_seconds = tm->tm_sec + 60 * (tm->tm_min + 60 * (tm->tm_hour + 24 * (tm->tm_mday-1)));
+	
+	/* If the combined number of seconds is negative, adding it
+	 * to the number of seconds for the date should not produce
+	 * a negative value.
+	 */
+	if(combined_seconds < 0 && seconds < (ULONG)(-combined_seconds))
+	{
+		SHOWVALUE(seconds);
+		SHOWVALUE(combined_seconds);
+		SHOWMSG("invalid combined number of seconds");
+		goto out;
+	}
+
+	seconds += combined_seconds;
 
 	__locale_lock();
 
@@ -193,9 +141,12 @@ mktime(struct tm *tm)
 
 	__locale_unlock();
 
-	/* Finally, adjust for the difference between the Unix and the
+	/* Adjust for the difference between the Unix and the
 	   AmigaOS epochs, which differ by 8 years. */
 	result = seconds + UNIX_TIME_OFFSET;
+
+	/* Finally, normalize the provided time and date information. */
+	localtime_r(&result, tm);
 
  out:
 
