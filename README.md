@@ -1,6 +1,6 @@
 # clib2 – An ISO 'C' (1994) compliant runtime library for AmigaOS
 
-[![Build](https://github.com/amiga-mui/adtools/clib2/workflows/CI/badge.svg)](https://github.com/adtools/clib2/actions)
+[![Build](https://github.com/adtools/clib2/workflows/CI/badge.svg)](https://github.com/adtools/clib2/actions)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## What is this?
