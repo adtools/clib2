@@ -54,13 +54,9 @@ double
 tgamma(double x)
 {
 	int gamma_sign;
-    double y;
+    double y = __lgamma(x, &gamma_sign);
 
-	y = __lgamma(x,&gamma_sign);
-	if (gamma_sign < 0)
-		y = -y;
-
-	return y;
+	return gamma_sign * exp(y);
 }
 
 /****************************************************************************/

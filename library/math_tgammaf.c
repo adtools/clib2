@@ -54,13 +54,9 @@ float
 tgammaf(float x)
 {
 	int gamma_sign;
-	float y;
+	float y = __lgammaf(x, &gamma_sign);
 
-	y = __lgammaf(x,&gamma_sign);
-	if (gamma_sign < 0)
-		y = -y;
-
-	return y;
+	return gamma_sign * expf(y);
 }
 
 /****************************************************************************/
