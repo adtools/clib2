@@ -251,7 +251,7 @@ sqrt(double x)
 	}
 	else
 	{
-		result = 0;
+		result = NAN;
 		__set_errno(EDOM);
 	}
 
