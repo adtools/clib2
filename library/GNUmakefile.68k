@@ -941,6 +941,7 @@ AMIGA_LIB = \
 	amiga_hotkey.o \
 	amiga_invertstring.o \
 	amiga_newlist.o \
+	amiga_pools.o \
 	amiga_rangerand.o \
 	amiga_remtof.o \
 	amiga_rexxvars.o \
