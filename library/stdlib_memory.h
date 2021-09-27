@@ -61,6 +61,17 @@
 /****************************************************************************/
 
 /*
+ * Uncomment this to make all memory allocation operations return addresses
+ * which are aligned to a multiple of MEM_BLOCKSIZE (see <exec/memory.h>).
+ * This renders them 64 bit aligned which can be useful for floating point
+ * numbers in data structures used by the PowerPC. You pay for this privilege
+ * by spending an additional 4 bytes per allocation.
+ */
+#define __MEM_ALLOCATIONS_64_BIT_ALIGNED
+
+/****************************************************************************/
+
+/*
  * Uncomment this to enable the slab allocator.
  */
 #define __USE_SLAB_ALLOCATOR
@@ -167,7 +178,7 @@ struct MemoryNode
 	struct MinNode		mn_MinNode;
 
 	UBYTE				mn_AlreadyFree;
-	UBYTE				mn_Pad0[3];
+	UBYTE				mn_Pad0[7];			/* Note: provide 64 bit alignment */
 
 	void *				mn_Allocation;
 	size_t				mn_AllocationSize;
@@ -187,6 +198,10 @@ struct MemoryNode
 #endif /* __USE_MEM_TREES */
 
 #endif /* __MEM_DEBUG */
+
+#ifdef __MEM_ALLOCATIONS_64_BIT_ALIGNED
+	ULONG				mn_Alignment;
+#endif /* __MEM_ALLOCATIONS_64_BIT_ALIGNED */
 
 	ULONG				mn_Size;
 };
@@ -252,6 +267,9 @@ struct SlabNode
 struct SlabSingleAllocation
 {
 	struct MinNode	ssa_MinNode;
+#ifdef __MEM_ALLOCATIONS_64_BIT_ALIGNED
+	ULONG			ssa_Alignment;
+#endif /* __MEM_ALLOCATIONS_64_BIT_ALIGNED */
 	ULONG			ssa_Size;
 };
 

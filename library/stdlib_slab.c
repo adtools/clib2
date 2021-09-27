@@ -154,8 +154,13 @@ __slab_allocate(size_t allocation_size)
 		 * larger than the amount of memory which needs to be
 		 * allocated. We end up picking the smallest chunk
 		 * size that still works.
+		 *
+		 * Note that we start with a minimum size of 8 bytes because that
+		 * is the exact minimum size of a memory allocation as performed
+		 * by AllocMem() and the Allocate() function which it is built
+		 * upon.
 		 */
-		for(slab_index = 2, chunk_size = (1UL << slab_index) ;
+		for(slab_index = 3, chunk_size = (1UL << slab_index) ;
 		    slab_index < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ;
 		    slab_index++, chunk_size += chunk_size)
 		{
@@ -288,6 +293,12 @@ __slab_allocate(size_t allocation_size)
 
 				/* We couldn't reuse an empty slab? Then we'll have to allocate
 				 * memory for another one.
+				 *
+				 * Note that we allocate an extra MEM_BLOCKSIZE bytes so that we
+				 * may chop up the slab into chunks which all start on an address
+				 * which is a multiple of MEM_BLOCKSIZE bytes. This is useful for
+				 * aligning allocations to a 64 bit boundary on the PowerPC when
+				 * using floating point numbers embedded in data structures.
 				 */
 				if(new_sn == NULL)
 				{
@@ -297,11 +308,11 @@ __slab_allocate(size_t allocation_size)
 
 					#if defined(__amigaos4__)
 					{
-						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize,MEMF_PRIVATE);
+						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize + MEM_BLOCKSIZE,MEMF_PRIVATE);
 					}
 					#else
 					{
-						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize,MEMF_ANY);
+						new_sn = (struct SlabNode *)AllocVec(sizeof(*new_sn) + __slab_data.sd_StandardSlabSize + MEM_BLOCKSIZE,MEMF_ANY);
 					}
 					#endif /* __amigaos4__ */
 
@@ -329,6 +340,7 @@ __slab_allocate(size_t allocation_size)
 					{
 						struct SlabChunk * free_chunk;
 						ULONG num_free_chunks = 0;
+						ULONG aligned_first_byte;
 						BYTE * first_byte;
 						BYTE * last_byte;
 
@@ -342,13 +354,15 @@ __slab_allocate(size_t allocation_size)
 						 */
 						AddHead((struct List *)slab_list,(struct Node *)new_sn);
 
-						/* Split up the slab memory into individual chunks
-						 * of the same size and keep track of them
-						 * in the free list. The memory managed by
-						 * this slab immediately follows the
-						 * SlabNode header.
+						/* Split up the slab memory into individual chunks of the same
+						 * size and keep track of them in the free list. The memory
+						 * managed by this slab follows the SlabNode header with some
+						 * padding added to make the first allocatable slab start on
+						 * a 64 bit boundary.
 						 */
-						first_byte	= (BYTE *)&new_sn[1];
+						aligned_first_byte = ((ULONG)&new_sn[1] + MEM_BLOCKMASK) & ~MEM_BLOCKMASK;
+						
+						first_byte	= (BYTE *)aligned_first_byte;
 						last_byte	= &first_byte[__slab_data.sd_StandardSlabSize - chunk_size];
 
 						for(free_chunk = (struct SlabChunk *)first_byte ;
