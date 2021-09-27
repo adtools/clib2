@@ -97,7 +97,11 @@ include libm.gmk
 include libnet.gmk
 include libdebug.gmk
 include libamiga.gmk
-include libprofile.gmk
+
+# Olaf (2019-08-22): Please note that "profile_profil.o" can no longer
+#                    be built, presumably for lack of header files needed
+#                    to build it properly.
+#include libprofile.gmk
 
 all-targets: \
 	lib/crt0.o \
@@ -164,7 +168,9 @@ cvs-tag:
 
 # General build rules for all object files and the individual libraries
 
-lib/crtbegin.o : CFLAGS += -fno-aggressive-loop-optimizations
+#NO_AGGRESSIVE_LOOP_OPTIMIZATIONS := -fno-aggressive-loop-optimizations
+
+lib/crtbegin.o : CFLAGS += $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
@@ -179,7 +185,7 @@ lib/small-data/%.o : AFLAGS += $(SMALLDATA)
 lib/small-data/%.o : %.S
 	@$(ASSEMBLE)
 
-lib/small-data/crtbegin.o : CFLAGS += $(SMALLDATA) -fno-aggressive-loop-optimizations
+lib/small-data/crtbegin.o : CFLAGS += $(SMALLDATA) $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib/small-data/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
@@ -191,7 +197,7 @@ lib/soft-float/%.o : AFLAGS += $(SOFTFLOAT)
 lib/soft-float/%.o : %.S
 	@$(ASSEMBLE)
 
-lib/soft-float/crtbegin.o : CFLAGS += $(SOFTFLOAT) -fno-aggressive-loop-optimizations
+lib/soft-float/crtbegin.o : CFLAGS += $(SOFTFLOAT) $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib/soft-float/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
@@ -203,7 +209,7 @@ lib/baserel/%.o : AFLAGS += $(BASEREL)
 lib/baserel/%.o : %.S
 	@$(ASSEMBLE)
 
-lib/baserel/crtbegin.o : CFLAGS += $(BASEREL) -fno-aggressive-loop-optimizations
+lib/baserel/crtbegin.o : CFLAGS += $(BASEREL) $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib/baserel/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
@@ -215,7 +221,7 @@ lib.threadsafe/%.o : AFLAGS += $(LARGEDATA) $(THREADSAFE)
 lib.threadsafe/%.o : %.S
 	@$(ASSEMBLE)
 
-lib.threadsafe/crtbegin.o : CFLAGS += $(THREADSAFE) $(LARGEDATA) -fno-aggressive-loop-optimizations
+lib.threadsafe/crtbegin.o : CFLAGS += $(THREADSAFE) $(LARGEDATA) $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib.threadsafe/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
@@ -227,7 +233,7 @@ lib.threadsafe/small-data/%.o : AFLAGS += $(SMALLDATA) $(THREADSAFE)
 lib.threadsafe/small-data/%.o : %.S
 	@$(ASSEMBLE)
 
-lib.threadsafe/small-data/crtbegin.o : CFLAGS += $(THREADSAFE) $(SMALLDATA) -fno-aggressive-loop-optimizations
+lib.threadsafe/small-data/crtbegin.o : CFLAGS += $(THREADSAFE) $(SMALLDATA) $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib.threadsafe/small-data/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
@@ -239,7 +245,7 @@ lib.threadsafe/soft-float/%.o : AFLAGS += $(SOFTFLOAT) $(THREADSAFE)
 lib.threadsafe/soft-float/%.o : %.S
 	@$(ASSEMBLE)
 
-lib.threadsafe/soft-float/crtbegin.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT) -fno-aggressive-loop-optimizations
+lib.threadsafe/soft-float/crtbegin.o : CFLAGS += $(THREADSAFE) $(SOFTFLOAT) $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib.threadsafe/soft-float/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
@@ -251,7 +257,7 @@ lib.threadsafe/baserel/%.o : AFLAGS += $(BASEREL) $(THREADSAFE)
 lib.threadsafe/baserel/%.o : %.S
 	@$(ASSEMBLE)
 
-lib.threadsafe/baserel/crtbegin.o : CFLAGS += $(THREADSAFE) $(BASEREL) -fno-aggressive-loop-optimizations
+lib.threadsafe/baserel/crtbegin.o : CFLAGS += $(THREADSAFE) $(BASEREL) $(NO_AGGRESSIVE_LOOP_OPTIMIZATIONS)
 lib.threadsafe/baserel/crtbegin.o : crtbegin.c
 	@$(COMPILE)
 
