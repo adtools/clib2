@@ -103,6 +103,11 @@ profil(unsigned short *buffer, size_t bufSize, size_t offset, unsigned int scale
 
 	if (buffer == 0)
 	{
+		if (!IPM)
+		{
+			return 0;
+		}
+
 		Stack = SuperState();
 		IPM->EventControlTags(
 			PMECT_Disable, 			PMEC_MasterInterrupt,
