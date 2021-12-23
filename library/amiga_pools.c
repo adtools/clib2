@@ -63,8 +63,8 @@ struct MemoryPool
 	struct MinList	mp_PuddleMinList;		/* Both puddles and large allocations
 											 * are stored in this list. The puddles
 											 * are stored near the head of the list
-											 * and the puddles are stored near the
-											 * tail of the list.
+											 * and the large allocations are stored
+											 * near the tail of the list.
 											 */
 
 	ULONG			mp_MemoryFlags;			/* Memory attributes for allocation */
@@ -160,6 +160,7 @@ static APTR alloc_vec(ULONG size, ULONG flags)
 
 	if (size > 0)
 	{
+		/* Note: no overflow testing is being performed! */
 		size += sizeof(*mem);
 
 		mem = AllocMem(size, flags);
@@ -235,6 +236,8 @@ APTR LibCreatePool(
 
 	/* Round up the puddle size to the size of a
 	 * memory block, as managed by Allocate().
+	 *
+	 * Note: no overflow checking is performed!
 	 */
 	puddle_size = (puddle_size + MEM_BLOCKMASK) & ~MEM_BLOCKMASK;
 
@@ -277,6 +280,8 @@ static union PuddleUnion * create_new_puddle(struct MemoryPool * mp)
 
 	/* The extra sizeof(APTR) is needed for aligning the
 	 * allocatable memory chunks within the memory header.
+	 *
+	 * Note: no overflow checking is performed!
 	 */
 	pu = alloc_vec(sizeof(pu->pu_MemHeader) + puddle_size + sizeof(APTR), memory_flags);
 	if (pu == NULL)
@@ -400,6 +405,7 @@ APTR LibAllocPooled(APTR pool, ULONG mem_size)
 	{
 		struct LargeAllocation * la;
 
+		/* Note: no overflow checking is performed! */
 		pu = alloc_vec(sizeof(pu->pu_LargeAllocation) + mem_size, mp->mp_MemoryFlags);
 		if (pu == NULL)
 			goto out;
