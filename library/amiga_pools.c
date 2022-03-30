@@ -67,7 +67,9 @@ struct MemoryPool
 											 * near the tail of the list.
 											 */
 
-	ULONG			mp_MemoryFlags;			/* Memory attributes for allocation */
+	ULONG			mp_MemoryFlags;			/* Memory attributes for allocation,
+		 									 * which may also include MEMF_CLEAR.
+											 */
 	ULONG			mp_PuddleSize;			/* Largest allocation which will fit
 											 * into a single puddle.
 											 */
@@ -282,6 +284,12 @@ static union PuddleUnion * create_new_puddle(struct MemoryPool * mp)
 	 * allocatable memory chunks within the memory header.
 	 *
 	 * Note: no overflow checking is performed!
+	 *
+	 * Also note that the original memory allocation flags are
+	 * being used, which may include MEMF_CLEAR. This means that
+	 * if MEMF_CLEAR is set, the initial allocation will be
+	 * cleared and then the individual puddle allocations made
+	 * through LibAllocPooled() will be cleared, too.
 	 */
 	pu = alloc_vec(sizeof(pu->pu_MemHeader) + puddle_size + sizeof(APTR), memory_flags);
 	if (pu == NULL)
@@ -388,6 +396,12 @@ APTR LibAllocPooled(APTR pool, ULONG mem_size)
 				 * the entire allocated memory which Allocate()
 				 * returned. It's been rounded up to be a
 				 * multiple of MEM_BLOCKSIZE.
+				 *
+				 * Note that the puddle will have been allocated
+				 * with MEMF_CLEAR already, which does not render
+				 * the following memset() call redundant, but
+				 * making the initial puddle allocation use
+				 * MEMF_CLEAR is definitely redundant.
 				 */
 				if ((mp->mp_MemoryFlags & MEMF_CLEAR) != 0)
 					memset(result, 0, (mem_size + MEM_BLOCKMASK) & ~MEM_BLOCKMASK);
@@ -464,7 +478,7 @@ VOID LibFreePooled(APTR pool, APTR memory, ULONG size)
 			 */
 			for (pu = (union PuddleUnion *)mp->mp_PuddleMinList.mlh_Head ;
 			     pu->pu_Node.ln_Succ != NULL ;
-				 pu = (union PuddleUnion *)pu->pu_Node.ln_Succ)
+			     pu = (union PuddleUnion *)pu->pu_Node.ln_Succ)
 			{
 				/* Did we reach the end of the puddle list? Then
 				 * the given memory address and/or size may be
