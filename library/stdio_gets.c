@@ -55,14 +55,14 @@ gets(char *s)
 
 	assert( s != NULL );
 
-	if(__check_abort_enabled)
+	if (__check_abort_enabled)
 		__check_abort();
 
 	flockfile(stream);
 
 	#if defined(CHECK_FOR_NULL_POINTERS)
 	{
-		if(s == NULL)
+		if (s == NULL)
 		{
 			SHOWMSG("invalid parameters");
 
@@ -77,7 +77,7 @@ gets(char *s)
 	/* Take care of the checks and data structure changes that
 	 * need to be handled only once for this stream.
 	 */
-	if(__fgetc_check(stream) < 0)
+	if (__fgetc_check(stream) < 0)
 	{
 		result = NULL;
 		goto out;
@@ -86,29 +86,54 @@ gets(char *s)
 	/* So that we can tell error and 'end of file' conditions apart. */
 	clearerr(stream);
 
-	while(TRUE)
+	assert( 0 <= file->iob_BufferReadBytes );
+	assert( file->iob_BufferReadBytes <= file->iob_BufferSize );
+	assert( file->iob_BufferPosition <= file->iob_BufferSize );
+
+	while (TRUE)
 	{
 		/* If there is data in the buffer, try to copy it directly
-		   into the string buffer. If there is a line feed in the
-		   buffer, too, try to conclude the read operation. */
-		if(file->iob_BufferPosition < file->iob_BufferReadBytes)
+		 * into the string buffer. If there is a line feed in the
+		 * buffer, too, try to conclude the read operation.
+		 */
+		if (file->iob_BufferPosition < file->iob_BufferReadBytes)
 		{
 			size_t num_bytes_in_buffer = file->iob_BufferReadBytes - file->iob_BufferPosition;
 			const unsigned char * buffer = &file->iob_Buffer[file->iob_BufferPosition];
 			const unsigned char * lf;
 
+			assert( file->iob_BufferReadBytes >= file->iob_BufferPosition );
+
 			/* Try to find a line feed character which could conclude
-			   the read operation if the remaining buffer data, including
-			   the line feed character, fit into the string buffer. */
+			 * the read operation if the remaining buffer data, including
+			 * the line feed character, fit into the string buffer.
+			 */
 			lf = (unsigned char *)memchr(buffer, '\n', num_bytes_in_buffer);
-			if(lf != NULL)
+			if (lf != NULL)
 			{
 				size_t num_characters_in_line = lf + 1 - buffer;
 
+				assert( num_characters_in_line <= num_bytes_in_buffer );
+
+				/* Give the user a chance to abort what could otherwise
+				 * become an uninterrupted series of copying operations.
+				 */
+				if (__check_abort_enabled)
+					__check_abort();
+
 				/* Copy the remainder of the read buffer into the
-				   string buffer, including the terminating line
-				   feed character. */
-				memmove(s, buffer, num_characters_in_line);
+				 * string buffer, omitting the terminating line
+				 * feed character. This is the difference between
+				 * gets() and fgets(): fgets() will keep the
+				 * terminating line feed character, but gets()
+				 * will drop it.
+				 */
+				assert( num_characters_in_line > 0 );
+
+				memmove(s, buffer, num_characters_in_line - 1);
+				s += num_characters_in_line - 1;
+
+				assert( file->iob_BufferPosition + num_characters_in_line <= file->iob_BufferSize );
 
 				file->iob_BufferPosition += num_characters_in_line;
 
@@ -116,16 +141,20 @@ gets(char *s)
 				break;
 			}
 
+			assert( num_bytes_in_buffer > 0 );
+
 			memmove(s, buffer, num_bytes_in_buffer);
 			s += num_bytes_in_buffer;
 
+			assert( file->iob_BufferPosition + num_bytes_in_buffer <= file->iob_BufferSize );
+
 			file->iob_BufferPosition += num_bytes_in_buffer;
 		}
-	
+
 		c = __getc(stream);
-		if(c == EOF)
+		if (c == EOF)
 		{
-			if(ferror(stream))
+			if (ferror(stream))
 			{
 				/* Just to be on the safe side. */
 				(*s) = '\0';
@@ -135,14 +164,15 @@ gets(char *s)
 			}
 
 			/* Make sure that we return NULL if we really
-			   didn't read anything at all */
-			if(s == result)
+			 * didn't read anything at all.
+			 */
+			if (s == result)
 				result = NULL;
 
 			break;
 		}
 
-		if(c == '\n')
+		if (c == '\n')
 			break;
 
 		(*s++) = c;
