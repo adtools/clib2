@@ -162,6 +162,11 @@ extern int __fputc(int c,FILE *stream,int buffer_mode);
 
 /****************************************************************************/
 
+/* stdio_fputs.c */
+extern int __fputs(const char *s, int line_feed, FILE *stream);
+
+/****************************************************************************/
+
 /* stdio_sscanf_hook_entry.c */
 extern int __sscanf_hook_entry(struct iob *string,struct file_action_message *fam);
 
