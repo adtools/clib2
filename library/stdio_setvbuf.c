@@ -125,6 +125,8 @@ setvbuf(FILE *stream,char *buf,int bufmode,size_t size)
 		   allocate some memory for it. */
 		if(size > 0 && buf == NULL)
 		{
+			assert( size <= ((size + (__cache_line_size-1)) & ~(__cache_line_size-1)) );
+			
 			/* Allocate a little more memory than necessary. */
 			new_buffer = malloc(size + (__cache_line_size-1));
 			if(new_buffer == NULL)
