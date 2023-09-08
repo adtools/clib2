@@ -334,7 +334,7 @@ __wildcard_expand_init(void)
 					}
 					else if (rc != OK)
 					{
-						/* Some error occured. */
+						/* Some error occurred. */
 						error = EIO;
 						break;
 					}
