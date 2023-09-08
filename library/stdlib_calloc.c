@@ -67,6 +67,9 @@ __calloc(size_t num_elements, size_t element_size, const char * file, int line)
 		goto out;
 	}
 
+	/* Note: malloc(0) may allocate memory and will also
+	 *       initialize its contents to zero.
+	 */
 	result = __malloc(total_size, file, line);
 	if (result == NULL)
 	{
@@ -74,7 +77,8 @@ __calloc(size_t num_elements, size_t element_size, const char * file, int line)
 		goto out;
 	}
 
-	memset(result, 0, total_size);
+	if (total_size > 0)
+		memset(result, 0, total_size);
 
  out:
 
@@ -90,5 +94,5 @@ calloc(size_t num_elements, size_t element_size)
 
 	result = __calloc(num_elements, element_size, NULL, 0);
 
-	return(result);
+	return result;
 }
