@@ -69,11 +69,36 @@ struct MemoryContextNode
 
 /****************************************************************************/
 
+/* The default behaviour for alloca() failing is to
+ * terminate the program rather than let it stumble
+ * into a NULL-pointer reference.
+ */
+static void
+default_alloca_trap(void)
+{
+	abort();
+}
+
+/****************************************************************************/
+
+CLIB_CONSTRUCTOR(alloca_init)
+{
+	ENTER();
+
+	__alloca_trap = default_alloca_trap;
+
+	NewList((struct List *)&alloca_memory_list);
+
+	LEAVE();
+}
+
+/****************************************************************************/
+
 CLIB_DESTRUCTOR(alloca_exit)
 {
 	ENTER();
 
-	/* Clean this up, too, just to be safe. */
+	/* This list should remain empty. */
 	NewList((struct List *)&alloca_memory_list);
 
 	LEAVE();
@@ -83,18 +108,18 @@ CLIB_DESTRUCTOR(alloca_exit)
 
 /* Cleans up after all alloca() allocations that have been made so far. */
 static void
-alloca_cleanup(const char * file,int line)
+alloca_cleanup(const char * file, int line)
 {
 	void * stack_pointer = __get_sp();
 
 	__memory_lock();
 
 	/* Initialize this if it hasn't been taken care of yet. */
-	if(alloca_memory_list.mlh_Head == NULL)
+	if (alloca_memory_list.mlh_Head == NULL)
 		NewList((struct List *)&alloca_memory_list);
 
 	/* Is this worth cleaning up? */
-	if(NOT IsMinListEmpty(&alloca_memory_list))
+	if (NOT IsListEmpty((struct List *)&alloca_memory_list))
 	{
 		struct MemoryContextNode * mcn_prev;
 		struct MemoryContextNode * mcn;
@@ -106,21 +131,24 @@ alloca_cleanup(const char * file,int line)
 		   we move up from the end to the top of the list, the closer we get
 		   to the allocations made in the context of a stack frame near to
 		   where were currently are. */
-		for(mcn = (struct MemoryContextNode *)alloca_memory_list.mlh_TailPred ;
-		    mcn->mcn_MinNode.mln_Pred != NULL && mcn->mcn_StackPointer < stack_pointer ;
-		    mcn = mcn_prev)
+		for (mcn = (struct MemoryContextNode *)alloca_memory_list.mlh_TailPred ;
+		     mcn->mcn_MinNode.mln_Pred != NULL && mcn->mcn_StackPointer < stack_pointer ;
+		     mcn = mcn_prev)
 		{
 			mcn_prev = (struct MemoryContextNode *)mcn->mcn_MinNode.mln_Pred;
 
 			Remove((struct Node *)mcn);
 
-			__free_memory(mcn->mcn_Memory,TRUE,file,line);
-			__free_memory(mcn,FALSE,file,line);
+			/* Note: force the memory to be freed because it
+			         has gone out of scope. */
+			__free_memory(mcn->mcn_Memory, TRUE, file, line);
+
+			__free_memory(mcn, FALSE, file, line);
 		}
 
 		/* Drop the cleanup callback if there's nothing to be cleaned
 		   up any more. */
-		if(IsMinListEmpty(&alloca_memory_list))
+		if (IsListEmpty((struct List *)&alloca_memory_list))
 			__alloca_cleanup = NULL;
 	}
 
@@ -130,7 +158,7 @@ alloca_cleanup(const char * file,int line)
 /****************************************************************************/
 
 __static void *
-__alloca(size_t size,const char * file,int line)
+__alloca(size_t size, const char * file, int line)
 {
 	void * stack_pointer = __get_sp();
 	struct MemoryContextNode * mcn;
@@ -138,27 +166,23 @@ __alloca(size_t size,const char * file,int line)
 
 	__memory_lock();
 
-	/* Initialize this if it hasn't been taken care of yet. */
-	if(alloca_memory_list.mlh_Head == NULL)
-		NewList((struct List *)&alloca_memory_list);
-
 	__alloca_cleanup = alloca_cleanup;
-	(*__alloca_cleanup)(file,line);
+	(*__alloca_cleanup)(file, line);
 
-	mcn = __allocate_memory(sizeof(*mcn),FALSE,file,line);
-	if(mcn == NULL)
+	mcn = __allocate_memory(sizeof(*mcn), FALSE, file, line);
+	if (mcn == NULL)
 	{
 		SHOWMSG("not enough memory");
 		goto out;
 	}
 
 	/* Allocate memory which cannot be run through realloc() or free(). */
-	mcn->mcn_Memory = __allocate_memory(size,TRUE,file,line);
-	if(mcn->mcn_Memory == NULL)
+	mcn->mcn_Memory = __allocate_memory(size, TRUE, file, line);
+	if (mcn->mcn_Memory == NULL)
 	{
 		SHOWMSG("not enough memory");
 
-		__free(mcn,file,line);
+		__free(mcn, file, line);
 		goto out;
 	}
 
@@ -166,7 +190,7 @@ __alloca(size_t size,const char * file,int line)
 
 	assert( alloca_memory_list.mlh_Head != NULL );
 
-	AddTail((struct List *)&alloca_memory_list,(struct Node *)mcn);
+	AddTail((struct List *)&alloca_memory_list, (struct Node *)mcn);
 
 	result = mcn->mcn_Memory;
 
@@ -176,10 +200,14 @@ __alloca(size_t size,const char * file,int line)
 
 	/* If we are about to return NULL and a trap function is
 	   provided, call it rather than returning NULL. */
-	if(result == NULL && __alloca_trap != NULL)
-		(*__alloca_trap)();
+	if (result == NULL && __alloca_trap != NULL)
+	{
+		__alloca_cleanup = NULL;
 
-	return(result);
+		(*__alloca_trap)();
+	}
+
+	return result;
 }
 
 /****************************************************************************/
@@ -191,5 +219,5 @@ alloca(size_t size)
 
 	result = __alloca(size,NULL,0);
 
-	return(result);
+	return result;
 }
