@@ -369,7 +369,7 @@ void __get_slab_allocations(__slab_allocation_callback callback);
  * You supply a function which will be called for each line of the JSON
  * data produced. You can store this data in a file, or in the clipboard,
  * for later use. Your function must return 0 if it wants to be called
- * again, or return -1 if it wants to stop (e.g. if an error occured
+ * again, or return -1 if it wants to stop (e.g. if an error occurred
  * when writing the JSON data to disk). The same "user_data" pointer which
  * you pass to __get_slab_stats() will be passed to your callback function.
  *
