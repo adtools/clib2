@@ -29,6 +29,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if defined(__USE_SLAB_ALLOCATOR)
+
+/****************************************************************************/
+
 /*#define DEBUG*/
 
 #ifndef _STDLIB_HEADERS_H
@@ -47,9 +51,13 @@ struct SlabData NOCOMMON __slab_data;
 
 /****************************************************************************/
 
+/* Size of a single slab chunk, with padding to make
+ * it a multiple of 8.
+ */
 struct SlabChunk
 {
-	struct SlabNode * sc_Parent;
+	struct SlabNode *	sc_Parent;
+	ULONG				sc_Pad;
 };
 
 /****************************************************************************/
@@ -60,30 +68,58 @@ __slab_allocate(size_t allocation_size)
 	struct SlabChunk * chunk;
 	void * allocation = NULL;
 	size_t allocation_size_with_chunk_header;
+	BOOL overflow = FALSE;
+	ULONG padding;
 
 	D(("allocating %lu bytes of memory",allocation_size));
 
 	assert( __slab_data.sd_StandardSlabSize > 0 );
 
 	/* Check for integer overflow. */
-	allocation_size_with_chunk_header = sizeof(*chunk) + allocation_size;
-	if(allocation_size_with_chunk_header < allocation_size)
+	if (__addition_overflows(sizeof(*chunk), allocation_size))
+	{
+		SHOWMSG("integer overflow");
 		return(NULL);
+	}
+
+	allocation_size_with_chunk_header = sizeof(*chunk) + allocation_size;
 
 	/* Number of bytes to allocate exceeds the slab size?
 	 * If so, allocate this memory chunk separately and
 	 * keep track of it.
 	 */
-	if(allocation_size_with_chunk_header > __slab_data.sd_StandardSlabSize)
+	if (allocation_size_with_chunk_header > __slab_data.sd_StandardSlabSize)
 	{
+		ULONG total_single_allocation_size;
 		struct SlabSingleAllocation * ssa;
-		ULONG total_single_allocation_size = sizeof(*ssa) + allocation_size;
+
+		total_single_allocation_size = sizeof(*ssa) + allocation_size;
+
+		/* Pad the allocation size to a multiple of 8 bytes. */
+		if ((total_single_allocation_size % MEM_BLOCKSIZE) > 0)
+			padding = MEM_BLOCKSIZE - (total_single_allocation_size % MEM_BLOCKSIZE);
+		else
+			padding = 0;
 
 		D(("allocation size is > %ld; this will be stored separately",__slab_data.sd_StandardSlabSize));
-		D(("allocating %ld (MinNode+Size) + %ld = %ld bytes",sizeof(*ssa),allocation_size,total_single_allocation_size));
+		D(("allocating %ld (MinNode+Size+Padding) + %ld = %ld bytes",sizeof(*ssa),allocation_size,total_single_allocation_size));
+
+		/* Check if the sums will cause an integer overflow. */
+		if (__addition_overflows(sizeof(*ssa), allocation_size) ||
+		    __addition_overflows(total_single_allocation_size, padding))
+		{
+			overflow = TRUE;
+		}
+		else
+		{
+			/* Looking good so far. */
+			total_single_allocation_size += padding;
+
+			overflow = FALSE;
+		}
 
 		/* No integer overflow? */
-		if(allocation_size < total_single_allocation_size)
+		if (overflow == FALSE)
 		{
 			PROFILE_OFF();
 
@@ -99,21 +135,21 @@ __slab_allocate(size_t allocation_size)
 
 			PROFILE_ON();
 		}
-		/* Integer overflow has occured. */
+		/* Integer overflow has occurred. */
 		else
 		{
 			ssa = NULL;
 		}
 
-		if(ssa != NULL)
+		if (ssa != NULL)
 		{
 			ssa->ssa_Size = total_single_allocation_size;
 
 			allocation = &ssa[1];
 
-			D(("single allocation = 0x%08lx",allocation));
+			D(("single allocation = 0x%08lx", allocation));
 
-			AddTail((struct List *)&__slab_data.sd_SingleAllocations,(struct Node *)ssa);
+			AddTail((struct List *)&__slab_data.sd_SingleAllocations, (struct Node *)ssa);
 
 			__slab_data.sd_NumSingleAllocations++;
 			__slab_data.sd_TotalSingleAllocationSize += total_single_allocation_size;
@@ -122,7 +158,10 @@ __slab_allocate(size_t allocation_size)
 		}
 		else
 		{
-			D(("single allocation failed"));
+			if (overflow)
+				SHOWMSG("integer overflow");
+			else
+				D(("single allocation failed"));
 		}
 	}
 	/* Otherwise allocate a chunk from a slab. */
@@ -131,51 +170,67 @@ __slab_allocate(size_t allocation_size)
 		struct MinList * slab_list = NULL;
 		BOOL slab_reused = FALSE;
 		ULONG entry_size;
-		ULONG chunk_size;
+		ULONG chunk_size = 0;
 		int slab_index;
 
 		D(("allocation size is <= %ld; this will be allocated from a slab",__slab_data.sd_StandardSlabSize));
 
-		/* Add room for a pointer back to the slab which
-		 * the chunk belongs to.
+		/* Add room for a pointer back to the parent slab
+		 * which the chunk belongs to.
 		 */
 		entry_size = sizeof(*chunk) + allocation_size;
 
-		/* Chunks must be at least as small as a MinNode, because
-		 * that's what we use for keeping track of the chunks which
-		 * are available for allocation within each slab.
-		 */
-		if(entry_size < sizeof(struct MinNode))
-			entry_size = sizeof(struct MinNode);
+		/* Pad the allocation size to a multiple of 8 bytes. */
+		if ((entry_size % MEM_BLOCKSIZE) > 0)
+			padding = MEM_BLOCKSIZE - (entry_size % MEM_BLOCKSIZE);
+		else
+			padding = 0;
 
-		D(("final entry size prior to picking slab size = %ld bytes",entry_size));
+		/* Check if the sums will cause an integer overflow. */
+		if (__addition_overflows(sizeof(*chunk), allocation_size) ||
+		    __addition_overflows(entry_size, padding))
+		{
+			overflow = TRUE;
+		}
+		else
+		{
+			/* Looking good so far. */
+			entry_size += padding;
 
-		/* Find a slab which keeps track of chunks that are no
-		 * larger than the amount of memory which needs to be
-		 * allocated. We end up picking the smallest chunk
-		 * size that still works.
+			overflow = FALSE;
+		}
+
+		if (overflow == FALSE)
+		{
+			D(("final entry size prior to picking slab size = %ld bytes", entry_size));
+
+			/* Find a slab which keeps track of chunks that are no
+			 * larger than the amount of memory which needs to be
+			 * allocated. We end up picking the smallest chunk
+			 * size that still works.
 		 *
 		 * Note that we start with a minimum size of 8 bytes because that
 		 * is the exact minimum size of a memory allocation as performed
 		 * by AllocMem() and the Allocate() function which it is built
 		 * upon.
-		 */
+			 */
 		for(slab_index = 3, chunk_size = (1UL << slab_index) ;
-		    slab_index < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ;
-		    slab_index++, chunk_size += chunk_size)
-		{
-			if(entry_size <= chunk_size)
+			     slab_index < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ;
+			     slab_index++, chunk_size += chunk_size)
 			{
-				D(("using slab #%ld (%lu bytes per chunk)", slab_index, chunk_size));
+				if (entry_size <= chunk_size)
+				{
+					D(("using slab #%ld (%lu bytes per chunk)", slab_index, chunk_size));
 
-				assert( (chunk_size % sizeof(LONG)) == 0 );
+					assert( (chunk_size % sizeof(LONG)) == 0 );
 
-				slab_list = &__slab_data.sd_Slabs[slab_index];
-				break;
+					slab_list = &__slab_data.sd_Slabs[slab_index];
+					break;
+				}
 			}
 		}
 
-		if(slab_list != NULL)
+		if (slab_list != NULL)
 		{
 			struct SlabNode * sn;
 
@@ -248,7 +303,7 @@ __slab_allocate(size_t allocation_size)
 				D(("no slab is available which still has free room"));
 
 				/* Try to recycle an empty (unused) slab, if possible. */
-				for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ; 
+				for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ;
 				    free_node->mln_Succ != NULL ;
 				    free_node = free_node_next)
 				{
@@ -412,7 +467,7 @@ __slab_allocate(size_t allocation_size)
 
 					D(("purging empty slabs"));
 
-					for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ; 
+					for(free_node = (struct MinNode *)__slab_data.sd_EmptySlabs.mlh_Head ;
 					    free_node->mln_Succ != NULL ;
 					    free_node = free_node_next)
 					{
@@ -471,7 +526,10 @@ __slab_allocate(size_t allocation_size)
 		}
 		else
 		{
-			D(("no matching slab found"));
+			if (overflow)
+				SHOWMSG("integer overflow");
+			else
+				D(("no matching slab found"));
 		}
 	}
 
@@ -743,7 +801,7 @@ __slab_init(size_t slab_size)
 		size += size;
 
 	D(("size = %lu",size));
-	
+
 	/* If the slab size looks sound, enable the slab memory allocator. */
 	if((size & 0x80000000) == 0)
 	{
@@ -875,3 +933,7 @@ __slab_exit(void)
 
 	LEAVE();
 }
+
+/****************************************************************************/
+
+#endif /* __USE_SLAB_ALLOCATOR */
