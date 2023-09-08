@@ -150,27 +150,29 @@ extern char * __getcwd(char * buffer,size_t buffer_size,const char *file,int lin
 
 /****************************************************************************/
 
-/* If this flag is set in mn_Size, then this memory allocation
+/* If this flag is set in mn_Flags, then this memory allocation
  * cannot be released with free() or used with realloc(). This
  * flag is set by alloca().
  */
-#define MN_SIZE_NEVERFREE (0x80000000UL)
+#define MNF_NEVER_FREE (1UL << 0)
 
-/* This obtains the allocation size from a memory node, ignoring
- * the "never free" flag altogether.
+/* Memory allocations are remembered by this tracking data structure.
+ * Its size is always a multiple of 8 bytes, which provides memory
+ * address alignment to a 64-bit boundary.
  */
-#define GET_MN_SIZE(mn) ((mn)->mn_Size & ~MN_SIZE_NEVERFREE)
-
 struct MemoryNode
 {
-#ifdef __MEM_DEBUG
 	struct MinNode		mn_MinNode;
 
+	ULONG				mn_AllocationSize;
+	ULONG				mn_Flags;
+
+#ifdef __MEM_DEBUG
 	UBYTE				mn_AlreadyFree;
-	UBYTE				mn_Pad0[3];
+	UBYTE				mn_Pad1[3];
 
 	void *				mn_Allocation;
-	size_t				mn_AllocationSize;
+	size_t				mn_OriginalSize;
 
 	char *				mn_FreeFile;
 	int					mn_FreeLine;
@@ -183,12 +185,10 @@ struct MemoryNode
 	struct MemoryNode *	mn_Right;
 	struct MemoryNode *	mn_Parent;
 	UBYTE				mn_IsRed;
-	UBYTE				mn_Pad1[3];
+	UBYTE				mn_Pad2[3];
 #endif /* __USE_MEM_TREES */
 
 #endif /* __MEM_DEBUG */
-
-	ULONG				mn_Size;
 };
 
 #ifdef __USE_MEM_TREES
@@ -247,12 +247,14 @@ struct SlabNode
 };
 
 /* Memory allocations which are not part of a slab are
- * tracked using this data structure.
+ * tracked using this data structure. This data structure
+ * is supposed to be a multiple of 8 bytes in size.
  */
 struct SlabSingleAllocation
 {
 	struct MinNode	ssa_MinNode;
 	ULONG			ssa_Size;
+	ULONG			ssa_Pad;
 };
 
 /* This is the global bookkeeping information for managing
