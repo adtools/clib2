@@ -141,7 +141,7 @@ __allocate_memory(
 
 		if (__addition_overflows(sizeof(*mn) + MALLOC_HEAD_SIZE + MALLOC_TAIL_SIZE, size))
 		{
-			SHOWMSG("integer overflow")
+			SHOWMSG("integer overflow");
 
 			__set_errno(ENOMEM);
 			goto out;
