@@ -298,8 +298,8 @@ __allocate_memory(
 	#if defined(UNIX_PATH_SEMANTICS)
 	{
 		/* Set the zero length allocation contents to NULL. */
-		if (original_size == 0 && size >= sizeof(char *))
-			*(char **)result = NULL;
+		if (original_size == 0 && size >= sizeof(BYTE *))
+			*(BYTE **)result = NULL;
 	}
 	#endif /* UNIX_PATH_SEMANTICS */
 
