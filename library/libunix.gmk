@@ -22,13 +22,13 @@ LIBS += \
 UNIX_LIB := \
 	unix.lib_rev.o \
 	dirent_closedir.o \
-	dirent_rewinddir.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
+	dirent_rewinddir.o \
 	fcntl_creat.o \
 	fcntl_fcntl.o \
-	fcntl_open.o \
 	fcntl_get_default_file.o \
+	fcntl_open.o \
 	getopt_getopt_long.o \
 	mount_convertinfo.o \
 	mount_statfs.o \
@@ -36,16 +36,16 @@ UNIX_LIB := \
 	resource_setrlimit.o \
 	stat_chmod.o \
 	stat_fstat.o \
-	stat_lstat.o \
 	stat_lock.o \
+	stat_lstat.o \
 	stat_mkdir.o \
 	stat_rmdir.o \
 	stat_stat.o \
 	stdio_ctermid.o \
 	stdio_fdhookentry.o \
 	stdio_fflush.o \
-	stdio_fopen.o \
 	stdio_file_init.o \
+	stdio_fopen.o \
 	stdio_init_exit.o \
 	stdio_locksemaphorename.o \
 	stdio_openiob.o \
@@ -60,15 +60,17 @@ UNIX_LIB := \
 	stdlib_dlopen.o \
 	stdlib_expand_wildcard.o \
 	stdlib_expand_wildcard_check.o \
+	stdlib_free.o \
 	stdlib_getmemstats.o \
 	stdlib_main.o \
 	stdlib_main_stub.o \
+	stdlib_malloc.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
-	stdlib_malloc.o \
 	stdlib_realloc.o \
 	stdlib_resetmemstats.o \
+	stdlib_slab.o \
 	stdlib_system.o \
 	systeminfo_sysinfo.o \
 	termios_cfgetispeed.o \

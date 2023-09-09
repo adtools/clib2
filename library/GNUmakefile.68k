@@ -122,7 +122,7 @@ WARNINGS = \
 #	-Wconversion -Wshadow
 
 INCLUDES = -Iinclude -I. -Inetinclude
-#OPTIONS = -fno-builtin -fno-common -DDEBUG
+#OPTIONS = -fno-builtin -fno-common
  OPTIONS = -fno-builtin -fno-common -DNDEBUG
 #OPTIONS = -fno-builtin -fno-common -DNDEBUG -D__THREAD_SAFE
 #OPTIONS = -fno-builtin -fno-common -D__MEM_DEBUG
@@ -449,7 +449,6 @@ C_LIB = \
 	time_numbertostring.o \
 	time_strftime.o \
 	time_time.o \
-	time_tzset.o \
 	time_weekday.o \
 	uio_readv.o \
 	uio_writev.o \
@@ -492,13 +491,13 @@ C_LIB = \
 UNIX_LIB = \
 	unix.lib_rev.o \
 	dirent_closedir.o \
-	dirent_rewinddir.o \
 	dirent_opendir.o \
 	dirent_readdir.o \
+	dirent_rewinddir.o \
 	fcntl_creat.o \
 	fcntl_fcntl.o \
-	fcntl_open.o \
 	fcntl_get_default_file.o \
+	fcntl_open.o \
 	getopt_getopt_long.o \
 	mount_convertinfo.o \
 	mount_statfs.o \
@@ -506,17 +505,17 @@ UNIX_LIB = \
 	resource_setrlimit.o \
 	stat_chmod.o \
 	stat_fstat.o \
-	stat_lstat.o \
 	stat_lock.o \
+	stat_lstat.o \
 	stat_mkdir.o \
 	stat_rmdir.o \
 	stat_stat.o \
 	stdio_ctermid.o \
 	stdio_fdhookentry.o \
 	stdio_fflush.o \
+	stdio_file_init.o \
 	stdio_fopen.o \
 	stdio_init_exit.o \
-	stdio_file_init.o \
 	stdio_locksemaphorename.o \
 	stdio_openiob.o \
 	stdio_popen.o \
@@ -527,17 +526,28 @@ UNIX_LIB = \
 	stdlib_alloca_cleanup.o \
 	stdlib_alloca_trap.o \
 	stdlib_arg.o \
+	stdlib_calloc.o \
+	stdlib_decay_unused_slabs.o \
 	stdlib_expand_wildcard.o \
 	stdlib_expand_wildcard_check.o \
+	stdlib_free.o \
+	stdlib_free_unused_slabs.o \
 	stdlib_getmemstats.o \
+	stdlib_get_slab_allocations.o \
+	stdlib_get_slab_stats.o \
+	stdlib_get_slab_usage.o \
 	stdlib_main.o \
 	stdlib_main_stub.o \
+	stdlib_malloc.o \
 	stdlib_mkdtemp.o \
 	stdlib_mkstemp.o \
 	stdlib_mktemp.o \
-	stdlib_malloc.o \
 	stdlib_realloc.o \
+	stdlib_red_black.o \
 	stdlib_resetmemstats.o \
+	stdlib_slab.o \
+	stdlib_slab_max_size.o \
+	stdlib_slab_purge_threshold.o \
 	stdlib_system.o \
 	systeminfo_sysinfo.o \
 	termios_cfgetispeed.o \
@@ -1154,6 +1164,34 @@ $(LIBC_OBJS)/stdlib_get_slab_allocations.o : stdlib_get_slab_allocations.c stdli
 $(LIBC_OBJS)/stdlib_realloc.o : stdlib_realloc.c stdlib_memory.h include/stdlib.h
 
 $(LIBC_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_memory.h include/stdlib.h
+
+##############################################################################
+
+$(LIBUNIX_OBJS)/stdlib_alloca.o : stdlib_alloca.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_calloc.o : stdlib_calloc.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_decay_unused_slabs.o : stdlib_decay_unused_slabs.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_free.o : stdlib_free.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_free_unused_slabs.o : stdlib_free_unused_slabs.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_get_slab_allocations.o : stdlib_get_slab_allocations.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_get_slab_stats.o : stdlib_get_slab_stats.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_get_slab_usage.o : stdlib_get_slab_usage.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_malloc.o : stdlib_malloc.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_realloc.o : stdlib_realloc.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_red_black.o : stdlib_red_black.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_slab.o : stdlib_slab.c stdlib_memory.h include/stdlib.h
+
+$(LIBUNIX_OBJS)/stdlib_slab_purge_threshold.o : stdlib_slab_purge_threshold.c stdlib_memory.h include/stdlib.h
 
 ##############################################################################
 
