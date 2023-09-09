@@ -187,6 +187,11 @@ __allocate_memory(
 		if (__slab_data.sd_InUse)
 		{
 			mn = __slab_allocate(allocation_size);
+
+			SHOWPOINTER(mn);
+
+			assert( (((ULONG)mn) & MEM_BLOCKMASK) == 0 );
+			assert( (((ULONG)&mn[1]) & MEM_BLOCKMASK) == 0 );
 		}
 		/* Are we using the memory pool? */
 		else if (__memory_pool != NULL)
@@ -529,11 +534,14 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 	{
 		memory_semaphore = __create_semaphore();
 		if (memory_semaphore == NULL)
+		{
+			SHOWMSG("could not create memory semaphore");
 			goto out;
+		}
 	}
 	#endif /* __THREAD_SAFE */
 
-	#if defined(__USE_SLAB_ALLOCATOR)
+	#ifdef __USE_SLAB_ALLOCATOR
 	{
 		/* ZZZ this is just for the purpose of testing */
 		#if DEBUG
@@ -542,13 +550,15 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 
 			if (GetVar("SLAB_SIZE", slab_size_var, sizeof(slab_size_var), 0) > 0)
 			{
-				LONG value;
+				LONG value = 0;
 
 				if (StrToLong(slab_size_var, &value) > 0 && value > 0)
 					__slab_max_size = (size_t)value;
 			}
 		}
 		#endif
+
+		SHOWVALUE(__slab_max_size);
 
 		/* Enable the slab memory allocator? */
 		if (__slab_max_size > 0)
@@ -561,7 +571,10 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 			{
 				__memory_pool = CreatePool(MEMF_PRIVATE, (ULONG)__default_pool_size, (ULONG)__default_puddle_size);
 				if (__memory_pool == NULL)
+				{
+					SHOWMSG("could not create memory pool");
 					goto out;
+				}
 			}
 			#else
 			{
@@ -572,7 +585,10 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 				{
 					__memory_pool = CreatePool(MEMF_ANY, (ULONG)__default_pool_size, (ULONG)__default_puddle_size);
 					if (__memory_pool == NULL)
+					{
+						SHOWMSG("could not create memory pool");
 						goto out;
+					}
 				}
 			}
 			#endif /* __amigaos4__ */
@@ -584,7 +600,10 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 		{
 			__memory_pool = CreatePool(MEMF_PRIVATE, (ULONG)__default_pool_size, (ULONG)__default_puddle_size);
 			if (__memory_pool == NULL)
+			{
+				SHOWMSG("could not create memory pool");
 				goto out;
+			}
 		}
 		#else
 		{
@@ -595,12 +614,15 @@ STDLIB_CONSTRUCTOR(stdlib_memory_init)
 			{
 				__memory_pool = CreatePool(MEMF_ANY, (ULONG)__default_pool_size, (ULONG)__default_puddle_size);
 				if (__memory_pool == NULL)
+				{
+					SHOWMSG("could not create memory pool");
 					goto out;
+				}
 			}
 		}
 		#endif /* __amigaos4__ */
 	}
-	#endif /* __USE_SLAB_ALLOCATOR) */
+	#endif /* __USE_SLAB_ALLOCATOR */
 
 	success = TRUE;
 
