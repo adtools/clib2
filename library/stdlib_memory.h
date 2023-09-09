@@ -168,9 +168,6 @@ struct MemoryNode
 	ULONG				mn_Flags;
 
 #ifdef __MEM_DEBUG
-	UBYTE				mn_AlreadyFree;
-	UBYTE				mn_Pad1[3];
-
 	void *				mn_Allocation;
 	size_t				mn_OriginalSize;
 
@@ -180,10 +177,13 @@ struct MemoryNode
 	char *				mn_File;
 	int					mn_Line;
 
+	UBYTE				mn_AlreadyFree;
+	UBYTE				mn_Pad1[7];
 #ifdef __USE_MEM_TREES
 	struct MemoryNode *	mn_Left;
 	struct MemoryNode *	mn_Right;
 	struct MemoryNode *	mn_Parent;
+
 	UBYTE				mn_IsRed;
 	UBYTE				mn_Pad2[3];
 #endif /* __USE_MEM_TREES */
