@@ -78,7 +78,8 @@ __realloc(void *ptr, size_t size, const char * file, int line)
 #endif /* UNIX_PATH_SEMANTICS */
 	else
 	{
-		size_t old_size;
+		size_t new_allocation_size UNUSED;
+		size_t old_allocation_size;
 		struct MemoryNode * mn;
 		BOOL reallocate;
 
@@ -92,8 +93,7 @@ __realloc(void *ptr, size_t size, const char * file, int line)
 
 		#ifdef __MEM_DEBUG
 		{
-			/* If we managed to find the memory allocation,
-			   reallocate it. */
+			/* Quit if we failed to find the memory allocation. */
 			if (mn == NULL)
 			{
 				SHOWMSG("allocation not found");
@@ -101,8 +101,6 @@ __realloc(void *ptr, size_t size, const char * file, int line)
 				kprintf("[%s] %s:%ld:Address for realloc(0x%08lx,%ld) not known.\n",
 					__program_name, file, line, ptr, size);
 
-				/* Apparently, the address did not qualify for
-				   reallocation. */
 				goto out;
 			}
 		}
@@ -120,31 +118,39 @@ __realloc(void *ptr, size_t size, const char * file, int line)
 
 		assert( FLAG_IS_CLEAR(mn->mn_Flags, MNF_NEVER_FREE) );
 
-		old_size = mn->mn_AllocationSize;
+		old_allocation_size = mn->mn_AllocationSize;
 
-		/* Don't do anything unless the size of the allocation
-		   has really changed. */
+		/* If the memory debug option is enabled, just check if
+		 * requested allocation size has changed.
+		 */
 		#if defined(__MEM_DEBUG)
 		{
-			reallocate = (old_size != size);
+			reallocate = (mn->mn_OriginalSize != size);
+
+			new_allocation_size = (sizeof(*mn) + MALLOC_HEAD_SIZE + size + MALLOC_TAIL_SIZE + MEM_BLOCKMASK) & ~MEM_BLOCKMASK;
 		}
 		#else
 		{
-			if (size > old_size)
+			/* The actual size of the allocation is affected by the
+			   granularity and minimum allocation size used by the
+			   operating system. */
+			new_allocation_size = (sizeof(*mn) + size + MEM_BLOCKMASK) & ~MEM_BLOCKMASK;
+
+			if (new_allocation_size > old_allocation_size)
 			{
 				/* Allocation size should grow. */
 				reallocate = TRUE;
 			}
-			else
+			else if (new_allocation_size < old_allocation_size)
 			{
-
 				/* Optimization: If the block size shrinks by less than half the
 				                 original allocation size, do not reallocate the
-				                 block and do not copy over the contents of the old
-				                 allocation. We also take into account that the
-				                 actual size of the allocation is affected by a
-				                 certain operating system imposed granularity. */
-				reallocate = (size < old_size && size <= old_size / 2);
+				                 block. */
+				reallocate = (size <= old_allocation_size / 2);
+			}
+			else
+			{
+				reallocate = FALSE;
 			}
 		}
 		#endif /* __MEM_DEBUG */
@@ -153,10 +159,10 @@ __realloc(void *ptr, size_t size, const char * file, int line)
 		{
 			void * new_ptr;
 
-			D(("realloc() size has changed; old=%ld, new=%ld", old_size, size));
+			D(("realloc() allocation size has changed; old=%ld, new=%ld", old_allocation_size, new_allocation_size));
 
 			/* We allocate the new memory chunk before we
-			   attempt to replace the old. */
+			   attempt to replace the old one. */
 			new_ptr = __malloc(size, file, line);
 			if (new_ptr == NULL)
 			{
@@ -164,9 +170,41 @@ __realloc(void *ptr, size_t size, const char * file, int line)
 				goto out;
 			}
 
-			/* Copy the contents of the old allocation to the new buffer. */
-			if (size > old_size)
-				size = old_size;
+			/* With memory debugging enabled, the size of the allocation made
+			 * will use the requested and not the rounded size of the
+			 * allocation, which can be shorter. We need to deal with this.
+			 */
+			#if defined(__MEM_DEBUG)
+			{
+				struct MemoryNode * new_mn;
+
+				new_mn = __find_memory_node(new_ptr);
+				if (new_mn == NULL)
+				{
+					free(new_ptr);
+
+					SHOWMSG("Could not find memory node for new allocation");
+					goto out;
+				}
+
+				/* Make sure that if the new allocation size is smaller than
+				 * the old allocation, we only copy as much data as will fit
+				 * into the new allocation.
+				 */
+				if (size > new_mn->mn_OriginalSize)
+					size = new_mn->mn_OriginalSize;
+			}
+			#else
+			{
+				/* We assume that the total size of the allocation will
+				 * include padding. The requested size does not include
+				 * the memory node, of course, which is why it is added
+				 * here.
+				 */
+				if (size + sizeof(*mn) > old_allocation_size)
+					size = old_allocation_size - sizeof(*mn);
+			}
+			#endif /* __MEM_DEBUG */
 
 			memmove(new_ptr, ptr, size);
 
@@ -179,7 +217,7 @@ __realloc(void *ptr, size_t size, const char * file, int line)
 		else
 		{
 			D(("size didn't actually change that much (%ld -> %ld); returning memory block as is.",
-				old_size, size));
+				old_allocation_size, new_allocation_size));
 
 			/* No change in size. */
 			result = ptr;
