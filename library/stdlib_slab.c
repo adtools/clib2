@@ -417,8 +417,8 @@ __slab_allocate(size_t allocation_size)
 						 * padding added to make the first allocatable slab start on
 						 * a 64 bit boundary.
 						 */
-						aligned_first_byte = ((ULONG)&new_sn[1] + MEM_BLOCKMASK) & ~MEM_BLOCKMASK;
-						
+						aligned_first_byte = (((ULONG)&new_sn[1]) + MEM_BLOCKMASK) & ~MEM_BLOCKMASK;
+
 						first_byte	= (BYTE *)aligned_first_byte;
 						last_byte	= &first_byte[__slab_data.sd_StandardSlabSize - chunk_size];
 
@@ -445,6 +445,8 @@ __slab_allocate(size_t allocation_size)
 
 					/* Grab the first free chunk (there has to be one). */
 					chunk = (struct SlabChunk *)RemHead((struct List *)&new_sn->sn_FreeList);
+
+					assert( chunk != NULL );
 
 					/* Keep track of this chunk's parent slab. */
 					chunk->sc_ParentSlab = new_sn;
