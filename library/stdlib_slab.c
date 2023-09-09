@@ -29,10 +29,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(__USE_SLAB_ALLOCATOR)
-
-/****************************************************************************/
-
 /*#define DEBUG*/
 
 #ifndef _STDLIB_HEADERS_H
@@ -397,7 +393,6 @@ __slab_allocate(size_t allocation_size)
 					{
 						struct SlabChunk * free_chunk;
 						ULONG num_free_chunks = 0;
-						ULONG aligned_first_byte;
 						BYTE * first_byte;
 						BYTE * last_byte;
 
@@ -417,9 +412,7 @@ __slab_allocate(size_t allocation_size)
 						 * padding added to make the first allocatable slab start on
 						 * a 64 bit boundary.
 						 */
-						aligned_first_byte = (((ULONG)&new_sn[1]) + MEM_BLOCKMASK) & ~MEM_BLOCKMASK;
-
-						first_byte	= (BYTE *)aligned_first_byte;
+						first_byte	= (BYTE *)((((ULONG)&new_sn[1]) + MEM_BLOCKMASK) & ~MEM_BLOCKMASK);
 						last_byte	= &first_byte[__slab_data.sd_StandardSlabSize - chunk_size];
 
 						for (free_chunk = (struct SlabChunk *)first_byte ;
@@ -693,7 +686,7 @@ __slab_free(void * address, size_t allocation_size)
 					BYTE * first_byte;
 					BYTE * last_byte;
 
-					first_byte	= (BYTE *)&sn[1];
+					first_byte	= (BYTE *)((((ULONG)&sn[1]) + MEM_BLOCKMASK) & ~MEM_BLOCKMASK);
 					last_byte	= &first_byte[__slab_data.sd_StandardSlabSize - chunk_size];
 
 					for (free_chunk = (struct MinNode *)first_byte ;
@@ -781,18 +774,32 @@ __slab_free(void * address, size_t allocation_size)
 void
 __slab_init(size_t slab_size)
 {
+	const size_t min_slab_size = (1UL << 12);
 	const size_t max_slab_size = (1UL << (NUM_ENTRIES(__slab_data.sd_Slabs)));
 	size_t size;
+	size_t n;
+	int i;
 
-	SETDEBUGLEVEL(2);
+	ENTER();
 
-	D(("slab_size = %ld", slab_size));
+	D(("initial slab_size = %ld", slab_size));
 
-	/* Do not allow for a slab size that is larger than
-	 * what we support.
+	/* A slab size should never be too small to be useful
+	 * and never larger than we can support.
 	 */
+	if (slab_size < min_slab_size)
+	{
+		slab_size = min_slab_size;
+
+		D(("raising slab size to %ld bytes", slab_size));
+	}
+
 	if (slab_size > max_slab_size)
+	{
 		slab_size = max_slab_size;
+
+		D(("capping slab size at %ld bytes", slab_size));
+	}
 
 	/* If the maximum allocation size to be made from the slab
 	 * is not already a power of 2, round it up. We do not
@@ -802,33 +809,44 @@ __slab_init(size_t slab_size)
 	 * Note that the maximum allocation size also defines the
 	 * amount of memory which each slab manages.
 	 */
-	size = sizeof(struct MinNode);
-	while (size < slab_size && (size & 0x80000000) == 0)
-		size += size;
+	size = 0;
 
-	D(("size = %lu", size));
-
-	/* If the slab size looks sound, enable the slab memory allocator. */
-	if ((size & 0x80000000) == 0)
+	for (i = 0 ; i < 31 ; i++)
 	{
-		int i;
+		n = (1UL << i);
 
-		D(("activating slab allocator"));
+		/* Do not use a larger slab size than we can support. */
+		if (n > max_slab_size)
+			break;
 
-		memset(&__slab_data, 0, sizeof(__slab_data));
-
-		assert( size <= slab_size );
-
-		/* Start with an empty list of slabs for each chunk size. */
-		for (i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
-			NewList((struct List *)&__slab_data.sd_Slabs[i]);
-
-		NewList((struct List *)&__slab_data.sd_SingleAllocations);
-		NewList((struct List *)&__slab_data.sd_EmptySlabs);
-
-		__slab_data.sd_StandardSlabSize	= size;
-		__slab_data.sd_InUse			= TRUE;
+		/* Pick the largest slab size that is a power of two
+		 * which either matches the requested size or is larger
+		 * than it.
+		 */
+		if (n >= slab_size)
+		{
+			size = n;
+			break;
+		}
 	}
+
+	D(("activating slab allocator"));
+
+	memset(&__slab_data, 0, sizeof(__slab_data));
+
+	assert( size <= max_slab_size );
+
+	/* Start with an empty list of slabs for each chunk size. */
+	for (i = 0 ; i < (int)NUM_ENTRIES(__slab_data.sd_Slabs) ; i++)
+		NewList((struct List *)&__slab_data.sd_Slabs[i]);
+
+	NewList((struct List *)&__slab_data.sd_SingleAllocations);
+	NewList((struct List *)&__slab_data.sd_EmptySlabs);
+
+	__slab_data.sd_StandardSlabSize	= size;
+	__slab_data.sd_InUse			= TRUE;
+
+	LEAVE();
 }
 
 /****************************************************************************/
@@ -939,7 +957,3 @@ __slab_exit(void)
 
 	LEAVE();
 }
-
-/****************************************************************************/
-
-#endif /* __USE_SLAB_ALLOCATOR */
