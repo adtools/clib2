@@ -48,7 +48,7 @@
 /****************************************************************************/
 
 __static void *
-__calloc(size_t num_elements, size_t element_size, const char * file, int line)
+__calloc(size_t num_elements, size_t element_size, const char * file UNUSED, int line UNUSED)
 {
 	void * result = NULL;
 	size_t total_size;
