@@ -71,7 +71,7 @@ raise(int sig)
 	assert( SIGABRT <= sig && sig <= SIGTERM );
 
 	/* This has to be a well-known and supported signal. */
-	if(sig < SIGABRT || sig > SIGTERM)
+	if (sig < SIGABRT || sig > SIGTERM)
 	{
 		SHOWMSG("unknown signal number");
 
@@ -80,48 +80,49 @@ raise(int sig)
 	}
 
 	/* Can we deliver the signal? */
-	if(FLAG_IS_CLEAR(__signals_blocked,		(1 << sig)) &&
-	   FLAG_IS_CLEAR(local_signals_blocked,	(1 << sig)))
+	if (FLAG_IS_CLEAR(__signals_blocked,		(1 << sig)) &&
+	    FLAG_IS_CLEAR(local_signals_blocked,	(1 << sig)))
 	{
 		signal_handler_t handler;
 
 		/* Which handler is installed for this signal? */
 		handler = __signal_handler_table[sig - SIGABRT];
 
-		/* Should we ignore this signal? */
-		if(handler != SIG_IGN)
+		/* Should we handle this signal rather than ignoring it? */
+		if (handler != SIG_IGN)
 		{
 			/* Block delivery of this signal to prevent recursion. */
-			SET_FLAG(local_signals_blocked,(1 << sig));
+			SET_FLAG(local_signals_blocked, (1 << sig));
 
 			/* The default behaviour is to drop into abort(), or do
-			   something very much like it. */
-			if(handler == SIG_DFL)
+			 * something very much like it.
+			 */
+			if (handler == SIG_DFL)
 			{
 				SHOWMSG("this is the default handler");
 
-				if(sig == SIGINT)
+				if (sig == SIGINT)
 				{
 					char break_string[80];
 
 					/* Turn off ^C checking for good. */
 					__check_abort_enabled = FALSE;
 
-					Fault(ERROR_BREAK,NULL,break_string,(LONG)sizeof(break_string));
+					Fault(ERROR_BREAK, NULL, break_string, (LONG)sizeof(break_string));
 
 					__print_termination_message(break_string);
 
 					SHOWMSG("bye, bye...");
 				}
 
-				/* Drop straight into abort(), which might call signal()
-				   again but is otherwise guaranteed to eventually
-				   land us in _exit(). */
-				abort();
+				/* Drop straight into __abort(), which will
+				   eventually land us in _exit(). Note that
+				   abort() calls raise(SIGABRT). */
+				__abort();
 			}
-			else 
+			else
 			{
-				SHOWMSG("calling the handler");
+				SHOWMSG("calling the signal handler");
 
 				(*handler)(sig);
 
@@ -129,7 +130,7 @@ raise(int sig)
 			}
 
 			/* Unblock signal delivery again. */
-			CLEAR_FLAG(local_signals_blocked,(1 << sig));
+			CLEAR_FLAG(local_signals_blocked, (1 << sig));
 		}
 	}
 	else
