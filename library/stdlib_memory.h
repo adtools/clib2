@@ -266,8 +266,8 @@ struct SlabData
 	 * which are a power of 2 bytes in size, e.g. 8, 16, 32,
 	 * 64, 128 bytes. Hence, sd_Slabs[3] keeps track of the slabs
 	 * which are 8 bytes in size, sd_Slabs[4] is for 16 byte
-	 * chunks, etc. The minimum chunk size is 8, which is why
-	 * lists 0..2 are not used. Currently, there is an upper limit
+	 * chunks, etc. The minimum chunk size is 16, which is why
+	 * lists 0..3 are not used. Currently, there is an upper limit
 	 * of 2^17 bytes per chunk, but you should not be using slab
 	 * chunks much larger than 4096 bytes.
 	 */
