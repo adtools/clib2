@@ -120,6 +120,7 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 
 		SHOWVALUE(total_size);
 
+		/* No buffering enabled? */
 		if ((file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
 		{
 			ssize_t num_bytes_read;
@@ -144,7 +145,7 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 				/* If there is more data to be read and the read buffer is empty
 				 * anyway, we'll bypass the buffer entirely.
 				 */
-				if(file->iob_BufferReadBytes == 0 && total_size >= (size_t)file->iob_BufferSize)
+				if (file->iob_BufferReadBytes == 0 && total_size >= (size_t)file->iob_BufferSize)
 				{
 					ssize_t num_bytes_read;
 
@@ -163,19 +164,13 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 					break;
 				}
 
-				/* If there is data in the read buffer, try to copy it directly
-				 * into the output buffer.
+				/* If there is still data in the read buffer, try to copy it
+				 * directly into the output buffer.
 				 */
 				if (file->iob_BufferPosition < file->iob_BufferReadBytes)
 				{
 					const unsigned char * buffer = &file->iob_Buffer[file->iob_BufferPosition];
 					size_t num_bytes_in_buffer;
-
-					/* Give the user a chance to abort what could otherwise
-					 * become an uninterrupted series of copying operations.
-					 */
-					if (__check_abort_enabled)
-						__check_abort();
 
 					/* Copy as much data as will fit. */
 					assert( file->iob_BufferReadBytes >= file->iob_BufferPosition );
@@ -198,17 +193,13 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 					/* Stop if the string buffer has been filled. */
 					assert( total_size >= num_bytes_in_buffer );
 
+					/* Are we finished yet? */
 					total_size -= num_bytes_in_buffer;
 					if (total_size == 0)
 						break;
-
-					/* If the read buffer is now empty and there is still enough data
-					 * to be read, try to optimize the read operation.
-					 */
-					if (file->iob_BufferReadBytes == 0 && total_size >= (size_t)file->iob_BufferSize)
-						continue;
 				}
 
+				/* Read the next byte and/or refill the read buffer. */
 				c = __getc(file);
 				if (c == EOF)
 					break;
