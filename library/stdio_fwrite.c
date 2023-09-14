@@ -183,7 +183,9 @@ fwrite(const void *ptr,size_t element_size,size_t count,FILE *stream)
 
 					file->iob_BufferWriteBytes += num_buffer_bytes;
 
-					/* Write the buffer to disk if it's full or contains a line feed. */
+					/* Write the buffer to disk if the buffer is full
+					 * or contains a line feed.
+					 */
 					if ((lf != NULL || __iob_write_buffer_is_full(file)) && __flush_iob_write_buffer(file) < 0)
 					{
 						/* Abort with error. */
@@ -237,7 +239,8 @@ fwrite(const void *ptr,size_t element_size,size_t count,FILE *stream)
 			{
 				/* If there is more data to be written than the write buffer will hold
 				 * and the write buffer is empty anyway, then we'll bypass the write
-				 * buffer entirely.
+				 * buffer entirely. Note that we try to store a complete full buffer
+				 * worth's of data, not just a few bytes.
 				 */
 				if (file->iob_BufferWriteBytes == 0 && total_size >= (size_t)file->iob_BufferSize)
 				{

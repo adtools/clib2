@@ -108,6 +108,7 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 		size_t total_bytes_read = 0;
 		size_t total_size;
 		unsigned char * data = ptr;
+		ssize_t num_bytes_read;
 		int c;
 
 		if (__fgetc_check((FILE *)file) < 0)
@@ -123,8 +124,6 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 		/* No buffering enabled? */
 		if ((file->iob_Flags & IOBF_BUFFER_MODE) == IOBF_BUFFER_MODE_NONE)
 		{
-			ssize_t num_bytes_read;
-
 			/* We bypass the buffer entirely. */
 			num_bytes_read = read(file->iob_Descriptor, data, total_size);
 			if (num_bytes_read == -1)
@@ -142,13 +141,13 @@ fread(void *ptr,size_t element_size,size_t count,FILE *stream)
 		{
 			while (total_size > 0)
 			{
-				/* If there is more data to be read and the read buffer is empty
-				 * anyway, we'll bypass the buffer entirely.
+				/* If the read buffer is empty and there is more data to be
+				 * read, we'll bypass the buffer entirely. Note that we try
+				 * to read a complete full buffer worth's of data, not just
+				 * a few bytes.
 				 */
 				if (file->iob_BufferReadBytes == 0 && total_size >= (size_t)file->iob_BufferSize)
 				{
-					ssize_t num_bytes_read;
-
 					/* We bypass the buffer entirely. */
 					num_bytes_read = read(file->iob_Descriptor, data, total_size);
 					if (num_bytes_read == -1)
