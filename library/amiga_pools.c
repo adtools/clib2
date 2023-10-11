@@ -291,7 +291,7 @@ static union PuddleUnion * create_new_puddle(struct MemoryPool * mp)
 	 * cleared and then the individual puddle allocations made
 	 * through LibAllocPooled() will be cleared, too.
 	 */
-	pu = alloc_vec(sizeof(pu->pu_MemHeader) + puddle_size + sizeof(APTR), memory_flags);
+	pu = alloc_vec(sizeof(pu->pu_MemHeader) + sizeof(LONG) + puddle_size, memory_flags);
 	if (pu == NULL)
 		goto out;
 
@@ -301,7 +301,7 @@ static union PuddleUnion * create_new_puddle(struct MemoryPool * mp)
 	 * and must be aligned to a 64 bit address. This happens to be
 	 * the smallest allocatable memory unit (MEM_BLOCKSIZE == 8).
 	 */
-	mc = (struct MemChunk *)(((ULONG)&mh[1] + MEM_BLOCKMASK) & ~MEM_BLOCKMASK);
+	mc = (struct MemChunk *)(((ULONG)&mh[1] + sizeof(LONG)) & ~MEM_BLOCKMASK);
 
 	mc->mc_Next		= NULL;
 	mc->mc_Bytes	= puddle_size;
