@@ -3,3 +3,4 @@
 /library/compiler.log
 /library/netinclude
 *.map
+.vscode
