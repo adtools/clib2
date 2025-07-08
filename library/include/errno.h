@@ -166,6 +166,8 @@ extern int errno;
 
 #define EILSEQ			85	/* Encoding error detected */
 
+#define ENOTSUP			86	/* Not supported */
+
 /****************************************************************************/
 
 #ifdef __cplusplus
