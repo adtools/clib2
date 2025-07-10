@@ -1,6 +1,97 @@
+c.lib 1.217 (10.7.2025)
+
+- The raise() function no longer directly calls abort() because that
+  function in turn would have invoked raise(SIGABRT), triggering an
+  infinite loop. Instead, raise() now invokes the __abort() function
+  which abort() would have called via raise(SIGABRT).
+
+- fgets() no longer leverages the __getc() macro, which in the
+  original implementation added excessive overhead for even small
+  read operations. Instead, fgets() now focuses on copying data
+  stored in the FILE read buffer, transferring the buffered data
+  in bulk, if possible. The same kind of changes are present in
+  the gets() function.
+
+- fputs() and puts() no longer leverage the __putc() macro. As with
+  the fgets() implementation, the focus is now on enabling bulk
+  data transfer, eliminating the __putc() macro overhead.
+
+- fread() and fwrite() no longer leverage the __getc() and
+  __putc() macros. Their focus is on enabling bulk data transfer
+  instead.
+
+- The setvbuf() function now correctly sets the buffer size to the
+  value of BUFSIZ if a buffer size of 0 is specified. Previously,
+  setvbuf() would have disabled buffering for the FILE instead.
+  Failure to allocate a buffer of the specified non-zero size is
+  now caught and results in the setvbuf() function to indicate
+  failure, setting the errno variable to ENOBUFS.
+
+- The alloca() library function (which is a built-in function for
+  gcc, for example) now calls abort() rather than returning NULL.
+
+- Changed the numeric overflow check which the calloc() function
+  uses to be simpler.
+  
+- The memory management debugging code in stdlib_free.c is no longer
+  reusing the allocation size value to indicate that an allocation
+  should never be freed. This indication is now stored in a separate
+  flags field.
+  
+- The memory debugging code in malloc() now checks if the combined
+  size of the management data structures and front/back padding
+  stay within the bounds of a 32 bit integer.
+  
+  The list of memory nodes to be freed is now initialized first.
+  Previously, the list would be left uninitialized if the attempt to
+  allocate memory for memory arbitration semaphore had failed.
+
+- The realloc() function now obtains the original size of the
+  allocation from a dedicated field of the data structure which
+  precedes the allocation, whose purpose is to track the
+  allocation until it is freed. Previously, obtaining the relevant
+  allocation size information was encapsulated by a "clever"
+  macro.
+  
+  With memory debugging enabled, the stored allocation size no
+  longer says how much memory, padding included, is being used.
+  Instead, the requested allocation size is stored unchanged, with
+  the total allocation size derived from this number. The idea is
+  to make it harder to mistake the original allocation size for
+  the padded one and vice versa.
+
+- The use of the optional slab allocator now has to be deliberately
+  enabled in the "stdlib_memory.h" header file.
+
+- The minimum size of an allocation managed by the optional slab
+  allocator is now 16 bytes instead of 8.
+
+- The minimum size of a slab is now 4096 bytes.
+
+- The optional slab allocator now checks for integer overflows when
+  processing allocation requests, taking into account the size of
+  the actual allocating, including padding. The task of figuring
+  out how much padding is needed now rests in function which
+  calculates the total overhead.
+
+
+amiga.lib 1.216 (10.7.2025)
+
+- Added a 'C' implementation of the pools.lib functions which were
+  merged with the Kickstart/Workbench 3.0 era amiga.lib. This
+  implementation provides the LibDeletePool(), LibCreatePool(),
+  LibAllocPooled() and LibFreePooled() functions which had not
+  been available before in clib2.
+  
+  Please note that these functions are largely obsolete and only
+  helpful for code which must run on Kickstart 2.04. The current
+  implementation performs no error checking for integer overflows,
+  just like the original pools.lib implementation.
+
+
 c.lib 1.216 (xxx)
 
-- Add some wchar and multbyte-string related functions to allow gcc
+- Add some wchar and multibyte-string related functions to allow gcc
   building a libstdc++ library with wide char support. For now, the
   functions are mostly stub ones only. They can be implemented on
   demand.
