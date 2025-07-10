@@ -414,7 +414,7 @@ STDLIB_DESTRUCTOR(stdlib_memory_exit)
 
 	/* Make sure that freeing any memory does not also
 	 * trigger the alloca cleanup operations. Otherwise,
-	 * the the data structures used by alloca() to track
+	 * the data structures used by alloca() to track
 	 * the scope in which allocated memory remains
 	 * valid and should not be freed just yet may be
 	 * freed, corrupting them.

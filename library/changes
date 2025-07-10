@@ -177,7 +177,7 @@ c.lib 1.206 (24.4.2015)
 
 - Removed the remains of all the stack extension and stack overflow/underflow
   checking code. It never actually worked. The bit that does work is the stack
-  usage measurement code, plus the bit that sets up the the custom stack
+  usage measurement code, plus the bit that sets up the custom stack
   according to local setting or by calling a query function.
 
 
@@ -1355,7 +1355,7 @@ c.lib 1.187 (29.1.2005)
   adding/subtracting the local time zone.
 
 - Changed the algorithm that calculates the number of days that have passed
-  so far as used by the the __convert_time() function and the conversion
+  so far as used by the __convert_time() function and the conversion
   code in strftime().
 
 - Also changed the algorithm used by strftime() to produce the week numbers
