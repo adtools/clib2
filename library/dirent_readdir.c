@@ -1,10 +1,8 @@
 /*
- * $Id: dirent_readdir.c,v 1.10 2006-09-25 14:51:15 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2025 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -79,8 +77,10 @@ readdir(DIR * directory_pointer)
 
 				dh->dh_Position++;
 
-				dh->dh_DirectoryEntry.d_ino = 0;
 				strcpy(dh->dh_DirectoryEntry.d_name,".");
+
+				dh->dh_DirectoryEntry.d_ino = 0;
+				dh->dh_DirectoryEntry.d_type = DT_DIR;
 
 				result = &dh->dh_DirectoryEntry;
 			}
@@ -115,8 +115,9 @@ readdir(DIR * directory_pointer)
 									assert( sizeof(dh->dh_DirectoryEntry.d_name) >= sizeof(fib->fib_FileName) );
 
 									strcpy(dh->dh_DirectoryEntry.d_name,fib->fib_FileName);
-
+									
 									dh->dh_DirectoryEntry.d_ino = fib->fib_DiskKey;
+									dh->dh_DirectoryEntry.d_type = DT_DIR;
 
 									result = &dh->dh_DirectoryEntry;
 								}
@@ -147,9 +148,10 @@ readdir(DIR * directory_pointer)
 
 					dh->dh_Position++;
 
-					dh->dh_DirectoryEntry.d_ino = dh->dh_FileInfo.fib_DiskKey;
-
 					strcpy(dh->dh_DirectoryEntry.d_name,".");
+
+					dh->dh_DirectoryEntry.d_ino = dh->dh_FileInfo.fib_DiskKey;
+					dh->dh_DirectoryEntry.d_type = DT_DIR;
 
 					result = &dh->dh_DirectoryEntry;
 				}
@@ -176,9 +178,10 @@ readdir(DIR * directory_pointer)
 
 					SHOWMSG("returning ..");
 
-					dh->dh_DirectoryEntry.d_ino = fib->fib_DiskKey;
-
 					strcpy(dh->dh_DirectoryEntry.d_name,"..");
+
+					dh->dh_DirectoryEntry.d_ino = fib->fib_DiskKey;
+					dh->dh_DirectoryEntry.d_type = DT_DIR;
 
 					result = &dh->dh_DirectoryEntry;
 				}
@@ -192,11 +195,22 @@ readdir(DIR * directory_pointer)
 
 			if(ExNext(dh->dh_DirLock,&dh->dh_FileInfo))
 			{
-				dh->dh_DirectoryEntry.d_ino = dh->dh_FileInfo.fib_DiskKey;
-
+				int type;
+				
 				assert( sizeof(dh->dh_DirectoryEntry.d_name) >= sizeof(dh->dh_FileInfo.fib_FileName) );
 
 				strcpy(dh->dh_DirectoryEntry.d_name,dh->dh_FileInfo.fib_FileName);
+
+				dh->dh_DirectoryEntry.d_ino = dh->dh_FileInfo.fib_DiskKey;
+
+				if (dh->dh_FileInfo.fib_DirEntryType == ST_SOFTLINK)
+					type = DT_LNK;
+				else if (dh->dh_FileInfo.fib_DirEntryType < 0)
+					type = DT_REG;
+				else
+					type = DT_DIR;
+
+				dh->dh_DirectoryEntry.d_type = type;
 
 				result = &dh->dh_DirectoryEntry;
 			}

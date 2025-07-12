@@ -1,10 +1,8 @@
 /*
- * $Id: dirent.h,v 1.7 2006-01-08 12:06:14 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2025 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +73,29 @@ struct dirent
 {
 	ino_t	d_ino;
 	char	d_name[NAME_MAX+1];
+	int		d_type;
 };
+
+#define _DIRENT_HAVE_D_TYPE
+
+/****************************************************************************/
+
+/* Note that the directory entry type is not a POSIX feature, but it will
+ * make life easier for porting code which expects the 'd_type' structure
+ * member in the 'struct dirent'.
+ *
+ * The following types are not all supported on the Amiga. For the time being,
+ * DT_DIR (directory), DT_REG (regular file) and DT_LNK (soft link) should make
+ * sense.
+ */
+#define DT_UNKNOWN	0
+#define DT_FIFO		1
+#define DT_CHR		2
+#define DT_DIR		4
+#define DT_BLK		6
+#define DT_REG		8
+#define DT_LNK		10
+#define DT_SOCK		12
 
 /****************************************************************************/
 
