@@ -1,10 +1,8 @@
 /*
- * $Id: locale.h,v 1.5 2006-01-08 12:06:14 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2025 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +57,10 @@ extern "C" {
 
 /****************************************************************************/
 
-typedef void *locale_t;
+/* Forward declaration */
+struct __locale_t;
+
+typedef struct __locale_t *locale_t;
 
 /****************************************************************************/
 
