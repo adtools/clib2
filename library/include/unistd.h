@@ -117,7 +117,7 @@ extern int readlink(const char * path_name, char * buffer, int buffer_size);
 extern int chdir(const char * path_name);
 extern int lockf(int file_descriptor, int function, off_t size);
 extern unsigned int sleep(unsigned int seconds);
-extern void usleep(unsigned long microseconds);
+extern int usleep(unsigned long microseconds);
 extern int getopt(int argc, char * const argv[], const char *opts);
 extern pid_t getpid(void);
 extern char *realpath(const char *file_name, char *resolved_name);

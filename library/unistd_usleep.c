@@ -41,7 +41,7 @@
 
 /****************************************************************************/
 
-void
+int
 usleep(unsigned long microseconds)
 {
 	ENTER();
@@ -51,4 +51,6 @@ usleep(unsigned long microseconds)
 	__time_delay(0,microseconds);
 
 	LEAVE();
+	
+	return 0;
 }
