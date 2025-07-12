@@ -1,10 +1,8 @@
 /*
- * $Id: math_sqrt.c,v 1.9 2006-09-22 07:54:24 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2025 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -251,7 +249,8 @@ sqrt(double x)
 	}
 	else
 	{
-		result = 0;
+		result = NAN;
+
 		__set_errno(EDOM);
 	}
 
