@@ -1,10 +1,8 @@
 /*
- * $Id: math_tgamma.c,v 1.3 2006-01-08 12:04:24 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
- * Copyright (c) 2002-2015 by Olaf Barthel <obarthel (at) gmx.net>
+ * Copyright (c) 2002-2025 by Olaf Barthel <obarthel (at) gmx.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,13 +52,11 @@ double
 tgamma(double x)
 {
 	int gamma_sign;
-    double y;
+	double y;
 
-	y = __lgamma(x,&gamma_sign);
-	if (gamma_sign < 0)
-		y = -y;
+	y = __lgamma(x, &gamma_sign);
 
-	return y;
+	return gamma_sign * exp(y);
 }
 
 /****************************************************************************/

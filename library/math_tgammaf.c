@@ -1,6 +1,4 @@
 /*
- * $Id: math_tgammaf.c,v 1.3 2006-01-08 12:04:24 obarthel Exp $
- *
  * :ts=4
  *
  * Portable ISO 'C' (1994) runtime library for the Amiga computer
@@ -56,11 +54,9 @@ tgammaf(float x)
 	int gamma_sign;
 	float y;
 
-	y = __lgammaf(x,&gamma_sign);
-	if (gamma_sign < 0)
-		y = -y;
+	y = __lgammaf(x, &gamma_sign);
 
-	return y;
+	return gamma_sign * expf(y);
 }
 
 /****************************************************************************/
