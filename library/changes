@@ -1,5 +1,17 @@
 c.lib 1.217 (10.7.2025)
 
+- Added support for handling path names which exceed 255 characters in
+  the AmigaOS 2.x/3.x build. This feature works by replacing calls to the
+  CreateDir(), DeleteFile(), Lock(), MakeLink(), Open(), Rename(),
+  SetComment(), SetFileDate(), SetOwner() and SetProtection() functions
+  with a call to a front-end which breaks down long path names into
+  the individual path components. This is a compile-time option which
+  is enabled through the "library/stdio_long_path.h" header file.
+
+  Note that this feature is by default disabled for AmigaOS 4 because
+  its dos.library transparently performs the long path processing
+  by default.
+
 - The raise() function no longer directly calls abort() because that
   function in turn would have invoked raise(SIGABRT), triggering an
   infinite loop. Instead, raise() now invokes the __abort() function
@@ -73,6 +85,27 @@ c.lib 1.217 (10.7.2025)
   the actual allocating, including padding. The task of figuring
   out how much padding is needed now rests in function which
   calculates the total overhead.
+
+- The usleep() function now correctly returns 0 and the function
+  prototype reflects this, too. Thanks go to capehill who raised
+  this issue.
+
+- The "struct dirent" which is used by the readdir() function now
+  features a "d_type" member which indicates the kind of directory
+  element the respective entry represents. For the time being,
+  the type can be one of DT_DIR (directory, or hard link to a
+  file), DT_REG (file, or hard link to a file) or DT_LINK (soft
+  link).
+
+- Implemented the fixes for the tgamma() and tgammaf() functions
+  which were prompted by sodero. Thank you very much!
+
+- The sqrt() function now returns a plain NAN if the function
+  parameter is < 0. Thanks go to sodero for providing the fix.
+
+- The definition of "locale_t" in is now based upon an incomplete
+  structure, with locale_t being a pointer to it. This change was
+  was provided by sacredbanana. Thank you very much!
 
 
 amiga.lib 1.216 (10.7.2025)
