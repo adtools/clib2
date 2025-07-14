@@ -261,6 +261,7 @@ C_LIB = \
 	stdio_iobhookentry.o \
 	stdio_lock.o \
 	stdio_locksemaphorename.o \
+	stdio_long_path.o \
 	stdio_nostdio.o \
 	stdio_openiob.o \
 	stdio_parent_of_fh.o \
@@ -517,6 +518,7 @@ UNIX_LIB = \
 	stdio_fopen.o \
 	stdio_init_exit.o \
 	stdio_locksemaphorename.o \
+	stdio_long_path.o \
 	stdio_openiob.o \
 	stdio_popen.o \
 	stdio_record_locking.o \
@@ -604,6 +606,8 @@ UNIX_LIB = \
 	unistd_unlink.o \
 	unistd_wildcard_expand.o \
 	utime_utime.o
+
+stdio_long_path.o : stdio_long_path.c stdio_long_path.h
 
 MATH_LIB = \
 	complex_carg.o \
