@@ -607,8 +607,6 @@ UNIX_LIB = \
 	unistd_wildcard_expand.o \
 	utime_utime.o
 
-stdio_long_path.o : stdio_long_path.c stdio_long_path.h
-
 MATH_LIB = \
 	complex_carg.o \
 	complex_cargf.o \
