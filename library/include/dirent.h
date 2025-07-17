@@ -69,6 +69,13 @@ typedef long DIR;
 
 /****************************************************************************/
 
+/* The POSIX requirements for the 'struct dirent' cover little more than
+ * the 'd_ino' and 'd_name' fields. Because it is useful, the 'd_type'
+ * field identifies the type of object in question. This was added with
+ * clib2 1.217 (10.7.2025), and you can find out if the 'd_type' field
+ * is available in the 'struct dirent' by checking if the 
+ * _DIRENT_HAVE_D_TYPE macro is defined.
+ */
 struct dirent
 {
 	ino_t	d_ino;
