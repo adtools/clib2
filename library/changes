@@ -1,6 +1,6 @@
 c.lib 1.217 (10.7.2025)
 
-- Added support for handling path names which exceed 255 characters in
+- Added support for handling path names that exceed 255 characters in
   the AmigaOS 2.x/3.x build. This feature works by replacing calls to the
   CreateDir(), DeleteFile(), Lock(), MakeLink(), Open(), Rename(),
   SetComment(), SetFileDate(), SetOwner() and SetProtection() functions
@@ -9,8 +9,8 @@ c.lib 1.217 (10.7.2025)
   is enabled through the "library/stdio_long_path.h" header file.
 
   Note that this feature is by default disabled for AmigaOS 4 because
-  its dos.library transparently performs the long path processing
-  by default.
+  its dos.library already transparently performs the long path
+  processing.
 
 - The raise() function no longer directly calls abort() because that
   function in turn would have invoked raise(SIGABRT), triggering an
@@ -26,7 +26,11 @@ c.lib 1.217 (10.7.2025)
 
 - fputs() and puts() no longer leverage the __putc() macro. As with
   the fgets() implementation, the focus is now on enabling bulk
-  data transfer, eliminating the __putc() macro overhead.
+  data transfer, eliminating the __putc() macro overhead. For line
+  buffered output, both fputs() and puts() will check if the text
+  ends with a line feed and, if so, will output everything up to
+  and including the line feed. If enabled, Ctrl+C checking will
+  occur for every single line written.
 
 - fread() and fwrite() no longer leverage the __getc() and
   __putc() macros. Their focus is on enabling bulk data transfer
@@ -34,7 +38,9 @@ c.lib 1.217 (10.7.2025)
 
 - The setvbuf() function now correctly sets the buffer size to the
   value of BUFSIZ if a buffer size of 0 is specified. Previously,
-  setvbuf() would have disabled buffering for the FILE instead.
+  setvbuf() would have disabled buffering for the FILE instead (this
+  was a bug).
+
   Failure to allocate a buffer of the specified non-zero size is
   now caught and results in the setvbuf() function to indicate
   failure, setting the errno variable to ENOBUFS.
@@ -43,7 +49,7 @@ c.lib 1.217 (10.7.2025)
   gcc, for example) now calls abort() rather than returning NULL.
 
 - Changed the numeric overflow check which the calloc() function
-  uses to be simpler.
+  uses, simplifying it.
   
 - The memory management debugging code in stdlib_free.c is no longer
   reusing the allocation size value to indicate that an allocation
@@ -64,7 +70,7 @@ c.lib 1.217 (10.7.2025)
   allocation until it is freed. Previously, obtaining the relevant
   allocation size information was encapsulated by a "clever"
   macro.
-  
+
   With memory debugging enabled, the stored allocation size no
   longer says how much memory, padding included, is being used.
   Instead, the requested allocation size is stored unchanged, with
@@ -73,17 +79,18 @@ c.lib 1.217 (10.7.2025)
   the padded one and vice versa.
 
 - The use of the optional slab allocator now has to be deliberately
-  enabled in the "stdlib_memory.h" header file.
+  enabled in the "library/stdlib_memory.h" header file.
 
 - The minimum size of an allocation managed by the optional slab
-  allocator is now 16 bytes instead of 8.
+  allocator is now 16 bytes instead of 8 because the management
+  data structure for each allocation now includes a flags field.
 
 - The minimum size of a slab is now 4096 bytes.
 
 - The optional slab allocator now checks for integer overflows when
   processing allocation requests, taking into account the size of
-  the actual allocating, including padding. The task of figuring
-  out how much padding is needed now rests in function which
+  the actual allocation, including padding. The task of figuring
+  out how much padding is needed now rests in a function which
   calculates the total overhead.
 
 - The usleep() function now correctly returns 0 and the function
@@ -92,10 +99,12 @@ c.lib 1.217 (10.7.2025)
 
 - The "struct dirent" which is used by the readdir() function now
   features a "d_type" member which indicates the kind of directory
-  element the respective entry represents. For the time being,
+  entry the respective entry represents. For the time being,
   the type can be one of DT_DIR (directory, or hard link to a
-  file), DT_REG (file, or hard link to a file) or DT_LINK (soft
-  link).
+  directory), DT_REG (file, or hard link to a file) or DT_LINK (soft
+  link). How do you know if the "d_type" member is available?
+  Check if the _DIRENT_HAVE_D_TYPE macro is defined. If it is, then
+  you can make use of the "d_type" member.
 
 - Implemented the fixes for the tgamma() and tgammaf() functions
   which were prompted by sodero. Thank you very much!
@@ -103,7 +112,7 @@ c.lib 1.217 (10.7.2025)
 - The sqrt() function now returns a plain NAN if the function
   parameter is < 0. Thanks go to sodero for providing the fix.
 
-- The definition of "locale_t" in is now based upon an incomplete
+- The definition of "locale_t" is now based upon an incomplete
   structure, with locale_t being a pointer to it. This change was
   was provided by sacredbanana. Thank you very much!
 
